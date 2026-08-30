@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" role="img" aria-label="Breeze">
+  <defs>
+    <linearGradient id="breezeTile" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#3AA7D2"/>
+      <stop offset="1" stop-color="#1B6A97"/>
+    </linearGradient>
+  </defs>
+  <rect width="64" height="64" rx="15" fill="#FAF8F2"/>
+  <path d="M5 47 C6 34 15 25 25 27 C33 28.6 35 38 28.5 42 C22 46 13 39.5 14.5 29 C16.5 16.5 32 10.5 44 14.5 C52 17.2 57 23 59.5 30"
+        fill="none" stroke="#2589BE" stroke-width="5.8" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

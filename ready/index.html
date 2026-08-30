@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <title>READY · 고려에듀</title>
+  <meta name="theme-color" content="#FAF8F2" media="(prefers-color-scheme:light)">
+  <meta name="theme-color" content="#171816" media="(prefers-color-scheme:dark)">
+  <link rel="icon" href="../assets/favicon/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="../styles/fonts.css">
+  <link rel="stylesheet" href="../styles/tokens.css">
+  <link rel="stylesheet" href="../styles/base.css">
+  <link rel="stylesheet" href="ready.css?v=interactive-workbook-1">
+  <script defer src="config.js"></script>
+  <script type="module" src="app.js?v=interactive-workbook-1"></script>
+</head>
+<body data-ready-mode="student">
+<div id="app">
+  <header id="topbar">
+    <button id="logo" class="brand-button" type="button" data-home aria-label="READY 학생 홈"><span class="mark">Ready</span><span class="family">by Breeze</span></button>
+    <nav id="student-nav" class="student-nav" hidden><button type="button" data-student-route="passages">Home</button><button type="button" data-student-route="review">오답 복습</button></nav><div class="session-actions"><button id="theme-toggle" class="icon-button" type="button" aria-label="색상 모드 바꾸기">◐</button><button id="logout" class="button quiet small" type="button" hidden>로그아웃</button></div>
+  </header>
+  <main>
+    <section id="student-home" aria-labelledby="student-title">
+      <p class="eyebrow">READY</p><h1 id="student-title">학생을 선택하세요.</h1>
+      <div id="student-list" class="student-grid" aria-live="polite"></div>
+    </section>
+    <section id="pin-login" class="auth-wrap" hidden aria-labelledby="pin-title">
+      <button class="button quiet small" type="button" data-back-students>← 이름 선택</button>
+      <form id="pin-form" class="card auth-card">
+        <p class="eyebrow">STUDENT PIN</p><h1 id="pin-title"><span id="pin-student-name"></span> 학생</h1>
+        <label><span>개인 PIN</span><input id="student-pin" name="pin" type="password" inputmode="numeric" pattern="[0-9]{4,6}" minlength="4" maxlength="6" autocomplete="one-time-code" required></label>
+        <label class="remember"><input name="remember" type="checkbox"><span>이 기기에서 로그인 유지</span></label>
+        <button class="button primary" type="submit">학습 시작</button>
+      </form>
+    </section>
+    <section id="student-sets" hidden></section>
+    <section id="student-reader" hidden></section>
+    <section id="student-questions" hidden></section>
+    <section id="student-workbook" hidden></section>
+    <section id="student-library" hidden></section>
+  </main>
+</div>
+<div id="busy" class="busy" hidden aria-live="assertive"><span class="spinner"></span><span>잠시만요…</span></div>
+<div id="toast" role="status"></div>
+</body>
+</html>

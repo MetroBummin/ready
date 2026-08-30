@@ -1,0 +1,456 @@
+/* ================= 디자인 값 =================
+ *
+ * 이 앱이 쓰는 색·글꼴·그림자는 전부 여기 있습니다. 다른 스타일 파일에는
+ * `var(--이름)` 만 남습니다 — 거기는 "무엇이 어디에 놓이나"를 적는 곳이고,
+ * 여기는 "그게 무슨 색인가"를 적는 곳입니다.
+ *
+ * 그래서 디자인을 바꾸는 일은 이 파일 하나를 고치는 일입니다. 예전에는 색 하나를
+ * 바꾸려면 다섯 파일에서 hex 를 사냥해야 했고, 밝은 화면에서 고친 것을 어두운
+ * 화면에서 또 고쳐야 했습니다.
+ *
+ * 어두운 화면은 **같은 이름을 다시 선언**해서 만듭니다(맨 아래 `body.dark`).
+ * 그러니 새 색을 더할 때는 두 곳에 짝으로 적어 주세요. 컴포넌트 쪽에
+ * `body.dark .어쩌고{background:#333}` 를 다시 만들기 시작하면 이 파일이 있는
+ * 이유가 없어집니다.
+ *
+ * 이름은 쓰임새로 짓습니다(`--sheet`, `--field`). `--gray-800` 같은 이름은
+ * 밝은 화면에서 회색이던 것이 어두운 화면에서 회색이 아니게 되는 순간 거짓말이
+ * 됩니다.
+ */
+
+:root{
+  /* ---- 브라우저가 그리는 것들 ----
+     스크롤 막대·기본 입력칸처럼 우리가 아니라 브라우저가 색을 정하는 부분이
+     있습니다. 이 앱의 어둠은 `body.dark` 라는 우리끼리의 표시라서, 말해 주지
+     않으면 브라우저는 여전히 밝은 화면인 줄 알고 흰 스크롤 막대를 그립니다 —
+     읽는 화면에서 글과 낱말 창 사이에 흰 띠가 서 있던 것이 이것이었습니다.
+     그래서 어느 화면인지를 여기서 한 번 알려 줍니다(어두울 때는 `html.dark`). */
+  color-scheme:light;
+
+  /* ---- 글꼴 ----
+     제목에만 쓰는 Fraunces 는 SIL Open Font License 글꼴입니다. 본문과 버튼은
+     기기 기본 글꼴을 유지해 읽는 속도를 건드리지 않습니다. */
+  --ui:'Avenir Next','Helvetica Neue','Apple SD Gothic Neo','Pretendard',-apple-system,sans-serif;
+  --serif:Georgia,'Times New Roman',serif;
+  --display:'Fraunces',Georgia,'Times New Roman',serif;
+  --mono:ui-monospace,SFMono-Regular,Menlo,monospace;
+
+  /* ---- 종이 ----
+     라이트는 원래의 맑은 종이와 Breeze 블루를 지킵니다. 질감은 색을 탁하게
+     만드는 대신, 배경 위에만 아주 조용히 얹습니다. */
+  --paper:#FAF8F2;          /* 화면 바탕 */
+  --paper2:#FDFBF6;         /* 그 위의 옅은 면 — 입력칸·칩·상자 */
+  --sheet:#fff;             /* 떠 있는 면 — 시트·모달·패널·팝오버 */
+  --field:#fff;             /* 글씨를 받는 면 — 입력칸·표 */
+  --quiet:#F2F0E9;          /* 조용한 단추 면 — 닫기 ✕, 보조 버튼 */
+  --quiet-ink:#667D87;      /* 그 위의 글자 */
+  --hover-quiet:#E7F1F4;    /* 작은 아이콘 단추를 짚었을 때 */
+  --nav-hover:transparent;  /* 상단바의 이름표는 색이 아니라 글자만 밝아집니다 */
+  --th:#FBFAF5;             /* 표 머리 */
+  --texture-opacity:.5;     /* 바탕에 얹는 종이결 */
+
+  /* ---- 잉크와 선 ---- */
+  --ink:#18364A;
+  --ink-body:#2D3E43;
+  --soft:#667D87;
+  --soft2:#78909A;
+  --line:#E4E8DF;
+  --line2:#D7E1DE;
+  --sheet-line:#E4E8DF;     /* 떠 있는 면 위의 경계 */
+  --divider:#E5EBE7;        /* 낱말 창 안의 가로선 */
+  /* 스크롤 손잡이. 투명도로 적어 두면 어느 바탕 위에 서든 그 바탕에
+     녹습니다 — 이 막대는 글 옆에도 서고 원본 종이 옆에도 섭니다. */
+  --sb-thumb:rgba(24,54,74,.22);
+  --sb-thumb-strong:rgba(24,54,74,.40);   /* 짚거나 끄는 동안 */
+
+  /* ---- Breeze Sky ----
+     앱 전체가 같은 하늘을 봅니다. `--brand` 는 넓은 면·강조, `--brand-strong` 은
+     작은 글자·로고·누를 수 있는 곳처럼 대비가 필요한 자리입니다. 예전 이름은
+     호환용 별칭일 뿐이고 새 UI는 이 두 이름을 기준으로 만듭니다. */
+  --brand:#4DAED6;                 /* rgb(77, 174, 214) */
+  --brand-strong:#267FA8;          /* rgb(38, 127, 168) */
+  --blue:var(--brand);
+  --blue-deep:var(--brand-strong);
+  --sky:#E7F1F4;
+  --sky2:#DCEAF0;
+  --mint:#BDDCCD;
+  --chipbg:#E6F3F1;
+  --chiptx:#247B81;
+  --chip-hover:#D5EBE7;
+  --blue-ring:rgba(77,174,214,.55);   /* 색칠 ON 단추의 테두리 */
+
+  /* ---- AI 가 말하는 자리 ----
+     AI 가 나오는 곳은 셋입니다: 낱말 뜻을 기다리는 동안, 그 뜻이 뜬 뒤,
+     그리고 문장 통째로 물어봤을 때. 색이 자리마다 다르면 같은 목소리로
+     들리지 않습니다. 이제 셋 다 이 값들만 씁니다 — 흰색과 파랑, 이 앱의 색입니다. */
+  --ai-bg1:#EAF4FB; --ai-bg2:#F8FCFE; --ai-line:#CFE4EC;
+  /* 단어창의 뜻 카드는 AI라는 표시는 남기되 종이 위에 따로 떠 보이지 않게,
+     배경보다 한 숨만 차가운 흰색을 씁니다. */
+  --ai-panel:#F7FBFC;
+  --ai-key:#4E88A4; --ai-ink:#18364A; --ai-note:#5B707A; --ai-quiet:#8AA0A9;
+  --ai-mk-hover:rgba(255,255,255,.6);
+  --ai-mk-focus:#fff;
+
+  /* ---- 기다리는 동안의 오로라 ----
+     옅은 파랑 바탕 위로 흰빛과 짙은 파란빛이 서로 다른 자리에서 번집니다. */
+  --aurora-bed:linear-gradient(100deg,#BEDCF0,#DDEEF9 50%,#C7E3F4);
+  --aurora-glow:
+    radial-gradient(38% 64% at  8% 46%, rgba(255,255,255,.95), transparent 70%),
+    radial-gradient(36% 62% at 32% 56%, rgba(23,126,186,.78), transparent 70%),
+    radial-gradient(38% 64% at 56% 40%, rgba(255,255,255,.92), transparent 70%),
+    radial-gradient(40% 66% at 78% 60%, rgba(37,137,190,.76), transparent 70%),
+    radial-gradient(44% 70% at 98% 44%, rgba(255,255,255,.88), transparent 72%);
+
+  /* ---- 모르는 정도 ----
+     ★ 아리송 · ★★ 모름 · ★★★ 깜깜. 본문에 칠하는 색과 그 칩의 테두리·글자. */
+  --s1:#FFE28A; --s2:#FFC9A3; --s3:#FFB0B0;
+  --s1-line:#E6C14F; --s2-line:#E89A5F; --s3-line:#E57373;
+  --s1-ink:#7A5D00; --s2-ink:#8A4712; --s3-ink:#9C1F1F;
+  --mark1:#FFE28A; --mark2:#FFC9A3; --mark3:#FFB0B0;   /* 본문에 칠하는 면 */
+  --word-hover:#EFE9DB;                                 /* 저장 안 한 낱말을 짚었을 때 */
+
+  /* ---- 원본(PDF) 위에 얹는 표시 ---- */
+  --pick-fill:rgba(77,174,214,.25);  --pick-line:rgba(77,174,214,.45);
+  --pick1-fill:rgba(255,226,138,.45); --pick1-line:rgba(208,170,45,.6);
+  --pick2-fill:rgba(255,171,120,.42); --pick2-line:rgba(210,119,58,.55);
+  --pick3-fill:rgba(255,140,140,.42); --pick3-line:rgba(207,86,86,.55);
+  --saved1:rgba(255,226,138,.34); --saved2:rgba(255,171,120,.31); --saved3:rgba(255,140,140,.33);
+
+  /* ---- 여기 있었어요 ----
+     모드를 바꿨을 때 짚어 주는 자리. Breeze 라서 로고 그라디언트의 바람색을
+     씁니다 — 초록은 이 앱 어디에도 없는 색이었습니다. */
+  --cue:rgba(77,174,214,.34);
+  --cue-block:rgba(77,174,214,.16);
+  --cue-ring:rgba(77,174,214,.10);
+
+  /* ---- 되돌릴 수 없는 일 ---- */
+  --danger:#B0483A;
+  --danger-bg:#F7EAE7;
+  --danger-bg-hover:#F0DAD5;
+  --danger-line:#E7C7C1;
+  --danger-ico-bg:#F7E4DF;
+  --danger-tint:#FBEFEC;
+  --danger-tint2:#FBEDEA;
+  --danger-strong:#C0392B;
+  --red:#B84B43;
+
+  /* ---- 브랜드 ---- */
+  --brand-sky:var(--brand); /* 첫 화면의 하늘 */
+  /* 네이티브 Launch Screen과 WebView의 첫 프레임은 같은 검정입니다.
+     일러스트가 준비될 때까지 하늘색이 먼저 번쩍이지 않게 합니다. */
+  --splash-bg:#000;
+  --brand-cream:#FFF9EA;    /* 그 위의 글자 */
+  --brand-cream-soft:rgba(255,249,234,.88);   /* 상표 아래 한 줄 */
+  --rss-fresh-green:#8BCB4A; /* rgb(139, 203, 74) — 햇빛 받은 싱싱한 들판색 */
+  --brand-ink-shadow:0 2px 20px rgba(15,45,55,.32);
+  --splash-veil:linear-gradient(180deg,rgba(10,45,66,.14),transparent 38%,rgba(11,36,31,.24));
+
+  /* ---- 종이 한 장 (원서의 쪽) ---- */
+  --page:#FFFEFA;
+  --page-line:#EDEAE0;
+  --page-shadow:0 3px 16px rgba(60,50,30,.05);
+  --pageno:#B9B09E;
+  --source-page:#fff;                          /* PDF·EPUB 원본 쪽 */
+  --source-shadow:0 8px 28px rgba(25,31,35,.18);
+  --source-shadow-soft:0 8px 28px rgba(25,31,35,.14);
+  --source-wait:#AAA;
+
+  /* ---- 그림자 ---- */
+  --shadow:0 14px 34px rgba(23,55,71,.12);           /* 떠 있는 큰 것 */
+  --shadow-card:0 6px 18px rgba(23,55,71,.10);       /* 카드 */
+  --shadow-chrome:0 1px 5px rgba(23,55,71,.07);      /* 읽는 동안 떠 있는 조각 — 그림자가 아니라 들린 자국 */
+  --shadow-table:0 4px 18px rgba(23,55,71,.06);
+  --shadow-tab:0 1px 4px rgba(23,55,71,.10);
+  --shadow-panel:-8px 0 30px rgba(24,54,74,.08);     /* 옆에 서는 낱말 창 */
+  --shadow-sheet:0 -10px 40px rgba(24,54,74,.18);    /* 아래에서 올라오는 시트 */
+  --shadow-knob:0 1px 4px rgba(0,0,0,.25);           /* 토글 손잡이 */
+  --shadow-phrase:0 3px 10px rgba(37,137,190,.08);
+
+  /* ---- 덮개 ---- */
+  --scrim:rgba(24,54,74,.35);         /* 모달 뒤 */
+  --scrim-sheet:rgba(24,54,74,.25);   /* 바텀시트 뒤 */
+  /* 문장 해석 뒤. 다른 덮개보다 훨씬 옅습니다 — 이 창이 뜨는 동안 뒤에서는
+     방금 꾹 누른 문장이 파랗게 차 있고, 그 문장이 곧 "무엇에 대한 답인지"이기
+     때문입니다. 진하게 덮으면 답만 남고 질문이 사라집니다. */
+  --scrim-read:rgba(24,54,74,.08);
+  --drop-veil:rgba(220,239,245,.85);  /* 파일을 끌어다 놓는 동안 */
+
+  /* ---- 상단바·떠 있는 단추의 반투명 면 ---- */
+  --bar-bg:rgba(250,248,242,.9);
+  --bar-line:rgba(215,225,222,.42);
+  --rbar-bg:transparent;
+  /* 읽는 동안 떠 있는 조각 — 유리가 아니라 책 위에 얹은 얇은 종이입니다.
+     그래서 흰색이 아니라 바탕 종이색(`--paper`)을 옅게 깔고, 테두리는 반짝이는
+     흰 줄이 아니라 잉크가 아주 약하게 앉은 정도입니다. */
+  --chrome-paper:rgba(250,248,242,.72);
+  --chrome-press:rgba(23,55,71,.06);
+  --sec-act-bg:rgba(253,251,246,.56);
+  --sec-act-hover:#EFEDE4;
+  --sec-act-hover-line:#D9E3E1;
+  --cover-badge:rgba(255,255,255,.62);   /* 표지 위 작은 단추 */
+  --cover-badge-ink:#5C5648;
+  --cover-badge-hover:#fff;
+  --on-color:#fff;                       /* 사진·파랑 위에 얹는 글자 — 두 화면 모두 흰색 */
+  --cover-badge-quiet:rgba(255,255,255,.42);        /* 이미 올라간 책 */
+  --cover-badge-hover-quiet:rgba(255,255,255,.55);
+  --card-bar:rgba(0,0,0,.12);            /* 카드 바닥의 진행 막대 */
+  --cloud-thumb:rgba(255,255,255,.34);   /* 서버에만 있는 짧은 글 */
+  --cloud-del:rgba(255,255,255,.78);
+  --sheet-quiet:#FAF8F2;                 /* 흐린 카드 위의 단추 */
+  --big-hover:#E7F1F4;                   /* 큰 선택 상자를 짚었을 때 */
+  --ico-bg:#E3F1F2;                      /* 그 안의 아이콘 자리 */
+  --field-line:#E4E8DF;                  /* 입력칸 테두리 */
+  --field-soft:#FDFBF6;                  /* 입력칸 면 */
+  --cover-pick-ink:#667D87;              /* 표지 고르는 칸의 글자 */
+  --sec-act-line:#E4E8DF;                /* 섹션 머리의 작은 동그란 단추 */
+  --sec-act-ink:#667D87;
+  --sec-act-hover-ink:var(--brand-strong);
+  --rss-thumb:#FDFBF6;                   /* 방금 도착한 글의 표지 바탕 */
+  --cloud-line:#D7E1DE;                  /* 아직 이 기기에 없는 것의 테두리 */
+  --toggle-off:#D8D4C8;
+  --placeholder:#C8D7D6;                 /* 아직 안 채운 칸의 흐린 글씨 */
+  --speak-bg:#fff;                       /* 발음 단추 */
+  --speak-line:#E4E8DF;
+  --mark-bg:#F0F2F1;                     /* 색칠 ON/OFF 단추 */
+  --mark-line:#D7DEDC;
+  --mark-on:#E7F1F4;
+  --mark-on-ink:var(--brand-strong);
+  --chip-hit:#E7F1F4;                    /* 지금 문장에 있는 표현 */
+  --sticky-line:rgba(229,235,231,.72);   /* 낱말 창 머리의 아래선 */
+  --retry-ink:#667D87;                   /* 다른 뜻으로 다시 물어보기 */
+  --retry-hover:var(--brand-strong);
+  --seg-on:#E7F1F4;                      /* 세 칸짜리 띠에서 고른 칸 */
+  --seg-on-ink:var(--brand-strong);
+  --toggle-knob:#fff;
+  --stbtn-bg:#fff;                       /* 모르는 정도 단추 — 두 화면 모두 흰 칸 */
+  --chrome-line:rgba(23,55,71,.09);      /* 읽는 동안 떠 있는 조각 */
+  --chrome-ink:#667D87;
+  --note-bg:#DCEAF0;                     /* 활동 상자 · 역주 */
+  --note-line:#D7E1DE;
+  --quote-line:#D7E1DE;                  /* 인용문 왼쪽 선 */
+  --code-bg:#FDFBF6;
+  --ghost-btn-hover:#E9E6DD;
+  --tabs-bed:#F2F0E9;                    /* 설정 탭이 앉는 자리 */
+  --tab-on:#fff;
+  --ghost-btn:#F2F0E9;                   /* 두 번째 큰 단추 */
+  --toast-ink:#fff;
+  --minitoast-ink:#fff;
+  --error-ink:#BA4C43;
+  /* 단어 보관함 — 잠겨 있을 때와 열려 있을 때 */
+  --vault-locked:linear-gradient(145deg,#F7F7F3,#EFF0EC);
+  --vault-locked-line:#D9DDD8;
+  --vault-locked-field:#E9EAE5;
+  --vault-locked-field-line:#D8D8D3;
+  --vault-note:rgba(255,255,255,.58);
+  --vault-field:rgba(255,255,255,.88);
+  --vault-key:rgba(255,255,255,.72);
+  --vault-btn:rgba(255,255,255,.74);
+  --handle:#C8D7D6;                      /* 바텀시트 손잡이 */
+  --dash:#CBD9D3;                        /* 점선 테두리 — 추가 카드 */
+  --toast-bg:#18364A;
+  --minitoast-bg:rgba(24,54,74,.8);
+  --boot-fail:#B0483A;
+
+  /* ---- 표지가 없는 긴 글 카드 ---- */
+  --cover1-bg:#EEE7D5; --cover1-ink:#473D33; --cover1-sub:#715C45;
+  --cover2-bg:#DCEBF0; --cover2-ink:#244B60; --cover2-sub:#38667C;
+  --cover3-bg:#E6E2EE; --cover3-ink:#463954; --cover3-sub:#625273;
+  /* ---- 표지가 없는 짧은 글 카드 ---- */
+  --card1:linear-gradient(160deg,#DCEFF5,#EFE9DA); --card1-ink:#244B60;
+  --card2:linear-gradient(160deg,#E7E1F0,#F6EFE6); --card2-ink:#463954;
+  --card3:linear-gradient(160deg,#D9EDE3,#F3F0E2); --card3-ink:#1F5343;
+  --card4:linear-gradient(160deg,#F5E2DC,#F5EFE4); --card4-ink:#6A3B30;
+  --cover-veil:linear-gradient(to bottom, rgba(10,18,24,.55), rgba(10,18,24,.15) 45%, rgba(10,18,24,.72));
+  --cover-src-veil:linear-gradient(to top, rgba(10,18,24,.78), rgba(10,18,24,0));
+  --cover-text-shadow:0 1px 4px rgba(0,0,0,.5);
+  --cover-src-shadow:0 1px 3px rgba(0,0,0,.45);
+  --wave-dark-opacity:1;               /* 카드 아래 파도 — 어두운 화면에서만 낮춥니다 */
+
+  /* ---- 표 ---- */
+  --td-line:#F2EFE7;
+  --rowdel:#C3BBA9;
+  --ex-ink:#5B707A;                    /* 저장된 예문 */
+}
+
+/* ---- 한국어 화면의 제목 글꼴 ----
+   Fraunces 를 스택 맨 앞에 그대로 둡니다. 로마자(로고의 "Breeze")는 지금까지와
+   똑같이 Fraunces 로 찍히고, Fraunces 에 없는 한글만 고운바탕으로 넘어갑니다 —
+   같은 결의 바탕체라 로고 옆에서 남처럼 보이지 않습니다. 글꼴 파일은 한국어를
+   고른 사람에게만 받아옵니다(scripts/ui/i18n.js). */
+body.lang-ko{--display:'Fraunces','Gowun Batang',Georgia,'Times New Roman',serif;}
+/* 고운바탕은 Fraunces보다 세로 여백이 넉넉합니다. 한글을 고른 때에는 제목만
+   한 단계 가볍게 줄여, 같은 정보량과 리듬으로 읽히게 합니다. 본문 글자와 로고는
+   건드리지 않습니다. */
+body.lang-ko #greet{font-size:14px;}
+body.lang-ko #bigq{font-size:clamp(27px,4vw,37px); line-height:1.1;}
+body.lang-ko .sec-head h2{font-size:21px; line-height:1.2;}
+body.lang-ko #v-vocab h1,
+body.lang-ko #v-casuals h1,
+body.lang-ko #v-longform h1{font-size:22px; line-height:1.2;}
+body.lang-ko #set-card h2{font-size:20px; line-height:1.2;}
+body.lang-ko .navbtn{font-size:16px; line-height:1.1;}
+@media(max-width:760px){
+  body.lang-ko #set-card h2{font-size:18px;}
+}
+
+/* ================= 어두운 화면 =================
+   검은 화면도 앱용 차콜 대신 먹을 먹인 종이처럼 따뜻하게 둡니다.
+   위와 같은 이름을 다시 선언하는 것이 전부입니다 — 컴포넌트 쪽은 한 줄도
+   달라지지 않습니다. */
+
+/* 종이색은 html 에도 걸립니다. 내용이 짧으면 body 아래로 html 의 배경이
+   드러나기 때문입니다(scripts/ui/preferences.js 가 두 곳에 함께 표를 답니다). */
+html.dark{--paper:#171816; color-scheme:dark;}
+
+body.dark{
+  --brand:#4DAED6;
+  --brand-strong:#78C9EA;
+  --blue:var(--brand);
+  --blue-deep:var(--brand-strong);
+  --paper:#171816;
+  --splash-bg:#171816;
+  --nav-hover:#22262B;
+  --paper2:#1B1C19;
+  --sheet:#1F2327;
+  --field:#1C1F23;
+  --quiet:#2A2E33;
+  --quiet-ink:#9AA1A8;
+  --hover-quiet:#22262B;
+  --th:#22262B;
+  --texture-opacity:.17;
+
+  --ink:#E7E1D4;
+  --ink-body:#D5D0C4;
+  --soft:#A09E94;
+  --soft2:#8D8E87;
+  --line:#30312C;
+  --line2:#3C3D37;
+  --sheet-line:#2A2E33;
+  --divider:#30363B;
+  --sb-thumb:rgba(231,225,212,.20);
+  --sb-thumb-strong:rgba(231,225,212,.38);
+
+  --sky:#203C47;
+  --sky2:#294B57;
+  --chipbg:#20363A;
+  --chiptx:#92C4C6;
+  --chip-hover:#22333C;
+  --blue-ring:rgba(77,174,214,.6);
+
+  --ai-bg1:#1C2E39; --ai-bg2:#182731; --ai-line:#2F4650;
+  --ai-panel:#202C33;
+  --ai-key:#6FC3E6; --ai-ink:#EAF4F8; --ai-note:#AFC3CB; --ai-quiet:#8798A0;
+  --ai-mk-hover:rgba(255,255,255,.07);
+  --ai-mk-focus:#141A1E;
+
+  /* 어두운 종이 위에서는 같은 흰빛이 종이를 뚫습니다. 바탕을 깊은 파랑으로
+     내리고 흰빛도 한 단계 낮춥니다 — 색은 그대로 흰색과 파랑 둘입니다. */
+  --aurora-bed:linear-gradient(100deg,#1A2C38,#22394A 52%,#1D3140);
+  --aurora-glow:
+    radial-gradient(38% 64% at  8% 46%, rgba(226,244,253,.50), transparent 70%),
+    radial-gradient(36% 62% at 32% 56%, rgba(37,137,190,.78), transparent 70%),
+    radial-gradient(38% 64% at 56% 40%, rgba(226,244,253,.46), transparent 70%),
+    radial-gradient(40% 66% at 78% 60%, rgba(111,199,236,.62), transparent 70%),
+    radial-gradient(44% 70% at 98% 44%, rgba(226,244,253,.44), transparent 72%);
+
+  /* 밝은 화면의 노랑·주황·분홍을 그대로 깔면 어두운 종이에서 형광펜이 됩니다.
+     같은 색을 알파로 눕힙니다. */
+  --mark1:rgba(255,226,138,.30);
+  --mark2:rgba(255,171,120,.32);
+  --mark3:rgba(255,140,140,.34);
+  --word-hover:#2E3237;
+
+  /* 어두운 종이 위에서는 같은 알파가 거의 안 보입니다. */
+  --cue:rgba(111,199,236,.30);
+  --cue-block:rgba(111,199,236,.17);
+
+  --danger:#D98A7A;
+  --danger-bg:#33211E;
+  --danger-bg-hover:#3E2823;
+  --danger-ico-bg:#3A2622;
+  --danger-tint:#3E2823;
+  --danger-tint2:#3E2823;
+
+  --page:#1C1F23;
+  --page-line:#2A2E33;
+  --page-shadow:none;
+
+  --shadow:0 14px 34px rgba(0,0,0,.4);
+  --shadow-card:0 6px 18px rgba(0,0,0,.32);
+  --shadow-chrome:0 1px 5px rgba(0,0,0,.2);
+
+  --bar-bg:rgba(23,24,22,.88);
+  --bar-line:rgba(77,76,68,.42);
+  --rbar-bg:rgba(23,24,22,.93);
+  --chrome-paper:rgba(23,24,22,.62);
+  --chrome-press:rgba(255,255,255,.07);
+  --sec-act-bg:#20211F;
+  --sec-act-hover:#2A2C28;
+  --sec-act-hover-line:#63899A;
+  --cover-badge:rgba(0,0,0,.42);
+  --cover-badge-ink:#9AA1A8;
+  --cover-badge-hover:rgba(0,0,0,.6);
+  --cover-badge-quiet:rgba(0,0,0,.42);
+  --cover-badge-hover-quiet:rgba(0,0,0,.6);
+  --cloud-thumb:rgba(255,255,255,.025);
+  --cloud-del:rgba(0,0,0,.45);
+  --sheet-quiet:#171816;
+  --big-hover:#23303A;
+  --ico-bg:#22333C;
+  --field-line:#2A2E33;
+  --field-soft:#1C1F23;
+  --cover-pick-ink:#E7E1D4;
+  --sec-act-line:#41443D;
+  --sec-act-ink:#B7BBB0;
+  --sec-act-hover-ink:#9BC1CD;
+  --rss-fresh-green:#9BD75B;
+  --rss-thumb:#1D2126;
+  --cloud-line:#2E3339;
+  --dash:#3A3F45;
+  --speak-bg:#22262B;
+  --speak-line:#2A2E33;
+  --mark-bg:#252A2E;
+  --mark-line:#343A40;
+  --mark-on:#18394C;
+  --mark-on-ink:#70C9EF;
+  --blue-ring:#277FA9;
+  --chip-hit:#22333C;
+  --sticky-line:#2A2E33;
+  --retry-ink:#9AA1A8;
+  --retry-hover:var(--brand-strong);
+  --seg-on:#263C47;
+  --seg-on-ink:var(--brand-strong);
+  --chrome-line:rgba(255,255,255,.07);
+  --chrome-ink:#9AA1A8;
+  --note-bg:#1E272B;
+  --note-line:#2F3A40;
+  --quote-line:#3A424A;
+  --code-bg:#191D21;
+  --ghost-btn-hover:#2E3339;
+  --tabs-bed:#191C1F;
+  --tab-on:#2A2E33;
+  --ghost-btn:#262A2F;
+  --minitoast-ink:#16181B;
+  --toast-ink:#16181B;
+  --toast-bg:#E7E1D4;
+  --vault-key:rgba(255,255,255,.04);
+  --vault-btn:rgba(255,255,255,.04);
+  --minitoast-bg:rgba(228,233,238,.85);
+  --wave-dark-opacity:.13;
+
+  /* 표지가 없는 카드는 어두운 화면에서 색을 벗고 종이 한 장으로 돌아갑니다. */
+  --cover1-bg:#22262B; --cover1-ink:#D3CFC4; --cover1-sub:#9AA1A8;
+  --cover2-bg:#22262B; --cover2-ink:#D3CFC4; --cover2-sub:#9AA1A8;
+  --cover3-bg:#22262B; --cover3-ink:#D3CFC4; --cover3-sub:#9AA1A8;
+  --card1:linear-gradient(160deg,#1F2C34,#242229); --card1-ink:#C6D6DD;
+  --card2:linear-gradient(160deg,#272231,#2A2622); --card2-ink:#D4CBDD;
+  --card3:linear-gradient(160deg,#1E2B27,#26261E); --card3-ink:#C3D8CF;
+  --card4:linear-gradient(160deg,#2E2320,#2A2622); --card4-ink:#E0C8BF;
+
+  --td-line:#25292E;
+  /* 저장된 예문. 라이트의 #5B707A 는 어두운 종이 위에서 대비가 3.3:1 밖에 안 나와
+     13px 이탤릭이 배경으로 가라앉습니다 — 단어장의 펼친 예문과 단어창의 `#p-ex`
+     가 같은 토큰을 씁니다. 같은 청회색 계열을 밝은 쪽으로 옮겨 7:1 로 올리되,
+     `--soft`(6.6:1)보다 눈에 덜 띄게 두어 뜻보다 앞서지 않게 합니다. */
+  --ex-ink:#8FA6B0;
+}

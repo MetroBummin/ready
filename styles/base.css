@@ -1,0 +1,89 @@
+/* Foundation, splash, and navigation
+   색·글꼴·그림자는 여기 없습니다 — styles/tokens.css 한 곳에 모여 있습니다. */
+
+  *{box-sizing:border-box; margin:0; padding:0;}
+  /* 내용이 짧으면 body 아래로 html 의 배경이 드러납니다. 그래서 종이색은 여기에도
+     걸립니다 — 어두운 값은 tokens.css 의 `html.dark` 가 같은 이름으로 줍니다. */
+  html{background:var(--paper);}
+  body{background:var(--paper); color:var(--ink); font-family:var(--ui); -webkit-text-size-adjust:100%; text-size-adjust:100%; overflow-x:hidden;
+       min-height:100vh;}
+  /* 종이결. 색을 탁하게 만드는 대신 배경 위에만 조용히 얹습니다. */
+  body::before{content:''; position:fixed; inset:0; pointer-events:none; opacity:var(--texture-opacity); z-index:0;
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.78' numOctaves='3' seed='18'/><feColorMatrix type='matrix' values='1 0 0 0 .72 0 1 0 0 .68 0 0 1 0 .56 0 0 0 .045 0'/></filter><rect width='220' height='220' filter='url(%23n)'/></svg>");}
+  #app{position:relative; z-index:1;}
+
+  /* ================= splash ================= */
+  #splash{position:fixed; inset:0; z-index:200; overflow:hidden; background:var(--splash-bg); display:none;
+    align-items:center; justify-content:center; transition:opacity .24s ease; isolation:isolate;}
+  html.native-shell #splash{display:flex;}
+  #splash.hide{opacity:0; pointer-events:none;}
+  /* 홈 화면 앱과 일반 모바일 브라우저 모두 같은 첫 장면을 봅니다.
+     주소창 주변의 색보다 브랜드 전환을 우선합니다. */
+  #splash .splash-scene{position:absolute; inset:0; z-index:-2; background:var(--splash-bg); overflow:hidden;
+    opacity:1;}
+  /* 사진은 `<img>` 가 아니라 배경입니다 — 위의 `display:none` 안에서는 브라우저가
+     배경 그림을 아예 요청하지 않기 때문입니다. `::before` 가 사진, `::after` 가
+     그 위에 덮는 얇은 막입니다(뒤에 오는 쪽이 위에 그려집니다).
+
+     같은 그림을 두 벌 둡니다. 윗줄이 JPEG, 아랫줄이 AVIF 입니다 — `image-set` 을
+     모르는 낡은 브라우저는 윗줄에서 멈추고, 아는 브라우저는 아랫줄이 덮어씁니다.
+     둘 중 이긴 한 벌만 받습니다(둘 다 받지 않습니다). 만드는 법은
+     assets/brand/README.md 에 적어 두었습니다. */
+  #splash .splash-scene::before{content:''; position:absolute; inset:0;
+    background-image:url(../assets/brand/breeze-day.jpg);
+    background-image:image-set(url(../assets/brand/breeze-day.avif) type('image/avif'),
+                               url(../assets/brand/breeze-day.jpg) type('image/jpeg'));
+    background-position:center bottom; background-size:cover; background-repeat:no-repeat;
+    animation:scene-breathe 16s ease-in-out infinite alternate;}
+  #splash .splash-scene::after{content:''; position:absolute; inset:0; background:var(--splash-veil);}
+  /* 두 줄은 한 덩어리입니다. 그래서 크기도 한 곳에서만 정합니다 — 상표는 이
+     font-size 그대로, 그 아래 한 줄은 그 몇 분의 몇으로. 예전에는 상표만 화면
+     너비를 따라 줄고 아래 한 줄은 12px 에 붙박여 있어서, 화면이 좁아질수록
+     꼬리가 상표보다 넓어져 양옆으로 삐져나왔습니다. */
+  #splash .splash-brand{display:flex; flex-direction:column; align-items:center; transform:translateY(-15vh);
+    font-size:clamp(52px,8vw,68px); color:var(--brand-cream); text-align:center;
+    text-shadow:var(--brand-ink-shadow); opacity:1;}
+  #splash .word{font-family:var(--display); font-size:1em; font-weight:600; letter-spacing:-.045em; color:var(--brand-cream);}
+  #splash .tag{font-size:.17em; color:var(--brand-cream-soft); letter-spacing:.1em; margin-top:.7em;
+    text-transform:uppercase; font-weight:600; white-space:nowrap;}
+  @keyframes scene-breathe{from{transform:translate3d(0,0,0)}to{transform:scale(1.012) translate3d(-.12%,-.15%,0)}}
+  /* 넓은 화면에서는 들판의 아이를 비켜 왼쪽에 섭니다. 두 줄이 서로 가운데를
+     맞추는 것은 그대로입니다 — 덩어리째 왼쪽으로 갈 뿐입니다. */
+  @media (min-aspect-ratio:4/3){
+    #splash .splash-scene::before{background-image:url(../assets/brand/breeze-day-wide.jpg);
+      background-position:center;}
+    #splash .splash-scene::before{background-image:image-set(
+      url(../assets/brand/breeze-day-wide.avif) type('image/avif'),
+      url(../assets/brand/breeze-day-wide.jpg) type('image/jpeg'));}
+    #splash .splash-brand{width:min(38vw,440px); margin-right:42vw; transform:translateY(-4vh);}
+  }
+  @media (prefers-reduced-motion:reduce){
+    #splash .splash-scene,#splash .splash-brand{animation:none; opacity:1;}
+    #splash .splash-scene::before{animation:none;}
+  }
+
+  /* ================= top bar ================= */
+  /* 위쪽 여백에 안전 영역을 더합니다. 브라우저에서는 0 이라 그대로이고, 아이폰
+     노치·다이내믹 아일랜드 아래에서는 그만큼 내려갑니다 — 네이티브 셸에서 로고가
+     시계와 겹쳐 있었습니다. */
+  #topbar{position:sticky; top:0; z-index:50; display:flex; align-items:center; gap:14px;
+    padding:calc(16px + env(safe-area-inset-top)) 26px 16px;
+    background:var(--bar-bg); backdrop-filter:blur(10px); border-bottom:1px solid var(--bar-line);}
+  #logo{display:flex; align-items:center; cursor:pointer; user-select:none;}
+  #logo .mark{font-family:var(--display); font-size:25px; font-weight:600; letter-spacing:-1.35px; color:var(--brand-strong);}
+  #topbar nav{margin-left:auto; display:flex; gap:18px; align-items:center;}
+  .navbtn{border:none; background:transparent; padding:8px 0; border-radius:0; font-size:17px;
+    cursor:pointer; color:var(--soft); font-family:var(--display); font-weight:500; letter-spacing:-.35px; text-transform:none;}
+  .navbtn.on{background:transparent; color:var(--blue-deep);}
+  .navbtn:hover{background:var(--nav-hover); color:var(--blue);}
+  #login-nudge{position:absolute; top:calc(100% - 6px); left:var(--login-nudge-x,50%); border:0; border-radius:11px;
+    min-width:38px; padding:5px 9px; white-space:nowrap; word-break:keep-all; overflow-wrap:normal;
+    background:var(--brand); color:var(--on-color); box-shadow:var(--shadow-tab);
+    font:700 10px/1 var(--ui); cursor:pointer; transform:translate(-50%,-3px); opacity:0; pointer-events:none;
+    transition:transform .16s ease,opacity .16s ease;}
+  #login-nudge::before{content:''; position:absolute; top:-4px; left:50%; width:8px; height:8px;
+    background:var(--brand); transform:translateX(-50%) rotate(45deg); border-radius:1px;}
+  #login-nudge.on{opacity:1; pointer-events:auto; transform:translate(-50%,0);}
+  #login-nudge span{position:relative; z-index:1;}
+
+  .view{display:none;} .view.on{display:block;}

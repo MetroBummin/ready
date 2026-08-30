@@ -1,0 +1,278 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width,initial-scale=1,viewport-fit=cover"
+    />
+    <title>READY Admin · 고려에듀</title>
+    <meta
+      name="theme-color"
+      content="#FAF8F2"
+      media="(prefers-color-scheme:light)"
+    />
+    <meta
+      name="theme-color"
+      content="#171816"
+      media="(prefers-color-scheme:dark)"
+    />
+    <link
+      rel="icon"
+      href="../../assets/favicon/favicon.svg"
+      type="image/svg+xml"
+    />
+    <link rel="stylesheet" href="../../styles/fonts.css" />
+    <link rel="stylesheet" href="../../styles/tokens.css" />
+    <link rel="stylesheet" href="../../styles/base.css" />
+    <link rel="stylesheet" href="../ready.css?v=question-mvp-1" />
+    <script defer src="../config.js"></script>
+    <script type="module" src="app.js?v=breeze-reader-panel-2"></script>
+  </head>
+  <body data-ready-mode="admin">
+    <div id="app">
+      <header id="topbar">
+        <button
+          id="logo"
+          class="brand-button"
+          type="button"
+          data-route="students"
+        >
+          <span class="mark">Ready</span><span class="family">Admin</span>
+        </button>
+        <nav id="admin-nav" hidden>
+          <button class="navbtn on" type="button" data-route="students">
+            Students</button
+          ><button class="navbtn" type="button" data-route="passages">
+            Passages</button
+          ><button class="navbtn" type="button" data-route="scopes">시험범위</button>
+        </nav>
+        <button
+          id="theme-toggle"
+          class="icon-button"
+          type="button"
+          aria-label="색상 모드 바꾸기"
+        >
+          ◐</button
+        ><button
+          id="admin-logout"
+          class="button quiet small"
+          type="button"
+          hidden
+        >
+          로그아웃
+        </button>
+      </header>
+      <main>
+        <section
+          id="admin-login"
+          class="auth-wrap"
+          aria-labelledby="admin-login-title"
+        >
+          <form id="admin-login-form" class="card auth-card">
+            <p class="eyebrow">READY ADMIN</p>
+            <h1 id="admin-login-title">관리자 로그인</h1>
+            <p class="lead">
+              관리자 비밀번호는 로그인할 때 한 번만 서버에서 확인합니다.
+            </p>
+            <label
+              ><span>관리자 비밀번호</span
+              ><input
+                name="password"
+                type="password"
+                autocomplete="current-password"
+                maxlength="200"
+                required /></label
+            ><button class="button primary" type="submit">
+              관리자 화면 열기
+            </button>
+          </form>
+        </section>
+        <section class="view" id="v-passages">
+          <div class="page-head">
+            <div>
+              <p class="eyebrow">PASSAGE LIBRARY</p>
+              <h1>지문</h1>
+            </div>
+            <button id="refresh-passages" class="button quiet" type="button">
+              새로고침
+            </button>
+          </div>
+          <div class="filter-toolbar">
+            <label
+              >학년<select id="passage-grade-filter">
+                <option value="">전체</option>
+                <option>1학년</option>
+                <option>2학년</option>
+                <option>3학년</option>
+              </select></label
+            ><label
+              >종류<select id="passage-type-filter">
+                <option value="">전체</option>
+                <option value="TEXTBOOK">교과서</option>
+                <option value="MOCK_EXAM">모의고사</option>
+              </select></label
+            ><label
+              >연도<input
+                id="passage-year-filter"
+                inputmode="numeric"
+                placeholder="전체" /></label
+            ><label
+              >월<select id="passage-month-filter">
+                <option value="">전체</option>
+                <option>3</option>
+                <option>6</option>
+                <option>9</option>
+                <option>11</option>
+              </select></label
+            >
+          </div>
+          <div id="passage-selection"></div>
+          <div id="passage-library"></div>
+        </section>
+        <section class="view" id="v-students">
+          <div class="page-head">
+            <div>
+              <p class="eyebrow">STUDENTS</p>
+              <h1>학생 관리</h1>
+            </div>
+            <button id="refresh-admin" class="button quiet" type="button">
+              새로고침
+            </button>
+          </div>
+          <section class="card form-card">
+            <div class="card-head">
+              <div>
+                <span class="step">+</span>
+                <h2>학생 추가</h2>
+              </div>
+            </div>
+            <form
+              id="create-student-form"
+              class="form-grid student-create-school"
+            >
+              <label
+                ><span>학생 이름</span
+                ><input name="name" maxlength="40" required /></label
+              ><label
+                ><span>학교</span
+                ><select name="school" required>
+                  <option value="신흥고">신흥고</option>
+                  <option value="동고">동고</option>
+                  <option value="중앙고">중앙고</option>
+                  <option value="한빛고">한빛고</option>
+                </select></label
+              ><label
+                ><span>학년</span
+                ><select name="grade" required>
+                  <option value="1학년">1학년</option>
+                  <option value="2학년">2학년</option>
+                  <option value="3학년">3학년</option>
+                </select></label
+              ><label
+                ><span>개인 PIN</span
+                ><input
+                  name="pin"
+                  type="password"
+                  inputmode="numeric"
+                  pattern="[0-9]{4,6}"
+                  minlength="4"
+                  maxlength="6"
+                  autocomplete="new-password"
+                  required /></label
+              ><button class="button primary" type="submit">학생 추가</button>
+            </form>
+          </section>
+          <div class="filter-toolbar">
+            <label
+              >학교<select id="student-school-filter">
+                <option value="">전체</option>
+                <option>신흥고</option>
+                <option>동고</option>
+                <option>중앙고</option>
+                <option>한빛고</option>
+              </select></label
+            ><label
+              >학년<select id="student-grade-filter">
+                <option value="">전체</option>
+                <option>1학년</option>
+                <option>2학년</option>
+                <option>3학년</option>
+              </select></label
+            >
+          </div>
+          <div id="admin-students"></div>
+        </section>
+        <section class="view" id="v-scopes">
+          <div class="page-head">
+            <div>
+              <p class="eyebrow">CURRENT SCOPE</p>
+              <h1>시험범위</h1>
+            </div>
+            <button id="refresh-exams" class="button quiet" type="button">
+              새로고침
+            </button>
+          </div>
+          <div id="teacher-exams"></div>
+        </section>
+        <section class="view" id="v-scope-detail">
+          <div id="scope-detail-content"></div>
+        </section>
+      </main>
+    </div>
+    <div id="passage-modal" class="modal" aria-hidden="true">
+      <div class="modal-scrim" data-close-passage></div>
+      <section
+        class="sheet"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="passage-modal-title"
+      >
+        <div class="sheet-head">
+          <div>
+            <p class="eyebrow">PASSAGE</p>
+            <h2 id="passage-modal-title">지문 관리</h2>
+          </div>
+          <button
+            class="icon-button"
+            type="button"
+            data-close-passage
+            aria-label="닫기"
+          >
+            ×
+          </button>
+        </div>
+        <div id="passage-editor"></div>
+      </section>
+    </div>
+    <div id="delete-modal" class="modal" aria-hidden="true">
+      <div class="modal-scrim" data-close-delete></div>
+      <section
+        class="sheet small-sheet"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="delete-title"
+      >
+        <div class="sheet-head">
+          <div>
+            <p class="eyebrow">DELETE</p>
+            <h2 id="delete-title">삭제 확인</h2>
+          </div>
+          <button
+            class="icon-button"
+            type="button"
+            data-close-delete
+            aria-label="닫기"
+          >
+            ×
+          </button>
+        </div>
+        <div id="delete-content"></div>
+      </section>
+    </div>
+    <div id="busy" class="busy" hidden>
+      <span class="spinner"></span><span>잠시만요…</span>
+    </div>
+    <div id="toast" role="status"></div>
+  </body>
+</html>
