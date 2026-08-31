@@ -47,7 +47,7 @@ assert.match(explanationMigration,/ready_import_question_explanations[\s\S]*matc
 assert.match(neRelinkMigration,/lesson\\s\*1[\s\S]*공통영어2[\s\S]*민병천[\s\S]*question_count desc/,'NE textbook aliases do not resolve to the question-bearing lesson');
 assert.match(neRelinkMigration,/ready_exam_passages[\s\S]*surviving_passage_id[\s\S]*scope relink contract failed/,'NE scope relink is not atomic or verified');
 
-assert.match(edge,/studentOps = new Set\(\["student_bootstrap", "student_passage", "student_questions", "student_review_questions", "submit_attempt", "student_workbook", "submit_workbook_attempt"\]\)/,'Student runtime exposes operations outside the Question and Workbook paths');
+assert.match(edge,/studentOps = new Set\(\["student_bootstrap", "student_passage", "student_questions", "student_review_questions", "set_question_bookmark", "submit_attempt", "student_workbook", "submit_workbook_attempt"\]\)/,'Student runtime exposes operations outside the Question, Review, and Workbook paths');
 assert.doesNotMatch(edge.match(/async function dispatch[\s\S]*?\n\}/)?.[0]||'',/word_lookup|save_word|save_sentence|personal_library/,'Dormant lexical operations remain dispatched');
 assert.match(edge,/function publicQuestion[\s\S]*responseSlots[\s\S]*variantSegments[\s\S]*contentBlocks/,'Structured public Question contract is incomplete');
 assert.match(edge,/validateQuestionSpec[\s\S]*renderSpec[\s\S]*importStatus/,'Public Question does not expose its explicit render specification');
@@ -76,7 +76,7 @@ for(const questionNo of [...Array.from({length:24},(_,index)=>277+index),...Arra
 assert.match(edge,/TARGET_RANGE_REPAIRS[\s\S]*295:[\s\S]*that glows in the Orion constellation[\s\S]*297:/,'Written Passage focus ranges are incomplete');
 assert.match(edge,/TARGET_RANGE_REPAIRS[\s\S]*236:[\s\S]*bare imagination of a feast[\s\S]*240:[\s\S]*continued to explore/,'Meaning questions with label-only prompts lack their full source expressions');
 assert.match(edge,/unresolvedQuestionIds[\s\S]*latest\.has[\s\S]*!correct/,'Review is not derived from the latest append-only Attempt');
-assert.match(edge,/studentReviewQuestions[\s\S]*eligibleUnresolvedQuestionIds/,'Review queue endpoint is missing');
+assert.match(edge,/eligibleReviewQuestionIds[\s\S]*ready_question_bookmarks[\s\S]*studentReviewQuestions/,'Review does not combine bookmarks and latest wrong Attempts');
 assert.match(edge,/isMainTextQuestion[\s\S]*isDialogueText[\s\S]*sourceBigrams/,'Textbook questions are not positively matched to the canonical main text');
 assert.match(edge,/normalizeMainTextQuestionRows[\s\S]*Never infer its text[\s\S]*questionRows/,'Question text can still be inherited from an adjacent row');
 assert.match(edge,/attemptedQuestionIds[\s\S]*!attempted\.has/,'Solved questions are not removed from the new-question queue');
@@ -191,10 +191,14 @@ assert.match(leeWrittenText,/investigation system[\s\S]*developing this field/,'
 const apparatusQuestion={skill:'written',prompt:'지문에서 찾아 쓰시오.',passageText:'He sent a message. The picture was poor.',setText:'He sent a message. The picture was poor. (1) What did he send? → He sent ______. (2) Why was it poor? → Because ______.',responseType:'written'};
 assert.equal(runInNewContext(`${passageFunctions}; currentQuestionPassage(question)`,{question:apparatusQuestion}),'He sent a message. The picture was poor.','A written question and answer frame is still appended to Passage prose');
 assert.doesNotMatch(app.match(/function renderScope\(\)[\s\S]*?\n\}/)?.[0]||'',/data-open-review/,'Home still duplicates the top-level wrong-answer review route');
-assert.match(app,/student_review_questions[\s\S]*복습 문제/,'Wrong-answer review UI is missing');
+assert.match(app,/student_review_questions[\s\S]*Review를 준비/,'Review UI is missing');
+assert.match(app,/question-result-dot/,'Shorts outcome marker is missing');
+assert.match(app,/question-bookmark[\s\S]*data-toggle-bookmark|data-toggle-bookmark[\s\S]*question-bookmark/,'Shorts bookmark is missing');
+assert.match(app,/window\.addEventListener\('wheel'[\s\S]*pointerdown[\s\S]*ArrowDown/,'Shorts navigation is missing wheel, touch, or keyboard controls');
+assert.match(edge,/ready_ai_grading_requests[\s\S]*callGeminiGrade[\s\S]*ready_attempts/,'Written answers are not persisted before AI grading');
 assert.match(app,/resultFeedbackHtml[\s\S]*data-toggle-explanation/,'Submitted answers cannot reveal an explanation progressively');
 assert.doesNotMatch(app,/toggleExplanation[\s\S]{0,240}result\.correct/,'Correct answers are still blocked from revealing their explanation');
-assert.match(edge,/return \{ attempt, correct, answer: correct \? null : answer, explanation \}/,'Correct attempts do not receive the verified explanation');
+assert.match(edge,/return \{ attempt, correct, answer: correct \? null : answer, explanation,[^}]*aiFeedback/,'Correct attempts do not receive the verified explanation and grading feedback');
 assert.match(extractor,/explanation_table[\s\S]*explanations\[number\]/,'Publisher explanations are not extracted into each Question payload');
 assert.match(busanExtractor,/range\(1, 41\)[\s\S]*range\(97, 138\)[\s\S]*range\(211, 219\)[\s\S]*range\(343, 351\)/,'The 18-28 Busan explanation inventory is incomplete');
 assert.match(busanExtractor,/for expected in range\(1, 365\)[\s\S]*len\(rows\) != 137/,'Busan explanations are not bounded by the complete PDF sequence and READY identity count');

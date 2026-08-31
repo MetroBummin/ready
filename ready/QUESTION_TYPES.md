@@ -64,7 +64,7 @@ renderer는 taxonomy 이름이나 한국어 발문을 보고 화면을 추측하
 - 서로 연동된 빈칸(예: 두 단어의 순서 교환)은 `accepted_response_sets`로 허용되는 전체 조합만 지정한다.
 - 서버가 NFKC, case folding, 문장부호 제거, 연속 공백 축약 후 정확히 비교한다.
 - PDF 18~28의 고쳐쓰기, 배열, 조건형 영작, 빈칸 요약은 이 방식으로 deterministic grading이 가능했다.
-- 자유 응답 AI grading은 현재 계약이 아니다.
+- 결정론적 비교로 확정되지 않은 자유 응답은 저장 후 AI grading fallback을 사용한다.
 
 ## 다섯 renderer family
 
@@ -107,7 +107,7 @@ renderer는 taxonomy 이름이나 한국어 발문을 보고 화면을 추측하
 
 ### E. Written Response (`family: written`)
 
-`response_slots`와 `accepted_answers`를 사용한다. 답안의 의미적 자유도가 커 정확 비교가 부적절한 문제는 `draft` 또는 unsupported로 둔다.
+`response_slots`와 `accepted_answers`를 사용한다. 정확 비교가 먼저 실행되고, 의미적 자유도가 큰 답안은 같은 출판사 정답과 조건을 rubric으로 삼아 AI가 보조 판정한다.
 
 ## Canonical, variant, special content
 
@@ -157,9 +157,13 @@ Passage와의 영어 bigram 일치를 하위 호환 검증으로 사용한다.
 풀이 상태, 랜덤/유형/난이도 필터의 최소 단위는 항상 개별 Question ID다. 학생 화면은
 현재 Question의 `set_text`와 장치만 렌더링하며 이웃 Question의 빈칸·밑줄·기호를 합치지 않는다.
 
-## Review rule
+## Shorts와 Review
 
-현재 Exam에서 학생·Question별 마지막 Attempt가 오답이면 복습 대상이다. 이후 복습 Attempt가 정답이면 마지막 Attempt가 정답으로 바뀌어 자동 해결된다. 원시 Attempt는 수정하거나 삭제하지 않는다.
+학생 문제 풀이는 한 화면에 한 문제만 보여 주는 Shorts 방식이다. 모바일은 세로 스와이프, 데스크톱은 휠·트랙패드, 키보드는 위·아래 방향키로 이동한다. 긴 문제는 화면 내부를 끝까지 읽은 뒤 추가 동작이 있어야 다음 문제로 넘어간다.
+
+Review의 단일 기준은 `ready_question_bookmarks`다. 학생은 정답 여부와 관계없이 오른쪽 위 북마크로 문제를 저장하거나 제거할 수 있다. 오답 Attempt는 자동으로 북마크되며, 기존 오답도 migration에서 한 번 북마크로 이관한다. 북마크 옆 점은 가장 최근 Attempt가 정답이면 초록색, 오답이면 빨간색이다. 원시 Attempt는 수정하거나 삭제하지 않는다.
+
+서술형은 정규화된 정답·허용 답안을 먼저 결정론적으로 검사한다. 여기서 확정되지 않은 답안만 AI 채점으로 보내며, 외부 호출 전에 `ready_ai_grading_requests`에 학생 응답과 당시 rubric을 저장한다. AI는 출판사 정답표를 바꾸지 않고 의미·문법·조건 충족 여부만 판정한다.
 
 ## Renderer 추가 체크
 
@@ -167,7 +171,7 @@ Passage와의 영어 bigram 일치를 하위 호환 검증으로 사용한다.
 2. canonical Passage를 수정하지 않는가?
 3. raw HTML이나 제출 전 정답 노출이 없는가?
 4. server deterministic grading이 가능한가?
-5. 새 테이블 없이 append-only Attempt와 Review 규칙을 지키는가?
+5. append-only Attempt와 북마크 기반 Review 규칙을 지키는가?
 6. mobile/desktop에서 의미가 유지되는가?
 
 18~28 inventory는 `ready/inventory/2026-06-busan-18-28.md`를 본다.

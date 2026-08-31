@@ -10,6 +10,17 @@ export function applyAnswerKeyWordCounts(payload,spec){
 }
 const normalized=value=>compact(value).toLowerCase().replace(/[“”‘’]/g,"'");
 const includesLoose=(haystack,needle)=>!needle||normalized(haystack).includes(normalized(needle));
+const lexical=value=>normalized(value).replace(/[‐‑‒–—―]/g,'-').replace(/[^a-z0-9' -]+/g,' ').replace(/\s+/g,' ').trim();
+const includesLexical=(haystack,needle)=>!needle||lexical(haystack).includes(lexical(needle));
+const escapeRegExp=value=>String(value||'').replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
+function restoreCanonicalTargets(spec){
+  let restored=String(spec?.passage_text||'');
+  for(const target of spec?.targets||[]){
+    const shown=String(target?.text||'').trim(),canonical=String(target?.canonical_text||'').trim();
+    if(shown&&canonical&&normalized(shown)!==normalized(canonical))restored=restored.replace(new RegExp(escapeRegExp(shown),'gi'),canonical);
+  }
+  return restored;
+}
 const withoutAnnotationLabels=value=>String(value||'').replace(/[ⓐ-ⓕ]/g,'').replace(/\([A-H]\)(?=[A-Za-z])/g,'');
 const labels=value=>[...new Set(String(value||'').match(/[ⓐ-ⓕ]/g)||[])];
 const particleWords=new Set(['off','on','up','out','in','away','back','over','down','through','around','along']);
@@ -38,9 +49,10 @@ export function validateWrittenStructure(question,spec,canonical){
   if(!raw)errors.push('raw PDF question source missing');
   if(!payload.explanation)errors.push('publisher explanation missing');
   if(normalized(spec.prompt_text)!==normalized(payload.prompt))errors.push('prompt changed during structuring');
-  if(spec.passage_mode==='authored_variant'&&!includesLoose(withoutAnnotationLabels(raw),spec.passage_text))errors.push('student passage exceeds raw question range');
+  const authoredInRaw=includesLoose(withoutAnnotationLabels(raw),spec.passage_text);
+  const authoredRestoresCanonical=includesLexical(canonical,restoreCanonicalTargets(spec));
+  if(spec.passage_mode==='authored_variant'&&!authoredInRaw&&!authoredRestoresCanonical)errors.push('student passage cannot be verified as raw text or a canonical annotation overlay');
   if(spec.passage_mode==='canonical_excerpt'&&!includesLoose(canonical,spec.passage_text))errors.push('passage excerpt not found in canonical source');
-  if(spec.passage_mode==='authored_variant'&&!includesLoose(withoutAnnotationLabels(raw),spec.passage_text))errors.push('authored passage not found in raw question');
   if(/[가-힣]|\(\d+\)\s*(?:What|Why|How|Where|When|Who|Which)\b|_{2,}|→/i.test(spec.passage_text))errors.push('student passage contains question apparatus');
   if(spec.summary_text&&includesLoose(spec.passage_text,spec.summary_text))errors.push('summary leaked into student passage');
   if(spec.task_text&&includesLoose(spec.passage_text,spec.task_text))errors.push('Korean target leaked into student passage');

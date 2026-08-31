@@ -16,6 +16,7 @@ const writtenStructurer=read('tools/ready-structure-written-with-codex.mjs');
 const writtenContract=read('tools/ready-written-contract.mjs');
 const sourceContract=read('server/ready/source-contract.mjs');
 const objectiveFallback=read('tools/ready-structure-objective-fallback-with-codex.mjs');
+const shortsMigration=read('supabase/migrations/20260831113000_ready_shorts_bookmarks_ai_grading.sql');
 
 const operationPattern=/(?:call|readyApi|record)\(['"]([a-z_]+)['"]/g;
 const clientOps=new Set([...admin.matchAll(operationPattern),...student.matchAll(operationPattern)].map(match=>match[1]));
@@ -28,7 +29,7 @@ assert.match(types,/Question-first[\s\S]*plain prose/,'Question-first product bo
 assert.match(types,/multiple_choice[\s\S]*written_response/,'Two grading contracts are undocumented');
 assert.match(types,/Standard Multiple Choice[\s\S]*Annotated Multiple Choice[\s\S]*Structural Multiple Choice[\s\S]*Summary Completion[\s\S]*Written Response/,'Renderer families are incomplete');
 assert.match(types,/raw HTML/,'Structured payload rule is missing');
-assert.match(types,/마지막 Attempt가 오답/,'Latest-attempt review rule is missing');
+assert.match(types,/Review의 단일 기준[\s\S]*ready_question_bookmarks[\s\S]*오답 Attempt는 자동/,'Bookmark-first Review rule is missing');
 assert.match(importing,/PDF[\s\S]*source exam[\s\S]*canonical Passage ID[\s\S]*atomic import/,'Import flow is incomplete');
 assert.match(importing,/private structured Question bundle|private JSON bundle/,'Copyright-safe private bundle boundary is missing');
 assert.match(importer,/mode:apply\?'apply':'dry-run'/,'Importer is not dry-run by default');
@@ -38,6 +39,7 @@ assert.match(writtenStructurer,/validateWrittenStructure/,'Written-response stru
 assert.match(writtenContract,/response_slots\.length!==accepted\.length[\s\S]*word count[\s\S]*continuous student-passage range/,'AI-written specs are not deterministically checked against answers and source text');
 assert.match(sourceContract,/QUESTION_BLOCK_WHITELISTS[\s\S]*block_refs[\s\S]*approved passage contains Korean text/,'Block-first provenance and family whitelist gate is missing');
 assert.match(objectiveFallback,/import_status==='drop'[\s\S]*callCodex[\s\S]*validateQuestionSpec[\s\S]*status:'drop'/,'Objective deterministic drops do not pass through the one-shot strict AI fallback');
+assert.match(shortsMigration,/ready_question_bookmarks[\s\S]*ready_ai_grading_requests[\s\S]*status in \('pending', 'completed', 'failed'\)/,'Shorts bookmark or persisted AI grading storage is missing');
 assert.doesNotMatch(objectiveFallback,/retry|attempt\s*<\s*2/i,'Objective AI fallback must never retry');
 assert.match(inventory,/\| 1 \| 40[\s\S]*\| 2 \| 41[\s\S]*\| 3 \| 24[\s\S]*\| 4 \| 32[\s\S]*\*\*137\*\*/,'18-28 inventory totals are incorrect');
 for(const passage of [18,19,20,21,22,23,24,25,26,27,28])assert.match(inventory,new RegExp(`\\| ${passage} \\|`),`Passage ${passage} is missing from inventory`);

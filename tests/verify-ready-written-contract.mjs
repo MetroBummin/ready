@@ -17,12 +17,17 @@ assert.deepEqual(validateWrittenStructure(base,clean,canonical),[]);
 
 const errors=overrides=>validateWrittenStructure(base,{...clean,...overrides},canonical);
 assert(errors({prompt_text:'다른 문제'}).some(item=>item.includes('prompt changed')));
-assert(errors({passage_mode:'authored_variant',passage_text:'This text is outside the PDF source.'}).some(item=>item.includes('exceeds raw question range')));
+assert(errors({passage_mode:'authored_variant',passage_text:'This text is outside the PDF source.'}).some(item=>item.includes('cannot be verified')));
 assert(errors({passage_text:'His location settings were turned off. 요약문 (A) ______'}).some(item=>item.includes('question apparatus')));
 assert(errors({targets:[{label:'ⓔ',text:'turned',canonical_text:'turned off'}]}).some(item=>item.includes('full marked phrase')));
 assert(errors({response_slots:[]}).some(item=>item.includes('slot count')));
 assert(errors({response_slots:[{label:'답 1',word_count:1}]}).some(item=>item.includes('word count')));
 assert(errors({conditions:[]}).some(item=>item.includes('conditions missing')));
+
+const overlayBase={type:'written_response',payload:{prompt:'밑줄 친 ⓐ를 고쳐 쓰시오.',_raw_question_text:'The event will ⓐhold tomorrow. (A) 행사는 열릴 것이다.',explanation:'수동태가 필요하다.',accepted_answers:[['be held']]}};
+const overlay={kind:'correction',prompt_text:overlayBase.payload.prompt,passage_mode:'authored_variant',passage_text:'The event will hold tomorrow.',task_text:'',targets:[{label:'ⓐ',text:'hold',canonical_text:'be held'}],conditions:[],word_bank:[],response_slots:[{label:'ⓐ',word_count:2}],summary_text:'',confidence:.99,issues:[]};
+assert.deepEqual(validateWrittenStructure(overlayBase,overlay,'The event will be held tomorrow.'),[]);
+assert(validateWrittenStructure(overlayBase,{...overlay,passage_text:'The event hold tomorrow.'},'The event will be held tomorrow.').some(item=>item.includes('cannot be verified')));
 
 const summaryQuestion={type:'written_response',payload:{prompt:'다음 글의 요약문의 빈칸 (A), (B)를 완성하시오.',_raw_question_text:'Source passage. 요약문: (A) ____ (B) ____',explanation:'해설',accepted_answers:[['one'],['two words']]}};
 const summarySpec={kind:'summary',prompt_text:summaryQuestion.payload.prompt,passage_mode:'canonical_excerpt',passage_text:'Source passage.',task_text:'',targets:[],conditions:[],word_bank:[],response_slots:[{label:'A',word_count:1},{label:'B',word_count:2}],summary_text:'',confidence:.99,issues:[]};
