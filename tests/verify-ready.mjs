@@ -98,6 +98,8 @@ for(const removed of ['inferredChoiceParts','CHOICE_PART_REPAIRS','WRITING_GUIDE
 }
 assert.match(app,/contractPassageHtml[\s\S]*contractChoiceCopyHtml[\s\S]*contractResponseComplete/);
 assert.match(edge,/publicInteractionContract[\s\S]*deterministicGrade/);
+assert.match(edge,/semantic reference[\s\S]*faithful synonyms and paraphrases/,'AI grading must treat publisher answers as semantic truth, not exact copy');
+assert.match(edge,/같은 원인·사실을 나타내는 자연스러운 동의어와 바꿔쓰기를 정답으로 인정/);
 assert.match(runtime,/data-contract-device[\s\S]*choice_matrix/);
 assert.doesNotMatch(css,/question-choice\.eliminated[^}]*text-decoration\s*:\s*line-through/,'Eliminated choices should remain readable');
 assert.match(css,/\.choice-cell[\s\S]*grid-template-columns/,'Choice matrices must have an explicit visual grid');
