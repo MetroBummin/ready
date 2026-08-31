@@ -107,6 +107,20 @@ READY_API_URL=... READY_ADMIN_PASSWORD=... \
   npm run ready:import -- /absolute/path/to/private-bundle.json --apply
 ```
 
+서술형은 기존 자료까지 import 전에 동일한 AI 구조화 관문을 거친다.
+
+```bash
+npm run structure:written -- \
+  --input /absolute/path/to/private-bundle.json \
+  --output /absolute/path/to/structured-bundle.json
+```
+
+이 단계는 로그인된 Codex CLI로 원문, 우리말 목표문장, 조건, 보기, 연속 포인팅 범위,
+요약문, 답 칸을 분리한다. 이어서 코드는 원문 포함 여부, 답 칸 수, 각 정답의 실제
+단어 수를 다시 검사한다. 신뢰도 0.85 미만이거나 한 항목이라도 어긋나면
+`import_status=needs_review`가 되어 학생 화면에서 제외된다. AI는 비공개 정답을
+수정하지 않으며 정답에서는 검증에 필요한 칸 수와 단어 수만 사용한다.
+
 서버는 admin session을 만든 뒤 `ready_import_question_bundle` RPC 하나로 bundle 전체를 transaction 처리한다. 한 row라도 검증에 실패하면 전체 import가 rollback된다.
 
 ## E2E acceptance

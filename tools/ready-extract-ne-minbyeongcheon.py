@@ -272,6 +272,8 @@ def target_ranges(text: str, prompt: str) -> list[dict]:
             words = words[:2]
         elif words[0].lower() in {"has", "have", "had", "is", "are", "was", "were", "being", "been"}:
             words = words[: min(3, len(words))]
+        elif len(words) >= 2 and words[1].lower() in {"off", "on", "up", "out", "in", "away", "back", "over", "down", "through", "around", "along"}:
+            words = words[:2]
         else:
             words = words[:1]
         ranges.append({"label": label, "text": " ".join(words)})
@@ -280,7 +282,12 @@ def target_ranges(text: str, prompt: str) -> list[dict]:
 
 def response_slots(accepted_answers: list) -> list[dict]:
     count = len(accepted_answers)
-    return [{"label": "답" if count == 1 else f"답 {index + 1}"} for index in range(count)]
+    slots = []
+    for index, accepted in enumerate(accepted_answers):
+        variants = accepted if isinstance(accepted, list) else [accepted]
+        word_counts = {len(re.findall(r"[A-Za-z0-9]+(?:['’][A-Za-z]+)?", str(value))) for value in variants}
+        slots.append({"label": "답" if count == 1 else f"답 {index + 1}", "word_count": next(iter(word_counts)) if len(word_counts) == 1 else None})
+    return slots
 
 
 def writing_guide(prompt: str, body: str, slots: list[dict]) -> dict:
@@ -294,7 +301,10 @@ def writing_guide(prompt: str, body: str, slots: list[dict]) -> dict:
             if re.search(r"[A-Za-z]", item) and not re.search(r"[가-힣]", item):
                 bank.append(item)
     kind = "multi-correction" if "고쳐" in prompt and len(slots) > 1 else "sentence"
-    return {"kind": kind, "title": prompt, "slot_labels": [slot["label"] for slot in slots], "conditions": conditions, "word_bank": bank}
+    korean = re.findall(r"[가-힣][가-힣A-Za-z0-9\s,.'’“”()·-]{8,}?(?:다|요)\.", body)
+    task_text = max(korean, key=len).strip() if korean else ""
+    targets = target_ranges(body, prompt) if "고쳐" in prompt else []
+    return {"kind": kind, "title": prompt, "slot_labels": [slot["label"] for slot in slots], "conditions": conditions, "word_bank": bank, "task_text": task_text, "targets": targets}
 
 
 def english_tokens(value: str) -> list[str]:

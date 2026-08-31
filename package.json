@@ -7,6 +7,7 @@
     "dev": "python3 -m http.server 4173 --directory .",
     "test": "node tests/verify-ready.mjs && node tests/verify-ready-contracts.mjs && node tests/verify-ready-intelligence.mjs",
     "build": "node tools/build-pages.mjs",
+    "structure:written": "node tools/ready-structure-written-with-codex.mjs",
     "import": "node tools/ready-import-questions.mjs",
     "deploy:api": "npx supabase functions deploy ready --no-verify-jwt --project-ref fqvhlyocdkwiyioiokte"
   }

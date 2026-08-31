@@ -119,6 +119,20 @@ export function questionSpecErrors(spec, payload = {}, type = "multiple_choice")
   for (const extra of list(spec?.extras)) if (!extraSet.has(extra)) errors.push(`unknown extra ${extra}`);
   if (type === "multiple_choice" && spec?.responseMode !== "choice") errors.push("multiple choice requires choice response");
   if (type === "written_response" && spec?.responseMode !== "input") errors.push("written response requires input response");
+  if (type === "written_response") {
+    const guide = payload.writing_guide && typeof payload.writing_guide === "object" ? payload.writing_guide : null;
+    const accepted = list(payload.accepted_answers), slots = list(payload.response_slots);
+    if (!guide) errors.push("written response guide is missing");
+    if (!accepted.length || slots.length !== accepted.length) errors.push("written response slot contract is incomplete");
+    const kind = text(guide?.kind), targets = list(guide?.targets);
+    if (/correction/.test(kind) && !targets.length) errors.push("written correction targets are missing");
+    if (["sentence", "arrangement"].includes(kind) && /우리말/.test(text(payload.prompt)) && !text(guide?.task_text)) errors.push("written Korean target is missing");
+    for (const [index, slot] of slots.entries()) {
+      const variants = Array.isArray(accepted[index]) ? accepted[index] : [accepted[index]];
+      const counts = new Set(variants.map(value => (text(value).match(/[A-Za-z0-9]+(?:['’][A-Za-z]+)?/g) || []).length));
+      if (counts.size === 1 && Number(slot?.word_count) && !counts.has(Number(slot.word_count))) errors.push(`written slot ${index + 1} word count mismatch`);
+    }
+  }
   if (spec?.passage?.source === "authored_variant" && !text(payload.variant_text || payload.set_text)) errors.push("authored variant text is missing");
   if (spec?.passage?.source === "segments" && !list(payload.variant_segments).length) errors.push("variant segments are missing");
   if (spec?.passage?.source === "blocks" && !list(payload.content_blocks).length && !list(spec.blocks).length) errors.push("content blocks are missing");

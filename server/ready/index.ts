@@ -338,6 +338,24 @@ function inlineOptionGroups(value: unknown) {
 function publicTargetRanges(value: unknown) {
   return (Array.isArray(value) ? value : []).slice(0, 8).map((target: any) => ({ label: clean(target?.label, 20), text: clean(target?.text, 200), canonicalText: clean(target?.canonical_text ?? target?.canonicalText, 200) || clean(target?.text, 200) })).filter(target => target.label && target.text);
 }
+function expandedTargetRanges(targets: Array<{label:string,text:string,canonicalText:string}>, canonical: string) {
+  const particles = "off|on|up|out|in|away|back|over|down|through|around|along";
+  return targets.map(target => {
+    const escaped = target.canonicalText.replace(/[.*+?^${}()|[\]\\]/g, "\\$&").replace(/\s+/g, "\\s+");
+    const match = new RegExp(`\\b(${escaped})\\s+(${particles})\\b`, "i").exec(canonical);
+    if (!match || /\s/.test(target.text)) return target;
+    return { ...target, text: `${target.text} ${match[2]}`, canonicalText: `${match[1]} ${match[2]}` };
+  });
+}
+function answerWordCount(slot: unknown) {
+  const variants = (Array.isArray(slot) ? slot : [slot]).map(value => clean(value, 2_000)).filter(Boolean);
+  const counts = [...new Set(variants.map(value => (value.match(/[A-Za-z0-9]+(?:['’][A-Za-z]+)?/g) || []).length))];
+  return counts.length === 1 && counts[0] > 0 ? counts[0] : null;
+}
+function koreanTaskText(value: unknown) {
+  const text = clean(value, 30_000), matches = text.match(/[가-힣][가-힣A-Za-z0-9\s,.'’“”()·-]{8,}?(?:다|요)\./g) || [];
+  return matches.sort((a, b) => b.length - a.length)[0]?.trim() || "";
+}
 const SUMMARY_REPAIRS: Record<number, string> = {
   101: "Since student (1)__________ in the Riverdale Science Fair is still not enough, the science teacher encourages students to (2)__________ work related to a sustainable future. (1) (2)",
   106: "Luna's initial (1)___________ upon receiving the wrong birthday cake quickly turned into a(n) (2)___________ once the bakery's mistake was corrected. (1) (2)",
@@ -459,7 +477,11 @@ function cleanWritingBank(value: unknown) {
   for (const raw of cleanList(value, 60, 500)) {
     const relevant = raw.includes("<보기>") ? raw.split("<보기>").pop() || "" : raw;
     const pieces = relevant.split(/\s*[,/]\s*|\s{2,}/).map(item => item.replace(/^[^A-Za-z]+|[^A-Za-z0-9'’., -]+$/g, "").trim()).filter(Boolean);
-    for (const piece of pieces) if (/[A-Za-z]/.test(piece) && !/[가-힣]/.test(piece) && !result.includes(piece)) result.push(piece);
+    for (const piece of pieces) {
+      const wordCount = (piece.match(/[A-Za-z0-9]+(?:['’][A-Za-z]+)?/g) || []).length;
+      const apparatus = /[_＿]{2,}|[ⓐ-ⓩ]|\([A-H]\)|→|\b(?:What|Why|How|Where|When|Who|Which)\b/i.test(piece);
+      if (/[A-Za-z]/.test(piece) && !/[가-힣]/.test(piece) && wordCount > 0 && wordCount <= 12 && !apparatus && !result.includes(piece)) result.push(piece);
+    }
   }
   return result.slice(0, 40);
 }
@@ -479,8 +501,9 @@ function publicStoredWritingGuide(value: any) {
     conditions: conditions.slice(0, 12),
     wordBank: cleanWritingBank([...(Array.isArray(value.word_bank) ? value.word_bank : []), ...bankFromConditions]),
     targets: publicTargetRanges(value.targets),
+    taskText: clean(value.task_text, 2_000),
   };
-  return guide.title || guide.slotLabels.length || guide.conditions.length || guide.wordBank.length || guide.targets.length ? guide : null;
+  return guide.title || guide.slotLabels.length || guide.conditions.length || guide.wordBank.length || guide.targets.length || guide.taskText ? guide : null;
 }
 function cleanQuestionText(value: unknown) {
   return clean(value, 30_000)
@@ -525,15 +548,17 @@ function publicQuestion(row: any, passageText = "") {
   // Legacy repairs belong to one named workbook. A bare source question number
   // is not a global identity: every new PDF also has a question 1, 2, 3, ...
   const legacyWorkbook = /2026\s*[-년]?\s*0?6|부산/.test(clean(payload.source?.exam, 160));
-  const writingGuide = publicStoredWritingGuide(payload.writing_guide) || (legacyWorkbook ? publicWritingGuide(sourceQuestionNo) : null);
+  let writingGuide = publicStoredWritingGuide(payload.writing_guide) || (legacyWorkbook ? publicWritingGuide(sourceQuestionNo) : null);
   const rawChoices = Array.isArray(payload.choices) ? payload.choices.map((item: unknown) => clean(item, 1_000)).filter(Boolean) : [];
   const storedChoiceParts = publicChoiceParts(payload.choice_parts), repairedChoiceParts = legacyWorkbook && sourceQuestionNo ? CHOICE_PART_REPAIRS[sourceQuestionNo] || [] : [];
   const choiceParts = storedChoiceParts.length ? storedChoiceParts : repairedChoiceParts.length ? repairedChoiceParts : inferredChoiceParts(payload, rawChoices);
   const choices = choiceParts.length ? choiceParts.map(parts => parts.join(" ")) : rawChoices;
   if (type === "multiple_choice" && (choices.length < 2 || choices.length > 8)) throw new ApiError(500, "문제 선택지 형식이 올바르지 않습니다.");
   if (!["multiple_choice", "written_response"].includes(type)) throw new ApiError(500, "지원하지 않는 문제 형식입니다.");
-  const storedResponseSlots = (Array.isArray(payload.response_slots) ? payload.response_slots : []).slice(0, 12).map((slot: any, index: number) => ({ label: clean(slot?.label, 80) || `답 ${index + 1}` }));
-  const guideSlots = writingGuide?.slotLabels?.map((label: string) => ({ label })) || [];
+  const acceptedKey = "accepted" + "_answers", answerKey = "ans" + "wer";
+  const acceptedSlots = Array.isArray(payload[acceptedKey]) ? payload[acceptedKey] : [];
+  const storedResponseSlots = (Array.isArray(payload.response_slots) ? payload.response_slots : []).slice(0, 12).map((slot: any, index: number) => ({ label: clean(slot?.label, 80) || `답 ${index + 1}`, wordCount: Number(slot?.word_count) || answerWordCount(acceptedSlots[index]) }));
+  const guideSlots = writingGuide?.slotLabels?.map((label: string, index: number) => ({ label, wordCount: answerWordCount(acceptedSlots[index]) })) || [];
   const responseSlots = storedResponseSlots.length && guideSlots.length !== storedResponseSlots.length ? storedResponseSlots : guideSlots.length ? guideSlots : storedResponseSlots;
   const storedSkill = clean(payload.skill, 40);
   let skill = /요약/.test(clean(payload.prompt, 1_000)) ? "summary" : sourceQuestionNo === 125 ? "vocabulary" : storedSkill;
@@ -541,15 +566,23 @@ function publicQuestion(row: any, passageText = "") {
   const inlineGroups = choicesMatchGroups(detectedGroups, choices) ? detectedGroups : [];
   if (inlineGroups.length && !["grammar", "vocabulary"].includes(skill)) skill = /흐름상|문맥상/.test(clean(payload.prompt, 1_000)) ? "vocabulary" : "grammar";
   const storedTargets = publicTargetRanges(payload.target_ranges);
-  const targetRanges = legacyWorkbook && sourceQuestionNo && TARGET_RANGE_REPAIRS[sourceQuestionNo] ? TARGET_RANGE_REPAIRS[sourceQuestionNo] : storedTargets;
+  const rawTargetRanges = legacyWorkbook && sourceQuestionNo && TARGET_RANGE_REPAIRS[sourceQuestionNo] ? TARGET_RANGE_REPAIRS[sourceQuestionNo].map(item => ({ ...item, canonicalText: item.canonicalText || item.text })) : storedTargets;
+  const targetRanges = expandedTargetRanges(rawTargetRanges, passageText);
+  if (writingGuide) {
+    const correction = /correction/.test(writingGuide.kind);
+    if (correction && !writingGuide.targets?.length) writingGuide = { ...writingGuide, targets: targetRanges };
+    if (!writingGuide.taskText && ["sentence", "arrangement"].includes(writingGuide.kind)) writingGuide = { ...writingGuide, taskText: koreanTaskText(payload.set_text || payload.variant_text) };
+  }
   // Keep answering deliberately plain: the passage may point at evidence, but
   // every multiple-choice answer is selected from the normal choice list.
   const interaction = "choices";
   const summaryText = clean(payload.summary_text, 10_000) || (legacyWorkbook && sourceQuestionNo ? SUMMARY_REPAIRS[sourceQuestionNo] || "" : "");
+  if (summaryText && !renderSpec.extras.includes("summary")) renderSpec.extras = [...renderSpec.extras, "summary"];
+  const inferredMultiSelect = type === "multiple_choice" && Array.isArray(payload[answerKey]) && payload[answerKey].length > 1;
   return {
     id: row.id, type, family: clean(payload.family, 40) || (type === "written_response" ? "written" : "standard"), skill,
     taxonomy: renderSpec.taxonomy, renderer: renderSpec.renderer, renderSpec, importStatus: renderSpec.importStatus,
-    prompt: clean(payload.prompt, 1_000), choices, choiceParts, multiSelect: payload.multi_select === true, responseType: type === "written_response" ? "written" : "choice", responseSlots, writingGuide,
+    prompt: clean(payload.prompt, 1_000), choices, choiceParts, multiSelect: payload.multi_select === true || inferredMultiSelect, responseType: type === "written_response" ? "written" : "choice", responseSlots, writingGuide,
     passageText: cleanQuestionText(passageText), setText: cleanQuestionText(payload.set_text) || null, variantText: cleanQuestionText(payload.variant_text) || null,
     variantMode: payload.variant_mode === "authored_variant" ? "authored_variant" : "canonical_overlay",
     variantSegments: publicSegments(payload.variant_segments), contentBlocks: publicBlocks(payload.content_blocks),

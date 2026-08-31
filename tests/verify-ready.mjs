@@ -107,8 +107,13 @@ assert.match(app,/currentQuestionPassage\(question\)[\s\S]*questionPassageHtml\(
 assert.match(app,/canonicalOption[\s\S]*sort\(\(a,b\)=>b\.length-a\.length\)/,'Overlapping alternatives do not prefer the specific longer option');
 assert.match(app,/passage-pointer[\s\S]*question-footnote/,'Plain Passage pointing and footnote rendering is missing');
 assert.match(app,/markQuestionChoice[\s\S]*choiceSwipe[\s\S]*pointerdown[\s\S]*pointermove/,'Choice candidate swipe states are missing');
+assert.match(app,/result\.correct&&selected/,'A correct selected choice can still keep the neutral selected color');
+assert.match(app,/marks\[index\]===['"]eliminated['"][\s\S]*filter\(value=>value!==index\)/,'Eliminating a choice does not remove it from the submitted response');
 assert.match(app,/combinationChoiceParts[\s\S]*choice-separator/,'Grammar and vocabulary combination choices are not visually separated');
 assert.match(edge,/inferredChoiceParts[\s\S]*row\.length === labels\.length/,'Unambiguous multi-blank choice columns are not preserved');
+assert.match(edge,/inferredMultiSelect[\s\S]*payload\[answerKey\]\.length > 1/,'Multiple-answer questions still depend on a fragile imported flag');
+assert.match(edge,/answerWordCount[\s\S]*wordCount: answerWordCount/,'Written answer fields do not carry verified per-slot word counts');
+assert.match(edge,/expandedTargetRanges[\s\S]*off\|on\|up\|out/,'Phrasal-verb pointers can still be truncated to the verb token');
 assert.match(app,/hasWorkbook[\s\S]*data-start-workbook/,'The interactive Lesson 1 Workbook is not reachable beside its Passage');
 assert.doesNotMatch(app,/data-open-workbook|window\.open\([^)]*workbook/i,'Workbook still opens a passive PDF instead of an exercise');
 assert.match(app,/student_workbook[\s\S]*submit_workbook_attempt[\s\S]*data-workbook-retry/,'Workbook input, grading, or retry flow is incomplete');
@@ -183,6 +188,8 @@ const leeWrittenText=runInNewContext(`${passageFunctions}; currentQuestionPassag
 assert.match(leeWrittenText,/ⓐ그녀는 결혼할 수밖에 없었다/,'The current lowercase writing target disappears');
 assert.doesNotMatch(leeWrittenText,/\(A\)|\(B\)|_{3,}/,'Inactive uppercase blanks leak into a writing question');
 assert.match(leeWrittenText,/investigation system[\s\S]*developing this field/,'Inactive blanks are not restored from canonical prose');
+const apparatusQuestion={skill:'written',prompt:'지문에서 찾아 쓰시오.',passageText:'He sent a message. The picture was poor.',setText:'He sent a message. The picture was poor. (1) What did he send? → He sent ______. (2) Why was it poor? → Because ______.',responseType:'written'};
+assert.equal(runInNewContext(`${passageFunctions}; currentQuestionPassage(question)`,{question:apparatusQuestion}),'He sent a message. The picture was poor.','A written question and answer frame is still appended to Passage prose');
 assert.doesNotMatch(app.match(/function renderScope\(\)[\s\S]*?\n\}/)?.[0]||'',/data-open-review/,'Home still duplicates the top-level wrong-answer review route');
 assert.match(app,/student_review_questions[\s\S]*복습 문제/,'Wrong-answer review UI is missing');
 assert.match(app,/resultFeedbackHtml[\s\S]*data-toggle-explanation/,'Submitted answers cannot reveal an explanation progressively');

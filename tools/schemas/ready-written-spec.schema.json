@@ -1,0 +1,43 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["kind", "task_text", "targets", "conditions", "word_bank", "response_slots", "summary_text", "confidence", "issues"],
+  "properties": {
+    "kind": { "enum": ["sentence", "arrangement", "correction", "multi-correction", "summary"] },
+    "task_text": { "type": "string" },
+    "targets": {
+      "type": "array",
+      "maxItems": 12,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["label", "text", "canonical_text"],
+        "properties": {
+          "label": { "type": "string" },
+          "text": { "type": "string" },
+          "canonical_text": { "type": "string" }
+        }
+      }
+    },
+    "conditions": { "type": "array", "maxItems": 20, "items": { "type": "string" } },
+    "word_bank": { "type": "array", "maxItems": 40, "items": { "type": "string" } },
+    "response_slots": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 12,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["label", "word_count"],
+        "properties": {
+          "label": { "type": "string" },
+          "word_count": { "type": ["integer", "null"], "minimum": 1 }
+        }
+      }
+    },
+    "summary_text": { "type": "string" },
+    "confidence": { "type": "number", "minimum": 0, "maximum": 1 },
+    "issues": { "type": "array", "maxItems": 20, "items": { "type": "string" } }
+  }
+}

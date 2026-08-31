@@ -12,6 +12,7 @@ const types=read('ready/QUESTION_TYPES.md');
 const importing=read('ready/QUESTION_IMPORT.md');
 const inventory=read('ready/inventory/2026-06-busan-18-28.md');
 const importer=read('tools/ready-import-questions.mjs');
+const writtenStructurer=read('tools/ready-structure-written-with-codex.mjs');
 
 const operationPattern=/(?:call|readyApi|record)\(['"]([a-z_]+)['"]/g;
 const clientOps=new Set([...admin.matchAll(operationPattern),...student.matchAll(operationPattern)].map(match=>match[1]));
@@ -29,6 +30,8 @@ assert.match(importing,/PDF[\s\S]*source exam[\s\S]*canonical Passage ID[\s\S]*a
 assert.match(importing,/private structured Question bundle|private JSON bundle/,'Copyright-safe private bundle boundary is missing');
 assert.match(importer,/mode:apply\?'apply':'dry-run'/,'Importer is not dry-run by default');
 assert.match(importer,/READY_API_URL[\s\S]*READY_ADMIN_PASSWORD/,'Apply-mode credentials are not environment-only');
+assert.match(writtenStructurer,/codex[\s\S]*--output-schema[\s\S]*confidence>=0\.85[\s\S]*needs_review/,'Written-response imports do not pass through the Codex structure-and-verify gate');
+assert.match(writtenStructurer,/response_slots\.length!==accepted\.length[\s\S]*word count[\s\S]*target not found/,'AI-written specs are not deterministically checked against answers and source text');
 assert.match(inventory,/\| 1 \| 40[\s\S]*\| 2 \| 41[\s\S]*\| 3 \| 24[\s\S]*\| 4 \| 32[\s\S]*\*\*137\*\*/,'18-28 inventory totals are incorrect');
 for(const passage of [18,19,20,21,22,23,24,25,26,27,28])assert.match(inventory,new RegExp(`\\| ${passage} \\|`),`Passage ${passage} is missing from inventory`);
 assert.match(inventory,/Question 32 \(Passage 25 chart\)/,'Chart asset limitation is not reported');
