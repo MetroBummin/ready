@@ -2,6 +2,12 @@
 
 고려에듀의 지문 중심 영어 문제 풀이와 인터랙티브 워크북입니다.
 
+## UI 개발 원칙
+
+Student 또는 Admin UI를 변경하기 전에 반드시 [`DESIGN.md`](./DESIGN.md)를 먼저 읽습니다. 현재 시각 구조와 기능 보존 경계는 [`UI_AUDIT.md`](./UI_AUDIT.md), 정적 컴포넌트 기준은 [`design-preview.html`](./design-preview.html), 의미 토큰의 기준값은 [`design-tokens.css`](./design-tokens.css)에 있습니다.
+
+시각 개편은 기존 Question Contract와 Interaction Contract의 표현 계층만 다룹니다. importer, validator, renderer 데이터 계약, grader, Attempt, READY/DROP, source filter, Shorts navigation, Workbook, authentication, API, DB를 디자인 때문에 다시 작성하거나 확장하지 않습니다.
+
 이 저장소가 READY의 단일 배포 기준입니다.
 
 - `ready/`: 학생 화면과 관리자 화면

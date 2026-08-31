@@ -1,0 +1,91 @@
+/* READY canonical visual tokens. Not wired into production until the UI implementation phase. */
+:root {
+  color-scheme: light;
+
+  --ready-canvas: #f6f5f0;
+  --ready-canvas-quiet: #efeee8;
+  --ready-surface: #ffffff;
+  --ready-ink: #24231d;
+  --ready-body: #56544d;
+  --ready-muted: #7e7b71;
+  --ready-hairline: #deddd6;
+  --ready-hairline-strong: #bebbb1;
+  --ready-primary: #e84a0c;
+  --ready-primary-hover: #c93d08;
+  --ready-on-primary: #ffffff;
+  --ready-action: #11110f;
+  --ready-action-hover: #2a2924;
+  --ready-on-action: #ffffff;
+  --ready-success: #187a55;
+  --ready-success-soft: #e8f4ee;
+  --ready-error: #b83a35;
+  --ready-error-soft: #f8eae8;
+  --ready-warning: #a56a09;
+  --ready-warning-soft: #f8f0dc;
+  --ready-focus: #24231d;
+
+  --ready-font-sans: Inter, Pretendard, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --ready-font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+
+  --ready-text-display: 32px;
+  --ready-leading-display: 1.12;
+  --ready-tracking-display: -0.025em;
+  --ready-text-title-lg: 26px;
+  --ready-leading-title-lg: 1.25;
+  --ready-tracking-title-lg: -0.015em;
+  --ready-text-title: 20px;
+  --ready-leading-title: 1.35;
+  --ready-text-question: 17px;
+  --ready-leading-question: 1.66;
+  --ready-text-body: 16px;
+  --ready-leading-body: 1.55;
+  --ready-text-small: 14px;
+  --ready-leading-small: 1.45;
+  --ready-text-meta: 12px;
+  --ready-leading-meta: 1.35;
+  --ready-text-eyebrow: 11px;
+  --ready-leading-eyebrow: 1.3;
+  --ready-tracking-eyebrow: 0.1em;
+
+  --ready-space-1: 4px;
+  --ready-space-2: 8px;
+  --ready-space-3: 12px;
+  --ready-space-4: 16px;
+  --ready-space-5: 20px;
+  --ready-space-6: 24px;
+  --ready-space-8: 32px;
+  --ready-space-12: 48px;
+  --ready-space-16: 64px;
+
+  --ready-radius-xs: 3px;
+  --ready-radius-sm: 5px;
+  --ready-radius-md: 8px;
+  --ready-radius-round: 999px;
+
+  --ready-control-height: 42px;
+  --ready-touch-target: 48px;
+  --ready-reading-width: 760px;
+  --ready-content-width: 1180px;
+  --ready-shadow-float: 0 12px 30px rgb(36 35 29 / 10%);
+
+  --ready-duration-fast: 120ms;
+  --ready-duration-screen: 160ms;
+  --ready-duration-panel: 200ms;
+  --ready-ease: cubic-bezier(0.2, 0, 0, 1);
+}
+
+@media (max-width: 560px) {
+  :root {
+    --ready-text-display: 28px;
+    --ready-text-title-lg: 23px;
+    --ready-text-question: 16px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --ready-duration-fast: 0ms;
+    --ready-duration-screen: 0ms;
+    --ready-duration-panel: 0ms;
+  }
+}
