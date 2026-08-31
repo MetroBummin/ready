@@ -225,13 +225,33 @@ async function deletePassage(body: any) {
 }
 async function importQuestions(body: any) {
   if (!Array.isArray(body.questions)) throw new ApiError(400, "검증된 Question 배열이 필요합니다.");
-  for (const [index, question] of body.questions.entries()) {
+  const incoming = structuredClone(body.questions), unresolved = incoming.filter((question: any) => !clean(question?.passage_id, 80));
+  if (unresolved.length) {
+    const existingRows = rows<any[]>(await db.from("ready_questions").select("passage_id,payload").limit(2_000));
+    const byIdentity = new Map<string, string>(), byLesson = new Map<string, Set<string>>();
+    for (const row of existingRows) {
+      const source = row?.payload?.source || {}, identity = [source.exam, source.passage_no, source.source_question_no, source.section].map(value => clean(value, 180)).join("::");
+      if (identity.replaceAll("::", "")) byIdentity.set(identity, clean(row.passage_id, 80));
+      if (/NE능률\(민병천\)/.test(clean(source.exam, 180)) && source.passage_no) {
+        const lesson = clean(source.passage_no, 20), ids = byLesson.get(lesson) || new Set<string>();
+        if (clean(row.passage_id, 80)) ids.add(clean(row.passage_id, 80));
+        byLesson.set(lesson, ids);
+      }
+    }
+    for (const question of unresolved) {
+      const source = question?.payload?.source || {}, identity = [source.exam, source.passage_no, source.source_question_no, source.section].map(value => clean(value, 180)).join("::");
+      const lessonIds = byLesson.get(clean(source.passage_no, 20));
+      question.passage_id = byIdentity.get(identity) || (lessonIds?.size === 1 ? [...lessonIds][0] : "");
+      if (!question.passage_id) throw new ApiError(400, `기존 canonical Passage를 찾지 못했습니다: ${clean(question?.passage_key, 120) || identity}`);
+    }
+  }
+  for (const [index, question] of incoming.entries()) {
     const validation = validateQuestionSpec(question?.payload || {}, clean(question?.type, 40), clean(question?.status, 20) || "draft");
     if (validation.errors.length) throw new ApiError(400, `${index + 1}번 문제의 출제 명세가 불완전합니다: ${validation.errors.join(", ")}`);
     if (validation.spec.importStatus === "ready" && question?.status !== "available") throw new ApiError(400, `${index + 1}번 문제는 ready이므로 available 상태여야 합니다.`);
     if (validation.spec.importStatus !== "ready" && question?.status === "available") throw new ApiError(400, `${index + 1}번 문제는 검수 전이므로 공개할 수 없습니다.`);
   }
-  const result = await db.rpc("ready_import_question_bundle", { p_questions: body.questions });
+  const result = await db.rpc("ready_import_question_bundle", { p_questions: incoming });
   if (result.error) throw new ApiError(400, result.error.message);
   const relink = await db.rpc("ready_relink_ne_minbyeongcheon_lessons");
   if (relink.error) throw new ApiError(500, relink.error.message);

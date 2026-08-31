@@ -1,3 +1,5 @@
+import { sourceContractErrors } from "./source-contract.mjs";
+
 export const READY_RENDERERS = Object.freeze([
   "standard_mcq",
   "annotated_passage_mcq",
@@ -139,12 +141,13 @@ export function questionSpecErrors(spec, payload = {}, type = "multiple_choice")
   for (const [index, annotation] of list(spec?.passage?.annotations).entries()) {
     if (!annotation || !text(annotation.kind) || (!text(annotation.text) && !text(annotation.label))) errors.push(`annotation ${index + 1} is incomplete`);
   }
+  if (Number(payload?.pipeline_contract?.version) === 2) errors.push(...sourceContractErrors(payload, spec));
   return errors;
 }
 
 export function validateQuestionSpec(payload = {}, type = "multiple_choice", rowStatus = "available") {
   const spec = normalizeQuestionSpec(payload, type, rowStatus);
   const errors = questionSpecErrors(spec, payload, type);
-  if (type === "written_response" && (payload?.ai_structure?.engine !== "codex-cli" || Number(payload?.ai_structure?.contract_version) !== 1)) errors.push("written response did not pass the AI structure contract");
+  if (type === "written_response" && (payload?.ai_structure?.engine !== "codex-cli" || Number(payload?.ai_structure?.contract_version) !== 2)) errors.push("written response did not pass the block-first AI structure contract");
   return { spec, errors, ready: spec.importStatus === "ready" && errors.length === 0 };
 }

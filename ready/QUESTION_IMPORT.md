@@ -127,6 +127,30 @@ npm run structure:written -- \
 없으면 import 자체를 거부한다. 즉 사람이 중간 단계를 빠뜨려도 미검수 서술형이
 공개될 수 없다.
 
+## Block-first PASS/DROP pipeline
+
+가져오기는 완성된 문자열에서 불필요한 것을 지우지 않는다. PDF를 `passage`,
+`prompt`, `korean_target`, `condition`, `word_bank`, `choice`, `summary`,
+`answer_template`, `annotation_source`, `explanation`, `stimulus` source block으로
+먼저 나눈 뒤 renderer별 whitelist에 있는 block만 학생 명세에 넣는다.
+
+모든 문제는 PDF SHA-256, 문제 identity, page, bbox provenance를 가진다. provenance는
+import/debug 전용이며 학생 renderer가 원문 PDF를 다시 읽거나 위치 정보에 의존하지
+않는다. 승인된 passage block과 학생에게 표시되는 passage가 정확히 같지 않거나,
+prompt·요약·한글 목표문·조건이 passage에 섞였거나, annotation이 `turned off` 같은
+정확한 연속 문자열을 가리키지 않으면 즉시 `DROP`한다. 전체 canonical Passage로
+대체하는 fallback은 금지한다.
+
+서술형은 서로 다른 유형을 대표하는 7개 fixture가 최종 렌더 계약까지 모두 통과한
+뒤에만 전체를 한 번 처리한다. AI는 PDF block 경계만 구조화하고 정답은 출판사
+정답표를 source of truth로 유지한다. 코드는 답칸 수, 정답 수, 실제 단어 수,
+필수 우리말·조건·보기와 연속 annotation을 다시 검증한다.
+
+객관식은 먼저 deterministic extraction과 같은 strict validator를 통과시킨다.
+통과한 문제는 AI에 보내지 않는다. 탈락 문제만 AI block/span 구조화를 정확히 한 번
+거친 뒤 같은 validator에 넣으며 재시도하지 않는다. validator를 느슨하게 하거나
+개별 문제 예외를 추가해 AI 결과를 살리는 것은 금지한다.
+
 서버는 admin session을 만든 뒤 `ready_import_question_bundle` RPC 하나로 bundle 전체를 transaction 처리한다. 한 row라도 검증에 실패하면 전체 import가 rollback된다.
 
 ## E2E acceptance

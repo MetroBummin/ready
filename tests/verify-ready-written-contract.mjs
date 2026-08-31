@@ -1,6 +1,8 @@
 import assert from 'node:assert/strict';
 import { validateWrittenStructure } from '../tools/ready-written-contract.mjs';
 import { validateQuestionSpec } from '../server/ready/question-spec.mjs';
+import { buildStructuredSourceContract, sourceContractErrors } from '../tools/ready-source-contract.mjs';
+import { buildObjectiveSourceContract } from '../tools/ready-source-contract.mjs';
 
 const canonical='His location settings were turned off. He used the last of his battery to send a text message.';
 const base={type:'written_response',payload:{
@@ -26,9 +28,31 @@ const summaryQuestion={type:'written_response',payload:{prompt:'다음 글의 �
 const summarySpec={kind:'summary',prompt_text:summaryQuestion.payload.prompt,passage_mode:'canonical_excerpt',passage_text:'Source passage.',task_text:'',targets:[],conditions:[],word_bank:[],response_slots:[{label:'A',word_count:1},{label:'B',word_count:2}],summary_text:'',confidence:.99,issues:[]};
 assert(validateWrittenStructure(summaryQuestion,summarySpec,'Source passage.').some(item=>item.includes('summary missing')));
 
-const renderPayload={prompt:'영작하시오.',taxonomy:'guided_writing',writing_guide:{kind:'sentence',title:'영작하시오.',slot_labels:['답'],conditions:[],word_bank:[],task_text:'문장을 쓰시오.',targets:[]},accepted_answers:['answer'],response_slots:[{label:'답',word_count:1}],import_status:'ready',spec:{renderer:'written_input',passage:{source:'canonical',annotations:[]},extras:[],choiceMode:'none',responseMode:'input',gradingMode:'accepted_variants'}};
+const renderPayload={prompt:'영작하시오.',set_text:'This is the approved source passage.',taxonomy:'guided_writing',writing_guide:{kind:'sentence',title:'영작하시오.',slot_labels:['답'],conditions:[],word_bank:[],task_text:'문장을 쓰시오.',targets:[]},accepted_answers:['answer'],response_slots:[{label:'답',word_count:1}],import_status:'ready',spec:{renderer:'written_input',passage:{source:'blocks',annotations:[]},extras:[],choiceMode:'none',responseMode:'input',gradingMode:'accepted_variants'}};
 assert.equal(validateQuestionSpec(renderPayload,'written_response','available').ready,false);
-renderPayload.ai_structure={engine:'codex-cli',contract_version:1};
+buildStructuredSourceContract({payload:renderPayload,structured:{passage_text:renderPayload.set_text,task_text:'문장을 쓰시오.',conditions:[],word_bank:[],summary_text:'',targets:[],response_slots:renderPayload.response_slots},sourceFileHash:'a'.repeat(64)});
+renderPayload.ai_structure={engine:'codex-cli',contract_version:2};
 assert.equal(validateQuestionSpec(renderPayload,'written_response','available').ready,true);
+
+const polluted=structuredClone(renderPayload);
+polluted.source_blocks.find(block=>block.block_kind==='passage').source_text+=' 영작하시오.';
+assert(sourceContractErrors(polluted,polluted.spec).some(item=>item.includes('Korean text')));
+const wrongFamily=structuredClone(renderPayload);
+wrongFamily.spec.renderer='standard_mcq';
+assert(sourceContractErrors(wrongFamily,wrongFamily.spec).some(item=>item.includes('does not allow korean_target')));
+const missingProvenance=structuredClone(renderPayload);
+delete missingProvenance.pipeline_contract.block_refs.passage;
+assert(sourceContractErrors(missingProvenance,missingProvenance.spec).some(item=>item.includes('passage provenance')));
+
+const objective={prompt:'윗글의 제목으로 알맞은 것은?',set_text:'His location settings were turned off.',taxonomy:'title',choices:['A','B','C','D','E'],answer:[0],multi_select:false,explanation:'해설',import_status:'ready',source:{exam:'시험',section:'1',source_question_no:1,document_sha256:'b'.repeat(64),page:1,bbox:[0,0,100,100]},spec:{renderer:'standard_mcq',passage:{source:'blocks',annotations:[]},extras:[],choiceMode:'single',responseMode:'choice',gradingMode:'exact'}};
+buildObjectiveSourceContract(objective);
+assert.equal(validateQuestionSpec(objective,'multiple_choice','available').ready,true);
+const KoreanPassage=structuredClone(objective);KoreanPassage.set_text+=' 우리말';buildObjectiveSourceContract(KoreanPassage);
+assert(sourceContractErrors(KoreanPassage,KoreanPassage.spec).some(item=>item.includes('Korean text')));
+const oversized=structuredClone(objective);oversized.set_text='A'.repeat(1801);buildObjectiveSourceContract(oversized);
+assert(sourceContractErrors(oversized,oversized.spec).some(item=>item.includes('student range budget')));
+const truncatedPhrase=structuredClone(objective);
+truncatedPhrase.taxonomy='grammar_single_error';truncatedPhrase.spec.renderer='annotated_passage_mcq';truncatedPhrase.target_ranges=[{label:'ⓔ',text:'turned',kind:'target'}];truncatedPhrase._raw_question_text='His location settings were ⓔturned off.';buildObjectiveSourceContract(truncatedPhrase);
+assert(sourceContractErrors(truncatedPhrase,truncatedPhrase.spec).some(item=>item.includes('truncates a marked phrasal span')));
 
 console.log('READY written import contract verification passed.');

@@ -1,7 +1,13 @@
 const compact=value=>String(value||'').normalize('NFKC').replace(/\s+/g,' ').trim();
 export const wordCount=value=>(String(value||'').match(/[A-Za-z0-9]+(?:['’][A-Za-z]+)?/g)||[]).length;
-const variants=slot=>(Array.isArray(slot)?slot:[slot]).map(compact).filter(Boolean);
+const variants=slot=>(Array.isArray(slot)?slot:[slot]).map(value=>compact(String(value||'').replace(/^\s*[ⓐ-ⓩ]\s*/u,'').replace(/^\s*\([A-H]\)\s*/u,''))).filter(Boolean);
 export const expectedWordCounts=payload=>(payload?.accepted_answers||[]).map(slot=>{const counts=[...new Set(variants(slot).map(wordCount))];return counts.length===1?counts[0]:null;});
+export function applyAnswerKeyWordCounts(payload,spec){
+  const counts=expectedWordCounts(payload),slots=Array.isArray(spec?.response_slots)?spec.response_slots:[];
+  if(slots.length!==counts.length)return spec;
+  spec.response_slots=slots.map((slot,index)=>({...slot,word_count:counts[index]??slot.word_count??null}));
+  return spec;
+}
 const normalized=value=>compact(value).toLowerCase().replace(/[“”‘’]/g,"'");
 const includesLoose=(haystack,needle)=>!needle||normalized(haystack).includes(normalized(needle));
 const withoutAnnotationLabels=value=>String(value||'').replace(/[ⓐ-ⓕ]/g,'').replace(/\([A-H]\)(?=[A-Za-z])/g,'');

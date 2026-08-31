@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["prompt_text", "passage_mode", "passage_text", "annotations", "summary_text", "stimulus_text", "confidence", "issues"],
+  "properties": {
+    "prompt_text": { "type": "string", "minLength": 1 },
+    "passage_mode": { "enum": ["canonical_excerpt", "authored_variant"] },
+    "passage_text": { "type": "string", "minLength": 1 },
+    "annotations": {
+      "type": "array",
+      "maxItems": 12,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["label", "text", "canonical_text"],
+        "properties": {
+          "label": { "type": "string" },
+          "text": { "type": "string", "minLength": 1 },
+          "canonical_text": { "type": "string" }
+        }
+      }
+    },
+    "summary_text": { "type": "string" },
+    "stimulus_text": { "type": "string" },
+    "confidence": { "type": "number", "minimum": 0, "maximum": 1 },
+    "issues": { "type": "array", "maxItems": 20, "items": { "type": "string" } }
+  }
+}

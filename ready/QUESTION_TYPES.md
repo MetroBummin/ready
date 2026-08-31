@@ -6,7 +6,9 @@
 
 renderer는 taxonomy 이름이나 한국어 발문을 보고 화면을 추측하지 않는다. 새 Question은 `payload.taxonomy`, `payload.import_status`, `payload.spec`으로 본문 출처, 허용 annotation/block, 응답 방식과 채점 방식을 완전히 선언한다. 명세에 없는 요소는 처음부터 렌더하지 않는다.
 
-`import_status`는 `ready`, `needs_review`, `unsupported` 중 하나다. 검증된 `ready`만 `status=available`로 공개하며, 애매한 추출 결과는 학생 화면의 휴리스틱으로 수리하지 않고 검수 대상으로 보낸다.
+`import_status`는 `ready`, `drop` 두 개뿐이다. 검증된 `ready`만 `status=available`로 공개한다. 애매하거나 계약이 깨진 문제는 학생 화면의 휴리스틱으로 수리하지 않고 `drop`으로 폐기한다.
+
+세밀한 taxonomy는 데이터 분류용이고 renderer는 다섯 개뿐이다. renderer는 taxonomy 이름을 해석하지 않고, 명세가 선언한 passage block, annotation, extra block, response mode만 그린다. PDF 해시·페이지·bbox는 import/debug provenance이며 학생 runtime의 렌더링 의존성이 아니다.
 
 이 문서와 `QUESTION_IMPORT.md`는 READY Question 작업의 source of truth다. 현재 계약은 2026년 6월 부산 고2 예상문제 원문 18~28번의 137문항을 조사한 결과만 반영한다.
 

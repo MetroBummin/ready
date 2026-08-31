@@ -49,19 +49,33 @@ def clean_noise(value: str) -> str:
     return compact(value)
 
 
-def problem_pages(path: Path) -> str:
-    """Read each worksheet in visual page order: left column, then right."""
-    chunks = []
+def problem_pages(path: Path) -> tuple[str, list[dict]]:
+    """Read visual blocks without discarding their PDF coordinates."""
+    chunks, spans, cursor = [], [], 0
     with pdfplumber.open(path) as pdf:
-        for page in pdf.pages:
+        for page_index, page in enumerate(pdf.pages, 1):
             full = page.extract_text() or ""
             if "공통영어2 정답" in full:
                 break
             middle, margin = page.width / 2, 42
             boxes = ((margin, 65, middle - 4, page.height - 28), (middle + 4, 65, page.width - margin, page.height - 28))
             for box in boxes:
-                chunks.append(page.crop(box).extract_text(x_tolerance=1.5, y_tolerance=3, layout=True) or "")
-    return "\n".join(chunks)
+                chunk = page.crop(box).extract_text(x_tolerance=1.5, y_tolerance=3, layout=True) or ""
+                if chunks:
+                    cursor += 1
+                start = cursor
+                chunks.append(chunk)
+                cursor += len(chunk)
+                spans.append({"start": start, "end": cursor, "page": page_index, "bbox": [round(float(value), 2) for value in box]})
+    return "\n".join(chunks), spans
+
+
+def source_location(spans: list[dict], start: int, end: int) -> dict:
+    candidates = [(max(0, min(end, span["end"]) - max(start, span["start"])), span) for span in spans]
+    overlap, span = max(candidates, key=lambda item: item[0])
+    if overlap <= 0:
+        return {"page": None, "bbox": None}
+    return {"page": span["page"], "bbox": span["bbox"]}
 
 
 def source_paths(downloads: Path) -> list[Path]:
@@ -402,12 +416,14 @@ def extract_exam(path: Path, exam_index: int, written_answers: dict[str, list] |
     answers = answer_table(reader)
     embedded_written_answers = written_answer_table(reader, WRITTEN[exam_index - 1])
     explanations = explanation_table(reader)
-    problem_text = problem_pages(path)
+    problem_text, source_spans = problem_pages(path)
+    document_sha256 = hashlib.sha256(path.read_bytes()).hexdigest()
     positions = question_positions(problem_text)
     current_context = clean_noise(problem_text[:positions[0][1]].split("")[-1])
     questions = []
     for order, (number, start, content_start) in enumerate(positions):
         end = positions[order + 1][1] if order < 19 else len(problem_text)
+        location = source_location(source_spans, start, end)
         prompt, body = prompt_and_body(number, problem_text[content_start:end])
         inline_context, choices, trailing_context = split_choices(body)
         written = number in WRITTEN[exam_index - 1]
@@ -445,6 +461,10 @@ def extract_exam(path: Path, exam_index: int, written_answers: dict[str, list] |
             "source_question_no": number,
             "section": str(round_),
             "set_id": f"ne-l{lesson}-r{round_}-{context_hash}",
+            "document_sha256": document_sha256,
+            "source_file": path.name,
+            "page": location["page"],
+            "bbox": location["bbox"],
         }
         payload = {
             "family": family_for(prompt, written),

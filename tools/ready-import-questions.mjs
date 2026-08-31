@@ -20,23 +20,40 @@ if(written.length&&!allowLegacy){
   if(bundle.ai_written_structure.mode!=='full')throw new Error('A representative sample gate cannot be imported; run the full written-response gate after all samples pass.');
   const gate=bundle.ai_written_structure;
   if(Number(gate.processed_questions)!==Number(gate.source_written_questions))throw new Error('The full written-response gate did not process every source question.');
-  if(Number(gate.ready)!==written.length||Number(gate.output_written_questions)!==written.length)throw new Error('Dropped written responses must not remain in the import bundle.');
   if(Number(gate.ready)+Number(gate.dropped)!==Number(gate.processed_questions))throw new Error('Written-response gate totals are inconsistent.');
+  const finalWritten=bundle?.pipeline_validation?.written;
+  if(!finalWritten||Number(finalWritten.ready)!==written.length)throw new Error('Final written-response validation count does not match the import bundle.');
+  if(Number(finalWritten.ready)+Number(finalWritten.dropped)!==Number(finalWritten.source))throw new Error('Final written-response validation totals are inconsistent.');
+}
+const objective=questions.filter(item=>item?.type==='multiple_choice');
+if(objective.length&&!allowLegacy){
+  const finalObjective=bundle?.pipeline_validation?.objective;
+  if(!finalObjective||Number(finalObjective.ready)!==objective.length)throw new Error('Final objective validation count does not match the import bundle.');
+  if(Number(finalObjective.ready)+Number(finalObjective.dropped)!==Number(finalObjective.source))throw new Error('Final objective validation totals are inconsistent.');
+  if(Number(finalObjective.deterministic_ready)+Number(finalObjective.ai_recovered)!==Number(finalObjective.ready))throw new Error('Objective recovery totals are inconsistent.');
+  if(Number(finalObjective.ai_attempted)!==Number(finalObjective.source)-Number(finalObjective.deterministic_ready))throw new Error('Objective AI fallback must process deterministic drops only.');
+  if(Number(finalObjective.ai_attempted)>0){
+    const gate=bundle.ai_objective_fallback;
+    if(gate?.engine!=='codex-cli'||Number(gate.attempted)!==Number(finalObjective.ai_attempted)||Number(gate.recovered)!==Number(finalObjective.ai_recovered))throw new Error('Objective AI fallback audit does not match final validation.');
+    if(Number(gate.recovered)+Number(gate.dropped)!==Number(gate.attempted))throw new Error('Objective AI fallback totals are inconsistent.');
+  }
 }
 
 const identities=new Set();
 for(const [index,item] of questions.entries()){
   const source=item?.payload?.source||{};
-  if(!/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(item?.passage_id||''))throw new Error(`Row ${index+1}: passage_id must be a UUID.`);
+  const hasPassageId=/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(item?.passage_id||'');
+  if(!hasPassageId&&!/^[a-z0-9][a-z0-9-]{2,100}$/i.test(item?.passage_key||''))throw new Error(`Row ${index+1}: passage_id UUID or a stable passage_key is required.`);
   if(!['multiple_choice','written_response'].includes(item?.type))throw new Error(`Row ${index+1}: unsupported type.`);
   if(!item?.payload?.prompt?.trim())throw new Error(`Row ${index+1}: prompt is required.`);
   if(!source.exam||!Number.isInteger(Number(source.passage_no))||!Number.isInteger(Number(source.source_question_no))||!source.section)throw new Error(`Row ${index+1}: source metadata is incomplete.`);
-  const identity=[item.passage_id,source.exam,source.passage_no,source.source_question_no,source.section].join(':');
+  const identity=[item.passage_id||item.passage_key,source.exam,source.passage_no,source.source_question_no,source.section].join(':');
   if(identities.has(identity))throw new Error(`Row ${index+1}: duplicate source identity ${identity}.`);
   identities.add(identity);
   if(item.type==='multiple_choice'&&(!Array.isArray(item.payload.choices)||item.payload.choices.length<2||!Array.isArray(item.payload.answer)||!item.payload.answer.length))throw new Error(`Row ${index+1}: multiple-choice contract is incomplete.`);
   if(item.type==='written_response'&&(!Array.isArray(item.payload.accepted_answers)||!item.payload.accepted_answers.length))throw new Error(`Row ${index+1}: written-response accepted_answers are required.`);
   if(!item.payload.spec&&!allowLegacy)throw new Error(`Row ${index+1}: explicit payload.spec is required (use --allow-legacy only for old verified bundles).`);
+  if(!allowLegacy&&Number(item.payload?.pipeline_contract?.version)!==2)throw new Error(`Row ${index+1}: block-first pipeline contract v2 is required.`);
   const validation=validateQuestionSpec(item.payload,item.type,item.status||'draft');
   if(validation.errors.length)throw new Error(`Row ${index+1}: invalid render spec: ${validation.errors.join(', ')}.`);
   if(validation.spec.importStatus==='ready'&&item.status!=='available')throw new Error(`Row ${index+1}: ready questions must use status=available.`);
