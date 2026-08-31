@@ -426,6 +426,7 @@ function publicStoredWritingGuide(value: any) {
     wordBank: cleanWritingBank([...(Array.isArray(value.word_bank) ? value.word_bank : []), ...bankFromConditions]),
     targets: publicTargetRanges(value.targets),
     taskText: clean(value.task_text, 2_000),
+    taskLabel: clean(value.task_label, 80),
   };
   return guide.title || guide.slotLabels.length || guide.conditions.length || guide.wordBank.length || guide.targets.length || guide.taskText ? guide : null;
 }

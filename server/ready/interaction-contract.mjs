@@ -8,6 +8,11 @@ const WRITTEN_LAYOUTS=new Set(['sentence','sentence_parts','short_answers','arra
 
 export const INTERACTION_CONTRACT_VERSION=1;
 
+export function requiresPassageEvidence(prompt=''){
+  const value=String(prompt||'').replace(/\s+/g,' ');
+  return /(?:본문(?:을|에서)|윗글|지문|글을\s*(?:읽고|바탕)|위\s*글)/u.test(value)||/\b(?:based on|according to)\s+(?:the\s+)?(?:passage|text)\b|\bread\s+(?:the\s+)?(?:passage|text)\b/i.test(value);
+}
+
 function publicSlot(slot,index){
   return {
     id:text(slot?.id)||`slot-${index+1}`,
@@ -103,6 +108,7 @@ export function interactionContractErrors(payload={},type='multiple_choice'){
     if(text(contract.selection)!=='none')errors.push('written response selection must be none');
     const layout=text(contract?.response?.layout),slots=list(contract?.response?.slots),accepted=list(payload.accepted_answers);
     if(!WRITTEN_LAYOUTS.has(layout))errors.push('written response layout is missing');
+    if(requiresPassageEvidence(payload.prompt)&&contract?.passage?.visible!==true)errors.push('written prompt requires visible passage evidence');
     if(slots.length!==accepted.length)errors.push('interaction response slots do not match answer slots');
     const ids=new Set();
     slots.forEach((slot,index)=>{

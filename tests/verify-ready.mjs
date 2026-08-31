@@ -78,6 +78,12 @@ assert.equal(contractResponseComplete(written.spec.interaction,['first','']),fal
 assert.deepEqual(publisherRoundTripErrors(written,'written_response'),[]);
 assert.deepEqual(deterministicGrade(written,'written_response',{responses:['The police decided to use social media','to find clues in the picture']}),{valid:true,correct:true,answer:written.accepted_answers});
 
+const passageAnswer=structuredClone(written);
+passageAnswer.prompt='다음 본문을 읽고 영어 질문에 답하시오.';
+delete passageAnswer.spec.interaction;
+compileInteractionContract(passageAnswer,'written_response');
+assert.equal(passageAnswer.spec.interaction.passage.visible,true,'A passage-dependent prompt must render its approved evidence');
+
 const staleSlots=structuredClone(written);
 staleSlots.accepted_answers=[['one'],['two'],['three']];
 assert(interactionContractErrors(staleSlots,'written_response').some(error=>error.includes('response slots do not match answer slots')));
