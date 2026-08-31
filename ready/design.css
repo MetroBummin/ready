@@ -419,8 +419,9 @@ body[data-ready-mode="student"] .question-passage .reading-sentence{display:inli
 .writing-bank>div{display:flex;flex-wrap:wrap;border-top:1px solid var(--ready-hairline);border-left:1px solid var(--ready-hairline)}
 .writing-bank span{padding:6px 9px;border:0;border-right:1px solid var(--ready-hairline);border-bottom:1px solid var(--ready-hairline);border-radius:0;color:var(--ready-body);background:transparent;font-size:13px;font-weight:600}
 .written-slot-list{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:var(--ready-space-3)}
-.cloze-sentence{padding:var(--ready-space-4);border:1px solid var(--ready-hairline);border-radius:var(--ready-radius-xs);background:var(--ready-surface);font-family:var(--ready-font-serif);font-size:clamp(17px,2.2vw,21px);line-height:2.35}
-.cloze-slot{display:inline-block;margin:0 3px;vertical-align:baseline}.cloze-slot input{width:clamp(72px,9ch,118px);min-width:0;padding:4px 7px;border:0;border-bottom:2px solid var(--ready-ink);border-radius:0;background:var(--ready-canvas-quiet);font:700 .82em/1.2 var(--ready-font-sans);text-align:center}
+.cloze-frame{padding:var(--ready-space-4);border-left:2px solid var(--ready-ink);background:var(--ready-canvas-quiet);font-family:var(--ready-font-serif);font-size:clamp(16px,2vw,19px);line-height:2.15}
+.cloze-blank{display:inline-block;width:clamp(52px,7vw,86px);margin:0 4px;vertical-align:baseline}.cloze-blank i{display:block;border-bottom:1px solid currentColor}
+.cloze-slot-list{padding-top:var(--ready-space-3);border-top:1px solid var(--ready-hairline)}.cloze-slot-list label{display:grid;gap:var(--ready-space-2)}.cloze-slot-list label>span{font:750 11px/1 var(--ready-font-mono)}
 .sentence-answer{display:grid;gap:var(--ready-space-2)}
 .written-workspace input,.written-workspace textarea{font-size:16px}
 .written-workspace textarea{min-height:100px}

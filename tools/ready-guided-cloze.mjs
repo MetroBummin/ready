@@ -36,7 +36,7 @@ export function structureGuidedCloze(payload={}){
     title:'빈칸에 들어갈 단어를 각각 입력하세요.',
     publisherAnswer:variants[0],
     acceptedAnswers,
-    responseSlots:acceptedAnswers.map((_answers,index)=>({label:`빈칸 ${index+1}`,word_count:1})),
+    responseSlots:acceptedAnswers.map((_answers,index)=>({label:String(index+1),word_count:1})),
     answerTemplate:template,
   };
 }

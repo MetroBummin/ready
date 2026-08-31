@@ -59,6 +59,7 @@ clozePayload.response_slots=[{label:'(A)',word_count:16}];
 const cloze=structureGuidedCloze(clozePayload);
 assert.equal(cloze?.responseSlots.length,4);
 assert.deepEqual(cloze?.acceptedAnswers,[['there'],['are'],['same'],['scene']]);
+assert.deepEqual(cloze?.responseSlots.map(slot=>slot.label),['1','2','3','4']);
 assert.equal(applyGuidedClozeContract(clozePayload),true);
 buildStructuredSourceContract({payload:clozePayload,structured:{passage_text:clozePayload.set_text,task_text:clozePayload.writing_guide.task_text,conditions:[],word_bank:[],summary_text:'',targets:[],response_slots:clozePayload.response_slots},sourceFileHash:'a'.repeat(64)});
 compileInteractionContract(clozePayload,'written_response');

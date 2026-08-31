@@ -17,6 +17,7 @@ const updates=[],report=[];
 for(const row of rows){
   const payload=structuredClone(row.payload),source=payload.source||{},before=payload.accepted_answers?.[0]?.[0]||'',alreadyCloze=String(payload?.writing_guide?.kind||'').replace(/-/g,'_')==='sentence_cloze',structuredNow=!alreadyCloze&&applyGuidedClozeContract(payload);
   if(!alreadyCloze&&!structuredNow)continue;
+  if(alreadyCloze){payload.response_slots=(payload.response_slots||[]).map((slot,index)=>({...slot,label:String(index+1)}));payload.writing_guide.slot_labels=payload.response_slots.map(slot=>slot.label);}
   buildStructuredSourceContract({payload,structured:{passage_text:payload.set_text||payload.variant_text||payload.passage_text,task_text:payload.writing_guide?.task_text||'',conditions:payload.writing_guide?.conditions||[],word_bank:payload.writing_guide?.word_bank||[],summary_text:payload.summary_text||'',targets:payload.writing_guide?.targets||[],response_slots:payload.response_slots},sourceFileHash:source.document_sha256,page:source.page,bbox:source.bbox});
   compileInteractionContract(payload,'written_response');
   const validation=validateQuestionSpec(payload,'written_response','available');
