@@ -4,6 +4,7 @@ import { validateQuestionSpec } from '../server/ready/question-spec.mjs';
 import { buildStructuredSourceContract, sourceContractErrors } from '../tools/ready-source-contract.mjs';
 import { buildObjectiveSourceContract } from '../tools/ready-source-contract.mjs';
 import { compileInteractionContract } from '../tools/ready-interaction-contract.mjs';
+import { applyGuidedClozeContract, structureGuidedCloze } from '../tools/ready-guided-cloze.mjs';
 
 const canonical='His location settings were turned off. He used the last of his battery to send a text message.';
 const base={type:'written_response',payload:{
@@ -49,6 +50,24 @@ zeroWordSlot.accepted_answers=["'"];
 zeroWordSlot.response_slots=[{label:'답',word_count:0}];
 compileInteractionContract(zeroWordSlot,'written_response');
 assert.equal(validateQuestionSpec(zeroWordSlot,'written_response','available').ready,false);
+
+const clozePayload=structuredClone(renderPayload);
+clozePayload.prompt='각 빈칸에 한 단어씩 쓸 것 보기 There / same / scene 보기____ ____ hints from research showing that your brain uses the ____ regions to imagine a ____.';
+clozePayload.accepted_answers=[['There are hints from research showing that your brain uses the same regions to imagine a scene']];
+clozePayload.writing_guide={...clozePayload.writing_guide,kind:'sentence',title:clozePayload.prompt};
+clozePayload.response_slots=[{label:'(A)',word_count:16}];
+const cloze=structureGuidedCloze(clozePayload);
+assert.equal(cloze?.responseSlots.length,4);
+assert.deepEqual(cloze?.acceptedAnswers,[['there'],['are'],['same'],['scene']]);
+assert.equal(applyGuidedClozeContract(clozePayload),true);
+buildStructuredSourceContract({payload:clozePayload,structured:{passage_text:clozePayload.set_text,task_text:clozePayload.writing_guide.task_text,conditions:[],word_bank:[],summary_text:'',targets:[],response_slots:clozePayload.response_slots},sourceFileHash:'a'.repeat(64)});
+compileInteractionContract(clozePayload,'written_response');
+assert.equal(clozePayload.spec.interaction.response.layout,'sentence_cloze');
+assert.equal(clozePayload.spec.interaction.response.template.filter(item=>item.kind==='slot').length,4);
+assert.equal(validateQuestionSpec(clozePayload,'written_response','available').ready,true);
+const brokenCloze=structuredClone(clozePayload);
+brokenCloze.spec.interaction.response.template=brokenCloze.spec.interaction.response.template.filter(item=>item.kind!=='slot'||item.slotIndex!==2);
+assert.equal(validateQuestionSpec(brokenCloze,'written_response','available').ready,false);
 
 const polluted=structuredClone(renderPayload);
 polluted.source_blocks.find(block=>block.block_kind==='passage').source_text+=' 영작하시오.';

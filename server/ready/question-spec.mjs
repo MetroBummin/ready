@@ -129,10 +129,10 @@ export function questionSpecErrors(spec, payload = {}, type = "multiple_choice")
     if (!accepted.length || slots.length !== accepted.length) errors.push("written response slot contract is incomplete");
     const kind = text(guide?.kind), targets = list(guide?.targets);
     if (/correction/.test(kind) && !targets.length) errors.push("written correction targets are missing");
-    if (["sentence", "arrangement"].includes(kind) && /우리말/.test(text(payload.prompt)) && !text(guide?.task_text)) errors.push("written Korean target is missing");
+    if (["sentence", "sentence_cloze", "sentence-cloze", "arrangement"].includes(kind) && /우리말/.test(text(payload.prompt)) && !text(guide?.task_text)) errors.push("written Korean target is missing");
     for (const [index, slot] of slots.entries()) {
       const variants = Array.isArray(accepted[index]) ? accepted[index] : [accepted[index]];
-      const counts = new Set(variants.map(value => (text(value).match(/[A-Za-z0-9]+(?:['’][A-Za-z]+)?/g) || []).length));
+      const counts = new Set(variants.map(value => (text(value).match(/[A-Za-z]+(?:['’][A-Za-z]+)?|\d+(?:,\d{3})*(?:\.\d+)?/g) || []).length));
       if (!variants.length || counts.has(0)) errors.push(`written slot ${index + 1} has no lexical publisher answer`);
       if (!Number.isInteger(Number(slot?.word_count)) || Number(slot?.word_count) < 1 || !counts.has(Number(slot.word_count))) errors.push(`written slot ${index + 1} word count mismatch`);
     }

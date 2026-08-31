@@ -1,5 +1,5 @@
 const compact=value=>String(value||'').normalize('NFKC').replace(/\s+/g,' ').trim();
-export const wordCount=value=>(String(value||'').match(/[A-Za-z0-9]+(?:['’][A-Za-z]+)?/g)||[]).length;
+export const wordCount=value=>(String(value||'').match(/[A-Za-z]+(?:['’][A-Za-z]+)?|\d+(?:,\d{3})*(?:\.\d+)?/g)||[]).length;
 const variants=slot=>(Array.isArray(slot)?slot:[slot]).map(value=>compact(String(value||'').replace(/^\s*[ⓐ-ⓩ]\s*/u,'').replace(/^\s*\([A-H]\)\s*/u,''))).filter(Boolean);
 export const expectedWordCounts=payload=>(payload?.accepted_answers||[]).map(slot=>{const counts=[...new Set(variants(slot).map(wordCount))];return counts.length===1?counts[0]:null;});
 export function applyAnswerKeyWordCounts(payload,spec){

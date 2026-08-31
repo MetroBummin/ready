@@ -2,9 +2,9 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "type": "object",
   "additionalProperties": false,
-  "required": ["kind", "prompt_text", "passage_mode", "passage_text", "task_text", "targets", "conditions", "word_bank", "response_slots", "summary_text", "confidence", "issues"],
+  "required": ["kind", "prompt_text", "passage_mode", "passage_text", "task_text", "targets", "conditions", "word_bank", "response_slots", "answer_template", "summary_text", "confidence", "issues"],
   "properties": {
-    "kind": { "enum": ["sentence", "arrangement", "correction", "multi-correction", "summary"] },
+    "kind": { "enum": ["sentence", "sentence-cloze", "arrangement", "correction", "multi-correction", "summary"] },
     "prompt_text": { "type": "string", "minLength": 1 },
     "passage_mode": { "enum": ["canonical_excerpt", "authored_variant"] },
     "passage_text": { "type": "string", "minLength": 1 },
@@ -36,6 +36,20 @@
         "properties": {
           "label": { "type": "string" },
           "word_count": { "type": ["integer", "null"], "minimum": 1 }
+        }
+      }
+    },
+    "answer_template": {
+      "type": "array",
+      "maxItems": 80,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["kind", "text", "slot_index"],
+        "properties": {
+          "kind": { "enum": ["text", "slot"] },
+          "text": { "type": "string" },
+          "slot_index": { "type": ["integer", "null"], "minimum": 0 }
         }
       }
     },

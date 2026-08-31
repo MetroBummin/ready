@@ -94,6 +94,7 @@ function combinationRows(groups,choices){
 
 function writtenLayout(payload){
   const guide=payload.writing_guide||{},kind=text(guide.kind).replace(/-/g,'_'),slots=list(payload.response_slots),targets=list(guide.targets||payload.target_ranges);
+  if(kind==='sentence_cloze')return 'sentence_cloze';
   if(kind==='summary')return 'summary';
   if(kind==='arrangement')return 'arrangement';
   if(kind==='multi_correction')return 'multi_correction';
@@ -122,7 +123,7 @@ export function compileInteractionContract(payload={},type='multiple_choice'){
     const ranges=list(payload.target_ranges||payload?.writing_guide?.targets),layout=writtenLayout(payload);
     devices=ranges.length?annotationDevices(source,ranges):[];
     const sourceRequired=requiresPassageEvidence(payload),hideAnswerOnlySource=text(payload?.writing_guide?.task_text)&&['sentence','sentence_parts'].includes(layout);
-    payload.spec.interaction={version:INTERACTION_CONTRACT_VERSION,kind:'written_response',selection:'none',passage:{visible:sourceRequired||!hideAnswerOnlySource,segments:tokenizePassage(source,devices)},choices:{columns:[],rows:[]},response:{layout,slots:writtenSlots(payload,layout),targetIds:devices.map(item=>item.id)}};
+    payload.spec.interaction={version:INTERACTION_CONTRACT_VERSION,kind:'written_response',selection:'none',passage:{visible:sourceRequired||!hideAnswerOnlySource,segments:tokenizePassage(source,devices)},choices:{columns:[],rows:[]},response:{layout,slots:writtenSlots(payload,layout),targetIds:devices.map(item=>item.id),template:layout==='sentence_cloze'?list(payload?.writing_guide?.answer_template):[]}};
     return payload.spec.interaction;
   }
 

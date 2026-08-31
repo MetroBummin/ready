@@ -104,6 +104,9 @@ for(const removed of ['inferredChoiceParts','CHOICE_PART_REPAIRS','WRITING_GUIDE
   assert.doesNotMatch(`${app}\n${edge}`,new RegExp(removed.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')),`Runtime inference remains: ${removed}`);
 }
 assert.match(app,/contractPassageHtml[\s\S]*contractChoiceCopyHtml[\s\S]*contractResponseComplete/);
+assert.match(app,/response\.layout==='sentence_cloze'[\s\S]*cloze-sentence/,'Partial guided writing must render its explicit cloze contract');
+assert.match(app,/workbook-choice-or[\s\S]*또는/,'Workbook grammar choices must render as an explicit either-or control');
+assert.doesNotMatch(app,/workbookChoiceHtml[^\n]*join\('<i>\/<\/i>'\)/,'Workbook grammar choices must not fall back to slash-separated text');
 assert.match(edge,/publicInteractionContract[\s\S]*deterministicGrade/);
 assert.match(edge,/semantic reference[\s\S]*faithful synonyms and paraphrases/,'AI grading must treat publisher answers as semantic truth, not exact copy');
 assert.match(edge,/같은 원인·사실을 나타내는 자연스러운 동의어와 바꿔쓰기를 정답으로 인정/);

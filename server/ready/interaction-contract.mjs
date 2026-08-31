@@ -1,10 +1,11 @@
 const text=value=>typeof value==='string'?value.trim():'';
 const list=value=>Array.isArray(value)?value:[];
-const wordCount=value=>(String(value||'').match(/[A-Za-z0-9]+(?:['’][A-Za-z]+)?/g)||[]).length;
+const wordCount=value=>(String(value||'').match(/[A-Za-z]+(?:['’][A-Za-z]+)?|\d+(?:,\d{3})*(?:\.\d+)?/g)||[]).length;
 const normalize=value=>text(value).normalize('NFKC').toLowerCase().replace(/[“”‘’'".,!?;:()[\]{}]/g,'').replace(/\s+/g,' ').trim();
 const INTERACTION_KINDS=new Set(['choice_list','choice_matrix','inline_options','position_choice','written_response']);
 const SEGMENT_KINDS=new Set(['text','annotation','blank','inline_options','position']);
-const WRITTEN_LAYOUTS=new Set(['sentence','sentence_parts','short_answers','arrangement','correction','multi_correction','summary']);
+const WRITTEN_LAYOUTS=new Set(['sentence','sentence_cloze','sentence_parts','short_answers','arrangement','correction','multi_correction','summary']);
+const TEMPLATE_KINDS=new Set(['text','slot']);
 
 export const INTERACTION_CONTRACT_VERSION=1;
 
@@ -38,7 +39,7 @@ export function publicInteractionContract(value){
       kind:text(segment?.kind),id:text(segment?.id),label:text(segment?.label),text:String(segment?.text||''),options:list(segment?.options).map(text),
     }))},
     choices:{columns:list(choices.columns).map(text),rows:list(choices.rows).map(row=>({cells:list(row?.cells).map(text)}))},
-    response:{layout:text(response.layout),slots:list(response.slots).map(publicSlot),targetIds:list(response.targetIds).map(text)},
+    response:{layout:text(response.layout),slots:list(response.slots).map(publicSlot),targetIds:list(response.targetIds).map(text),template:list(response.template).map(item=>({kind:text(item?.kind),text:item?.kind==='text'?String(item?.text||''):'',slotIndex:item?.kind==='slot'?Number(item?.slotIndex):null}))},
   };
 }
 
@@ -126,8 +127,18 @@ export function interactionContractErrors(payload={},type='multiple_choice'){
       else if(!counts.size||!counts.has(Number(slot.wordCount)))errors.push(`response slot ${index+1} word count does not match publisher answer`);
     });
     const guideKind=text(payload?.writing_guide?.kind).replace(/-/g,'_');
-    const expectedLayout=guideKind==='summary'?'summary':guideKind==='arrangement'?'arrangement':guideKind==='multi_correction'?'multi_correction':guideKind==='correction'?'correction':slots.length>1?(list(payload?.writing_guide?.targets).length?'short_answers':'sentence_parts'):'sentence';
+    const expectedLayout=guideKind==='sentence_cloze'?'sentence_cloze':guideKind==='summary'?'summary':guideKind==='arrangement'?'arrangement':guideKind==='multi_correction'?'multi_correction':guideKind==='correction'?'correction':slots.length>1?(list(payload?.writing_guide?.targets).length?'short_answers':'sentence_parts'):'sentence';
     if(layout!==expectedLayout)errors.push(`written response layout ${layout||'?'} does not match explicit guide ${expectedLayout}`);
+    if(layout==='sentence_cloze'){
+      const template=list(contract?.response?.template),slotIndexes=template.filter(item=>text(item?.kind)==='slot').map(item=>Number(item?.slotIndex));
+      if(!template.length||template.some(item=>!TEMPLATE_KINDS.has(text(item?.kind))))errors.push('written cloze template is missing or invalid');
+      if(slotIndexes.length!==slots.length||slotIndexes.some((value,index)=>value!==index))errors.push('written cloze template slots do not match response controls');
+      if(!template.some(item=>text(item?.kind)==='text'&&wordCount(item?.text)>0))errors.push('written cloze template has no fixed context');
+      const answerValues=accepted.map(slot=>String((Array.isArray(slot)?slot[0]:slot)||''));
+      const reconstructed=template.map(item=>text(item?.kind)==='slot'?answerValues[Number(item.slotIndex)]||'':String(item?.text||'')).join('');
+      const publisherFull=text(payload?.writing_guide?.publisher_answer);
+      if(!publisherFull||normalize(reconstructed)!==normalize(publisherFull))errors.push('written cloze template does not reconstruct publisher answer');
+    }
     if(['correction','multi_correction','short_answers'].includes(layout)&&list(contract?.response?.targetIds).length!==slots.length)errors.push('written target count does not match response controls');
   }
   return [...new Set(errors)];
