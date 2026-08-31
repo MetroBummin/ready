@@ -15,14 +15,14 @@ function query(sql){
 const rows=query("select id,type,status,payload from public.ready_questions where type='written_response' and status='available' order by created_at");
 const updates=[],report=[];
 for(const row of rows){
-  const payload=structuredClone(row.payload),source=payload.source||{},before=payload.accepted_answers?.[0]?.[0]||'';
-  if(!applyGuidedClozeContract(payload))continue;
+  const payload=structuredClone(row.payload),source=payload.source||{},before=payload.accepted_answers?.[0]?.[0]||'',alreadyCloze=String(payload?.writing_guide?.kind||'').replace(/-/g,'_')==='sentence_cloze',structuredNow=!alreadyCloze&&applyGuidedClozeContract(payload);
+  if(!alreadyCloze&&!structuredNow)continue;
   buildStructuredSourceContract({payload,structured:{passage_text:payload.set_text||payload.variant_text||payload.passage_text,task_text:payload.writing_guide?.task_text||'',conditions:payload.writing_guide?.conditions||[],word_bank:payload.writing_guide?.word_bank||[],summary_text:payload.summary_text||'',targets:payload.writing_guide?.targets||[],response_slots:payload.response_slots},sourceFileHash:source.document_sha256,page:source.page,bbox:source.bbox});
   compileInteractionContract(payload,'written_response');
   const validation=validateQuestionSpec(payload,'written_response','available');
   report.push({id:row.id,exam:source.exam,question:source.source_question_no,slots:payload.response_slots.length,ready:validation.ready,errors:validation.errors});
   if(!validation.ready)continue;
-  if(payload.writing_guide.publisher_answer!==before)throw new Error(`publisher answer changed for ${row.id}`);
+  if(structuredNow&&payload.writing_guide.publisher_answer!==before)throw new Error(`publisher answer changed for ${row.id}`);
   updates.push({id:row.id,payload});
 }
 

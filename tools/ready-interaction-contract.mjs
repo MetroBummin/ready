@@ -122,7 +122,7 @@ export function compileInteractionContract(payload={},type='multiple_choice'){
   if(type==='written_response'){
     const ranges=list(payload.target_ranges||payload?.writing_guide?.targets),layout=writtenLayout(payload);
     devices=ranges.length?annotationDevices(source,ranges):[];
-    const sourceRequired=requiresPassageEvidence(payload),hideAnswerOnlySource=text(payload?.writing_guide?.task_text)&&['sentence','sentence_parts'].includes(layout);
+    const sourceRequired=requiresPassageEvidence(payload),hideAnswerOnlySource=text(payload?.writing_guide?.task_text)&&['sentence','sentence_cloze','sentence_parts'].includes(layout);
     payload.spec.interaction={version:INTERACTION_CONTRACT_VERSION,kind:'written_response',selection:'none',passage:{visible:sourceRequired||!hideAnswerOnlySource,segments:tokenizePassage(source,devices)},choices:{columns:[],rows:[]},response:{layout,slots:writtenSlots(payload,layout),targetIds:devices.map(item=>item.id),template:layout==='sentence_cloze'?list(payload?.writing_guide?.answer_template):[]}};
     return payload.spec.interaction;
   }

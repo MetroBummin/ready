@@ -63,6 +63,7 @@ assert.equal(applyGuidedClozeContract(clozePayload),true);
 buildStructuredSourceContract({payload:clozePayload,structured:{passage_text:clozePayload.set_text,task_text:clozePayload.writing_guide.task_text,conditions:[],word_bank:[],summary_text:'',targets:[],response_slots:clozePayload.response_slots},sourceFileHash:'a'.repeat(64)});
 compileInteractionContract(clozePayload,'written_response');
 assert.equal(clozePayload.spec.interaction.response.layout,'sentence_cloze');
+assert.equal(clozePayload.spec.interaction.passage.visible,false,'Partial guided writing must never expose the publisher answer above its blanks');
 assert.equal(clozePayload.spec.interaction.response.template.filter(item=>item.kind==='slot').length,4);
 assert.equal(validateQuestionSpec(clozePayload,'written_response','available').ready,true);
 const brokenCloze=structuredClone(clozePayload);
