@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">READY</string>
+    <string name="title_activity_main">READY</string>
+    <string name="package_name">kr.co.breeze.ready</string>
+    <string name="custom_url_scheme">kr.co.breeze.ready</string>
+</resources>
