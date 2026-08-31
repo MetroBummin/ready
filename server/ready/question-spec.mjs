@@ -17,7 +17,7 @@ export const READY_TAXONOMY = Object.freeze([
   "blank_word", "blank_phrase", "blank_sentence",
   "sentence_insertion", "irrelevant_sentence", "paragraph_order",
   "implication", "summary_two_blank", "summary_completion",
-  "arrangement", "translation", "guided_writing", "correction",
+  "arrangement", "translation", "guided_writing", "correction", "reference",
 ]);
 
 const rendererSet = new Set(READY_RENDERERS);
@@ -45,6 +45,7 @@ export function legacyTaxonomy(payload = {}, type = "multiple_choice") {
   if (/일치/.test(prompt)) return "content_true";
   if (/답할 수 없/.test(prompt)) return "unanswerable";
   if (/어법/.test(prompt)) return payload.multi_select === true ? "grammar_multi_error" : "grammar_single_error";
+  if (/가리키는 대상|지칭/.test(prompt)) return "reference";
   if (/어휘|문맥상|흐름상/.test(prompt) || skill === "vocabulary") return "vocabulary_context";
   if (/삽입/.test(prompt) || skill === "insertion") return "sentence_insertion";
   if (/무관/.test(prompt)) return "irrelevant_sentence";

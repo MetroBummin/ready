@@ -57,6 +57,22 @@ const missingBlanks=objective({set_text:'The system was investigated and the fie
 assert(interactionContractErrors(missingBlanks,'multiple_choice').some(error=>error.includes('prompt devices do not match passage devices')));
 assert.equal(validateQuestionSpec(missingBlanks,'multiple_choice','available').ready,false);
 
+const inlinePublisher=objective({
+  prompt:'(A), (B), (C)의 각 네모 안에서 어법상 알맞은 것을 고르시오.',taxonomy:'grammar_ab',
+  set_text:'He was (A)[safe / safely], chose (B)[which / what], and planned (C)[to hike / hiking].',
+  choices:['safe - what - hiking','safely - which - hiking','safe - which - to hike'],answer:[2],
+});
+assert.equal(inlinePublisher.spec.interaction.kind,'choice_list');
+assert.equal(inlinePublisher.spec.interaction.passage.segments.filter(item=>item.kind==='inline_options_display').length,3);
+assert.doesNotMatch(contractPassageHtml(inlinePublisher.spec.interaction,{escape}),/data-inline-option/);
+assert.equal(validateQuestionSpec(inlinePublisher,'multiple_choice','available').ready,true);
+const mismatchedInline=objective({prompt:'(A), (B), (C)의 각 네모 안에서 문맥에 맞는 낱말을 고르시오.',taxonomy:'vocabulary_context',set_text:'He was (A)[safe / safely], chose (B)[which / what], and planned (C)[to hike / hiking].',choices:['ⓐ','ⓑ','ⓒ','ⓓ','ⓔ'],answer:[0]});
+assert.equal(validateQuestionSpec(mismatchedInline,'multiple_choice','available').ready,false);
+
+const reference=objective({prompt:'밑줄 친 부분이 가리키는 대상이 다른 것은?',taxonomy:'reference',set_text:'One of ① his hobbies mattered. ② He agreed. ③ Him they trusted.',choices:['1','2','3'],answer:[1],target_ranges:[{label:'①',text:'his'},{label:'②',text:'He'},{label:'③',text:'Him'}],spec:{renderer:'annotated_passage_mcq',passage:{source:'canonical',annotations:[]},extras:[],choiceMode:'single',responseMode:'choice',gradingMode:'exact'}});
+assert.equal(reference.spec.interaction.passage.segments.filter(item=>item.kind==='annotation').length,3);
+assert.equal(validateQuestionSpec(reference,'multiple_choice','available').ready,true);
+
 const written={
   prompt:'주어진 우리말을 조건에 맞게 영작하시오.',
   set_text:'The police decided to use social media to find clues in the picture.',

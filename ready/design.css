@@ -420,7 +420,7 @@ body[data-ready-mode="student"] .question-passage .reading-sentence{display:inli
 .writing-bank span{padding:6px 9px;border:0;border-right:1px solid var(--ready-hairline);border-bottom:1px solid var(--ready-hairline);border-radius:0;color:var(--ready-body);background:transparent;font-size:13px;font-weight:600}
 .written-slot-list{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:var(--ready-space-3)}
 .cloze-frame{padding:var(--ready-space-4);border-left:2px solid var(--ready-ink);background:var(--ready-canvas-quiet);font-family:var(--ready-font-serif);font-size:clamp(16px,2vw,19px);line-height:2.15}
-.cloze-blank{display:inline-block;width:clamp(52px,7vw,86px);margin:0 4px;vertical-align:baseline}.cloze-blank i{display:block;border-bottom:1px solid currentColor}
+.contract-blank{display:inline-flex;align-items:flex-end;gap:5px;margin:0 4px;vertical-align:baseline}.contract-blank i{display:block;width:clamp(38px,5vw,62px);border-bottom:1px solid currentColor}
 .cloze-slot-list{padding-top:var(--ready-space-3);border-top:1px solid var(--ready-hairline)}.cloze-slot-list label{display:grid;gap:var(--ready-space-2)}.cloze-slot-list label>span{font:750 11px/1 var(--ready-font-mono)}
 .sentence-answer{display:grid;gap:var(--ready-space-2)}
 .written-workspace input,.written-workspace textarea{font-size:16px}
@@ -437,6 +437,7 @@ body[data-ready-mode="student"] .question-passage .reading-sentence{display:inli
 .inline-option-group{display:inline-flex;max-width:100%;align-items:center;flex-wrap:wrap;gap:3px;margin:0 2px;padding:2px;border-radius:var(--ready-radius-xs);background:var(--ready-canvas-quiet);white-space:normal}
 .inline-option-group>b{margin-left:3px;color:var(--ready-muted);font:750 11px/1 var(--ready-font-mono)}
 .inline-option-group>i{color:var(--ready-muted);font-style:normal}
+.inline-option-group.display-only{background:transparent}.inline-option-copy{padding:2px 1px;border-bottom:1px solid var(--ready-hairline-strong);font-weight:700}
 .inline-answer{display:inline-flex;align-items:center;gap:var(--ready-space-1);margin:2px;padding:4px 7px;border:1px solid var(--ready-hairline-strong);border-radius:var(--ready-radius-xs);color:var(--ready-body);background:var(--ready-surface);font-size:.88em;font-weight:700;line-height:1.25;vertical-align:baseline;cursor:pointer}
 .inline-answer:hover{border-color:var(--ready-ink);color:var(--ready-ink);background:var(--ready-canvas-quiet);transform:none}
 .inline-answer.selected{border-color:var(--ready-ink);color:var(--ready-on-action);background:var(--ready-action);box-shadow:none}

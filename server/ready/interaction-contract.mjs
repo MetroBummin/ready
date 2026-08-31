@@ -3,7 +3,7 @@ const list=value=>Array.isArray(value)?value:[];
 const wordCount=value=>(String(value||'').match(/[A-Za-z]+(?:['’][A-Za-z]+)?|\d+(?:,\d{3})*(?:\.\d+)?/g)||[]).length;
 const normalize=value=>text(value).normalize('NFKC').toLowerCase().replace(/[“”‘’'".,!?;:()[\]{}]/g,'').replace(/\s+/g,' ').trim();
 const INTERACTION_KINDS=new Set(['choice_list','choice_matrix','inline_options','position_choice','written_response']);
-const SEGMENT_KINDS=new Set(['text','annotation','blank','inline_options','position']);
+const SEGMENT_KINDS=new Set(['text','annotation','blank','inline_options','inline_options_display','position']);
 const WRITTEN_LAYOUTS=new Set(['sentence','sentence_cloze','sentence_parts','short_answers','arrangement','correction','multi_correction','summary']);
 const TEMPLATE_KINDS=new Set(['text','slot']);
 
@@ -23,6 +23,7 @@ function publicSlot(slot,index){
     label:text(slot?.label)||`답 ${index+1}`,
     control:slot?.control==='textarea'?'textarea':'text',
     placeholder:text(slot?.placeholder)||'답을 입력하세요',
+    wordCount:Number(slot?.wordCount)||null,
   };
 }
 
@@ -61,7 +62,7 @@ export function interactionContractErrors(payload={},type='multiple_choice'){
     if(label)deviceLabels.push(label);
     if(kind==='annotation'&&!copy)errors.push(`annotation ${id||index+1} has no exact text`);
     if(kind==='blank'&&copy)errors.push(`blank ${id||index+1} exposes answer text`);
-    if(kind==='inline_options'&&list(segment?.options).length<2)errors.push(`inline option ${id||index+1} is incomplete`);
+    if(['inline_options','inline_options_display'].includes(kind)&&list(segment?.options).length<2)errors.push(`inline option ${id||index+1} is incomplete`);
     rendered+=copy;
   }
   const approved=text(payload.set_text||payload.variant_text||payload.passage_text);
@@ -76,6 +77,8 @@ export function interactionContractErrors(payload={},type='multiple_choice'){
     if(!['choice_list','choice_matrix','inline_options','position_choice'].includes(text(contract.kind)))errors.push('multiple choice requires a choice interaction');
     if(!['single','multi'].includes(text(contract.selection)))errors.push('multiple choice selection mode is missing');
     const rows=list(contract?.choices?.rows),choices=list(payload.choices),columns=list(contract?.choices?.columns);
+    const approvedInlineApparatus=/(?:\([A-H]\)|[ⓐ-ⓩ])\s*\[[^\]]+\/[^\]]+\]/.test(approved);
+    if(approvedInlineApparatus&&!segments.some(segment=>['inline_options','inline_options_display'].includes(segment.kind)))errors.push('inline-choice passage apparatus is not connected to the publisher choices');
     if(rows.length!==choices.length)errors.push('choice row count does not match choices');
     const expectedCells=contract.kind==='choice_matrix'?columns.length:1;
     if(contract.kind==='choice_matrix'&&expectedCells<2)errors.push('choice matrix columns are missing');
@@ -107,6 +110,24 @@ export function interactionContractErrors(payload={},type='multiple_choice'){
       const activeLabels=contract.kind==='choice_matrix'?segments.filter(segment=>segment.kind==='blank').map(item=>text(item.label)):segments.filter(segment=>segment.kind==='inline_options').map(item=>text(item.label));
       if(JSON.stringify(activeLabels)!==JSON.stringify(contract.kind==='choice_matrix'?columns:promptLabels))errors.push('prompt devices do not match passage devices');
     }
+    const displayGroups=segments.filter(segment=>segment.kind==='inline_options_display');
+    if(displayGroups.length){
+      if(contract.kind!=='choice_list')errors.push('display-only inline options require publisher choice selection');
+      if(JSON.stringify(displayGroups.map(item=>text(item.label)))!==JSON.stringify(promptLabels))errors.push('display-only inline option labels do not match the prompt');
+      const normalized=value=>normalize(value).replace(/[^a-z0-9]+/g,'');
+      for(const [index,row] of rows.entries()){
+        const choice=text(row?.cells?.[0]),expected=normalized(choice);
+        let matched=false;
+        const visit=(group,parts)=>{if(matched)return;if(group===displayGroups.length){matched=normalized(parts.join(' '))===expected;return;}for(const option of list(displayGroups[group].options))visit(group+1,[...parts,option]);};
+        visit(0,[]);
+        if(!matched)errors.push(`choice row ${index+1} does not encode one option from every inline group`);
+      }
+    }
+    if(taxonomyStartsWithBlank(payload)&&!segments.some(segment=>segment.kind==='blank'))errors.push('blank question has no explicit blank passage device');
+    const numericPointers=rows.length&&rows.every((row,index)=>text(row?.cells?.[0])===String(index+1));
+    const annotationPointers=segments.filter(segment=>segment.kind==='annotation').map(segment=>text(segment.label));
+    const circledDigits=['①','②','③','④','⑤','⑥','⑦','⑧'];
+    if(contract.kind==='choice_list'&&numericPointers&&!rows.every((_row,index)=>annotationPointers.includes(circledDigits[index])))errors.push('numeric pointer choices must be reconstructed as semantic publisher choices');
   }else if(type==='written_response'){
     if(text(contract.kind)!=='written_response')errors.push('written response requires written_response interaction');
     if(text(contract.selection)!=='none')errors.push('written response selection must be none');
@@ -129,11 +150,19 @@ export function interactionContractErrors(payload={},type='multiple_choice'){
     const guideKind=text(payload?.writing_guide?.kind).replace(/-/g,'_');
     const expectedLayout=guideKind==='sentence_cloze'?'sentence_cloze':guideKind==='summary'?'summary':guideKind==='arrangement'?'arrangement':guideKind==='multi_correction'?'multi_correction':guideKind==='correction'?'correction':slots.length>1?(list(payload?.writing_guide?.targets).length?'short_answers':'sentence_parts'):'sentence';
     if(layout!==expectedLayout)errors.push(`written response layout ${layout||'?'} does not match explicit guide ${expectedLayout}`);
-    if(layout==='sentence_cloze'){
+    if(['sentence_cloze','summary'].includes(layout)){
       const template=list(contract?.response?.template),slotIndexes=template.filter(item=>text(item?.kind)==='slot').map(item=>Number(item?.slotIndex));
-      if(!template.length||template.some(item=>!TEMPLATE_KINDS.has(text(item?.kind))))errors.push('written cloze template is missing or invalid');
-      if(slotIndexes.length!==slots.length||slotIndexes.some((value,index)=>value!==index))errors.push('written cloze template slots do not match response controls');
-      if(!template.some(item=>text(item?.kind)==='text'&&wordCount(item?.text)>0))errors.push('written cloze template has no fixed context');
+      if(!template.length||template.some(item=>!TEMPLATE_KINDS.has(text(item?.kind))))errors.push(`written ${layout} template is missing or invalid`);
+      if(slotIndexes.length!==slots.length||slotIndexes.some((value,index)=>value!==index))errors.push(`written ${layout} template slots do not match response controls`);
+      if(!template.some(item=>text(item?.kind)==='text'&&wordCount(item?.text)>0))errors.push(`written ${layout} template has no fixed context`);
+      if(layout==='summary'){
+        const contracted=template.map(item=>text(item?.kind)==='slot'?'_____':String(item?.text||'')).join('');
+        const normalizedFrame=value=>String(value||'').replace(/[_＿]{3,}/g,'_____').replace(/\s+/g,' ').trim();
+        if(normalizedFrame(contracted)!==normalizedFrame(payload.summary_text))errors.push('written summary template does not equal the approved summary frame');
+      }
+    }
+    if(layout==='sentence_cloze'){
+      const template=list(contract?.response?.template);
       const answerValues=accepted.map(slot=>String((Array.isArray(slot)?slot[0]:slot)||''));
       const reconstructed=template.map(item=>text(item?.kind)==='slot'?answerValues[Number(item.slotIndex)]||'':String(item?.text||'')).join('');
       const publisherFull=text(payload?.writing_guide?.publisher_answer);
@@ -149,6 +178,8 @@ export function promptDeviceLabels(prompt){
   for(const match of source.match(/\([A-H]\)|[ⓐ-ⓩ㉠-㉭]/g)||[])if(!labels.includes(match))labels.push(match);
   return labels;
 }
+
+function taxonomyStartsWithBlank(payload){return text(payload?.taxonomy||payload?.spec?.taxonomy).startsWith('blank_');}
 
 function normalizedCombination(value){return normalize(value).replace(/[^a-z0-9]+/g,'');}
 function inlineExpected(contract,payload){

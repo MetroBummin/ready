@@ -10,6 +10,7 @@ export function contractPassageHtml(contract,{escape,result=null,inlineSelected=
       const groupIndex=list(contract.passage.segments).filter(item=>item.kind==='inline_options').indexOf(segment);
       return `<span class="inline-option-group" data-contract-device="${escape(segment.id)}"><b>${escape(segment.label)}</b>${list(segment.options).map((option,optionIndex)=>`<button type="button" data-inline-group="${groupIndex}" data-inline-option="${optionIndex}" class="inline-option${inlineSelected[groupIndex]===optionIndex?' selected':''}" aria-pressed="${inlineSelected[groupIndex]===optionIndex}" ${result?'disabled':''}>${escape(option)}</button>`).join('<i>/</i>')}</span>`;
     }
+    if(segment.kind==='inline_options_display')return `<span class="inline-option-group display-only" data-contract-device="${escape(segment.id)}"><b>${escape(segment.label)}</b>${list(segment.options).map(option=>`<span class="inline-option-copy">${escape(option)}</span>`).join('<i>/</i>')}</span>`;
     if(segment.kind==='position'){
       const rowIndex=list(contract?.choices?.rows).findIndex(row=>row?.cells?.[0]===segment.label),chosen=selected.includes(rowIndex),correct=result?.answer?.includes(rowIndex);
       const state=result?(correct?' correct':chosen?' wrong':''):chosen?' selected':'';

@@ -114,6 +114,20 @@ function writtenSlots(payload,layout){
   }));
 }
 
+function answerFrameTemplate(source,slots,label){
+  const matches=[...String(source||'').matchAll(/[_＿]{3,}/g)];
+  if(matches.length!==slots.length)throw new Error(`${label} blank count ${matches.length} does not match response slots ${slots.length}`);
+  const template=[];
+  let cursor=0;
+  matches.forEach((match,index)=>{
+    pushText(template,String(source).slice(cursor,match.index));
+    template.push({kind:'slot',slotIndex:index});
+    cursor=(match.index||0)+match[0].length;
+  });
+  pushText(template,String(source).slice(cursor));
+  return template;
+}
+
 export function compileInteractionContract(payload={},type='multiple_choice'){
   if(!payload.spec||typeof payload.spec!=='object')throw new Error('explicit Question render spec is missing');
   const source=text(payload.set_text||payload.variant_text||payload.passage_text),taxonomy=text(payload.taxonomy),selection=payload.multi_select===true||list(payload.answer).length>1?'multi':'single';
@@ -123,7 +137,8 @@ export function compileInteractionContract(payload={},type='multiple_choice'){
     const ranges=list(payload.target_ranges||payload?.writing_guide?.targets),layout=writtenLayout(payload);
     devices=ranges.length?annotationDevices(source,ranges):[];
     const sourceRequired=requiresPassageEvidence(payload),hideAnswerOnlySource=text(payload?.writing_guide?.task_text)&&['sentence','sentence_cloze','sentence_parts'].includes(layout);
-    payload.spec.interaction={version:INTERACTION_CONTRACT_VERSION,kind:'written_response',selection:'none',passage:{visible:sourceRequired||!hideAnswerOnlySource,segments:tokenizePassage(source,devices)},choices:{columns:[],rows:[]},response:{layout,slots:writtenSlots(payload,layout),targetIds:devices.map(item=>item.id),template:layout==='sentence_cloze'?list(payload?.writing_guide?.answer_template):[]}};
+    const slots=writtenSlots(payload,layout),template=layout==='sentence_cloze'?list(payload?.writing_guide?.answer_template):layout==='summary'?answerFrameTemplate(payload.summary_text,slots,'summary'):[];
+    payload.spec.interaction={version:INTERACTION_CONTRACT_VERSION,kind:'written_response',selection:'none',passage:{visible:sourceRequired||!hideAnswerOnlySource,segments:tokenizePassage(source,devices)},choices:{columns:[],rows:[]},response:{layout,slots,targetIds:devices.map(item=>item.id),template}};
     return payload.spec.interaction;
   }
 
@@ -133,7 +148,7 @@ export function compileInteractionContract(payload={},type='multiple_choice'){
   }else {
     const inline=inlineDevices(source),blanks=blankDevices(source),ranges=list(payload.target_ranges);
     const combinations=inline.length?combinationRows(inline,choices):null;
-    if(inline.length&&combinations){kind='inline_options';devices=inline;rows=rowsFromChoices(payload);}
+    if(inline.length&&combinations){kind='choice_list';devices=inline.map(device=>({...device,kind:'inline_options_display'}));rows=rowsFromChoices(payload);}
     else if(blanks.length){
       devices=blanks;
       if(promptLabels.length>1){

@@ -5,6 +5,7 @@ import { buildStructuredSourceContract, sourceContractErrors } from '../tools/re
 import { buildObjectiveSourceContract } from '../tools/ready-source-contract.mjs';
 import { compileInteractionContract } from '../tools/ready-interaction-contract.mjs';
 import { applyGuidedClozeContract, structureGuidedCloze } from '../tools/ready-guided-cloze.mjs';
+import { publicInteractionContract } from '../server/ready/interaction-contract.mjs';
 
 const canonical='His location settings were turned off. He used the last of his battery to send a text message.';
 const base={type:'written_response',payload:{
@@ -50,6 +51,24 @@ zeroWordSlot.accepted_answers=["'"];
 zeroWordSlot.response_slots=[{label:'답',word_count:0}];
 compileInteractionContract(zeroWordSlot,'written_response');
 assert.equal(validateQuestionSpec(zeroWordSlot,'written_response','available').ready,false);
+
+const summaryPayload=structuredClone(renderPayload);
+summaryPayload.prompt='다음 글을 요약한 문장의 빈칸 (A), (B)를 완성하시오.';
+summaryPayload.taxonomy='summary_completion';
+summaryPayload.summary_text='The first answer is (A) _____ and the second is (B) _____.';
+summaryPayload.accepted_answers=[['one'],['two words']];
+summaryPayload.response_slots=[{label:'(A)',word_count:1},{label:'(B)',word_count:2}];
+summaryPayload.writing_guide={...summaryPayload.writing_guide,kind:'summary',title:summaryPayload.prompt,slot_labels:['(A)','(B)']};
+summaryPayload.spec.extras=['summary'];
+buildStructuredSourceContract({payload:summaryPayload,structured:{passage_text:summaryPayload.set_text,task_text:'요약문을 완성하시오.',conditions:[],word_bank:[],summary_text:summaryPayload.summary_text,targets:[],response_slots:summaryPayload.response_slots},sourceFileHash:'a'.repeat(64)});
+compileInteractionContract(summaryPayload,'written_response');
+assert.equal(summaryPayload.spec.interaction.response.template.filter(item=>item.kind==='slot').length,2);
+assert.equal(publicInteractionContract(summaryPayload.spec.interaction).response.slots[1].wordCount,2);
+const summaryValidation=validateQuestionSpec(summaryPayload,'written_response','available');
+assert.equal(summaryValidation.ready,true,summaryValidation.errors.join('\n'));
+const brokenSummary=structuredClone(summaryPayload);
+brokenSummary.spec.interaction.response.template=brokenSummary.spec.interaction.response.template.filter(item=>item.kind!=='slot'||item.slotIndex!==1);
+assert.equal(validateQuestionSpec(brokenSummary,'written_response','available').ready,false);
 
 const clozePayload=structuredClone(renderPayload);
 clozePayload.prompt='각 빈칸에 한 단어씩 쓸 것 보기 There / same / scene 보기____ ____ hints from research showing that your brain uses the ____ regions to imagine a ____.';
@@ -101,5 +120,7 @@ assert(sourceContractErrors(inactiveDevice,inactiveDevice.spec).some(item=>item.
 const bareLabel=structuredClone(objective);bareLabel.taxonomy='grammar_single_error';bareLabel.spec.renderer='annotated_passage_mcq';bareLabel.set_text='She believed that the system worked.';bareLabel.target_ranges=[{label:'A',text:'that',kind:'target'}];buildObjectiveSourceContract(bareLabel);
 assert.equal(bareLabel.target_ranges[0].label,'(A)');
 assert.equal(sourceContractErrors(bareLabel,bareLabel.spec).some(item=>item.includes('non-renderable label')),false);
+const missingPublisherUnderline=structuredClone(objective);missingPublisherUnderline.prompt='밑줄 친 부분의 지칭 대상이 다른 것은?';buildObjectiveSourceContract(missingPublisherUnderline);
+assert(sourceContractErrors(missingPublisherUnderline,missingPublisherUnderline.spec).some(item=>item.includes('geometry-validated annotation')));
 
 console.log('READY written import contract verification passed.');

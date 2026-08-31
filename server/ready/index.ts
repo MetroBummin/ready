@@ -457,6 +457,7 @@ function publicTaxonomyLabel(taxonomy: string) {
     sentence_insertion: "문장 삽입", irrelevant_sentence: "무관한 문장", paragraph_order: "문단 순서",
     summary_two_blank: "요약 빈칸", guided_writing: "조건 영작", translation: "영작·해석",
     arrangement: "순서 배열", correction: "어색한 곳 고치기", summary_completion: "서술형 요약",
+    reference: "지칭 추론",
   };
   return labels[taxonomy] || taxonomy.replaceAll("_", " ");
 }

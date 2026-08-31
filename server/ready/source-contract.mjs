@@ -9,7 +9,7 @@ const PLAIN_TAXONOMIES=new Set(['topic','title','main_idea','purpose','emotion',
 const EVIDENCE_TAXONOMIES=new Set(['content_true','content_false','unanswerable']);
 const FIXED_ANNOTATION_SPANS=['in order to','as well as','because of','due to','rather than','such as','according to','not only','but also','so that','even though','in case of','in front of','be able to'];
 const EVIDENCE_STOPWORDS=new Set('a an and are as at be been being but by did do does for from had has have he her hers him his how i in into is it its may might more most not of on only or our she should so than that the their them they this those to was we were what when where which who why will with would'.split(' '));
-const validAnnotationLabel=value=>/^(?:[ⓐ-ⓩ]|\([A-H]\)|[㉠-㉭])$/.test(compact(value));
+const validAnnotationLabel=value=>/^(?:[①-⑧ⓐ-ⓩ]|\([A-H]\)|[㉠-㉭])$/.test(compact(value));
 const evidenceTokens=value=>(String(value||'').toLowerCase().match(/[a-z]+(?:['’][a-z]+)?/g)||[]).map(token=>token.replace(/[’']/g,"'")).filter(token=>token.length>3&&!EVIDENCE_STOPWORDS.has(token));
 
 export const PIPELINE_CONTRACT_VERSION=2;
@@ -60,6 +60,7 @@ export function sourceContractErrors(payload={},spec={}){
   const prompt=compact(payload.prompt),sourcePrompt=list(refs.prompt).map(id=>compact(byId.get(compact(id))?.source_text)).filter(Boolean).join(' ');
   if(prompt&&sourcePrompt&&prompt!==sourcePrompt)errors.push('prompt does not equal approved prompt blocks');
   if(/[가-힣]/.test(selectedPassage))errors.push('approved passage contains Korean text');
+  if(/밑줄\s*친/.test(prompt)&&spec?.responseMode==='choice'&&!list(spec?.passage?.annotations).length)errors.push('underlined prompt has no geometry-validated annotation spans');
   if(selectedPassage.length>1800)errors.push('approved passage exceeds the student range budget');
   const hasBlankApparatus=/_{3,}/.test(selectedPassage);
   if((hasBlankApparatus&&!taxonomy.startsWith('blank_'))||/(?:^|\s)→/.test(selectedPassage)||/(?:\(\d+\)\s*)?(?:What|Why|How|Where|When|Who|Which)\b[^?]{0,160}\?/i.test(selectedPassage))errors.push('approved passage contains question apparatus');
@@ -95,6 +96,6 @@ export function sourceContractErrors(payload={},spec={}){
       }
     }
   }
-  if(['grammar_single_error','grammar_multi_error','vocabulary_context'].includes(spec?.taxonomy)&&!list(spec?.passage?.annotations).length)errors.push('annotated question has no validated annotation spans');
+  if(['grammar_single_error','grammar_multi_error','vocabulary_context','reference'].includes(spec?.taxonomy)&&!list(spec?.passage?.annotations).length)errors.push('annotated question has no validated annotation spans');
   return [...new Set(errors)];
 }
