@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
 import { validateWrittenStructure } from '../tools/ready-written-contract.mjs';
+import { validateQuestionSpec } from '../server/ready/question-spec.mjs';
 
 const canonical='His location settings were turned off. He used the last of his battery to send a text message.';
 const base={type:'written_response',payload:{
@@ -24,5 +25,10 @@ assert(errors({conditions:[]}).some(item=>item.includes('conditions missing')));
 const summaryQuestion={type:'written_response',payload:{prompt:'다음 글의 요약문의 빈칸 (A), (B)를 완성하시오.',_raw_question_text:'Source passage. 요약문: (A) ____ (B) ____',explanation:'해설',accepted_answers:[['one'],['two words']]}};
 const summarySpec={kind:'summary',prompt_text:summaryQuestion.payload.prompt,passage_mode:'canonical_excerpt',passage_text:'Source passage.',task_text:'',targets:[],conditions:[],word_bank:[],response_slots:[{label:'A',word_count:1},{label:'B',word_count:2}],summary_text:'',confidence:.99,issues:[]};
 assert(validateWrittenStructure(summaryQuestion,summarySpec,'Source passage.').some(item=>item.includes('summary missing')));
+
+const renderPayload={prompt:'영작하시오.',taxonomy:'guided_writing',writing_guide:{kind:'sentence',title:'영작하시오.',slot_labels:['답'],conditions:[],word_bank:[],task_text:'문장을 쓰시오.',targets:[]},accepted_answers:['answer'],response_slots:[{label:'답',word_count:1}],import_status:'ready',spec:{renderer:'written_input',passage:{source:'canonical',annotations:[]},extras:[],choiceMode:'none',responseMode:'input',gradingMode:'accepted_variants'}};
+assert.equal(validateQuestionSpec(renderPayload,'written_response','available').ready,false);
+renderPayload.ai_structure={engine:'codex-cli',contract_version:1};
+assert.equal(validateQuestionSpec(renderPayload,'written_response','available').ready,true);
 
 console.log('READY written import contract verification passed.');

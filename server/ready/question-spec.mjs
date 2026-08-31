@@ -145,5 +145,6 @@ export function questionSpecErrors(spec, payload = {}, type = "multiple_choice")
 export function validateQuestionSpec(payload = {}, type = "multiple_choice", rowStatus = "available") {
   const spec = normalizeQuestionSpec(payload, type, rowStatus);
   const errors = questionSpecErrors(spec, payload, type);
+  if (type === "written_response" && (payload?.ai_structure?.engine !== "codex-cli" || Number(payload?.ai_structure?.contract_version) !== 1)) errors.push("written response did not pass the AI structure contract");
   return { spec, errors, ready: spec.importStatus === "ready" && errors.length === 0 };
 }

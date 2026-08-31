@@ -33,6 +33,7 @@ for(const [index,question] of written.entries()){
     if(structured.passage_mode==='authored_variant'){payload.variant_mode='authored_variant';payload.variant_text=structured.passage_text;}else{payload.variant_mode='canonical_overlay';delete payload.variant_text;}
     if(structured.summary_text)payload.summary_text=structured.summary_text;else delete payload.summary_text;
     payload.import_status=ready?'ready':'drop';
+    if(ready)payload.ai_structure={engine:'codex-cli',contract_version:1};else delete payload.ai_structure;
     question.status=ready?'available':'draft';
     if(payload.spec){payload.spec.importStatus=payload.import_status;payload.spec.passage={source:structured.passage_mode==='authored_variant'?'authored_variant':'canonical',annotations:structured.targets,deviceMode:structured.targets.length?'annotations':'plain'};payload.spec.extras=structured.summary_text?['summary']:[];}
     report.push({source:payload.source,status:payload.import_status,confidence:structured.confidence,issues,inputCharacters:promptFor(question,canonical).length,outputCharacters:JSON.stringify(structured).length});
