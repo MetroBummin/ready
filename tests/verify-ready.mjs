@@ -80,9 +80,16 @@ assert.deepEqual(deterministicGrade(written,'written_response',{responses:['The 
 
 const passageAnswer=structuredClone(written);
 passageAnswer.prompt='다음 본문을 읽고 영어 질문에 답하시오.';
+passageAnswer.writing_guide.task_text='What caused the police to use social media?';
 delete passageAnswer.spec.interaction;
 compileInteractionContract(passageAnswer,'written_response');
 assert.equal(passageAnswer.spec.interaction.passage.visible,true,'A passage-dependent prompt must render its approved evidence');
+
+const guidedTarget=structuredClone(written);
+guidedTarget.prompt='윗글의 우리말을 조건에 맞게 영작하시오.';
+delete guidedTarget.spec.interaction;
+compileInteractionContract(guidedTarget,'written_response');
+assert.equal(guidedTarget.spec.interaction.passage.visible,false,'Guided writing must not reveal its publisher answer even when the prompt refers to the passage');
 
 const staleSlots=structuredClone(written);
 staleSlots.accepted_answers=[['one'],['two'],['three']];

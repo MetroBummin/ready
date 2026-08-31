@@ -8,8 +8,11 @@ const WRITTEN_LAYOUTS=new Set(['sentence','sentence_parts','short_answers','arra
 
 export const INTERACTION_CONTRACT_VERSION=1;
 
-export function requiresPassageEvidence(prompt=''){
-  const value=String(prompt||'').replace(/\s+/g,' ');
+export function requiresPassageEvidence(input={}){
+  const payload=input&&typeof input==='object'?input:{prompt:input};
+  const value=String(payload.prompt||'').replace(/\s+/g,' '),task=String(payload?.writing_guide?.task_text||'').trim();
+  const koreanWritingTarget=/[가-힣]/u.test(task)&&/(?:영작|우리말|문장(?:을|으로)?\s*(?:완성|작성))/u.test(value);
+  if(koreanWritingTarget)return false;
   return /(?:본문(?:을|에서)|윗글|지문|글을\s*(?:읽고|바탕)|위\s*글)/u.test(value)||/\b(?:based on|according to)\s+(?:the\s+)?(?:passage|text)\b|\bread\s+(?:the\s+)?(?:passage|text)\b/i.test(value);
 }
 
@@ -108,7 +111,7 @@ export function interactionContractErrors(payload={},type='multiple_choice'){
     if(text(contract.selection)!=='none')errors.push('written response selection must be none');
     const layout=text(contract?.response?.layout),slots=list(contract?.response?.slots),accepted=list(payload.accepted_answers);
     if(!WRITTEN_LAYOUTS.has(layout))errors.push('written response layout is missing');
-    if(requiresPassageEvidence(payload.prompt)&&contract?.passage?.visible!==true)errors.push('written prompt requires visible passage evidence');
+    if(requiresPassageEvidence(payload)&&contract?.passage?.visible!==true)errors.push('written prompt requires visible passage evidence');
     if(slots.length!==accepted.length)errors.push('interaction response slots do not match answer slots');
     const ids=new Set();
     slots.forEach((slot,index)=>{
