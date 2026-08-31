@@ -5,12 +5,25 @@
   "type": "module",
   "scripts": {
     "dev": "python3 -m http.server 4173 --directory .",
-    "test": "node tests/verify-ready.mjs && node tests/verify-ready-contracts.mjs && node tests/verify-ready-intelligence.mjs && node tests/verify-ready-written-contract.mjs",
+    "test": "node tests/verify-ready.mjs && node tests/verify-ready-contracts.mjs && node tests/verify-ready-intelligence.mjs && node tests/verify-ready-written-contract.mjs && node tests/verify-ready-shorts.mjs",
     "build": "node tools/build-pages.mjs",
+    "native:sync": "npm run build && cap sync",
+    "native:ios": "npm run native:sync && cap open ios",
+    "native:android": "npm run native:sync && cap open android",
+    "native:doctor": "cap doctor",
+    "native:verify": "node tests/verify-ready-native.mjs",
     "structure:written": "node tools/ready-structure-written-with-codex.mjs",
     "validate:pipeline": "node tools/ready-validate-pipeline.mjs",
     "structure:objective-fallback": "node tools/ready-structure-objective-fallback-with-codex.mjs",
     "import": "node tools/ready-import-questions.mjs",
     "deploy:api": "npx supabase functions deploy ready --no-verify-jwt --project-ref fqvhlyocdkwiyioiokte"
+  },
+  "dependencies": {
+    "@capacitor/android": "^8.5.0",
+    "@capacitor/core": "^8.5.0",
+    "@capacitor/ios": "^8.5.0"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "^8.5.0"
   }
 }

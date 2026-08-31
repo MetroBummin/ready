@@ -1,0 +1,17 @@
+{
+  "appId": "kr.co.breeze.ready",
+  "appName": "READY",
+  "webDir": "dist",
+  "backgroundColor": "#F6F5F0",
+  "server": {
+    "androidScheme": "https"
+  },
+  "ios": {
+    "contentInset": "never",
+    "preferredContentMode": "mobile",
+    "backgroundColor": "#F6F5F0"
+  },
+  "android": {
+    "backgroundColor": "#F6F5F0"
+  }
+}
