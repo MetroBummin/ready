@@ -144,10 +144,14 @@ const {NE_MINBYEONGCHEON_L2_WORKBOOK}=await import('../server/ready/workbook-ne-
 const {YBM_PARKJUNEON_L1_WORKBOOK}=await import('../server/ready/workbook-ybm-l1.mjs');
 const {YBM_PARKJUNEON_L2_WORKBOOK}=await import('../server/ready/workbook-ybm-l2.mjs');
 const workbooks=[NE_MINBYEONGCHEON_L1_WORKBOOK,NE_MINBYEONGCHEON_L2_WORKBOOK,YBM_PARKJUNEON_L1_WORKBOOK,YBM_PARKJUNEON_L2_WORKBOOK];
-assert.deepEqual(workbooks.map(book=>book.stages.flatMap(stage=>stage.items).length),[254,356,309,292]);
+assert.deepEqual(workbooks.map(book=>book.stages.flatMap(stage=>stage.items).length),[289,364,317,302]);
+for(const book of workbooks)assert.deepEqual(book.stages.map(stage=>stage.stage),[2,3,4,5,6,7,8,9],`${book.workbookKey} must expose every requested workbook stage`);
 const workbookItems=workbooks.flatMap(book=>book.stages.flatMap(stage=>stage.items));
 assert.equal(new Set(workbookItems.map(item=>item.key)).size,workbookItems.length);
-for(const item of workbookItems){assert(item.answers.length>0);if(item.kind==='blank_input'||item.kind==='verb_form')assert.equal((item.prompt.match(/_{5,}/g)||[]).length,item.answers.length);if(item.kind==='choice_groups')assert.equal(item.groups.length,item.answers.length);if(item.kind==='translation_ai')assert.equal(item.answers.length,1);}
-for(const book of workbooks.slice(1)){assert.equal(book.source.preserved,true);assert.match(book.source.sha256,/^[a-f0-9]{64}$/);for(const item of book.unpublishedExercises)assert.equal(item.status,'INVALID');}
+for(const item of workbookItems){assert(item.answers.length>0);if(item.kind==='blank_input'||item.kind==='verb_form')assert.equal((item.prompt.match(/_{5,}/g)||[]).length,item.answers.length);if(item.kind==='choice_groups')assert.equal(item.groups.length,item.answers.length);if(item.kind==='correction_pairs')assert.equal(item.pairCount*2,item.answers.length);if(item.kind==='translation_ai')assert.equal(item.answers.length,1);}
+for(const book of workbooks){assert.equal(book.source.preserved,true);assert.match(book.source.sha256,/^[a-f0-9]{64}$/);for(const item of book.unpublishedExercises)assert.equal(item.status,'INVALID');}
+assert.match(app,/placeholder="\$\{esc\(hint\|\|'\'\)\}"/,'Stage 5 base verbs must be input placeholders, not exposed labels');
+assert.match(app,/filter\(\(\{chipIndex\}\)=>!chosenSet\.has\(chipIndex\)\)/,'Stage 8 selected chips must disappear from the remaining word bank');
+assert.match(edge,/reference가 "아주 작은"이고 학생이 "작은"이라고 써도 맞습니다/,'Translation AI grading must tolerate nonessential degree modifiers');
 
 console.log('READY executable Question contract checks passed');

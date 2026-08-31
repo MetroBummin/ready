@@ -10,14 +10,16 @@
 6. 현재 interaction이 없으면 `UNSUPPORTED`, 원문/정답 연결을 증명하지 못하면 `INVALID`로 기록하고 학생에게 보내지 않는다.
 
 PDF 전체를 폐기하지 않는다. `unpublishedExercises`에는 INVALID exercise의 stage, number,
-source, prompt, reason을 남긴다. 1단계 읽기 원본과 7단계 vector underline, 10단계 mixed
-Check는 현재 `UNSUPPORTED`다.
+source, prompt, reason을 남긴다. 현재 학생 학습 범위는 2~9단계이며, 이 범위의 모든 단계는
+공통 contract로 지원한다. 1단계 읽기 원본과 10단계 mixed Check는 현재 범위 밖이다.
 
 ## Contract rules
 
 - renderer가 단계명, 빈칸 개수, 문자열 모양으로 interaction을 추측하지 않는다.
 - `kind`, `prompt`, `answers`, `groups`, `hints`, `wordBank`가 실행 방법을 완전히 명시한다.
 - 어법 선택은 모든 조합 중 출판사 전체 영문에 유일하게 존재하는 조합만 READY다.
+- 7단계는 본문 전체와 출판사 정답표의 오류/교정 쌍을 계약에 넣으며, PDF의 밑줄 좌표를
+  renderer가 다시 추측하지 않는다.
 - 영작은 PDF의 부분 frame을 유지하고 실제 빈칸만 만든다.
 - 해석은 출판사 해석을 비공개 semantic reference로 사용한다.
 - 특정 교재명이나 문항 번호를 위한 repair rule은 추가하지 않는다.

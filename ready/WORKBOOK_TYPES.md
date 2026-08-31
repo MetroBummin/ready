@@ -26,10 +26,11 @@ Workbook PDF는 보존되는 원본 패키지다. 공개 판정은 파일이 아
 - `UNSUPPORTED`: 원문과 provenance는 유지하지만 현재 interaction이 없어 숨긴다.
 - `INVALID`: 해당 exercise의 frame/정답 연결을 증명하지 못해 숨긴다.
 
-현재 2·3·5·6·8단계는 결정론적으로 채점하고, 4단계 해석은 출판사 해석을 semantic
-reference로 삼아 AI가 채점한다. 9단계는 PDF의 부분 문장 frame을 그대로 유지하고 각
-실제 빈칸만 결정론적으로 채점한다. 1단계는 읽기 원본이며, 7단계와 10단계 Check에서 아직
-지원하지 않는 interaction은 `UNSUPPORTED`로 보존한다.
+현재 학생 학습 범위는 2~9단계다. 2·3·5·6·8단계는 결정론적으로 채점하고, 4단계 해석은
+출판사 해석을 semantic reference로 삼아 AI가 채점한다. 7단계는 출판사 정답표의
+오류/교정 쌍을 명시적으로 입력받아 결정론적으로 채점한다. 9단계는 PDF의 부분 문장
+frame을 그대로 유지하고 실제 빈칸만 결정론적으로 채점한다. 1단계 읽기 원본과 10단계
+mixed Check는 현재 학습 범위 밖으로 원본만 보존한다.
 
 ## Runtime contract
 
@@ -44,5 +45,5 @@ reference로 삼아 AI가 채점한다. 9단계는 PDF의 부분 문장 frame을
 - Review에서 해당 exercise를 열 때도 원래 Workbook renderer를 그대로 사용한다.
 
 일반 추출기는 `tools/ready-extract-workbook-contract.py`다. 카탈로그마다 원본 파일명과
-SHA-256, 단계별 `source / ready / invalid` 수를 남긴다. 기존 NE 1과의 손검증된 7단계는
-`tools/ready-extract-ne-workbook.py`의 계약을 계속 사용한다.
+SHA-256, 단계별 `source / ready / invalid` 수를 남긴다. 7단계도 교재별 예외 없이 같은
+추출기와 answer-key-backed contract를 사용한다.

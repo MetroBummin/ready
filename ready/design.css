@@ -451,8 +451,8 @@ body[data-ready-mode="student"] .question-passage .reading-sentence{display:inli
 .workbook-head{margin-bottom:var(--ready-space-6)}
 .workbook-head h1{margin:var(--ready-space-2) 0;font-size:clamp(26px,4vw,36px);font-weight:720;line-height:1.2}
 .workbook-head>p:last-child{margin:0;color:var(--ready-body);font-size:14px}
-.workbook-tabs{display:flex;gap:0;margin:0 0 var(--ready-space-4);border:1px solid var(--ready-hairline)}
-.workbook-tabs button{display:grid;min-width:116px;gap:var(--ready-space-1);padding:var(--ready-space-3);border:0;border-right:1px solid var(--ready-hairline);border-radius:0;color:var(--ready-muted);background:transparent;text-align:left;cursor:pointer}
+.workbook-tabs{display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:0;margin:0 0 var(--ready-space-4);border:1px solid var(--ready-hairline)}
+.workbook-tabs button{display:grid;min-width:0;gap:var(--ready-space-1);padding:10px 8px;border:0;border-right:1px solid var(--ready-hairline);border-radius:0;color:var(--ready-muted);background:transparent;text-align:left;cursor:pointer}
 .workbook-tabs button.active{color:var(--ready-on-action);background:var(--ready-action);box-shadow:none}
 .workbook-tabs span{font-size:12px;font-weight:750}.workbook-tabs b{font:650 10px/1 var(--ready-font-mono)}
 .workbook-card{padding:var(--ready-space-6);border:1px solid var(--ready-hairline);border-radius:var(--ready-radius-sm);background:var(--ready-surface);box-shadow:none}
@@ -460,8 +460,10 @@ body[data-ready-mode="student"] .question-passage .reading-sentence{display:inli
 .workbook-instruction{margin:var(--ready-space-2) 0 var(--ready-space-5);color:var(--ready-body);font-size:14px}
 .workbook-card blockquote,.workbook-task-passage{margin:0 0 var(--ready-space-5);padding:var(--ready-space-4);border:0;border-left:2px solid var(--ready-ink);border-radius:0;color:var(--ready-body);background:var(--ready-canvas-quiet);font-size:16px;line-height:1.7;overflow-wrap:anywhere}
 .workbook-prompt{min-width:0;color:var(--ready-ink);font-size:18px;font-weight:500;line-height:2;overflow-wrap:anywhere}
-.workbook-blank{display:inline-grid;min-width:105px;gap:3px;margin:0 var(--ready-space-1);vertical-align:middle}
-.workbook-blank input{min-width:105px;padding:7px 9px;border:0;border-bottom:2px solid var(--ready-ink);border-radius:0;background:var(--ready-canvas-quiet);font-size:16px;text-align:center}
+.workbook-blank{display:inline-grid;width:auto;min-width:0;gap:3px;margin:0 3px;vertical-align:middle}
+body[data-ready-mode] .workbook-blank input{box-sizing:border-box;width:calc(var(--workbook-slot-ch,8)*1ch + 28px);min-width:56px;max-width:220px;min-height:34px;height:34px;padding:2px 7px;border:0;border-bottom:2px solid var(--ready-ink);border-radius:0;background:var(--ready-canvas-quiet);font-size:15px;text-align:center}
+.workbook-blank input::placeholder{color:var(--ready-body);opacity:.72}
+.workbook-blank input:focus::placeholder{color:transparent}
 .workbook-blank.correct input{border-color:var(--ready-success);background:var(--ready-success-soft)}
 .workbook-blank.wrong input{border-color:var(--ready-error);background:var(--ready-error-soft)}
 .workbook-feedback{display:flex;gap:var(--ready-space-2);margin-top:var(--ready-space-5);padding:var(--ready-space-3) 0;border-top:2px solid currentColor;border-radius:0;font-size:13px;line-height:1.5}
@@ -476,12 +478,13 @@ body[data-ready-mode="student"] .question-passage .reading-sentence{display:inli
 .workbook-choice-group>small{grid-column:1/-1;color:var(--ready-error);font-size:11px}
 .workbook-correction-list{display:grid;gap:var(--ready-space-2)}
 .workbook-correction-row{display:grid;grid-template-columns:28px minmax(0,1fr) 24px minmax(0,1fr);gap:var(--ready-space-2);align-items:end;padding:var(--ready-space-3);border-bottom:1px solid var(--ready-hairline)}
+body[data-ready-mode] .workbook-correction-row input{min-height:36px;height:36px;padding:4px 7px}
 .workbook-correction-row>span{align-self:center;color:var(--ready-muted);font:750 11px/1 var(--ready-font-mono)}
 .workbook-correction-row.correct{background:var(--ready-success-soft)}.workbook-correction-row.wrong{background:var(--ready-error-soft)}
 .workbook-order-group{display:inline-grid;gap:var(--ready-space-2);margin:var(--ready-space-2) var(--ready-space-1);padding:var(--ready-space-2);border:1px solid var(--ready-hairline);background:var(--ready-canvas-quiet);vertical-align:middle}
 .workbook-state{display:flex;align-items:center;gap:var(--ready-space-2)}.workbook-state .question-bookmark{width:36px;height:36px}
-.workbook-order-built,.workbook-order-bank{display:flex;min-height:37px;flex-wrap:wrap;gap:var(--ready-space-1);align-items:center}
-.workbook-translation{display:grid;gap:var(--ready-space-2);color:var(--ready-muted);font-size:12px;font-weight:750}.workbook-translation textarea{width:100%;padding:var(--ready-space-3);border:1px solid var(--ready-hairline-strong);color:var(--ready-ink);background:var(--ready-canvas-quiet);font:500 16px/1.65 var(--ready-font-sans);resize:vertical}.workbook-word-bank{display:flex;flex-wrap:wrap;gap:var(--ready-space-1);align-items:center;margin:0 0 var(--ready-space-4)}.workbook-word-bank small{margin-right:var(--ready-space-2);color:var(--ready-muted);font-weight:750}.workbook-word-bank span{padding:5px 8px;border:1px solid var(--ready-hairline);background:var(--ready-canvas-quiet);font-size:13px}
+.workbook-order-built,.workbook-order-bank{display:flex;min-height:37px;flex-wrap:wrap;gap:var(--ready-space-1);align-items:center}.workbook-order-bank em{color:var(--ready-muted);font-size:12px;font-style:normal}
+.workbook-translation{display:grid;gap:var(--ready-space-2);color:var(--ready-muted);font-size:12px;font-weight:750}.workbook-translation textarea{width:100%;min-height:84px;padding:10px;border:1px solid var(--ready-hairline-strong);color:var(--ready-ink);background:var(--ready-canvas-quiet);font:500 15px/1.55 var(--ready-font-sans);resize:vertical}.workbook-word-bank{display:flex;flex-wrap:wrap;gap:var(--ready-space-1);align-items:center;margin:0 0 var(--ready-space-4)}.workbook-word-bank small{margin-right:var(--ready-space-2);color:var(--ready-muted);font-weight:750}.workbook-word-bank span{padding:5px 8px;border:1px solid var(--ready-hairline);background:var(--ready-canvas-quiet);font-size:13px}
 .workbook-order-built{min-width:220px;padding:5px 7px;border-bottom:2px solid var(--ready-ink)}
 .workbook-order-built button,.workbook-order-bank button{padding:6px 9px;border:1px solid var(--ready-hairline);border-radius:var(--ready-radius-xs);color:var(--ready-ink);background:var(--ready-surface);font-size:14px;font-weight:700;cursor:pointer}
 .review-sections{display:grid;gap:var(--ready-space-6)}.review-group{display:flex;align-items:center;justify-content:space-between;gap:var(--ready-space-6);padding:var(--ready-space-5);border:1px solid var(--ready-hairline);background:var(--ready-surface)}.review-group h2{margin:4px 0 0}.workbook-review-group{display:block}.review-workbook-list{display:grid;margin-top:var(--ready-space-4);border-top:1px solid var(--ready-hairline)}.review-workbook-list button{display:flex;min-height:62px;align-items:center;justify-content:space-between;gap:var(--ready-space-4);padding:var(--ready-space-3) 0;border:0;border-bottom:1px solid var(--ready-hairline);color:var(--ready-ink);background:transparent;text-align:left;cursor:pointer}.review-workbook-list button span{display:grid;gap:3px}.review-workbook-list small{color:var(--ready-muted)}
@@ -569,7 +572,8 @@ body[data-ready-mode] #toast.on{opacity:1;transform:translate(-50%,0)}
   .choice-matrix .choice-cell+.choice-cell{padding:var(--ready-space-2) 0 0;border:0;border-top:1px solid var(--ready-hairline)}
   .written-workspace.correction{grid-template-columns:1fr}
   .writing-target,.writing-conditions{grid-template-columns:1fr;gap:var(--ready-space-2)}
-  .workbook-tabs{overflow-x:auto}
+  .workbook-tabs{display:flex;overflow-x:auto}
+  .workbook-tabs button{flex:0 0 92px}
   .workbook-card{padding:var(--ready-space-4)}
   .workbook-correction-row{grid-template-columns:24px minmax(0,1fr);align-items:start}
   .workbook-correction-row>b{display:none}.workbook-correction-row label{grid-column:2}

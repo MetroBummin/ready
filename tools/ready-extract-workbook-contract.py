@@ -22,9 +22,12 @@ META = {
     4: ("해석 연습", "영문을 자연스러운 우리말로 해석하세요."),
     5: ("동사형", "주어진 동사를 문장에 맞는 형태로 고쳐 쓰세요."),
     6: ("어법 선택", "각 구간에서 어법상 알맞은 표현을 고르세요."),
+    7: ("어색한 곳 찾기", "어색한 표현을 찾아 쓰고 알맞게 고쳐 쓰세요."),
     8: ("순서 배열", "주어진 단어와 어구를 눌러 문장 순서로 배열하세요."),
     9: ("영작 연습", "제시어와 문장 틀을 사용해 빈칸을 완성하세요."),
 }
+
+PAIRED_ROW_STAGES = (2, 3, 4, 5, 6, 8, 9)
 
 
 def norm(value: str) -> str:
@@ -160,15 +163,86 @@ def ordered_group(group: list[str], canonical: str) -> str:
     return " ".join(chip for _start, chip in sorted(positions))
 
 
+def stage7_prompt_items(reader: PdfReader) -> list[tuple[str, int, str]]:
+    """Read stage 7 passages; vector underlines are not needed for the response contract."""
+    page_texts = []
+    for index in stage_pages(reader, 7):
+        value = reader.pages[index].extract_text() or ""
+        if "본문 외 지문" not in value:
+            page_texts.append(value)
+    value = " ".join(page_texts)
+    headings = list(re.finditer(r"(문맥상|어법상)\s*어색한 것 찾기", value))
+    output = []
+    for heading_index, heading in enumerate(headings):
+        family = "context" if heading.group(1) == "문맥상" else "grammar"
+        end = headings[heading_index + 1].start() if heading_index + 1 < len(headings) else len(value)
+        section = value[heading.end():end]
+        for match in re.finditer(r"(?<![\d(])(\d+)\)(.*?)(?=\(1\)\s*_{5,})", section, flags=re.S):
+            output.append((family, int(match.group(1)), norm(match.group(2))))
+    if not output:
+        raise ValueError("stage 7: no executable passages")
+    return output
+
+
+def stage7_answer_items(reader: PdfReader) -> list[tuple[str, int, list[tuple[str, str]]]]:
+    value = " ".join((page.extract_text() or "") for page in reader.pages if "Answer Key" in (page.extract_text() or ""))
+    output = []
+    for marker in re.finditer(r"워크북\s*7\s*어색한 곳 찾기 연습", value):
+        following = value[marker.end():]
+        next_stage = re.search(r"워크북\s*8", following)
+        block = following[:next_stage.start() if next_stage else len(following)]
+        headings = list(re.finditer(r"(문맥상|어법상)\s*어색한 것 찾기", block))
+        for heading_index, heading in enumerate(headings):
+            family = "context" if heading.group(1) == "문맥상" else "grammar"
+            end = headings[heading_index + 1].start() if heading_index + 1 < len(headings) else len(block)
+            section = block[heading.end():end]
+            starts = list(re.finditer(r"(?<!\d)(\d+)\)\s*\(1\)", section))
+            for item_index, start in enumerate(starts):
+                item_end = starts[item_index + 1].start() if item_index + 1 < len(starts) else len(section)
+                item_text = section[start.end() - 3:item_end]
+                pairs = [(norm(wrong), norm(correct)) for _number, wrong, correct in re.findall(
+                    r"\((\d+)\)\s*(.*?)\s*→\s*(.*?)(?=\(\d+\)\s*|$)", item_text, flags=re.S
+                )]
+                if pairs:
+                    output.append((family, int(start.group(1)), pairs))
+    if not output:
+        raise ValueError("stage 7: publisher answer key missing")
+    return output
+
+
+def stage7_items(reader: PdfReader, prefix: str) -> list[dict]:
+    prompts, answers = stage7_prompt_items(reader), stage7_answer_items(reader)
+    queues: dict[tuple[str, int], list[list[tuple[str, str]]]] = {}
+    for family, number, pairs in answers:
+        queues.setdefault((family, number), []).append(pairs)
+    items = []
+    for index, (family, number, prompt) in enumerate(prompts, 1):
+        candidates = queues.get((family, number), [])
+        if not candidates:
+            raise ValueError(f"stage 7 {family} item {number}: answer missing")
+        pairs = candidates.pop(0)
+        flat_answers = [value for pair in pairs for value in pair]
+        items.append({"key": f"{prefix}-s7-{family}-{number:02d}", "stage": 7, "number": index,
+                      "kind": "correction_pairs", "source": "", "prompt": prompt,
+                      "pairCount": len(pairs), "subtype": family, "answers": flat_answers})
+    return items
+
+
 def compile_catalog(pdf: Path, key: str, title: str, prefix: str) -> tuple[dict, dict]:
     reader = PdfReader(pdf)
-    raw = {stage: rows(reader, stage) for stage in META}
+    raw = {stage: rows(reader, stage) for stage in PAIRED_ROW_STAGES}
     english = [source for source, _prompt in raw[2]]
     korean = [source for source, _prompt in raw[3]]
     corpus = norm(" ".join(english))
     unpublished = []
     stages, statuses = [], {str(stage): {"source": len(items), "ready": 0, "invalid": 0} for stage, items in raw.items()}
+    stage7 = stage7_items(reader, prefix)
+    statuses["7"] = {"source": len(stage7), "ready": len(stage7), "invalid": 0}
     for stage in META:
+        if stage == 7:
+            stage_title, instruction = META[stage]
+            stages.append({"stage": stage, "title": f"{stage}단계 · {stage_title}", "instruction": instruction, "items": stage7})
+            continue
         items = []
         for index, (source, prompt) in enumerate(raw[stage]):
             number, item = index + 1, None
@@ -210,7 +284,7 @@ def compile_catalog(pdf: Path, key: str, title: str, prefix: str) -> tuple[dict,
         stage_title, instruction = META[stage]
         stages.append({"stage": stage, "title": f"{stage}단계 · {stage_title}", "instruction": instruction, "items": items})
     provenance = {"sourceFile": pdf.name, "sha256": hashlib.sha256(pdf.read_bytes()).hexdigest(), "preserved": True}
-    report = {"source": provenance, "exerciseStatus": statuses, "unsupported": {"1": "read_only_source", "7": "vector_underlines", "10": "mixed_check"}, "ready": sum(len(stage["items"]) for stage in stages)}
+    report = {"source": provenance, "exerciseStatus": statuses, "unsupported": {"1": "outside_requested_range", "10": "outside_requested_range"}, "ready": sum(len(stage["items"]) for stage in stages)}
     return {"workbookKey": key, "title": title, "source": provenance, "importReport": report, "unpublishedExercises": unpublished, "stages": stages}, report
 
 

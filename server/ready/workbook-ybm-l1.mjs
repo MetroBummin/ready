@@ -47,14 +47,18 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
         "source": 47,
         "ready": 45,
         "invalid": 2
+      },
+      "7": {
+        "source": 8,
+        "ready": 8,
+        "invalid": 0
       }
     },
     "unsupported": {
-      "1": "read_only_source",
-      "7": "vector_underlines",
-      "10": "mixed_check"
+      "1": "outside_requested_range",
+      "10": "outside_requested_range"
     },
-    "ready": 309
+    "ready": 317
   },
   "unpublishedExercises": [
     {
@@ -210,7 +214,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
             "헤드라인",
             "깜짝 놀랐"
           ],
-          "key": "ybm-l1-s2-01",
+          "key": "ybm-pj-l1-s2-01",
           "stage": 2,
           "number": 1
         },
@@ -223,7 +227,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
             "친한",
             "충격적인"
           ],
-          "key": "ybm-l1-s2-02",
+          "key": "ybm-pj-l1-s2-02",
           "stage": 2,
           "number": 2
         },
@@ -235,7 +239,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
             "피해 없는",
             "가짜"
           ],
-          "key": "ybm-l1-s2-03",
+          "key": "ybm-pj-l1-s2-03",
           "stage": 2,
           "number": 3
         },
@@ -247,7 +251,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
             "사실",
             "당황했"
           ],
-          "key": "ybm-l1-s2-04",
+          "key": "ybm-pj-l1-s2-04",
           "stage": 2,
           "number": 4
         },
@@ -260,7 +264,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
             "있었",
             "을 떠올리게 했다"
           ],
-          "key": "ybm-l1-s2-05",
+          "key": "ybm-pj-l1-s2-05",
           "stage": 2,
           "number": 5
         },
@@ -273,7 +277,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
             "이슈",
             "로 밝혀졌다"
           ],
-          "key": "ybm-l1-s2-06",
+          "key": "ybm-pj-l1-s2-06",
           "stage": 2,
           "number": 6
         },
@@ -287,7 +291,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
             "콘텐츠",
             "제작자들"
           ],
-          "key": "ybm-l1-s2-07",
+          "key": "ybm-pj-l1-s2-07",
           "stage": 2,
           "number": 7
         },
@@ -301,7 +305,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
             "운동선수",
             "혼란스럽게 했"
           ],
-          "key": "ybm-l1-s2-09",
+          "key": "ybm-pj-l1-s2-09",
           "stage": 2,
           "number": 9
         },
@@ -313,7 +317,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
             "실수로",
             "에 기여한"
           ],
-          "key": "ybm-l1-s2-10",
+          "key": "ybm-pj-l1-s2-10",
           "stage": 2,
           "number": 10
         },
@@ -327,7 +331,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
             "유포하는 것",
             "드문"
           ],
-          "key": "ybm-l1-s2-11",
+          "key": "ybm-pj-l1-s2-11",
           "stage": 2,
           "number": 11
         },
@@ -341,7 +345,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
             "의도적인",
             "시도"
           ],
-          "key": "ybm-l1-s2-12",
+          "key": "ybm-pj-l1-s2-12",
           "stage": 2,
           "number": 12
         },
@@ -357,7 +361,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
             "의도",
             "특정"
           ],
-          "key": "ybm-l1-s2-13",
+          "key": "ybm-pj-l1-s2-13",
           "stage": 2,
           "number": 13
         },
@@ -372,7 +376,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
             "대중",
             "해를 끼칠"
           ],
-          "key": "ybm-l1-s2-14",
+          "key": "ybm-pj-l1-s2-14",
           "stage": 2,
           "number": 14
         },
@@ -384,7 +388,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
             "비상사태",
             "흔한"
           ],
-          "key": "ybm-l1-s2-15",
+          "key": "ybm-pj-l1-s2-15",
           "stage": 2,
           "number": 15
         },
@@ -398,7 +402,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
             "으로 돌아가",
             "대피소"
           ],
-          "key": "ybm-l1-s2-16",
+          "key": "ybm-pj-l1-s2-16",
           "stage": 2,
           "number": 16
         },
@@ -409,7 +413,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
           "answers": [
             "쓰나미"
           ],
-          "key": "ybm-l1-s2-17",
+          "key": "ybm-pj-l1-s2-17",
           "stage": 2,
           "number": 17
         },
@@ -421,7 +425,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
             "분명히",
             "가라앉"
           ],
-          "key": "ybm-l1-s2-18",
+          "key": "ybm-pj-l1-s2-18",
           "stage": 2,
           "number": 18
         },
@@ -436,7 +440,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
             "정부",
             "발표해"
           ],
-          "key": "ybm-l1-s2-19",
+          "key": "ybm-pj-l1-s2-19",
           "stage": 2,
           "number": 19
         },
@@ -448,7 +452,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
             "훨씬",
             "더 멀리"
           ],
-          "key": "ybm-l1-s2-20",
+          "key": "ybm-pj-l1-s2-20",
           "stage": 2,
           "number": 20
         },
@@ -460,7 +464,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
             "현상",
             "설명"
           ],
-          "key": "ybm-l1-s2-22",
+          "key": "ybm-pj-l1-s2-22",
           "stage": 2,
           "number": 22
         },
@@ -474,7 +478,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
             "자극적인",
             "공유하"
           ],
-          "key": "ybm-l1-s2-23",
+          "key": "ybm-pj-l1-s2-23",
           "stage": 2,
           "number": 23
         },
@@ -489,7 +493,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
             "아마도",
             "게시한"
           ],
-          "key": "ybm-l1-s2-24",
+          "key": "ybm-pj-l1-s2-24",
           "stage": 2,
           "number": 24
         },
@@ -503,7 +507,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
             "경향이 있",
             "널리 퍼진"
           ],
-          "key": "ybm-l1-s2-25",
+          "key": "ybm-pj-l1-s2-25",
           "stage": 2,
           "number": 25
         },
@@ -517,7 +521,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
             "증거",
             "가능성이 더 크"
           ],
-          "key": "ybm-l1-s2-26",
+          "key": "ybm-pj-l1-s2-26",
           "stage": 2,
           "number": 26
         },
@@ -530,7 +534,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
             "부합하",
             "는 경향이 있다"
           ],
-          "key": "ybm-l1-s2-27",
+          "key": "ybm-pj-l1-s2-27",
           "stage": 2,
           "number": 27
         },
@@ -544,7 +548,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
             "함정",
             "빠진다"
           ],
-          "key": "ybm-l1-s2-28",
+          "key": "ybm-pj-l1-s2-28",
           "stage": 2,
           "number": 28
         },
@@ -559,7 +563,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
             "뒷받침하",
             "무시한다"
           ],
-          "key": "ybm-l1-s2-29",
+          "key": "ybm-pj-l1-s2-29",
           "stage": 2,
           "number": 29
         },
@@ -575,7 +579,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
             "맹목적으로",
             "무의식적으로"
           ],
-          "key": "ybm-l1-s2-30",
+          "key": "ybm-pj-l1-s2-30",
           "stage": 2,
           "number": 30
         },
@@ -587,7 +591,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
             "현혹하",
             "확신할"
           ],
-          "key": "ybm-l1-s2-31",
+          "key": "ybm-pj-l1-s2-31",
           "stage": 2,
           "number": 31
         },
@@ -599,7 +603,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
             "자극적인",
             "표제"
           ],
-          "key": "ybm-l1-s2-32",
+          "key": "ybm-pj-l1-s2-32",
           "stage": 2,
           "number": 32
         },
@@ -611,7 +615,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
             "클릭",
             "자극적이"
           ],
-          "key": "ybm-l1-s2-33",
+          "key": "ybm-pj-l1-s2-33",
           "stage": 2,
           "number": 33
         },
@@ -623,7 +627,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
             "본문",
             "주의 깊게"
           ],
-          "key": "ybm-l1-s2-34",
+          "key": "ybm-pj-l1-s2-34",
           "stage": 2,
           "number": 34
         },
@@ -634,7 +638,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
           "answers": [
             "액면 그대로"
           ],
-          "key": "ybm-l1-s2-35",
+          "key": "ybm-pj-l1-s2-35",
           "stage": 2,
           "number": 35
         },
@@ -648,7 +652,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
             "기술",
             "연습해라"
           ],
-          "key": "ybm-l1-s2-36",
+          "key": "ybm-pj-l1-s2-36",
           "stage": 2,
           "number": 36
         },
@@ -661,7 +665,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
             "분석하",
             "평가해"
           ],
-          "key": "ybm-l1-s2-37",
+          "key": "ybm-pj-l1-s2-37",
           "stage": 2,
           "number": 37
         },
@@ -673,7 +677,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
             "편견",
             "점검해라"
           ],
-          "key": "ybm-l1-s2-38",
+          "key": "ybm-pj-l1-s2-38",
           "stage": 2,
           "number": 38
         },
@@ -687,7 +691,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
             "영향을 미칠",
             "고려해라"
           ],
-          "key": "ybm-l1-s2-39",
+          "key": "ybm-pj-l1-s2-39",
           "stage": 2,
           "number": 39
         },
@@ -702,7 +706,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
             "반대되",
             "찾아보아라"
           ],
-          "key": "ybm-l1-s2-40",
+          "key": "ybm-pj-l1-s2-40",
           "stage": 2,
           "number": 40
         },
@@ -714,7 +718,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
             "출처",
             "신뢰성"
           ],
-          "key": "ybm-l1-s2-41",
+          "key": "ybm-pj-l1-s2-41",
           "stage": 2,
           "number": 41
         },
@@ -726,7 +730,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
             "작성한",
             "의도"
           ],
-          "key": "ybm-l1-s2-42",
+          "key": "ybm-pj-l1-s2-42",
           "stage": 2,
           "number": 42
         },
@@ -740,7 +744,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
             "타당한",
             "확인할"
           ],
-          "key": "ybm-l1-s2-43",
+          "key": "ybm-pj-l1-s2-43",
           "stage": 2,
           "number": 43
         },
@@ -754,7 +758,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
             "없애",
             "불가능할"
           ],
-          "key": "ybm-l1-s2-44",
+          "key": "ybm-pj-l1-s2-44",
           "stage": 2,
           "number": 44
         },
@@ -769,7 +773,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
             "피해",
             "줄일"
           ],
-          "key": "ybm-l1-s2-45",
+          "key": "ybm-pj-l1-s2-45",
           "stage": 2,
           "number": 45
         },
@@ -780,7 +784,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
           "answers": [
             "생산하"
           ],
-          "key": "ybm-l1-s2-46",
+          "key": "ybm-pj-l1-s2-46",
           "stage": 2,
           "number": 46
         }
@@ -802,7 +806,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
             "astonished",
             "headline"
           ],
-          "key": "ybm-l1-s3-01",
+          "key": "ybm-pj-l1-s3-01",
           "stage": 3,
           "number": 1
         },
@@ -815,7 +819,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
             "shocking",
             "close"
           ],
-          "key": "ybm-l1-s3-02",
+          "key": "ybm-pj-l1-s3-02",
           "stage": 3,
           "number": 2
         },
@@ -827,7 +831,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
             "undamaged",
             "fake"
           ],
-          "key": "ybm-l1-s3-03",
+          "key": "ybm-pj-l1-s3-03",
           "stage": 3,
           "number": 3
         },
@@ -839,7 +843,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
             "embarrassed",
             "fact"
           ],
-          "key": "ybm-l1-s3-04",
+          "key": "ybm-pj-l1-s3-04",
           "stage": 3,
           "number": 4
         },
@@ -852,7 +856,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
             "of",
             "happened"
           ],
-          "key": "ybm-l1-s3-05",
+          "key": "ybm-pj-l1-s3-05",
           "stage": 3,
           "number": 5
         },
@@ -866,7 +870,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
             "turned",
             "out"
           ],
-          "key": "ybm-l1-s3-06",
+          "key": "ybm-pj-l1-s3-06",
           "stage": 3,
           "number": 6
         },
@@ -880,7 +884,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
             "sought",
             "attention"
           ],
-          "key": "ybm-l1-s3-07",
+          "key": "ybm-pj-l1-s3-07",
           "stage": 3,
           "number": 7
         },
@@ -896,7 +900,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
             "views",
             "posts"
           ],
-          "key": "ybm-l1-s3-08",
+          "key": "ybm-pj-l1-s3-08",
           "stage": 3,
           "number": 8
         },
@@ -910,7 +914,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
             "athlete",
             "confused"
           ],
-          "key": "ybm-l1-s3-09",
+          "key": "ybm-pj-l1-s3-09",
           "stage": 3,
           "number": 9
         },
@@ -923,7 +927,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
             "contributed",
             "to"
           ],
-          "key": "ybm-l1-s3-10",
+          "key": "ybm-pj-l1-s3-10",
           "stage": 3,
           "number": 10
         },
@@ -937,7 +941,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
             "distributor",
             "unusual"
           ],
-          "key": "ybm-l1-s3-11",
+          "key": "ybm-pj-l1-s3-11",
           "stage": 3,
           "number": 11
         },
@@ -951,7 +955,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
             "manipulate",
             "inaccurate"
           ],
-          "key": "ybm-l1-s3-12",
+          "key": "ybm-pj-l1-s3-12",
           "stage": 3,
           "number": 12
         },
@@ -967,7 +971,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
             "political",
             "benefits"
           ],
-          "key": "ybm-l1-s3-13",
+          "key": "ybm-pj-l1-s3-13",
           "stage": 3,
           "number": 13
         },
@@ -982,7 +986,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
             "individuals",
             "involved"
           ],
-          "key": "ybm-l1-s3-14",
+          "key": "ybm-pj-l1-s3-14",
           "stage": 3,
           "number": 14
         },
@@ -996,7 +1000,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
             "of",
             "emergency"
           ],
-          "key": "ybm-l1-s3-15",
+          "key": "ybm-pj-l1-s3-15",
           "stage": 3,
           "number": 15
         },
@@ -1011,7 +1015,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
             "to",
             "shelters"
           ],
-          "key": "ybm-l1-s3-16",
+          "key": "ybm-pj-l1-s3-16",
           "stage": 3,
           "number": 16
         },
@@ -1022,7 +1026,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
           "answers": [
             "tsunami"
           ],
-          "key": "ybm-l1-s3-17",
+          "key": "ybm-pj-l1-s3-17",
           "stage": 3,
           "number": 17
         },
@@ -1034,7 +1038,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
             "apparently",
             "sink"
           ],
-          "key": "ybm-l1-s3-18",
+          "key": "ybm-pj-l1-s3-18",
           "stage": 3,
           "number": 18
         },
@@ -1050,7 +1054,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
             "government",
             "announce"
           ],
-          "key": "ybm-l1-s3-19",
+          "key": "ybm-pj-l1-s3-19",
           "stage": 3,
           "number": 19
         },
@@ -1062,7 +1066,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
             "significantly",
             "farther"
           ],
-          "key": "ybm-l1-s3-20",
+          "key": "ybm-pj-l1-s3-20",
           "stage": 3,
           "number": 20
         },
@@ -1077,7 +1081,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
             "on",
             "average"
           ],
-          "key": "ybm-l1-s3-21",
+          "key": "ybm-pj-l1-s3-21",
           "stage": 3,
           "number": 21
         },
@@ -1089,7 +1093,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
             "explanation",
             "phenomenon"
           ],
-          "key": "ybm-l1-s3-22",
+          "key": "ybm-pj-l1-s3-22",
           "stage": 3,
           "number": 22
         },
@@ -1103,7 +1107,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
             "share",
             "stimulating"
           ],
-          "key": "ybm-l1-s3-23",
+          "key": "ybm-pj-l1-s3-23",
           "stage": 3,
           "number": 23
         },
@@ -1118,7 +1122,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
             "unknown",
             "possibly"
           ],
-          "key": "ybm-l1-s3-24",
+          "key": "ybm-pj-l1-s3-24",
           "stage": 3,
           "number": 24
         },
@@ -1132,7 +1136,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
             "tend",
             "effortlessly"
           ],
-          "key": "ybm-l1-s3-25",
+          "key": "ybm-pj-l1-s3-25",
           "stage": 3,
           "number": 25
         },
@@ -1147,7 +1151,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
             "critically",
             "examining"
           ],
-          "key": "ybm-l1-s3-26",
+          "key": "ybm-pj-l1-s3-26",
           "stage": 3,
           "number": 26
         },
@@ -1161,7 +1165,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
             "fits",
             "prejudices"
           ],
-          "key": "ybm-l1-s3-27",
+          "key": "ybm-pj-l1-s3-27",
           "stage": 3,
           "number": 27
         },
@@ -1175,7 +1179,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
             "confirmation",
             "bias"
           ],
-          "key": "ybm-l1-s3-28",
+          "key": "ybm-pj-l1-s3-28",
           "stage": 3,
           "number": 28
         },
@@ -1190,7 +1194,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
             "ignore",
             "support"
           ],
-          "key": "ybm-l1-s3-29",
+          "key": "ybm-pj-l1-s3-29",
           "stage": 3,
           "number": 29
         },
@@ -1206,7 +1210,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
             "candidates",
             "unconsciously"
           ],
-          "key": "ybm-l1-s3-30",
+          "key": "ybm-pj-l1-s3-30",
           "stage": 3,
           "number": 30
         },
@@ -1219,7 +1223,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
             "sure",
             "mislead"
           ],
-          "key": "ybm-l1-s3-31",
+          "key": "ybm-pj-l1-s3-31",
           "stage": 3,
           "number": 31
         },
@@ -1231,7 +1235,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
             "provocative",
             "headlines"
           ],
-          "key": "ybm-l1-s3-32",
+          "key": "ybm-pj-l1-s3-32",
           "stage": 3,
           "number": 32
         },
@@ -1243,7 +1247,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
             "stimulating",
             "clicks"
           ],
-          "key": "ybm-l1-s3-33",
+          "key": "ybm-pj-l1-s3-33",
           "stage": 3,
           "number": 33
         },
@@ -1255,7 +1259,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
             "text",
             "carefully"
           ],
-          "key": "ybm-l1-s3-34",
+          "key": "ybm-pj-l1-s3-34",
           "stage": 3,
           "number": 34
         },
@@ -1267,7 +1271,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
             "face",
             "value"
           ],
-          "key": "ybm-l1-s3-35",
+          "key": "ybm-pj-l1-s3-35",
           "stage": 3,
           "number": 35
         },
@@ -1281,7 +1285,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
             "skills",
             "judge"
           ],
-          "key": "ybm-l1-s3-36",
+          "key": "ybm-pj-l1-s3-36",
           "stage": 3,
           "number": 36
         },
@@ -1294,7 +1298,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
             "analyze",
             "evaluate"
           ],
-          "key": "ybm-l1-s3-37",
+          "key": "ybm-pj-l1-s3-37",
           "stage": 3,
           "number": 37
         },
@@ -1306,7 +1310,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
             "examine",
             "biases"
           ],
-          "key": "ybm-l1-s3-38",
+          "key": "ybm-pj-l1-s3-38",
           "stage": 3,
           "number": 38
         },
@@ -1320,7 +1324,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
             "affect",
             "judgment"
           ],
-          "key": "ybm-l1-s3-39",
+          "key": "ybm-pj-l1-s3-39",
           "stage": 3,
           "number": 39
         },
@@ -1336,7 +1340,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
             "for",
             "oppose"
           ],
-          "key": "ybm-l1-s3-40",
+          "key": "ybm-pj-l1-s3-40",
           "stage": 3,
           "number": 40
         },
@@ -1348,7 +1352,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
             "credibility",
             "source"
           ],
-          "key": "ybm-l1-s3-41",
+          "key": "ybm-pj-l1-s3-41",
           "stage": 3,
           "number": 41
         },
@@ -1360,7 +1364,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
             "wrote",
             "intent"
           ],
-          "key": "ybm-l1-s3-42",
+          "key": "ybm-pj-l1-s3-42",
           "stage": 3,
           "number": 42
         },
@@ -1374,7 +1378,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
             "evidence",
             "valid"
           ],
-          "key": "ybm-l1-s3-43",
+          "key": "ybm-pj-l1-s3-43",
           "stage": 3,
           "number": 43
         },
@@ -1389,7 +1393,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
             "avoid",
             "eliminate"
           ],
-          "key": "ybm-l1-s3-44",
+          "key": "ybm-pj-l1-s3-44",
           "stage": 3,
           "number": 44
         },
@@ -1404,7 +1408,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
             "reduce",
             "damage"
           ],
-          "key": "ybm-l1-s3-45",
+          "key": "ybm-pj-l1-s3-45",
           "stage": 3,
           "number": 45
         },
@@ -1415,7 +1419,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
           "answers": [
             "producing"
           ],
-          "key": "ybm-l1-s3-46",
+          "key": "ybm-pj-l1-s3-46",
           "stage": 3,
           "number": 46
         }
@@ -1433,7 +1437,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
           "answers": [
             "어느 날 지나는 소셜 미디어를 스크롤하다가 '설악산 국립공원 흔들바위가 떨어졌다'는 뉴스 헤드라인을 보고 깜짝 놀랐다."
           ],
-          "key": "ybm-l1-s4-01",
+          "key": "ybm-pj-l1-s4-01",
           "stage": 4,
           "number": 1
         },
@@ -1444,7 +1448,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
           "answers": [
             "지나는 즉시 친한 친구들에게 이 충격적인 소식을 공유했다."
           ],
-          "key": "ybm-l1-s4-02",
+          "key": "ybm-pj-l1-s4-02",
           "stage": 4,
           "number": 2
         },
@@ -1455,7 +1459,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
           "answers": [
             "이후에, TV의 아침 뉴스에서 피해 없는 흔들바위 옆에 서 있던 기자가 \"오늘 인터넷에 올라온 흔들바위가 무너졌다는 기사는 가짜였습니다\"라고 말했다."
           ],
-          "key": "ybm-l1-s4-03",
+          "key": "ybm-pj-l1-s4-03",
           "stage": 4,
           "number": 3
         },
@@ -1466,7 +1470,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
           "answers": [
             "지나는 자신이 가짜 뉴스를 퍼뜨렸다는 사실에 당황했다."
           ],
-          "key": "ybm-l1-s4-04",
+          "key": "ybm-pj-l1-s4-04",
           "stage": 4,
           "number": 4
         },
@@ -1477,7 +1481,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
           "answers": [
             "이것은 지나에게 얼마 전 있었던 또다른 가짜 뉴스 사건을 떠올리게 했다."
           ],
-          "key": "ybm-l1-s4-05",
+          "key": "ybm-pj-l1-s4-05",
           "stage": 4,
           "number": 5
         },
@@ -1488,7 +1492,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
           "answers": [
             "유명한 운동선수가 사망했다는 뉴스가 온라인에서 가장 큰 이슈가 되었지만, 가짜로 밝혀졌다."
           ],
-          "key": "ybm-l1-s4-06",
+          "key": "ybm-pj-l1-s4-06",
           "stage": 4,
           "number": 6
         },
@@ -1499,7 +1503,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
           "answers": [
             "이것은 사람들의 주목을 끌기 위해 콘텐츠 제작자들이 만든 것이었다."
           ],
-          "key": "ybm-l1-s4-07",
+          "key": "ybm-pj-l1-s4-07",
           "stage": 4,
           "number": 7
         },
@@ -1510,7 +1514,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
           "answers": [
             "그들은 자신들의 게시물의 조회수를 높여 돈을 벌기 위해 자극적인 가짜 뉴스를 생산했다."
           ],
-          "key": "ybm-l1-s4-08",
+          "key": "ybm-pj-l1-s4-08",
           "stage": 4,
           "number": 8
         },
@@ -1521,7 +1525,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
           "answers": [
             "그 당시, 지나는 그런 가짜 뉴스를 만들고 퍼뜨린 사람들을 비판했었는데, 그것은 운동선수에게 상처를 주고 사람들을 혼란스럽게 했기 때문이었다."
           ],
-          "key": "ybm-l1-s4-09",
+          "key": "ybm-pj-l1-s4-09",
           "stage": 4,
           "number": 9
         },
@@ -1532,7 +1536,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
           "answers": [
             "하지만, 이번에는 지나 자신이 실수로 가짜 뉴스의 확산에 기여한 셈이 되었다."
           ],
-          "key": "ybm-l1-s4-10",
+          "key": "ybm-pj-l1-s4-10",
           "stage": 4,
           "number": 10
         },
@@ -1543,7 +1547,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
           "answers": [
             "가짜 뉴스가 사회에 미치는 영향안타깝게도 지나처럼 우발적으로 가짜 뉴스를 유포하는 것은 드문 일이 아니다."
           ],
-          "key": "ybm-l1-s4-11",
+          "key": "ybm-pj-l1-s4-11",
           "stage": 4,
           "number": 11
         },
@@ -1554,7 +1558,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
           "answers": [
             "가짜 뉴스는 부정확한 정보를 퍼뜨림으로써 사람들을 조종하려는 의도적인 시도이다."
           ],
-          "key": "ybm-l1-s4-12",
+          "key": "ybm-pj-l1-s4-12",
           "stage": 4,
           "number": 12
         },
@@ -1565,7 +1569,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
           "answers": [
             "가짜 뉴스는 사람들의 관심을 끌거나, 이익을 얻거나, 혹은 정치적 이득을 얻으려는 의도를 가진 특정 집단에 의해 만들어진다."
           ],
-          "key": "ybm-l1-s4-13",
+          "key": "ybm-pj-l1-s4-13",
           "stage": 4,
           "number": 13
         },
@@ -1576,7 +1580,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
           "answers": [
             "이것은 사람들을 혼란스럽게 하고, 사회를 어지럽히고, 심지어 관련된 모든 개인뿐만 아니라 대중에게 심각하게 해를 끼칠 수 있다."
           ],
-          "key": "ybm-l1-s4-14",
+          "key": "ybm-pj-l1-s4-14",
           "stage": 4,
           "number": 14
         },
@@ -1587,7 +1591,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
           "answers": [
             "비상사태 동안 가짜 뉴스가 퍼지는 것은 매우 흔한 일이다."
           ],
-          "key": "ybm-l1-s4-15",
+          "key": "ybm-pj-l1-s4-15",
           "stage": 4,
           "number": 15
         },
@@ -1598,7 +1602,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
           "answers": [
             "예를 들어, 2019년 9월 인도네시아 암본에서 규모 6.5의 지진이 발생한 후, 수천 명의 주민들이 집으로 돌아가지 않고 2주 동안 대피소에 머물렀다."
           ],
-          "key": "ybm-l1-s4-16",
+          "key": "ybm-pj-l1-s4-16",
           "stage": 4,
           "number": 16
         },
@@ -1609,7 +1613,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
           "answers": [
             "이것은 소셜 미디어에 또 다른 지진이 발생한 후 쓰나미가 곧 이어질 것이라는 가짜 뉴스 이야기 때문이었다."
           ],
-          "key": "ybm-l1-s4-17",
+          "key": "ybm-pj-l1-s4-17",
           "stage": 4,
           "number": 17
         },
@@ -1620,7 +1624,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
           "answers": [
             "그 메시지 중 하나는 '내 말을 믿든 믿지 않든 당신 마음이지만, 분명히 앞으로 며칠 안에 암본이 가라앉을 것이다'라는 내용이었다."
           ],
-          "key": "ybm-l1-s4-18",
+          "key": "ybm-pj-l1-s4-18",
           "stage": 4,
           "number": 18
         },
@@ -1631,7 +1635,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
           "answers": [
             "많은 이재민들이 여진에 대한 불안감에 휩싸여 있었기 때문에 정부는 이 정보가 가짜라고 발표해야 했다."
           ],
-          "key": "ybm-l1-s4-19",
+          "key": "ybm-pj-l1-s4-19",
           "stage": 4,
           "number": 19
         },
@@ -1642,7 +1646,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
           "answers": [
             "가짜 뉴스가 빠르게 퍼지는 이유소셜 미디어에서 가짜 뉴스는 진짜 이야기보다 훨씬 더 멀리, 빠르게 퍼진다."
           ],
-          "key": "ybm-l1-s4-20",
+          "key": "ybm-pj-l1-s4-20",
           "stage": 4,
           "number": 20
         },
@@ -1653,7 +1657,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
           "answers": [
             "미국 매사추세츠 공과대학의 한 연구에 따르면 가짜 뉴스는 평균적으로 진짜 뉴스보다 6배 빠르게 온라인에서 퍼지는 것으로 나타났다."
           ],
-          "key": "ybm-l1-s4-21",
+          "key": "ybm-pj-l1-s4-21",
           "stage": 4,
           "number": 21
         },
@@ -1664,7 +1668,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
           "answers": [
             "이러한 현상에 대한 한 가지 설명은 사람들이 새롭고 자극적인 것을 좋아한다는 것이다."
           ],
-          "key": "ybm-l1-s4-22",
+          "key": "ybm-pj-l1-s4-22",
           "stage": 4,
           "number": 22
         },
@@ -1675,7 +1679,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
           "answers": [
             "정보가 놀라운 것일 때 사람들은 그것이 놀랍다고 느낄 뿐만 아니라, 그 자극적인 뉴스를 다른 사람들과 공유하고 싶어 한다."
           ],
-          "key": "ybm-l1-s4-23",
+          "key": "ybm-pj-l1-s4-23",
           "stage": 4,
           "number": 23
         },
@@ -1686,7 +1690,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
           "answers": [
             "소셜 미디어를 통해 그것을 다른 사람들에게 전달함으로써, 그들은 아직 알려지지 않았지만 아마도 거짓일 수 있는 정보를 게시한 첫 번째 사람이기 때문에 주목을 받을 수 있다."
           ],
-          "key": "ybm-l1-s4-24",
+          "key": "ybm-pj-l1-s4-24",
           "stage": 4,
           "number": 24
         },
@@ -1697,7 +1701,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
           "answers": [
             "또한, 가짜 뉴스는 사람들이 일상생활에서 단순하고 쉽게 생각하는 경향이 있기 때문에 널리 퍼진다."
           ],
-          "key": "ybm-l1-s4-25",
+          "key": "ybm-pj-l1-s4-25",
           "stage": 4,
           "number": 25
         },
@@ -1708,7 +1712,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
           "answers": [
             "사람들은 비판적으로 그것을 조사하는 대신에, 어떠한 증거도 없이 새로운 정보를 믿을 가능성이 더 크다."
           ],
-          "key": "ybm-l1-s4-26",
+          "key": "ybm-pj-l1-s4-26",
           "stage": 4,
           "number": 26
         },
@@ -1719,7 +1723,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
           "answers": [
             "또한, 사람들은 사실이 아니더라도 자신의 편견이나 경험에 부합하는 정보를 믿으려는 경향이 있다."
           ],
-          "key": "ybm-l1-s4-27",
+          "key": "ybm-pj-l1-s4-27",
           "stage": 4,
           "number": 27
         },
@@ -1730,7 +1734,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
           "answers": [
             "이 과정에서 사람들은 '확증 편향'의 함정에 쉽게 빠진다."
           ],
-          "key": "ybm-l1-s4-28",
+          "key": "ybm-pj-l1-s4-28",
           "stage": 4,
           "number": 28
         },
@@ -1741,7 +1745,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
           "answers": [
             "즉, 그들은 자신의 신념을 확인시켜주는 뉴스만 선별적으로 받아들이고 이를 뒷받침하지 않는 뉴스는 무시한다."
           ],
-          "key": "ybm-l1-s4-29",
+          "key": "ybm-pj-l1-s4-29",
           "stage": 4,
           "number": 29
         },
@@ -1752,7 +1756,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
           "answers": [
             "예를 들어, 선거철에는 자신이 선호하는 후보를 긍정적으로 묘사하는 모든 뉴스를 맹목적으로 믿는 반면, 다른 후보에 대해 부정적인 내용을 보도하는 뉴스는 무의식적으로 믿는 경향이 있다."
           ],
-          "key": "ybm-l1-s4-30",
+          "key": "ybm-pj-l1-s4-30",
           "stage": 4,
           "number": 30
         },
@@ -1763,7 +1767,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
           "answers": [
             "가짜 뉴스를 식별하고 피하는 방법인터넷에 그렇게 많은 정보가 있는데 어떻게 가짜 뉴스가 당신을 현혹하지 않는지 확신할 수 있을까?"
           ],
-          "key": "ybm-l1-s4-31",
+          "key": "ybm-pj-l1-s4-31",
           "stage": 4,
           "number": 31
         },
@@ -1774,7 +1778,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
           "answers": [
             "첫째, 자극적인 표제를 넘어 읽어라."
           ],
-          "key": "ybm-l1-s4-32",
+          "key": "ybm-pj-l1-s4-32",
           "stage": 4,
           "number": 32
         },
@@ -1785,7 +1789,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
           "answers": [
             "그것들은 더 많은 클릭을 유도하기 위해 지나치게 자극적이어서 당신은 뜻하지 않게 그것들을 클릭할 수 있다."
           ],
-          "key": "ybm-l1-s4-33",
+          "key": "ybm-pj-l1-s4-33",
           "stage": 4,
           "number": 33
         },
@@ -1796,7 +1800,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
           "answers": [
             "따라서 표제만 읽지 말고 본문을 주의 깊게 읽어라."
           ],
-          "key": "ybm-l1-s4-34",
+          "key": "ybm-pj-l1-s4-34",
           "stage": 4,
           "number": 34
         },
@@ -1807,7 +1811,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
           "answers": [
             "둘째, 뉴스를 액면 그대로 읽지 말아라."
           ],
-          "key": "ybm-l1-s4-35",
+          "key": "ybm-pj-l1-s4-35",
           "stage": 4,
           "number": 35
         },
@@ -1818,7 +1822,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
           "answers": [
             "뉴스를 판단하기 위해 비판적인 사고 기술을 연습해라."
           ],
-          "key": "ybm-l1-s4-36",
+          "key": "ybm-pj-l1-s4-36",
           "stage": 4,
           "number": 36
         },
@@ -1829,7 +1833,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
           "answers": [
             "당신은 당신이 읽은 내용에 대해 질문하고, 분석하고, 평가해야 한다."
           ],
-          "key": "ybm-l1-s4-37",
+          "key": "ybm-pj-l1-s4-37",
           "stage": 4,
           "number": 37
         },
@@ -1840,7 +1844,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
           "answers": [
             "셋째, 당신의 편견을 점검해라."
           ],
-          "key": "ybm-l1-s4-38",
+          "key": "ybm-pj-l1-s4-38",
           "stage": 4,
           "number": 38
         },
@@ -1851,7 +1855,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
           "answers": [
             "자신의 신념이 당신의 판단에 영향을 미칠 수 있는지를 고려해라."
           ],
-          "key": "ybm-l1-s4-39",
+          "key": "ybm-pj-l1-s4-39",
           "stage": 4,
           "number": 39
         },
@@ -1862,7 +1866,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
           "answers": [
             "자신의 의견에 맞는 기사만 읽고 있는 것은 아닌지 스스로에게 물어보고, 자신의 의견에 반대되는 기사도 찾아보아라."
           ],
-          "key": "ybm-l1-s4-40",
+          "key": "ybm-pj-l1-s4-40",
           "stage": 4,
           "number": 40
         },
@@ -1873,7 +1877,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
           "answers": [
             "마지막으로, 출처의 신뢰성을 확인해라."
           ],
-          "key": "ybm-l1-s4-41",
+          "key": "ybm-pj-l1-s4-41",
           "stage": 4,
           "number": 41
         },
@@ -1884,7 +1888,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
           "answers": [
             "당신은 뉴스 기사를 작성한 사람이 누구인지, 뉴스 기사를 작성한 의도가 무엇인지 살펴봐야 한다."
           ],
-          "key": "ybm-l1-s4-42",
+          "key": "ybm-pj-l1-s4-42",
           "stage": 4,
           "number": 42
         },
@@ -1895,7 +1899,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
           "answers": [
             "또한 당신은 뉴스 기사가 신뢰할 수 있는 미디어 출처에서 나온 것인지, 증거가 타당한지 확인할 필요가 있다."
           ],
-          "key": "ybm-l1-s4-43",
+          "key": "ybm-pj-l1-s4-43",
           "stage": 4,
           "number": 43
         },
@@ -1906,7 +1910,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
           "answers": [
             "디지털 시대에는 온라인에서 퍼지는 모든 거짓 정보를 피하거나 없애는 것은 불가능할 수 있다."
           ],
-          "key": "ybm-l1-s4-44",
+          "key": "ybm-pj-l1-s4-44",
           "stage": 4,
           "number": 44
         },
@@ -1917,7 +1921,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
           "answers": [
             "하지만 만약 당신이 정보를 비판적이고 객관적으로 볼 수 있는 능력을 가지고 있다면, 당신은 가짜 뉴스가 야기할 수 있는 피해를 줄일 수 있을 것이다."
           ],
-          "key": "ybm-l1-s4-45",
+          "key": "ybm-pj-l1-s4-45",
           "stage": 4,
           "number": 45
         },
@@ -1928,7 +1932,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
           "answers": [
             "잊지 말아라! 누구나 가짜 뉴스를 생산하거나 퍼뜨리는 다음의 사람이 될 수 있다!"
           ],
-          "key": "ybm-l1-s4-46",
+          "key": "ybm-pj-l1-s4-46",
           "stage": 4,
           "number": 46
         }
@@ -1951,7 +1955,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
             "shared",
             "shocking"
           ],
-          "key": "ybm-l1-s5-02",
+          "key": "ybm-pj-l1-s5-02",
           "stage": 5,
           "number": 2
         },
@@ -1967,7 +1971,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
             "embarrassed",
             "had spread"
           ],
-          "key": "ybm-l1-s5-04",
+          "key": "ybm-pj-l1-s5-04",
           "stage": 5,
           "number": 4
         },
@@ -1983,7 +1987,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
             "reminded",
             "had happened"
           ],
-          "key": "ybm-l1-s5-05",
+          "key": "ybm-pj-l1-s5-05",
           "stage": 5,
           "number": 5
         },
@@ -2003,7 +2007,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
             "turned",
             "to be"
           ],
-          "key": "ybm-l1-s5-06",
+          "key": "ybm-pj-l1-s5-06",
           "stage": 5,
           "number": 6
         },
@@ -2019,7 +2023,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
             "had been made",
             "sought"
           ],
-          "key": "ybm-l1-s5-07",
+          "key": "ybm-pj-l1-s5-07",
           "stage": 5,
           "number": 7
         },
@@ -2037,7 +2041,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
             "to make",
             "raising"
           ],
-          "key": "ybm-l1-s5-08",
+          "key": "ybm-pj-l1-s5-08",
           "stage": 5,
           "number": 8
         },
@@ -2059,7 +2063,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
             "had hurt",
             "confused"
           ],
-          "key": "ybm-l1-s5-09",
+          "key": "ybm-pj-l1-s5-09",
           "stage": 5,
           "number": 9
         },
@@ -2075,7 +2079,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
             "had",
             "contributed"
           ],
-          "key": "ybm-l1-s5-10",
+          "key": "ybm-pj-l1-s5-10",
           "stage": 5,
           "number": 10
         },
@@ -2091,7 +2095,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
             "becoming",
             "is"
           ],
-          "key": "ybm-l1-s5-11",
+          "key": "ybm-pj-l1-s5-11",
           "stage": 5,
           "number": 11
         },
@@ -2109,7 +2113,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
             "to manipulate",
             "spreading"
           ],
-          "key": "ybm-l1-s5-12",
+          "key": "ybm-pj-l1-s5-12",
           "stage": 5,
           "number": 12
         },
@@ -2129,7 +2133,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
             "making",
             "gaining"
           ],
-          "key": "ybm-l1-s5-13",
+          "key": "ybm-pj-l1-s5-13",
           "stage": 5,
           "number": 13
         },
@@ -2145,7 +2149,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
             "is",
             "to spread"
           ],
-          "key": "ybm-l1-s5-15",
+          "key": "ybm-pj-l1-s5-15",
           "stage": 5,
           "number": 15
         },
@@ -2163,7 +2167,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
             "did not return",
             "were"
           ],
-          "key": "ybm-l1-s5-16",
+          "key": "ybm-pj-l1-s5-16",
           "stage": 5,
           "number": 16
         },
@@ -2183,7 +2187,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
             "had to announce",
             "was"
           ],
-          "key": "ybm-l1-s5-19",
+          "key": "ybm-pj-l1-s5-19",
           "stage": 5,
           "number": 19
         },
@@ -2197,7 +2201,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
           "answers": [
             "spreads"
           ],
-          "key": "ybm-l1-s5-20",
+          "key": "ybm-pj-l1-s5-20",
           "stage": 5,
           "number": 20
         },
@@ -2213,7 +2217,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
             "has shown",
             "spreads"
           ],
-          "key": "ybm-l1-s5-21",
+          "key": "ybm-pj-l1-s5-21",
           "stage": 5,
           "number": 21
         },
@@ -2229,7 +2233,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
             "is",
             "like"
           ],
-          "key": "ybm-l1-s5-22",
+          "key": "ybm-pj-l1-s5-22",
           "stage": 5,
           "number": 22
         },
@@ -2249,7 +2253,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
             "are",
             "to post"
           ],
-          "key": "ybm-l1-s5-24",
+          "key": "ybm-pj-l1-s5-24",
           "stage": 5,
           "number": 24
         },
@@ -2267,7 +2271,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
             "tend",
             "to think"
           ],
-          "key": "ybm-l1-s5-25",
+          "key": "ybm-pj-l1-s5-25",
           "stage": 5,
           "number": 25
         },
@@ -2285,7 +2289,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
             "to believe",
             "examining"
           ],
-          "key": "ybm-l1-s5-26",
+          "key": "ybm-pj-l1-s5-26",
           "stage": 5,
           "number": 26
         },
@@ -2303,7 +2307,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
             "inclined to believe",
             "fits"
           ],
-          "key": "ybm-l1-s5-27",
+          "key": "ybm-pj-l1-s5-27",
           "stage": 5,
           "number": 27
         },
@@ -2317,7 +2321,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
           "answers": [
             "fall"
           ],
-          "key": "ybm-l1-s5-28",
+          "key": "ybm-pj-l1-s5-28",
           "stage": 5,
           "number": 28
         },
@@ -2341,7 +2345,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
             "believing",
             "reports"
           ],
-          "key": "ybm-l1-s5-30",
+          "key": "ybm-pj-l1-s5-30",
           "stage": 5,
           "number": 30
         },
@@ -2357,7 +2361,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
             "make",
             "does not mislead"
           ],
-          "key": "ybm-l1-s5-31",
+          "key": "ybm-pj-l1-s5-31",
           "stage": 5,
           "number": 31
         },
@@ -2371,7 +2375,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
           "answers": [
             "read"
           ],
-          "key": "ybm-l1-s5-32",
+          "key": "ybm-pj-l1-s5-32",
           "stage": 5,
           "number": 32
         },
@@ -2391,7 +2395,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
             "to get",
             "may click"
           ],
-          "key": "ybm-l1-s5-33",
+          "key": "ybm-pj-l1-s5-33",
           "stage": 5,
           "number": 33
         },
@@ -2407,7 +2411,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
             "don't just read",
             "read"
           ],
-          "key": "ybm-l1-s5-34",
+          "key": "ybm-pj-l1-s5-34",
           "stage": 5,
           "number": 34
         },
@@ -2421,7 +2425,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
           "answers": [
             "don't read"
           ],
-          "key": "ybm-l1-s5-35",
+          "key": "ybm-pj-l1-s5-35",
           "stage": 5,
           "number": 35
         },
@@ -2437,7 +2441,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
             "Exercise",
             "to judge"
           ],
-          "key": "ybm-l1-s5-36",
+          "key": "ybm-pj-l1-s5-36",
           "stage": 5,
           "number": 36
         },
@@ -2451,7 +2455,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
           "answers": [
             "examine"
           ],
-          "key": "ybm-l1-s5-38",
+          "key": "ybm-pj-l1-s5-38",
           "stage": 5,
           "number": 38
         },
@@ -2467,7 +2471,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
             "Consider",
             "could affect"
           ],
-          "key": "ybm-l1-s5-39",
+          "key": "ybm-pj-l1-s5-39",
           "stage": 5,
           "number": 39
         },
@@ -2491,7 +2495,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
             "look",
             "oppose"
           ],
-          "key": "ybm-l1-s5-40",
+          "key": "ybm-pj-l1-s5-40",
           "stage": 5,
           "number": 40
         },
@@ -2505,7 +2509,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
           "answers": [
             "check"
           ],
-          "key": "ybm-l1-s5-41",
+          "key": "ybm-pj-l1-s5-41",
           "stage": 5,
           "number": 41
         },
@@ -2525,7 +2529,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
             "was",
             "writing"
           ],
-          "key": "ybm-l1-s5-42",
+          "key": "ybm-pj-l1-s5-42",
           "stage": 5,
           "number": 42
         },
@@ -2543,7 +2547,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
             "is",
             "is"
           ],
-          "key": "ybm-l1-s5-43",
+          "key": "ybm-pj-l1-s5-43",
           "stage": 5,
           "number": 43
         },
@@ -2563,7 +2567,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
             "eliminate",
             "spreads"
           ],
-          "key": "ybm-l1-s5-44",
+          "key": "ybm-pj-l1-s5-44",
           "stage": 5,
           "number": 44
         },
@@ -2581,7 +2585,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
             "producing",
             "spreading"
           ],
-          "key": "ybm-l1-s5-47",
+          "key": "ybm-pj-l1-s5-47",
           "stage": 5,
           "number": 47
         }
@@ -2620,7 +2624,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
             "saw",
             "Fallen"
           ],
-          "key": "ybm-l1-s6-01",
+          "key": "ybm-pj-l1-s6-01",
           "stage": 6,
           "number": 1
         },
@@ -2647,7 +2651,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
             "shocking",
             "close"
           ],
-          "key": "ybm-l1-s6-02",
+          "key": "ybm-pj-l1-s6-02",
           "stage": 6,
           "number": 2
         },
@@ -2684,7 +2688,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
             "being",
             "were"
           ],
-          "key": "ybm-l1-s6-03",
+          "key": "ybm-pj-l1-s6-03",
           "stage": 6,
           "number": 3
         },
@@ -2711,7 +2715,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
             "that",
             "had"
           ],
-          "key": "ybm-l1-s6-04",
+          "key": "ybm-pj-l1-s6-04",
           "stage": 6,
           "number": 4
         },
@@ -2743,7 +2747,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
             "that",
             "happened"
           ],
-          "key": "ybm-l1-s6-05",
+          "key": "ybm-pj-l1-s6-05",
           "stage": 6,
           "number": 5
         },
@@ -2770,7 +2774,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
             "it",
             "to be"
           ],
-          "key": "ybm-l1-s6-06",
+          "key": "ybm-pj-l1-s6-06",
           "stage": 6,
           "number": 6
         },
@@ -2792,7 +2796,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
             "been made",
             "who"
           ],
-          "key": "ybm-l1-s6-07",
+          "key": "ybm-pj-l1-s6-07",
           "stage": 6,
           "number": 7
         },
@@ -2814,7 +2818,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
             "produced",
             "raising"
           ],
-          "key": "ybm-l1-s6-08",
+          "key": "ybm-pj-l1-s6-08",
           "stage": 6,
           "number": 8
         },
@@ -2856,7 +2860,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
             "had",
             "confused"
           ],
-          "key": "ybm-l1-s6-09",
+          "key": "ybm-pj-l1-s6-09",
           "stage": 6,
           "number": 9
         },
@@ -2883,7 +2887,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
             "accidentally",
             "contributed"
           ],
-          "key": "ybm-l1-s6-10",
+          "key": "ybm-pj-l1-s6-10",
           "stage": 6,
           "number": 10
         },
@@ -2910,7 +2914,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
             "is",
             "unusual"
           ],
-          "key": "ybm-l1-s6-11",
+          "key": "ybm-pj-l1-s6-11",
           "stage": 6,
           "number": 11
         },
@@ -2937,7 +2941,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
             "deliberate",
             "manipulate"
           ],
-          "key": "ybm-l1-s6-12",
+          "key": "ybm-pj-l1-s6-12",
           "stage": 6,
           "number": 12
         },
@@ -2964,7 +2968,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
             "attracting",
             "gaining"
           ],
-          "key": "ybm-l1-s6-13",
+          "key": "ybm-pj-l1-s6-13",
           "stage": 6,
           "number": 13
         },
@@ -2991,7 +2995,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
             "harm",
             "involved"
           ],
-          "key": "ybm-l1-s6-14",
+          "key": "ybm-pj-l1-s6-14",
           "stage": 6,
           "number": 14
         },
@@ -3023,7 +3027,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
             "to spread",
             "during"
           ],
-          "key": "ybm-l1-s6-15",
+          "key": "ybm-pj-l1-s6-15",
           "stage": 6,
           "number": 15
         },
@@ -3050,7 +3054,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
             "thousands",
             "were"
           ],
-          "key": "ybm-l1-s6-16",
+          "key": "ybm-pj-l1-s6-16",
           "stage": 6,
           "number": 16
         },
@@ -3082,7 +3086,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
             "followed",
             "was"
           ],
-          "key": "ybm-l1-s6-17",
+          "key": "ybm-pj-l1-s6-17",
           "stage": 6,
           "number": 17
         },
@@ -3114,7 +3118,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
             "to believe",
             "days"
           ],
-          "key": "ybm-l1-s6-18",
+          "key": "ybm-pj-l1-s6-18",
           "stage": 6,
           "number": 18
         },
@@ -3151,7 +3155,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
             "that",
             "that"
           ],
-          "key": "ybm-l1-s6-19",
+          "key": "ybm-pj-l1-s6-19",
           "stage": 6,
           "number": 19
         },
@@ -3173,7 +3177,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
             "spreads",
             "faster"
           ],
-          "key": "ybm-l1-s6-20",
+          "key": "ybm-pj-l1-s6-20",
           "stage": 6,
           "number": 20
         },
@@ -3210,7 +3214,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
             "times",
             "faster"
           ],
-          "key": "ybm-l1-s6-21",
+          "key": "ybm-pj-l1-s6-21",
           "stage": 6,
           "number": 21
         },
@@ -3237,7 +3241,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
             "that",
             "new"
           ],
-          "key": "ybm-l1-s6-22",
+          "key": "ybm-pj-l1-s6-22",
           "stage": 6,
           "number": 22
         },
@@ -3279,7 +3283,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
             "stimulating",
             "others"
           ],
-          "key": "ybm-l1-s6-23",
+          "key": "ybm-pj-l1-s6-23",
           "stage": 6,
           "number": 23
         },
@@ -3311,7 +3315,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
             "because",
             "post"
           ],
-          "key": "ybm-l1-s6-24",
+          "key": "ybm-pj-l1-s6-24",
           "stage": 6,
           "number": 24
         },
@@ -3343,7 +3347,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
             "tend",
             "effortlessly"
           ],
-          "key": "ybm-l1-s6-25",
+          "key": "ybm-pj-l1-s6-25",
           "stage": 6,
           "number": 25
         },
@@ -3375,7 +3379,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
             "examining",
             "it"
           ],
-          "key": "ybm-l1-s6-26",
+          "key": "ybm-pj-l1-s6-26",
           "stage": 6,
           "number": 26
         },
@@ -3407,7 +3411,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
             "fits",
             "not"
           ],
-          "key": "ybm-l1-s6-27",
+          "key": "ybm-pj-l1-s6-27",
           "stage": 6,
           "number": 27
         },
@@ -3424,7 +3428,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
           "answers": [
             "fall"
           ],
-          "key": "ybm-l1-s6-28",
+          "key": "ybm-pj-l1-s6-28",
           "stage": 6,
           "number": 28
         },
@@ -3461,7 +3465,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
             "ignore",
             "that"
           ],
-          "key": "ybm-l1-s6-29",
+          "key": "ybm-pj-l1-s6-29",
           "stage": 6,
           "number": 29
         },
@@ -3503,7 +3507,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
             "something negative",
             "other"
           ],
-          "key": "ybm-l1-s6-30",
+          "key": "ybm-pj-l1-s6-30",
           "stage": 6,
           "number": 30
         },
@@ -3525,7 +3529,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
             "much",
             "that"
           ],
-          "key": "ybm-l1-s6-31",
+          "key": "ybm-pj-l1-s6-31",
           "stage": 6,
           "number": 31
         },
@@ -3542,7 +3546,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
           "answers": [
             "read"
           ],
-          "key": "ybm-l1-s6-32",
+          "key": "ybm-pj-l1-s6-32",
           "stage": 6,
           "number": 32
         },
@@ -3569,7 +3573,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
             "stimulating",
             "that"
           ],
-          "key": "ybm-l1-s6-33",
+          "key": "ybm-pj-l1-s6-33",
           "stage": 6,
           "number": 33
         },
@@ -3586,7 +3590,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
           "answers": [
             "read"
           ],
-          "key": "ybm-l1-s6-34",
+          "key": "ybm-pj-l1-s6-34",
           "stage": 6,
           "number": 34
         },
@@ -3603,7 +3607,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
           "answers": [
             "value"
           ],
-          "key": "ybm-l1-s6-35",
+          "key": "ybm-pj-l1-s6-35",
           "stage": 6,
           "number": 35
         },
@@ -3625,7 +3629,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
             "Exercise",
             "judge"
           ],
-          "key": "ybm-l1-s6-36",
+          "key": "ybm-pj-l1-s6-36",
           "stage": 6,
           "number": 36
         },
@@ -3647,7 +3651,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
             "evaluate",
             "what"
           ],
-          "key": "ybm-l1-s6-37",
+          "key": "ybm-pj-l1-s6-37",
           "stage": 6,
           "number": 37
         },
@@ -3664,7 +3668,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
           "answers": [
             "examine"
           ],
-          "key": "ybm-l1-s6-38",
+          "key": "ybm-pj-l1-s6-38",
           "stage": 6,
           "number": 38
         },
@@ -3681,7 +3685,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
           "answers": [
             "affect"
           ],
-          "key": "ybm-l1-s6-39",
+          "key": "ybm-pj-l1-s6-39",
           "stage": 6,
           "number": 39
         },
@@ -3728,7 +3732,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
             "that",
             "oppose"
           ],
-          "key": "ybm-l1-s6-40",
+          "key": "ybm-pj-l1-s6-40",
           "stage": 6,
           "number": 40
         },
@@ -3745,7 +3749,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
           "answers": [
             "check"
           ],
-          "key": "ybm-l1-s6-41",
+          "key": "ybm-pj-l1-s6-41",
           "stage": 6,
           "number": 41
         },
@@ -3767,7 +3771,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
             "who",
             "the intent was"
           ],
-          "key": "ybm-l1-s6-42",
+          "key": "ybm-pj-l1-s6-42",
           "stage": 6,
           "number": 42
         },
@@ -3789,7 +3793,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
             "check",
             "reliable"
           ],
-          "key": "ybm-l1-s6-43",
+          "key": "ybm-pj-l1-s6-43",
           "stage": 6,
           "number": 43
         },
@@ -3826,7 +3830,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
             "that",
             "spreads"
           ],
-          "key": "ybm-l1-s6-44",
+          "key": "ybm-pj-l1-s6-44",
           "stage": 6,
           "number": 44
         },
@@ -3868,7 +3872,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
             "that",
             "cause"
           ],
-          "key": "ybm-l1-s6-45",
+          "key": "ybm-pj-l1-s6-45",
           "stage": 6,
           "number": 45
         },
@@ -3885,9 +3889,160 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
           "answers": [
             "producing"
           ],
-          "key": "ybm-l1-s6-46",
+          "key": "ybm-pj-l1-s6-46",
           "stage": 6,
           "number": 46
+        }
+      ]
+    },
+    {
+      "stage": 7,
+      "title": "7단계 · 어색한 곳 찾기",
+      "instruction": "어색한 표현을 찾아 쓰고 알맞게 고쳐 쓰세요.",
+      "items": [
+        {
+          "key": "ybm-pj-l1-s7-context-01",
+          "stage": 7,
+          "number": 1,
+          "kind": "correction_pairs",
+          "source": "",
+          "prompt": "While scrolling through her social media one day, Gina was astonished when she saw the news headline, \"The Heundeulbawi in Seoraksan National Park Has Fallen.\" Gina immediately shared the shocking story with her close friends. Later, during the morning news on TV, a reporter standing next to the damaged Heundeulbawi said, \"Today's Internet stories of the Heundeulbawi being damaged were fake.\" Gina was embarrassed by the fact that she had spread the fake news. It reminded her of another incident of fake news that had happened a while ago. The news that a famous athlete had died became the number one issue online, but it turned out to be fake. It had been made by content creators who sought people's attention. They produced provocative false stories to make money by reducing the number of views of their posts. At that time, Gina criticized those who had made and spread fake news because it had helped the athlete and confused people. This time, however, Gina herself had accidentally contributed to the spread of fake news.",
+          "pairCount": 3,
+          "subtype": "context",
+          "answers": [
+            "damaged",
+            "undamaged",
+            "reducing",
+            "raising",
+            "helped",
+            "hurt"
+          ]
+        },
+        {
+          "key": "ybm-pj-l1-s7-context-02",
+          "stage": 7,
+          "number": 2,
+          "kind": "correction_pairs",
+          "source": "",
+          "prompt": "The Impact of Fake News on Society Unfortunately, becoming an accidental distributor of fake news like Gina is not usual. Fake news is a deliberate attempt to manipulate people by spreading inaccurate information. It is made by certain groups with the intention of attracting people's attention, making profits, or gaining political benefits. It can confuse people, protect society, and even seriously harm the public as well as all individuals involved. It is very uncommon for fake news to spread during states of emergency. For example, after an earthquake measuring 6.5 struck Ambon, Indonesia, in September 2019, thousands of residents did not return to their homes and were still in shelters for two weeks. This was because of fake news stories on social media that another earthquake followed by a tsunami was about to strike. One of those messages said, \"It's up to you if you want to believe me or not, but apparently Ambon is going to sink in the next few days.\" Many displaced people were so anxious about aftershocks that the government had to announce that the information was fake.",
+          "pairCount": 3,
+          "subtype": "context",
+          "answers": [
+            "usual",
+            "unusual",
+            "protect",
+            "disturb",
+            "uncommon",
+            "common"
+          ]
+        },
+        {
+          "key": "ybm-pj-l1-s7-context-03",
+          "stage": 7,
+          "number": 3,
+          "kind": "correction_pairs",
+          "source": "",
+          "prompt": "The Reasons for the Viral Spread of Fake News Fake news on social media spreads significantly farther and faster than true stories. A study by the Massachusetts Institute of Technology in the US has shown that fake news spreads online 6 times slower than real news on average. One explanation for this phenomenon is that people like new and provocative things. When information is astonishing, people not only feel that it is surprising, but they also want to share the stimulating news with others. By passing it to others on social media, they can gain attention because they are the first to post previously unknown, but possibly false, information. Also, fake news goes viral because people in their daily lives tend to think simply and effortlessly. It is more likely for them to believe new information without any proof, instead of critically examining it. Moreover, people are inclined to believe information that fits their prejudices or experiences even when not fake. In this process, people easily fall into the trap of \"confirmation bias.\" That is, they selectively accept news in a way that only confirms their beliefs and accept news that doesn't support them. During election season, for example, people tend to blindly believe any news describing their favored candidates in a positive way, while unconsciously believing news that reports something negative about other candidates.",
+          "pairCount": 3,
+          "subtype": "context",
+          "answers": [
+            "slower",
+            "faster",
+            "fake",
+            "true",
+            "accept",
+            "ignore"
+          ]
+        },
+        {
+          "key": "ybm-pj-l1-s7-context-04",
+          "stage": 7,
+          "number": 4,
+          "kind": "correction_pairs",
+          "source": "",
+          "prompt": "Ways to Spot and Avoid Fake News With so much information on the Internet, how can you make sure that fake news does not mislead you? First, read beyond the provocative headlines. They can be so stimulating to get less clicks that you may click on them accidentally. So don't just read the headlines, but read the text carefully. Second, don't read the news at face value. Exercise critical thinking skills to judge the news. You should question, analyze, and evaluate what you read. Third, examine your biases. Consider if your own beliefs could affect your judgment. Ask yourself if you are only reading articles that suit your opinion, and look for articles that support your opinion as well. Finally, check the credibility of the source. You should examine who wrote the news story and what the intent was behind writing the news story. You also need to check whether the news story is from a reliable media source and the evidence is valid. In the digital age, it might be possible to avoid or eliminate all false information that spreads online. However, if you have the ability to view information critically and objectively, you will be able to reduce the damage that fake news can cause. Don't forget! Anyone can be the next person producing or spreading fake news!",
+          "pairCount": 3,
+          "subtype": "context",
+          "answers": [
+            "less",
+            "more",
+            "support",
+            "oppose",
+            "possible",
+            "impossible"
+          ]
+        },
+        {
+          "key": "ybm-pj-l1-s7-grammar-01",
+          "stage": 7,
+          "number": 5,
+          "kind": "correction_pairs",
+          "source": "",
+          "prompt": "While scrolling through her social media one day, Gina was astonishing when she saw the news headline, \"The Heundeulbawi in Seoraksan National Park Has Fallen.\" Gina immediately shared the shocking story with her close friends. Later, during the morning news on TV, a reporter standing next to the undamaged Heundeulbawi said, \"Today's Internet stories of the Heundeulbawi being damaged was fake.\" Gina was embarrassed by the fact which she had spread the fake news. It reminded her of another incident of fake news that had happened a while ago. The news that a famous athlete had died became the number one issue online, but it turned out to be fake. It had been made by content creators who sought people's attention. They produced provocative false stories to make money by raising the number of views of their posts. At that time, Gina criticized those who had made and spread fake news because it had hurt the athlete and confused people. This time, however, Gina herself had accidentally contributed to the spread of fake news.",
+          "pairCount": 3,
+          "subtype": "grammar",
+          "answers": [
+            "Gina was astonishing when she saw the news headline",
+            "Gina was astonished when she saw the news headline",
+            "Today's Internet stories of the Heundeulbawi being damaged was fake",
+            "Today's Internet stories of the Heundeulbawi being damaged were fake",
+            "Gina was embarrassed by the fact which she had spread the fake news",
+            "Gina was embarrassed by the fact that she had spread the fake news"
+          ]
+        },
+        {
+          "key": "ybm-pj-l1-s7-grammar-02",
+          "stage": 7,
+          "number": 6,
+          "kind": "correction_pairs",
+          "source": "",
+          "prompt": "The Impact of Fake News on Society Unfortunately, becoming an accidental distributor of fake news like Gina is not unusual. Fake news is a deliberate attempt to manipulate people by spreading inaccurate information. It is made by certain groups with the intention of attracting people's attention, making profits, or gaining political benefits. It can confuse people, disturb society, and even seriously harm the public as well as all individuals involved. It is very common for fake news spreading during states of emergency. For example, after an earthquake measuring 6.5 struck Ambon, Indonesia, in September 2019, thousands of residents did not return to their homes and was still in shelters for two weeks. This was because of fake news stories on social media that another earthquake followed by a tsunami was about to strike. One of those messages said, \"It's up to you if you want to believe me or not, but apparently Ambon is going to sink in the next few days.\" Many displaced people were so anxious about aftershocks which the government had to announce that the information was fake.",
+          "pairCount": 3,
+          "subtype": "grammar",
+          "answers": [
+            "It is very common for fake news spreading during states of emergency",
+            "It is very common for fake news to spread during states of emergency",
+            "and was still in shelters for two weeks",
+            "and were still in shelters for two weeks",
+            "Many displaced people were so anxious about aftershocks which the government had to announce that the information was fake",
+            "Many displaced people were so anxious about aftershocks that the government had to announce that the information was fake"
+          ]
+        },
+        {
+          "key": "ybm-pj-l1-s7-grammar-03",
+          "stage": 7,
+          "number": 7,
+          "kind": "correction_pairs",
+          "source": "",
+          "prompt": "The Reasons for the Viral Spread of Fake News Fake news on social media spreads significantly farther and faster than true stories. A study by the Massachusetts Institute of Technology in the US has shown that fake news spreads online 6 times faster than real news on average. One explanation for this phenomenon is what people like new and provocative things. When information is astonishing, people not only feel that it is surprised, but they also want to share the stimulating news with others. By passing it to others on social media, they can gain attention because they are the first to post previously unknown, but possibly false, information. Also, fake news goes viral because people in their daily lives tend to think simply and effortlessly. That is more likely for them to believe new information without any proof, instead of critically examining it. Moreover, people are inclined to believe information that fits their prejudices or experiences even when not true. In this process, people easily fall into the trap of \"confirmation bias.\" That is, they selectively accept news in a way that only confirms their beliefs and ignore news that doesn't support them. During election season, for example, people tend to blindly believe any news describing their favored candidates in a positive way, while unconsciously believing news that reports something negative about other candidates.",
+          "pairCount": 3,
+          "subtype": "grammar",
+          "answers": [
+            "One explanation for this phenomenon is what people like new and provocative things",
+            "One explanation for this phenomenon is that people like new and provocative things",
+            "people not only feel that it is surprised",
+            "people not only feel that it is surprising",
+            "That is more likely for them to believe new information without any proof",
+            "It is more likely for them to believe new information without any proof"
+          ]
+        },
+        {
+          "key": "ybm-pj-l1-s7-grammar-04",
+          "stage": 7,
+          "number": 8,
+          "kind": "correction_pairs",
+          "source": "",
+          "prompt": "Ways to Spot and Avoid Fake News With so much information on the Internet, how can you make sure that fake news does not mislead you? First, read beyond the provocative headlines. They can be so stimulating to get more clicks that you may click on them accidentally. So don't just read the headlines, but read the text carefully. Second, don't read the news at face value. Exercise critical thinking skills to judge the news. You should question, analyze, and evaluate that you read. Third, examine your biases. Consider if your own beliefs could affect your judgment. Ask yourself if you are only reading articles that suit your opinion, and look for articles that oppose your opinion as well. Finally, check the credibility of the source. You should examine whom wrote the news story and what the intent was behind writing the news story. You also need to check whether the news story is from a reliable media source and the evidence is valid. In the digital age, it might be impossibly to avoid or eliminate all false information that spreads online. However, if you have the ability to view information critically and objectively, you will be able to reduce the damage that fake news can cause. Don't forget! Anyone can be the next person producing or spreading fake news!",
+          "pairCount": 3,
+          "subtype": "grammar",
+          "answers": [
+            "You should question, analyze, and evaluate that you read",
+            "You should question, analyze, and evaluate what you read",
+            "You should examine whom wrote the news story",
+            "You should examine who wrote the news story",
+            "it might be impossibly to avoid or eliminate all false information that spreads online",
+            "it might be impossible to avoid or eliminate all false information that spreads online"
+          ]
         }
       ]
     },
@@ -3920,7 +4075,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
             "while scrolling through her social media",
             "was astonished when she saw the news headline"
           ],
-          "key": "ybm-l1-s8-01",
+          "key": "ybm-pj-l1-s8-01",
           "stage": 8,
           "number": 1
         },
@@ -3939,7 +4094,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
           "answers": [
             "shared the shocking story with her close friends"
           ],
-          "key": "ybm-l1-s8-02",
+          "key": "ybm-pj-l1-s8-02",
           "stage": 8,
           "number": 2
         },
@@ -3968,7 +4123,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
             "a reporter standing next to the undamaged Heundeulbawi said",
             "damaged Today's Internet stories of the Heundeulbawi being were fake"
           ],
-          "key": "ybm-l1-s8-03",
+          "key": "ybm-pj-l1-s8-03",
           "stage": 8,
           "number": 3
         },
@@ -3992,7 +4147,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
           "answers": [
             "was embarrassed by the fact that she had spread the fake news"
           ],
-          "key": "ybm-l1-s8-04",
+          "key": "ybm-pj-l1-s8-04",
           "stage": 8,
           "number": 4
         },
@@ -4016,7 +4171,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
           "answers": [
             "reminded her of another incident of fake news that had happened"
           ],
-          "key": "ybm-l1-s8-05",
+          "key": "ybm-pj-l1-s8-05",
           "stage": 8,
           "number": 5
         },
@@ -4046,7 +4201,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
             "the news that a famous athlete had died became the number one issue",
             "be it turned out to fake"
           ],
-          "key": "ybm-l1-s8-06",
+          "key": "ybm-pj-l1-s8-06",
           "stage": 8,
           "number": 6
         },
@@ -4069,7 +4224,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
           "answers": [
             "had been made by content creators who sought people's attention"
           ],
-          "key": "ybm-l1-s8-07",
+          "key": "ybm-pj-l1-s8-07",
           "stage": 8,
           "number": 7
         },
@@ -4097,7 +4252,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
             "they produced provocative false stories to make money",
             "raising the number of views of their posts"
           ],
-          "key": "ybm-l1-s8-08",
+          "key": "ybm-pj-l1-s8-08",
           "stage": 8,
           "number": 8
         },
@@ -4128,7 +4283,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
             "criticized those who had made and spread fake news",
             "it had and hurt the athlete confused people"
           ],
-          "key": "ybm-l1-s8-09",
+          "key": "ybm-pj-l1-s8-09",
           "stage": 8,
           "number": 9
         },
@@ -4148,7 +4303,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
           "answers": [
             "had accidentally contributed to the spread of fake news"
           ],
-          "key": "ybm-l1-s8-10",
+          "key": "ybm-pj-l1-s8-10",
           "stage": 8,
           "number": 10
         },
@@ -4170,7 +4325,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
           "answers": [
             "of fake news becoming an accidental distributor like Gina is not unusual"
           ],
-          "key": "ybm-l1-s8-11",
+          "key": "ybm-pj-l1-s8-11",
           "stage": 8,
           "number": 11
         },
@@ -4197,7 +4352,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
             "fake news is a deliberate attempt to manipulate people",
             "spreading inaccurate information"
           ],
-          "key": "ybm-l1-s8-12",
+          "key": "ybm-pj-l1-s8-12",
           "stage": 8,
           "number": 12
         },
@@ -4221,7 +4376,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
           "answers": [
             "made by certain groups with the intention of attracting people's attention, making profits, or gaining political benefits"
           ],
-          "key": "ybm-l1-s8-13",
+          "key": "ybm-pj-l1-s8-13",
           "stage": 8,
           "number": 13
         },
@@ -4248,7 +4403,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
             "can confuse people, disturb society, and even seriously harm the public",
             "all individuals involved"
           ],
-          "key": "ybm-l1-s8-14",
+          "key": "ybm-pj-l1-s8-14",
           "stage": 8,
           "number": 14
         },
@@ -4270,7 +4425,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
           "answers": [
             "is very common for fake news to spread during states of emergency"
           ],
-          "key": "ybm-l1-s8-15",
+          "key": "ybm-pj-l1-s8-15",
           "stage": 8,
           "number": 15
         },
@@ -4304,7 +4459,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
             "an earthquake measuring 6.5 struck Ambon",
             "in thousands of residents did not return to their homes and were still shelters"
           ],
-          "key": "ybm-l1-s8-16",
+          "key": "ybm-pj-l1-s8-16",
           "stage": 8,
           "number": 16
         },
@@ -4331,7 +4486,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
           "answers": [
             "was because of fake news stories on social media that another earthquake followed by a tsunami was about to strike"
           ],
-          "key": "ybm-l1-s8-17",
+          "key": "ybm-pj-l1-s8-17",
           "stage": 8,
           "number": 17
         },
@@ -4370,7 +4525,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
             "me it's up to you if you want to believe or not",
             "to Ambon is going sink"
           ],
-          "key": "ybm-l1-s8-18",
+          "key": "ybm-pj-l1-s8-18",
           "stage": 8,
           "number": 18
         },
@@ -4400,7 +4555,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
           "answers": [
             "many displaced people were so anxious about aftershocks that the government had to announce that the information was fake"
           ],
-          "key": "ybm-l1-s8-19",
+          "key": "ybm-pj-l1-s8-19",
           "stage": 8,
           "number": 19
         },
@@ -4419,7 +4574,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
           "answers": [
             "spreads significantly farther and faster than true stories"
           ],
-          "key": "ybm-l1-s8-20",
+          "key": "ybm-pj-l1-s8-20",
           "stage": 8,
           "number": 20
         },
@@ -4443,7 +4598,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
           "answers": [
             "has shown that fake news spreads online 6 times faster than real news"
           ],
-          "key": "ybm-l1-s8-21",
+          "key": "ybm-pj-l1-s8-21",
           "stage": 8,
           "number": 21
         },
@@ -4468,7 +4623,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
           "answers": [
             "one explanation for this phenomenon is that people like new and provocative things"
           ],
-          "key": "ybm-l1-s8-22",
+          "key": "ybm-pj-l1-s8-22",
           "stage": 8,
           "number": 22
         },
@@ -4502,7 +4657,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
             "is not only feel that it surprising",
             "to they also want share the stimulating news"
           ],
-          "key": "ybm-l1-s8-23",
+          "key": "ybm-pj-l1-s8-23",
           "stage": 8,
           "number": 23
         },
@@ -4536,7 +4691,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
             "passing it to others on social media",
             "to they can gain attention because are the first post previously unknown"
           ],
-          "key": "ybm-l1-s8-24",
+          "key": "ybm-pj-l1-s8-24",
           "stage": 8,
           "number": 24
         },
@@ -4562,7 +4717,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
           "answers": [
             "fake news goes viral because people in their daily lives tend to think simply and effortlessly"
           ],
-          "key": "ybm-l1-s8-25",
+          "key": "ybm-pj-l1-s8-25",
           "stage": 8,
           "number": 25
         },
@@ -4590,7 +4745,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
             "more likely for them to believe new information without any proof",
             "it critically examining"
           ],
-          "key": "ybm-l1-s8-26",
+          "key": "ybm-pj-l1-s8-26",
           "stage": 8,
           "number": 26
         },
@@ -4619,7 +4774,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
             "are inclined to believe information that fits their prejudices or experiences",
             "when not true"
           ],
-          "key": "ybm-l1-s8-27",
+          "key": "ybm-pj-l1-s8-27",
           "stage": 8,
           "number": 27
         },
@@ -4650,7 +4805,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
             "that they selectively accept news in a way only confirms their beliefs",
             "that news ignore doesn't support them"
           ],
-          "key": "ybm-l1-s8-29",
+          "key": "ybm-pj-l1-s8-29",
           "stage": 8,
           "number": 29
         },
@@ -4687,7 +4842,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
             "in a tend to blindly believe any news describing their favored candidates positive way",
             "news candidates unconsciously believing that reports something negative about other"
           ],
-          "key": "ybm-l1-s8-30",
+          "key": "ybm-pj-l1-s8-30",
           "stage": 8,
           "number": 30
         },
@@ -4713,7 +4868,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
           "answers": [
             "fake news how can you make sure that does not mislead you"
           ],
-          "key": "ybm-l1-s8-31",
+          "key": "ybm-pj-l1-s8-31",
           "stage": 8,
           "number": 31
         },
@@ -4733,7 +4888,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
           "answers": [
             "read beyond the provocative headlines"
           ],
-          "key": "ybm-l1-s8-32",
+          "key": "ybm-pj-l1-s8-32",
           "stage": 8,
           "number": 32
         },
@@ -4757,7 +4912,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
           "answers": [
             "be so stimulating to get more clicks that you may click on them"
           ],
-          "key": "ybm-l1-s8-33",
+          "key": "ybm-pj-l1-s8-33",
           "stage": 8,
           "number": 33
         },
@@ -4782,7 +4937,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
             "don't just read the headlines",
             "read the text carefully"
           ],
-          "key": "ybm-l1-s8-34",
+          "key": "ybm-pj-l1-s8-34",
           "stage": 8,
           "number": 34
         },
@@ -4802,7 +4957,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
           "answers": [
             "don't read the news at face value"
           ],
-          "key": "ybm-l1-s8-35",
+          "key": "ybm-pj-l1-s8-35",
           "stage": 8,
           "number": 35
         },
@@ -4822,7 +4977,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
           "answers": [
             "exercise critical thinking skills to judge the news"
           ],
-          "key": "ybm-l1-s8-36",
+          "key": "ybm-pj-l1-s8-36",
           "stage": 8,
           "number": 36
         },
@@ -4845,7 +5000,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
           "answers": [
             "you should question, analyze, and evaluate what you read"
           ],
-          "key": "ybm-l1-s8-37",
+          "key": "ybm-pj-l1-s8-37",
           "stage": 8,
           "number": 37
         },
@@ -4863,7 +5018,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
           "answers": [
             "examine your biases"
           ],
-          "key": "ybm-l1-s8-38",
+          "key": "ybm-pj-l1-s8-38",
           "stage": 8,
           "number": 38
         },
@@ -4885,7 +5040,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
           "answers": [
             "consider if your own beliefs could affect your judgment"
           ],
-          "key": "ybm-l1-s8-39",
+          "key": "ybm-pj-l1-s8-39",
           "stage": 8,
           "number": 39
         },
@@ -4918,7 +5073,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
             "ask yourself if you are only reading articles that suit your opinion",
             "articles that your opinion look for oppose"
           ],
-          "key": "ybm-l1-s8-40",
+          "key": "ybm-pj-l1-s8-40",
           "stage": 8,
           "number": 40
         },
@@ -4937,7 +5092,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
           "answers": [
             "check the credibility of the source"
           ],
-          "key": "ybm-l1-s8-41",
+          "key": "ybm-pj-l1-s8-41",
           "stage": 8,
           "number": 41
         },
@@ -4967,7 +5122,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
             "you should examine who wrote the news story",
             "the news story what the intent was behind writing"
           ],
-          "key": "ybm-l1-s8-42",
+          "key": "ybm-pj-l1-s8-42",
           "stage": 8,
           "number": 42
         },
@@ -4995,7 +5150,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
             "need to check whether the news story is from a reliable media source",
             "is the evidence valid"
           ],
-          "key": "ybm-l1-s8-43",
+          "key": "ybm-pj-l1-s8-43",
           "stage": 8,
           "number": 43
         },
@@ -5020,7 +5175,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
           "answers": [
             "might be impossible to avoid or eliminate all false information that spreads online"
           ],
-          "key": "ybm-l1-s8-44",
+          "key": "ybm-pj-l1-s8-44",
           "stage": 8,
           "number": 44
         },
@@ -5054,7 +5209,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
             "you have the ability to view information critically and objectively",
             "will be able to reduce the damage that fake news can cause"
           ],
-          "key": "ybm-l1-s8-45",
+          "key": "ybm-pj-l1-s8-45",
           "stage": 8,
           "number": 45
         },
@@ -5072,7 +5227,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
           "answers": [
             "don't forget !"
           ],
-          "key": "ybm-l1-s8-46",
+          "key": "ybm-pj-l1-s8-46",
           "stage": 8,
           "number": 46
         }
@@ -5109,7 +5264,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
             "news",
             "headline"
           ],
-          "key": "ybm-l1-s9-01",
+          "key": "ybm-pj-l1-s9-01",
           "stage": 9,
           "number": 1
         },
@@ -5133,7 +5288,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
             "close",
             "friends"
           ],
-          "key": "ybm-l1-s9-02",
+          "key": "ybm-pj-l1-s9-02",
           "stage": 9,
           "number": 2
         },
@@ -5163,7 +5318,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
             "were",
             "fake"
           ],
-          "key": "ybm-l1-s9-03",
+          "key": "ybm-pj-l1-s9-03",
           "stage": 9,
           "number": 3
         },
@@ -5191,7 +5346,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
             "fake",
             "news"
           ],
-          "key": "ybm-l1-s9-04",
+          "key": "ybm-pj-l1-s9-04",
           "stage": 9,
           "number": 4
         },
@@ -5217,7 +5372,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
             "had",
             "happened"
           ],
-          "key": "ybm-l1-s9-05",
+          "key": "ybm-pj-l1-s9-05",
           "stage": 9,
           "number": 5
         },
@@ -5254,7 +5409,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
             "be",
             "fake"
           ],
-          "key": "ybm-l1-s9-06",
+          "key": "ybm-pj-l1-s9-06",
           "stage": 9,
           "number": 6
         },
@@ -5280,7 +5435,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
             "people's",
             "attention"
           ],
-          "key": "ybm-l1-s9-07",
+          "key": "ybm-pj-l1-s9-07",
           "stage": 9,
           "number": 7
         },
@@ -5314,7 +5469,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
             "their",
             "posts"
           ],
-          "key": "ybm-l1-s9-08",
+          "key": "ybm-pj-l1-s9-08",
           "stage": 9,
           "number": 8
         },
@@ -5351,7 +5506,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
             "confused",
             "people"
           ],
-          "key": "ybm-l1-s9-09",
+          "key": "ybm-pj-l1-s9-09",
           "stage": 9,
           "number": 9
         },
@@ -5377,7 +5532,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
             "fake",
             "news"
           ],
-          "key": "ybm-l1-s9-10",
+          "key": "ybm-pj-l1-s9-10",
           "stage": 9,
           "number": 10
         },
@@ -5402,7 +5557,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
             "not",
             "unusual"
           ],
-          "key": "ybm-l1-s9-11",
+          "key": "ybm-pj-l1-s9-11",
           "stage": 9,
           "number": 11
         },
@@ -5431,7 +5586,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
             "inaccurate",
             "information"
           ],
-          "key": "ybm-l1-s9-12",
+          "key": "ybm-pj-l1-s9-12",
           "stage": 9,
           "number": 12
         },
@@ -5467,7 +5622,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
             "political",
             "benefits"
           ],
-          "key": "ybm-l1-s9-13",
+          "key": "ybm-pj-l1-s9-13",
           "stage": 9,
           "number": 13
         },
@@ -5494,7 +5649,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
             "individuals",
             "involved"
           ],
-          "key": "ybm-l1-s9-14",
+          "key": "ybm-pj-l1-s9-14",
           "stage": 9,
           "number": 14
         },
@@ -5520,7 +5675,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
             "of",
             "emergency"
           ],
-          "key": "ybm-l1-s9-15",
+          "key": "ybm-pj-l1-s9-15",
           "stage": 9,
           "number": 15
         },
@@ -5554,7 +5709,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
             "in",
             "shelters"
           ],
-          "key": "ybm-l1-s9-16",
+          "key": "ybm-pj-l1-s9-16",
           "stage": 9,
           "number": 16
         },
@@ -5590,7 +5745,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
             "to",
             "strike"
           ],
-          "key": "ybm-l1-s9-17",
+          "key": "ybm-pj-l1-s9-17",
           "stage": 9,
           "number": 17
         },
@@ -5631,7 +5786,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
             "to",
             "sink"
           ],
-          "key": "ybm-l1-s9-18",
+          "key": "ybm-pj-l1-s9-18",
           "stage": 9,
           "number": 18
         },
@@ -5667,7 +5822,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
             "was",
             "fake"
           ],
-          "key": "ybm-l1-s9-19",
+          "key": "ybm-pj-l1-s9-19",
           "stage": 9,
           "number": 19
         },
@@ -5697,7 +5852,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
             "real",
             "news"
           ],
-          "key": "ybm-l1-s9-21",
+          "key": "ybm-pj-l1-s9-21",
           "stage": 9,
           "number": 21
         },
@@ -5727,7 +5882,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
             "provocative",
             "things."
           ],
-          "key": "ybm-l1-s9-22",
+          "key": "ybm-pj-l1-s9-22",
           "stage": 9,
           "number": 22
         },
@@ -5760,7 +5915,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
             "stimulating",
             "news"
           ],
-          "key": "ybm-l1-s9-23",
+          "key": "ybm-pj-l1-s9-23",
           "stage": 9,
           "number": 23
         },
@@ -5797,7 +5952,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
             "false",
             "information"
           ],
-          "key": "ybm-l1-s9-24",
+          "key": "ybm-pj-l1-s9-24",
           "stage": 9,
           "number": 24
         },
@@ -5827,7 +5982,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
             "simply",
             "effortlessly"
           ],
-          "key": "ybm-l1-s9-25",
+          "key": "ybm-pj-l1-s9-25",
           "stage": 9,
           "number": 25
         },
@@ -5856,7 +6011,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
             "examining",
             "it"
           ],
-          "key": "ybm-l1-s9-26",
+          "key": "ybm-pj-l1-s9-26",
           "stage": 9,
           "number": 26
         },
@@ -5889,7 +6044,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
             "not",
             "true"
           ],
-          "key": "ybm-l1-s9-27",
+          "key": "ybm-pj-l1-s9-27",
           "stage": 9,
           "number": 27
         },
@@ -5911,7 +6066,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
             "confirmation",
             "bias"
           ],
-          "key": "ybm-l1-s9-28",
+          "key": "ybm-pj-l1-s9-28",
           "stage": 9,
           "number": 28
         },
@@ -5946,7 +6101,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
             "support",
             "them"
           ],
-          "key": "ybm-l1-s9-29",
+          "key": "ybm-pj-l1-s9-29",
           "stage": 9,
           "number": 29
         },
@@ -5989,7 +6144,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
             "other",
             "candidates"
           ],
-          "key": "ybm-l1-s9-30",
+          "key": "ybm-pj-l1-s9-30",
           "stage": 9,
           "number": 30
         },
@@ -6015,7 +6170,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
             "mislead",
             "you"
           ],
-          "key": "ybm-l1-s9-31",
+          "key": "ybm-pj-l1-s9-31",
           "stage": 9,
           "number": 31
         },
@@ -6034,7 +6189,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
             "provocative",
             "headlines"
           ],
-          "key": "ybm-l1-s9-32",
+          "key": "ybm-pj-l1-s9-32",
           "stage": 9,
           "number": 32
         },
@@ -6065,7 +6220,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
             "on",
             "them"
           ],
-          "key": "ybm-l1-s9-33",
+          "key": "ybm-pj-l1-s9-33",
           "stage": 9,
           "number": 33
         },
@@ -6085,7 +6240,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
             "the",
             "text"
           ],
-          "key": "ybm-l1-s9-34",
+          "key": "ybm-pj-l1-s9-34",
           "stage": 9,
           "number": 34
         },
@@ -6104,7 +6259,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
             "face",
             "value"
           ],
-          "key": "ybm-l1-s9-35",
+          "key": "ybm-pj-l1-s9-35",
           "stage": 9,
           "number": 35
         },
@@ -6126,7 +6281,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
             "the",
             "news."
           ],
-          "key": "ybm-l1-s9-36",
+          "key": "ybm-pj-l1-s9-36",
           "stage": 9,
           "number": 36
         },
@@ -6151,7 +6306,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
             "you",
             "read."
           ],
-          "key": "ybm-l1-s9-37",
+          "key": "ybm-pj-l1-s9-37",
           "stage": 9,
           "number": 37
         },
@@ -6168,7 +6323,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
             "your",
             "biases"
           ],
-          "key": "ybm-l1-s9-38",
+          "key": "ybm-pj-l1-s9-38",
           "stage": 9,
           "number": 38
         },
@@ -6192,7 +6347,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
             "your",
             "judgment"
           ],
-          "key": "ybm-l1-s9-39",
+          "key": "ybm-pj-l1-s9-39",
           "stage": 9,
           "number": 39
         },
@@ -6230,7 +6385,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
             "your",
             "opinion"
           ],
-          "key": "ybm-l1-s9-40",
+          "key": "ybm-pj-l1-s9-40",
           "stage": 9,
           "number": 40
         },
@@ -6250,7 +6405,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
             "the",
             "source"
           ],
-          "key": "ybm-l1-s9-41",
+          "key": "ybm-pj-l1-s9-41",
           "stage": 9,
           "number": 41
         },
@@ -6282,7 +6437,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
             "news",
             "story"
           ],
-          "key": "ybm-l1-s9-42",
+          "key": "ybm-pj-l1-s9-42",
           "stage": 9,
           "number": 42
         },
@@ -6316,7 +6471,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
             "is",
             "valid"
           ],
-          "key": "ybm-l1-s9-43",
+          "key": "ybm-pj-l1-s9-43",
           "stage": 9,
           "number": 43
         },
@@ -6344,7 +6499,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
             "that",
             "spreads"
           ],
-          "key": "ybm-l1-s9-44",
+          "key": "ybm-pj-l1-s9-44",
           "stage": 9,
           "number": 44
         },
@@ -6387,7 +6542,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
             "can",
             "cause"
           ],
-          "key": "ybm-l1-s9-45",
+          "key": "ybm-pj-l1-s9-45",
           "stage": 9,
           "number": 45
         },
@@ -6402,7 +6557,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
             "Don't",
             "forget! Anyone can be the next person producing or spreading fake news!"
           ],
-          "key": "ybm-l1-s9-46",
+          "key": "ybm-pj-l1-s9-46",
           "stage": 9,
           "number": 46
         }
