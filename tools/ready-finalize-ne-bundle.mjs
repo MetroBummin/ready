@@ -3,6 +3,7 @@ import { readFileSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { validateQuestionSpec } from '../server/ready/question-spec.mjs';
 import { buildObjectiveSourceContract, buildStructuredSourceContract } from './ready-source-contract.mjs';
+import { compileAndValidateInteraction } from './ready-interaction-contract.mjs';
 
 const args=process.argv.slice(2),value=name=>{const index=args.indexOf(name);return index>=0?args[index+1]:'';};
 const objectiveFile=value('--objective'),evidenceFile=value('--evidence'),writtenFile=value('--written'),output=value('--output');
@@ -46,8 +47,9 @@ for(const question of objectiveSource){
     if(repaired){payload.set_text=repaired;payload.variant_text=repaired;payload.variant_mode='canonical_overlay';}
   }
   buildObjectiveSourceContract(payload);
+  const interactionErrors=compileAndValidateInteraction(payload,question.type);
   const validation=validateQuestionSpec(payload,question.type,'available');
-  const errors=[...validation.errors],rawEvidence=evidenceByIdentity.get(identity(payload.source));
+  const errors=[...interactionErrors,...validation.errors],rawEvidence=evidenceByIdentity.get(identity(payload.source));
   if(rawEvidence&&!normalize(rawEvidence).includes(normalize(payload.set_text||payload.variant_text))&&similarity(rawEvidence,payload.set_text||payload.variant_text)<.72)errors.push('AI student passage exceeds raw PDF question evidence');
   const ready=payload.import_status==='ready'&&!errors.length;
   payload.import_status=ready?'ready':'drop';
@@ -62,8 +64,9 @@ for(const question of writtenSource){
   delete payload._raw_question_text;
   const guide=payload.writing_guide||{};
   buildStructuredSourceContract({payload,structured:{passage_text:payload.set_text||payload.variant_text,task_text:guide.task_text||'',conditions:guide.conditions||[],word_bank:guide.word_bank||[],summary_text:payload.summary_text||'',targets:payload.target_ranges||guide.targets||[],response_slots:payload.response_slots||[]},sourceFileHash:payload.pipeline_contract?.document_sha256||payload.source?.document_sha256,page:payload.source?.page||null,bbox:payload.source?.bbox||null});
+  const interactionErrors=compileAndValidateInteraction(payload,question.type);
   const validation=validateQuestionSpec(payload,question.type,'available');
-  if(payload.import_status!=='ready'||validation.errors.length)throw new Error(`Accepted written question failed final validation: ${payload.source?.exam} #${payload.source?.source_question_no}: ${validation.errors.join(', ')}`);
+  if(payload.import_status!=='ready'||interactionErrors.length||validation.errors.length)throw new Error(`Accepted written question failed final validation: ${payload.source?.exam} #${payload.source?.source_question_no}: ${[...interactionErrors,...validation.errors].join(', ')}`);
   question.status='available';
   writtenReport.push({source:payload.source,status:'ready',errors:[]});
 }

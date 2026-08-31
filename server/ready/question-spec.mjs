@@ -1,4 +1,5 @@
 import { sourceContractErrors } from "./source-contract.mjs";
+import { interactionContractErrors, publisherRoundTripErrors } from "./interaction-contract.mjs";
 
 export const READY_RENDERERS = Object.freeze([
   "standard_mcq",
@@ -142,6 +143,8 @@ export function questionSpecErrors(spec, payload = {}, type = "multiple_choice")
     if (!annotation || !text(annotation.kind) || (!text(annotation.text) && !text(annotation.label))) errors.push(`annotation ${index + 1} is incomplete`);
   }
   if (Number(payload?.pipeline_contract?.version) === 2) errors.push(...sourceContractErrors(payload, spec));
+  errors.push(...interactionContractErrors(payload, type));
+  if (spec?.importStatus === "ready") errors.push(...publisherRoundTripErrors(payload, type));
   return errors;
 }
 

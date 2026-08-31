@@ -6,6 +6,7 @@ import { bearerToken, randomSessionToken, secureEqual, sha256Hex, validPin } fro
 import { lemma, tokenizeSentence } from "./lexical-core.mjs";
 import { NE_MINBYEONGCHEON_L1_WORKBOOK } from "./workbook-ne-l1.mjs";
 import { validateQuestionSpec } from "./question-spec.mjs";
+import { deterministicGrade, publicInteractionContract } from "./interaction-contract.mjs";
 
 const CORS = { "Access-Control-Allow-Origin": "*", "Access-Control-Allow-Headers": "authorization, apikey, content-type, x-client-info", "Access-Control-Allow-Methods": "POST, OPTIONS" };
 const json = (body: unknown, status = 200) => new Response(JSON.stringify(body), { status, headers: { ...CORS, "Content-Type": "application/json", "Cache-Control": "no-store" } });
@@ -378,157 +379,14 @@ function answerIndexes(value: unknown, choiceCount: number) {
   if (!indexes.length || indexes.length !== value.length) throw new ApiError(500, "문제 정답 형식이 올바르지 않습니다.");
   return indexes;
 }
-function publicSegments(value: unknown) {
-  return (Array.isArray(value) ? value : []).slice(0, 500).map((segment: any) => ({ text: clean(segment?.text, 5_000), kind: clean(segment?.kind, 20), label: clean(segment?.label, 20) }));
-}
-function publicBlocks(value: unknown) {
-  return (Array.isArray(value) ? value : []).slice(0, 80).map((block: any) => ({ kind: clean(block?.kind, 20), label: clean(block?.label, 80), text: clean(block?.text, 10_000), url: clean(block?.url, 2_000), alt: clean(block?.alt, 200), caption: clean(block?.caption, 500), segments: publicSegments(block?.segments) }));
-}
-function inlineOptionGroups(value: unknown) {
-  const text = clean(value, 30_000), groups: Array<{label:string,options:string[]}> = [];
-  for (const match of text.matchAll(/([ⓐ-ⓩ]|\([A-H]\))\s*\[([^\]]+)\]/g)) {
-    const options = match[2].split("/").map(option => clean(option, 100)).filter(Boolean);
-    if (options.length >= 2 && options.length <= 4) groups.push({ label: match[1], options });
-  }
-  return groups.length && groups.length <= 8 ? groups : [];
-}
 function publicTargetRanges(value: unknown) {
   return (Array.isArray(value) ? value : []).slice(0, 8).map((target: any) => ({ label: clean(target?.label, 20), text: clean(target?.text, 200), canonicalText: clean(target?.canonical_text ?? target?.canonicalText, 200) || clean(target?.text, 200) })).filter(target => target.label && target.text);
-}
-function expandedTargetRanges(targets: Array<{label:string,text:string,canonicalText:string}>, canonical: string) {
-  const particles = "off|on|up|out|in|away|back|over|down|through|around|along";
-  return targets.map(target => {
-    const escaped = target.canonicalText.replace(/[.*+?^${}()|[\]\\]/g, "\\$&").replace(/\s+/g, "\\s+");
-    const match = new RegExp(`\\b(${escaped})\\s+(${particles})\\b`, "i").exec(canonical);
-    if (!match || /\s/.test(target.text)) return target;
-    return { ...target, text: `${target.text} ${match[2]}`, canonicalText: `${match[1]} ${match[2]}` };
-  });
 }
 function answerWordCount(slot: unknown) {
   const variants = (Array.isArray(slot) ? slot : [slot]).map(value => clean(value, 2_000)).filter(Boolean);
   const counts = [...new Set(variants.map(value => (value.match(/[A-Za-z0-9]+(?:['’][A-Za-z]+)?/g) || []).length))];
   return counts.length === 1 && counts[0] > 0 ? counts[0] : null;
 }
-function koreanTaskText(value: unknown) {
-  const text = clean(value, 30_000), matches = text.match(/[가-힣][가-힣A-Za-z0-9\s,.'’“”()·-]{8,}?(?:다|요)\./g) || [];
-  return matches.sort((a, b) => b.length - a.length)[0]?.trim() || "";
-}
-const SUMMARY_REPAIRS: Record<number, string> = {
-  101: "Since student (1)__________ in the Riverdale Science Fair is still not enough, the science teacher encourages students to (2)__________ work related to a sustainable future. (1) (2)",
-  106: "Luna's initial (1)___________ upon receiving the wrong birthday cake quickly turned into a(n) (2)___________ once the bakery's mistake was corrected. (1) (2)",
-  111: "The belief that a group of (1)______________ members will automatically succeed is a misconception because it (2)______________ how those members can function as a whole. (1) (2)",
-  117: "The human brain evolved the ability to form mental images of the world to (1)__________ actions in advance, but evolution ensured these images remain (2)__________ to prevent us from confusing them with reality. (1) (2)",
-  122: "When making decisions, people tend to give low-probability events (1)______________ than their objective chances deserve, making them seem (2)______________ than they really are. (1) (2)",
-  127: "The real barriers to trade lie in transaction costs, but a common currency can help to ㉠_____________ them, which in turn leads to a(n) ㉡_____________ in the overall economy.㉠ ㉡",
-  132: "Since starlight travels a great distance before reaching us, observing the stars gives us a(n) (1)_____________ to explore the (2)_____________ of the universe. (1) (2)",
-  137: "Jacob Lawrence was an American painter who gained national (1)______________ by (2)______________ the lives of African-Americans in his paintings. (1) (2)",
-  343: "Because ____________ for the Riverdale Science Fair is lower than expected, Mr. Howard wants to ____________ students to participate by submitting a simple ____________ of their work on environmental conservation or renewable energy by June 25.",
-  344: "When Luna realized that the message and flavor of the cake were ____________, she wondered whether she ____________ ____________ ____________, but the baker returned with the correct cake and explained that they had taken ____________ ____________ ____________, leaving her completely satisfied.",
-  345: "It seems logical to assume the whole will be as _____________ and _____________ as its individual parts, but the fallacy of composition overlooks how the individuals _____________ _____________ each other, so it’s always necessary to check not only the individuals but also the _____________ _____________ when assembling a team.",
-  346: "Although humans have the ability to create mental images and ___________ future actions, ___________ has prevented these images from fully substituting ___________ experiences so that we would not ___________ ___________ ___________.",
-  347: "People tend to ____________ the likelihood of ____________ events, causing them to influence ____________ more than they should.",
-  348: "By removing various transaction costs that act as barriers to trade, a(n) ____________ ____________ allows companies to turn ____________ costs into ____________ ones, helping whole economies ____________ and ____________.",
-  349: "Since light from distant stars takes a long time to _____________ to Earth, observing them allows us to see the _____________ as it existed in the _____________.",
-  350: "Jacob Lawrence: A _____________ of _____________ History and Life",
-};
-const TARGET_RANGE_REPAIRS: Record<number, Array<{label:string,text:string,canonicalText?:string}>> = {
-  6: [{label:"ⓐ",text:"what"},{label:"ⓑ",text:"They"},{label:"ⓒ",text:"ordering"},{label:"ⓓ",text:"have received"},{label:"ⓔ",text:"Knowing"}],
-  11: [{label:"ⓐ",text:"that"},{label:"ⓑ",text:"is"},{label:"ⓒ",text:"That"},{label:"ⓓ",text:"the different “parts” interact with each other"},{label:"ⓔ",text:"assembling"}],
-  15: [{label:"ⓐ",text:"which"},{label:"ⓑ",text:"them"},{label:"ⓒ",text:"shows"},{label:"ⓓ",text:"were"},{label:"ⓔ",text:"consuming"}],
-  97: [{label:"ⓐ",text:"Although"},{label:"ⓑ",text:"to take part"},{label:"ⓒ",text:"is related",canonicalText:"related"},{label:"ⓓ",text:"interesting",canonicalText:"interested"},{label:"ⓔ",text:"submit"}],
-  102: [{label:"ⓐ",text:"to pick up"},{label:"ⓑ",text:"that"},{label:"ⓒ",text:"waited"},{label:"ⓓ",text:"explained"},{label:"ⓔ",text:"had chosen"},{label:"ⓕ",text:"even better than I imagined"}],
-  103: [{label:"(A)",text:"understand"},{label:"(B)",text:"wrong"},{label:"(C)",text:"unrelated"},{label:"(D)",text:"poor-quality"},{label:"(E)",text:"better"}],
-  107: [{label:"(A)",text:"assume"},{label:"(B)",text:"reasonable"},{label:"(C)",text:"fails to allow for"},{label:"(D)",text:"solution"},{label:"(E)",text:"possess a stable center"}],
-  109: [{label:"ⓐ",text:"that"},{label:"ⓑ",text:"what"},{label:"ⓒ",text:"how"},{label:"ⓓ",text:"the other"},{label:"ⓔ",text:"composing"},{label:"ⓕ",text:"assembled"},{label:"ⓖ",text:"involved"}],
-  112: [{label:"(A)",text:"excel at visual imagery"},{label:"(B)",text:"overlook forthcoming actions"},{label:"(C)",text:"the same regions"},{label:"(D)",text:"real thing"},{label:"(E)",text:"reflection"},{label:"(F)",text:"consumption of a feast"}],
-  113: [{label:"ⓐ",text:"where"},{label:"ⓑ",text:"are"},{label:"ⓒ",text:"what"},{label:"ⓓ",text:"internal generated"},{label:"ⓔ",text:"authentically"},{label:"ⓕ",text:"yourself"}],
-  114: [{label:"㉠",text:"a wise bit of self-restraint on your genes’ part"}],
-  118: [{label:"ⓐ",text:"that"},{label:"ⓑ",text:"can define",canonicalText:"can be defined"},{label:"ⓒ",text:"the most",canonicalText:"the more"},{label:"ⓓ",text:"playing",canonicalText:"play"},{label:"ⓔ",text:"is",canonicalText:"are"}],
-  123: [{label:"ⓐ",text:"exists"},{label:"ⓑ",text:"to hedge"},{label:"ⓒ",text:"what"},{label:"ⓓ",text:"reinvesting"},{label:"ⓔ",text:"from which"}],
-  128: [{label:"ⓐ",text:"to reach"},{label:"ⓑ",text:"it"},{label:"ⓒ",text:"is"},{label:"ⓓ",text:"familiar"},{label:"ⓔ",text:"were"}],
-  133: [{label:"ⓐ",text:"was known"},{label:"ⓑ",text:"simplified"},{label:"ⓒ",text:"bring"},{label:"ⓓ",text:"produced"},{label:"ⓔ",text:"including"}],
-  233: [{label:"(A)",text:"encourage more of you to take part"}], 234: [{label:"(A)",text:"this looks perfect, even better than I imagined"}],
-  235: [{label:"(A)",text:"lack a stable center"}], 236: [{label:"(A)",text:"You cannot cloy the hungry edge of appetite by bare imagination of a feast"}],
-  237: [{label:"(A)",text:"factor more into decisions than they should"}], 238: [{label:"(A)",text:"useless costs turn into productive costs"}],
-  239: [{label:"(A)",text:"we are looking back in time"}], 240: [{label:"(A)",text:"continued to explore the lives of African-Americans through his painting"}],
-  277: [{label:"ⓐ",text:"The annual Riverdale Science Fair will hold on July 18"},{label:"ⓑ",text:"submitting"}],
-  278: [{label:"(A)",text:"우리는 더 많은 여러분들이 참가하기를 독려하고 싶습니다."}], 279: [{label:"(B)",text:"여러분은 환경 보전 또는 재생 가능 에너지와 관련된 프로젝트, 실험, 또는 모델을 선보이도록 요청받습니다."}],
-  280: [{label:"ⓐ",text:"she couldn’t understand that she saw"},{label:"ⓑ",text:"Known she had chosen a quality bakery"}],
-  281: [{label:"(A)",text:"그녀는 주문했을 때 자신이 실수를 한 건지 궁금했다."}], 282: [{label:"(B)",text:"그는 그녀의 케이크와 함께 돌아왔고, 그들은 두 개의 비슷한 주문을 받았다고 설명했다."}],
-  283: [{label:"ⓐ",text:"that"},{label:"ⓑ",text:"assuming"},{label:"ⓒ",text:"how"},{label:"ⓓ",text:"collating"},{label:"ⓔ",text:"is composed"}],
-  284: [{label:"(A)",text:"당신은 당신이 합류시킨 모든 사람이 생산적이고 효율적이라는 것을 안다."}], 285: [{label:"(B)",text:"공동의 목표를 가진 팀을 구성할 때, 관련된 개개인뿐만 아니라 전체적인 관점도 항상 확인하라."}],
-  286: [{label:"ⓐ",text:"which"},{label:"ⓑ",text:"such internally generating representations"}],
-  287: [{label:"(A)",text:"심지어 당신의 뇌가 장면을 상상하기 위해 당신이 실제로 장면을 볼 때와 같은 영역을 사용하는 것을 보여주는 Harvard 대학교 심리학자 Steve Kosslyn에 의한 뇌 영상 연구들로부터 나온 단서들도 있다."}],
-  288: [{label:"(B)",text:"만약 세계에 대한 당신의 내적 모델이 완벽한 대체물이라면, 당신이 언제든 배고픔을 느낄 때 연회에서 당신 자신이 진수성찬을 먹는 것을 단순히 상상할 것이다."}],
-  289: [{label:"ⓐ",text:"Events what could happen but aren’t likely"},{label:"ⓑ",text:"people who play the lottery is often optimistic about winning"},{label:"ⓒ",text:"the odds of a single ticket wins the largest, most popular U.S. lotteries"}],
-  290: [{label:"(A)",text:"객관적인 1퍼센트의 발생 가능성을 가진 사건이 주관적으로는 5퍼센트의 발생 가능성을 가진 것처럼 보일 수 있다."}], 291: [{label:"(B)",text:"확률이 더 작을수록, 우리는 그것의 가능성을 더 과대평가한다."}],
-  292: [{label:"ⓐ",text:"exists"},{label:"ⓑ",text:"getting products to market at competitive prices"},{label:"ⓒ",text:"hedging funds"},{label:"ⓓ",text:"unifying some of the currencies"},{label:"ⓔ",text:"growing"}],
-  293: [{label:"(A)",text:"공동 통화를 갖는다는 것은 그러한 많은 거래 비용들이 사라지고 그 절감분이 기업들의 생산성과 혁신으로 재투자될 수 있음을 의미한다."}],
-  295: [{label:"ⓐ",text:"that glows in the Orion constellation"},{label:"ⓑ",text:"is even further away"},{label:"ⓒ",text:"what we have a chance of understanding the history of the universe"}],
-  296: [{label:"(A)",text:"우리가 더 먼 곳으로부터 온 빛을 모을 수 있을수록, 우리는 시간상으로 더 먼 과거를 볼 수 있다."}], 297: [{label:"(B)",text:"여러 세대의 인간에게 익숙한, 그것들의 빛은 최소 1,000년을 이동하여 우리에게 도달했다."}],
-  298: [{label:"ⓐ",text:"is known for vivid scenes of African-American history and daily life"},{label:"ⓑ",text:"most of them lost"}],
-  299: [{label:"(A)",text:"1917년 Atlantic City에서 태어나서, 그는 13세에 Harlem으로 이주해 Utopia Children’s Center에서 미술을 공부했다."}], 300: [{label:"(B)",text:"Jacob Lawrence의 걸작으로 널리 여겨지는 The Migration Series는 그에게 전국적인 인정을 가져다주었다."}],
-};
-const CHOICE_PART_REPAIRS: Record<number, string[][]> = {
-  1: [["be held", "invited", "to showcase"], ["hold", "inviting", "showcase"], ["be held", "invited", "showcase"], ["hold", "invited", "to showcase"], ["be held", "inviting", "to showcase"]],
-  19: [["aren’t", "are", "wins"], ["isn’t", "are", "winning"], ["aren’t", "are", "winning"], ["aren’t", "is", "winning"], ["isn’t", "is", "wins"]],
-  23: [["because", "Having", "grow"], ["because of", "Having", "grow"], ["because", "Have", "growing"], ["because of", "Having", "growing"], ["because of", "Have", "grow"]],
-  28: [["further", "which", "have"], ["further", "that", "has"], ["far", "which", "has"], ["further", "which", "has"], ["far", "that", "have"]],
-  31: [["where", "that", "was"], ["which", "that", "was"], ["where", "those", "was"], ["which", "those", "were"], ["where", "that", "were"]],
-  35: [["studied", "regarded", "lost"], ["studies", "regarding", "lost"], ["studied", "regarding", "were lost"], ["studies", "regarded", "were lost"], ["studied", "regarded", "were lost"]],
-  39: [["melt", "learn", "bowls"], ["melting", "learn", "bowl"], ["melt", "to learn", "bowl"], ["melt", "learn", "bowl"], ["melting", "to learn", "bowls"]],
-  99: [["evaluate", "conservation", "showcase"], ["present", "destruction", "showcase"], ["present", "conservation", "showcase"], ["evaluate", "destruction", "review"], ["present", "conservation", "review"]],
-  101: [["absence", "exhibit"], ["enrollment", "appreciate"], ["participation", "display"], ["criticism", "revise"], ["competition", "submit"]],
-  106: [["frustration", "regret"], ["excitement", "relief"], ["confusion", "satisfaction"], ["relief", "delight"], ["embarrassment", "anger"]],
-  111: [["incompetent", "neglects"], ["skilled", "prioritizes"], ["competent", "overlooks"], ["unqualified", "considers"], ["capable", "highlights"]],
-  117: [["rehearse", "perfect"], ["avoid", "incomplete"], ["simulate", "imperfect"], ["predict", "limited"], ["practice", "authentic"]],
-  119: [["subjective", "smaller", "pessimistic"], ["subjective", "smaller", "optimistic"], ["objective", "larger", "optimistic"], ["subjective", "larger", "pessimistic"], ["objective", "smaller", "pessimistic"]],
-  122: [["more consideration", "less likely"], ["little thought", "more significant"], ["low priority", "more certain"], ["more value", "less important"], ["more weight", "more likely"]],
-  125: [["substantial", "disappear", "productive"], ["negligible", "remain", "wasteful"], ["substantial", "disappear", "wasteful"], ["negligible", "remain", "productive"], ["substantial", "remain", "productive"]],
-  127: [["remove", "decline"], ["preserve", "benefit"], ["eliminate", "improvement"], ["multiply", "edge"], ["erase", "setback"]],
-  129: [["back", "further", "distant"], ["back", "further", "nearby"], ["back", "nearer", "distant"], ["forward", "further", "nearby"], ["forward", "nearer", "distant"]],
-  132: [["obstacle", "past"], ["illusion", "composition"], ["opportunity", "history"], ["challenge", "evolution"], ["chance", "future"]],
-  134: [["vague", "criticism", "preserved"], ["vague", "recognition", "lost"], ["vivid", "criticism", "preserved"], ["vivid", "recognition", "preserved"], ["vivid", "recognition", "lost"]],
-  137: [["disregard", "ignoring"], ["fame", "distorting"], ["criticism", "depicting"], ["wealth", "financing"], ["recognition", "portraying"]],
-};
-function publicChoiceParts(value: unknown) {
-  return (Array.isArray(value) ? value : []).slice(0, 8).map(row => cleanList(row, 4, 200)).filter(row => row.length > 1);
-}
-const WRITING_GUIDE_REPAIRS: Record<number, any> = {
-  277: { kind:"correction", title:"밑줄 친 ⓐ, ⓑ의 어색한 부분을 각각 알맞게 고쳐 쓰세요.", slotLabels:["ⓐ 고친 말","ⓑ 고친 말"], targets:[{label:"ⓐ",text:"The annual Riverdale Science Fair will hold on July 18"},{label:"ⓑ",text:"submitting"}] },
-  278: { kind:"arrangement", title:"밑줄 친 (A)의 우리말과 같은 뜻이 되도록 주어진 말을 알맞게 배열하세요.", slotLabels:["완성 문장"], conditions:["필요하면 형태를 바꿀 것"], wordBank:["take","more of you","encourage","like","part","we","would"] },
-  279: { kind:"sentence", title:"밑줄 친 (B)의 우리말을 조건에 맞게 영작하세요.", slotLabels:["완성 문장"], conditions:["주어진 단어와 표현을 사용할 것","필요하면 형태를 바꿀 것","17단어로 쓸 것"], wordBank:["related to","renewable energy","a project","model","environmental conservation","experiment","invite","present"] },
-  280: { kind:"correction", title:"밑줄 친 ⓐ, ⓑ의 어색한 부분을 고친 뒤 각각 전체를 다시 쓰세요.", slotLabels:["ⓐ 고친 전체 표현","ⓑ 고친 전체 표현"], conditions:["단어를 추가하지 말 것"], targets:[{label:"ⓐ",text:"she couldn’t understand that she saw"},{label:"ⓑ",text:"Known she had chosen a quality bakery"}] },
-  281: { kind:"sentence", title:"밑줄 친 (A)의 우리말을 조건에 맞게 영작하세요.", slotLabels:["완성 문장"], conditions:["She로 시작할 것","분사구문을 사용할 것","주어진 말을 사용하고 필요하면 변형할 것","9단어로 쓸 것"], wordBank:["make","order","a mistake","if","wonder","when"] },
-  282: { kind:"sentence", title:"밑줄 친 (B)의 우리말을 조건에 맞게 영작하세요.", slotLabels:["완성 문장"], conditions:["He로 시작할 것","분사구문을 사용할 것","과거완료를 사용할 것","주어진 말을 사용하고 필요하면 변형할 것","12단어로 쓸 것"], wordBank:["explain","with","receive","similar","return"] },
-  283: { kind:"multi-correction", title:"밑줄 친 ⓐ~ⓔ 중 어법상 어색한 두 곳을 찾아 알맞게 고쳐 쓰세요.", conditions:["기호와 고친 표현을 함께 쓸 것"], targets:[{label:"ⓐ",text:"that"},{label:"ⓑ",text:"assuming"},{label:"ⓒ",text:"how"},{label:"ⓓ",text:"collating"},{label:"ⓔ",text:"is composed"}] },
-  284: { kind:"sentence", title:"밑줄 친 (A)의 우리말을 조건에 맞게 영작하세요.", slotLabels:["완성 문장"], conditions:["명사절 접속사 that을 사용할 것","목적격 관계대명사를 생략할 것","주어진 말을 사용하고 필요하면 변형할 것","12단어로 쓸 것"], wordBank:["efficient","on board","productive","everyone","you’ve","know","bring"] },
-  285: { kind:"sentence", title:"밑줄 친 (B)의 우리말을 조건에 맞게 영작하세요.", slotLabels:["완성 문장"], conditions:["접속사를 남긴 분사구문을 주절 앞에 쓸 것","명사(구)를 수식하는 분사를 사용할 것","주어진 말을 사용하고 필요하면 변형할 것","19단어로 쓸 것"], wordBank:["a common goal","with","always check","when","the individuals","assemble","as","involve","the overall view","a team","well"] },
-  286: { kind:"correction", title:"밑줄 친 ⓐ, ⓑ의 어색한 부분을 각각 알맞게 고쳐 쓰세요.", slotLabels:["ⓐ 고친 말","ⓑ 고친 말"], targets:[{label:"ⓐ",text:"which"},{label:"ⓑ",text:"such internally generating representations"}] },
-  287: { kind:"sentence", title:"밑줄 친 (A)의 우리말을 조건에 맞게 영어 문장으로 완성하세요.", slotLabels:["완성 문장"], conditions:["명사(구)를 수식하는 분사를 사용할 것","명사절 접속사 that을 사용할 것","the same A as B를 사용할 것","주어진 말을 사용하고 필요하면 변형할 것"], wordBank:["even hints","there","regions","a scene","use","show","be"] },
-  288: { kind:"sentence", title:"밑줄 친 (B)의 우리말을 조건에 맞게 영어 문장으로 완성하세요.", slotLabels:["완성 문장"], conditions:["가정법 과거를 사용할 것","주어진 말을 사용하고 필요하면 변형할 것"], wordBank:["of the world","internal model","hungry","a perfect substitute","simply imagine","can"] },
-  289: { kind:"correction", title:"밑줄 친 ⓐ~ⓒ의 어색한 부분을 각각 알맞게 고쳐 쓰세요.", slotLabels:["ⓐ 고친 말","ⓑ 고친 말","ⓒ 고친 말"], targets:[{label:"ⓐ",text:"Events what could happen but aren’t likely"},{label:"ⓑ",text:"people who play the lottery is often optimistic"},{label:"ⓒ",text:"the odds of a single ticket wins the largest, most popular U.S. lotteries"}] },
-  290: { kind:"sentence", title:"밑줄 친 (A)의 우리말을 조건에 맞게 영작하세요.", slotLabels:["완성 문장"], conditions:["주격 관계대명사 that을 사용할 것","주어진 말을 사용하고 필요하면 변형할 것","21단어로 쓸 것"], wordBank:["have","a five-percent chance","could subjectively seem like","of occurring","it","an objective one-percent chance","an event"] },
-  291: { kind:"sentence", title:"밑줄 친 (B)의 우리말을 조건에 맞게 영작하세요.", slotLabels:["완성 문장"], conditions:["the+비교급, the+비교급 구문을 사용할 것","주어진 말을 사용하고 필요하면 변형할 것","10단어로 쓸 것"], wordBank:["small","the probability","much","overestimate","likelihood"] },
-  292: { kind:"multi-correction", title:"밑줄 친 ⓐ~ⓔ 중 어법상 어색한 두 곳을 찾아 알맞게 고쳐 쓰세요.", conditions:["기호와 고친 표현을 함께 쓸 것"], targets:[{label:"ⓐ",text:"exists"},{label:"ⓑ",text:"getting products to market at competitive prices"},{label:"ⓒ",text:"hedging funds"},{label:"ⓓ",text:"unifying some of the currencies"},{label:"ⓔ",text:"growing"}] },
-  293: { kind:"sentence", title:"밑줄 친 (A)의 우리말을 조건에 맞게 영어 문장으로 완성하세요.", slotLabels:["완성 문장"], conditions:["동명사 주어를 사용할 것","명사절 접속사 that을 사용할 것","주어진 말을 사용하고 필요하면 변형할 것"], wordBank:["disappear","have","mean","reinvest","those transaction costs","the savings","a common currency","can"] },
-  294: { kind:"arrangement", title:"빈칸 (B)에 들어갈 문장이 되도록 주어진 말을 알맞게 배열하세요.", slotLabels:["완성 문장"], wordBank:["that","provides for","a common currency","a strong economic foundation","can benefit from","all"] },
-  295: { kind:"correction", title:"밑줄 친 ⓐ~ⓒ의 어색한 부분을 각각 알맞게 고쳐 쓰세요.", slotLabels:["ⓐ 고친 말","ⓑ 고친 말","ⓒ 고친 말"], targets:[{label:"ⓐ",text:"that glows in the Orion constellation"},{label:"ⓑ",text:"is even further away"},{label:"ⓒ",text:"what we have a chance of understanding the history of the universe"}] },
-  296: { kind:"sentence", title:"밑줄 친 (A)의 우리말을 조건에 맞게 영어 문장으로 완성하세요.", slotLabels:["완성 문장"], conditions:["the+비교급, the+비교급 구문을 사용할 것","주어진 말을 사용하고 필요하면 변형할 것","각 빈칸에 한 단어씩 쓸 것"], wordBank:["can","from","look","light","collect","further"] },
-  297: { kind:"sentence", title:"밑줄 친 (B)의 우리말을 조건에 맞게 영어 문장으로 완성하세요.", slotLabels:["완성 문장"], conditions:["현재완료를 사용할 것","부사적 용법의 to부정사를 사용할 것","주어진 말을 사용할 것","각 빈칸에 한 단어씩 쓸 것"], wordBank:["to","at least 1,000 years","familiar","have","reach","travel","light"] },
-  298: { kind:"correction", title:"밑줄 친 ⓐ, ⓑ의 어색한 부분을 고친 뒤 각각 전체를 다시 쓰세요.", slotLabels:["ⓐ 고친 전체 표현","ⓑ 고친 전체 표현"], conditions:["ⓐ에는 단어를 추가하지 말 것"], targets:[{label:"ⓐ",text:"is known for vivid scenes of African-American history and daily life"},{label:"ⓑ",text:"most of them lost"}] },
-  299: { kind:"sentence", title:"밑줄 친 (A)의 우리말을 조건에 맞게 영어 문장으로 완성하세요.", slotLabels:["완성 문장"], conditions:["분사구문을 사용할 것","주어진 말을 사용하고 필요하면 변형할 것","각 빈칸에 한 단어씩 쓸 것"], wordBank:["move to","born","Atlantic City","study","Harlem","art"] },
-  300: { kind:"sentence", title:"밑줄 친 (B)의 우리말을 조건에 맞게 영작하세요.", slotLabels:["완성 문장"], conditions:["명사를 부연 설명하는 분사구를 사용할 것","동사+간접목적어+직접목적어 구조를 사용할 것","주어진 말을 사용하고 필요하면 변형할 것","13단어로 쓸 것"], wordBank:["bring","masterpiece","widely regard","national recognition"] },
-  343: { kind:"summary", title:"요약문의 빈칸에 들어갈 말을 지문에서 찾아 한 단어씩 쓰세요.", slotLabels:["빈칸 1","빈칸 2","빈칸 3"] },
-  344: { kind:"summary", title:"요약문의 빈칸에 들어갈 말을 지문에서 찾아 한 단어씩 쓰세요." },
-  345: { kind:"summary", title:"요약문의 빈칸에 들어갈 말을 지문에서 찾아 한 단어씩 쓰세요." },
-  346: { kind:"summary", title:"요약문의 빈칸에 들어갈 말을 지문에서 찾아 한 단어씩 쓰세요." },
-  347: { kind:"summary", title:"요지문의 빈칸에 들어갈 말을 지문에서 찾아 한 단어씩 쓰세요.", slotLabels:["빈칸 1","빈칸 2","빈칸 3"] },
-  348: { kind:"summary", title:"요약문의 빈칸에 들어갈 말을 지문에서 찾아 한 단어씩 쓰세요." },
-  349: { kind:"summary", title:"요약문의 빈칸에 들어갈 말을 지문에서 찾아 한 단어씩 쓰세요.", slotLabels:["빈칸 1","빈칸 2","빈칸 3"] },
-  350: { kind:"summary", title:"제목의 빈칸에 들어갈 말을 지문에서 찾아 한 단어씩 쓰세요.", slotLabels:["빈칸 1","빈칸 2"] },
-};
-function publicWritingGuide(questionNo: number | null) { return questionNo ? WRITING_GUIDE_REPAIRS[questionNo] || null : null; }
 function cleanWritingBank(value: unknown) {
   const result: string[] = [];
   for (const raw of cleanList(value, 60, 500)) {
@@ -567,85 +425,35 @@ function cleanQuestionText(value: unknown) {
     .replace(/^\s*(?:[※]\s*)?다음\s*(?:글|대화)(?:을|를)\s*읽고\s*(?:다음\s*)?물음에\s*답하시오\s*[.!?]?\s*/u, "")
     .replace(/\s+/g, " ").trim();
 }
-function normalizedCombination(value: unknown) { return clean(value, 1_000).normalize("NFKC").toLowerCase().replace(/[^a-z0-9]+/g, ""); }
-function choicesMatchGroups(groups: Array<{ label: string; options: string[] }>, choices: string[]) {
-  if (!groups.length || !choices.length) return false;
-  const combinations = new Set<string>();
-  function visit(index: number, parts: string[]) {
-    if (index === groups.length) { combinations.add(normalizedCombination(parts.join(" "))); return; }
-    for (const option of groups[index].options) visit(index + 1, [...parts, option]);
-  }
-  visit(0, []);
-  return choices.every(choice => combinations.has(normalizedCombination(choice)));
-}
-function inlineAnswer(payload: any, choiceCount: number) {
-  const groups = inlineOptionGroups(payload?.variant_text), answer = answerIndexes(payload?.answer, choiceCount);
-  if (!groups.length || answer.length !== 1) return [];
-  const expected = normalizedCombination(payload?.choices?.[answer[0]]), selected: number[] = [];
-  function visit(index: number, parts: string[]): boolean {
-    if (index === groups.length) return normalizedCombination(parts.join(" ")) === expected;
-    for (let option = 0; option < groups[index].options.length; option += 1) {
-      if (visit(index + 1, [...parts, groups[index].options[option]])) { selected[index] = option; return true; }
-    }
-    return false;
-  }
-  return visit(0, []) ? selected : [];
-}
-function inferredChoiceParts(payload: any, choices: string[]) {
-  const prompt = clean(payload?.prompt, 1_000), labels = [...new Set(prompt.match(/\([A-H]\)/g) || [])];
-  if (labels.length < 2 || labels.length > 4 || choices.length < 2) return [];
-  const parts = choices.map(choice => choice.split(/\s+/).filter(Boolean));
-  // Only infer an unambiguous table: every row must contain exactly one cell
-  // for every labelled blank. Multi-word cells remain importer-owned data.
-  return parts.every(row => row.length === labels.length) ? parts : [];
+function publicSkill(taxonomy: string) {
+  if (taxonomy.startsWith("grammar_")) return "grammar";
+  if (taxonomy.startsWith("vocabulary_")) return "vocabulary";
+  if (taxonomy.startsWith("blank_")) return "blank";
+  if (taxonomy === "sentence_insertion") return "insertion";
+  if (taxonomy === "paragraph_order") return "order";
+  if (taxonomy.startsWith("summary_")) return "summary";
+  if (["topic", "title", "main_idea", "purpose", "emotion", "content_true", "content_false", "unanswerable"].includes(taxonomy)) return "comprehension";
+  return taxonomy;
 }
 function publicQuestion(row: any, passageText = "", studentState: { bookmarked?: boolean; lastResult?: boolean | null } = {}) {
   const payload = row.payload || {}, type = clean(row.type, 40), sourceQuestionNo = Number(payload.source?.source_question_no) || null;
   const specValidation = validateQuestionSpec(payload, type, row.status || "available"), renderSpec = specValidation.spec;
-  // Legacy repairs belong to one named workbook. A bare source question number
-  // is not a global identity: every new PDF also has a question 1, 2, 3, ...
-  const legacyWorkbook = /2026\s*[-년]?\s*0?6|부산/.test(clean(payload.source?.exam, 160));
-  let writingGuide = publicStoredWritingGuide(payload.writing_guide) || (legacyWorkbook ? publicWritingGuide(sourceQuestionNo) : null);
-  const rawChoices = Array.isArray(payload.choices) ? payload.choices.map((item: unknown) => clean(item, 1_000)).filter(Boolean) : [];
-  const storedChoiceParts = publicChoiceParts(payload.choice_parts), repairedChoiceParts = legacyWorkbook && sourceQuestionNo ? CHOICE_PART_REPAIRS[sourceQuestionNo] || [] : [];
-  const choiceParts = storedChoiceParts.length ? storedChoiceParts : repairedChoiceParts.length ? repairedChoiceParts : inferredChoiceParts(payload, rawChoices);
-  const choices = choiceParts.length ? choiceParts.map(parts => parts.join(" ")) : rawChoices;
-  if (type === "multiple_choice" && (choices.length < 2 || choices.length > 8)) throw new ApiError(500, "문제 선택지 형식이 올바르지 않습니다.");
-  if (!["multiple_choice", "written_response"].includes(type)) throw new ApiError(500, "지원하지 않는 문제 형식입니다.");
-  const acceptedKey = "accepted" + "_answers", answerKey = "ans" + "wer";
-  const acceptedSlots = Array.isArray(payload[acceptedKey]) ? payload[acceptedKey] : [];
-  // Slot counts derived from the private answer key are validation metadata,
-  // never student hints. Explicit word-count conditions remain in writingGuide.
-  const storedResponseSlots = (Array.isArray(payload.response_slots) ? payload.response_slots : []).slice(0, 12).map((slot: any, index: number) => ({ label: clean(slot?.label, 80) || `답 ${index + 1}` }));
-  const guideSlots = writingGuide?.slotLabels?.map((label: string) => ({ label })) || [];
-  const responseSlots = storedResponseSlots.length && guideSlots.length !== storedResponseSlots.length ? storedResponseSlots : guideSlots.length ? guideSlots : storedResponseSlots;
-  const storedSkill = clean(payload.skill, 40);
-  let skill = /요약/.test(clean(payload.prompt, 1_000)) ? "summary" : sourceQuestionNo === 125 ? "vocabulary" : storedSkill;
-  const detectedGroups = type === "multiple_choice" ? inlineOptionGroups(payload.set_text || payload.variant_text) : [];
-  const inlineGroups = choicesMatchGroups(detectedGroups, choices) ? detectedGroups : [];
-  if (inlineGroups.length && !["grammar", "vocabulary"].includes(skill)) skill = /흐름상|문맥상/.test(clean(payload.prompt, 1_000)) ? "vocabulary" : "grammar";
-  const storedTargets = publicTargetRanges(payload.target_ranges);
-  const rawTargetRanges = legacyWorkbook && sourceQuestionNo && TARGET_RANGE_REPAIRS[sourceQuestionNo] ? TARGET_RANGE_REPAIRS[sourceQuestionNo].map(item => ({ ...item, canonicalText: item.canonicalText || item.text })) : storedTargets;
-  const targetRanges = expandedTargetRanges(rawTargetRanges, passageText);
-  if (writingGuide) {
-    const correction = /correction/.test(writingGuide.kind);
-    if (correction && !writingGuide.targets?.length) writingGuide = { ...writingGuide, targets: targetRanges };
-    if (!writingGuide.taskText && ["sentence", "arrangement"].includes(writingGuide.kind)) writingGuide = { ...writingGuide, taskText: koreanTaskText(payload.set_text || payload.variant_text) };
-  }
-  // Keep answering deliberately plain: the passage may point at evidence, but
-  // every multiple-choice answer is selected from the normal choice list.
-  const interaction = "choices";
-  const summaryText = clean(payload.summary_text, 10_000) || (legacyWorkbook && sourceQuestionNo ? SUMMARY_REPAIRS[sourceQuestionNo] || "" : "");
-  if (summaryText && !renderSpec.extras.includes("summary")) renderSpec.extras = [...renderSpec.extras, "summary"];
-  const inferredMultiSelect = type === "multiple_choice" && Array.isArray(payload[answerKey]) && payload[answerKey].length > 1;
+  if (!specValidation.ready) throw new ApiError(409, `검수가 끝나지 않은 문제입니다: ${specValidation.errors.join(", ")}`);
+  const interactionContract = publicInteractionContract(payload.spec?.interaction);
+  if (!interactionContract) throw new ApiError(409, "상호작용 계약이 없는 문제입니다.");
+  const choices = interactionContract.choices.rows.map((row: any) => row.cells.join(" "));
+  const choiceParts = interactionContract.kind === "choice_matrix" ? interactionContract.choices.rows.map((row: any) => row.cells) : [];
+  const writingGuide = type === "written_response" ? publicStoredWritingGuide(payload.writing_guide) : null;
+  const responseSlots = interactionContract.response.slots;
+  const inlineGroups = interactionContract.passage.segments.filter((segment: any) => segment.kind === "inline_options");
+  const targetRanges = interactionContract.passage.segments.filter((segment: any) => segment.kind === "annotation").map((segment: any) => ({ label: segment.label, text: segment.text, canonicalText: segment.text }));
+  const summaryText = renderSpec.extras.includes("summary") ? clean(payload.summary_text, 10_000) : "";
   return {
-    id: row.id, type, family: clean(payload.family, 40) || (type === "written_response" ? "written" : "standard"), skill,
+    id: row.id, type, family: clean(payload.family, 40) || (type === "written_response" ? "written" : "standard"), skill: publicSkill(renderSpec.taxonomy),
     taxonomy: renderSpec.taxonomy, renderer: renderSpec.renderer, renderSpec, importStatus: renderSpec.importStatus,
-    prompt: clean(payload.prompt, 1_000), choices, choiceParts, multiSelect: payload.multi_select === true || inferredMultiSelect, responseType: type === "written_response" ? "written" : "choice", responseSlots, writingGuide,
-    passageText: cleanQuestionText(passageText), setText: cleanQuestionText(payload.set_text) || null, variantText: cleanQuestionText(payload.variant_text) || null,
-    variantMode: payload.variant_mode === "authored_variant" ? "authored_variant" : "canonical_overlay",
-    variantSegments: publicSegments(payload.variant_segments), contentBlocks: publicBlocks(payload.content_blocks),
-    stimulus: clean(payload.stimulus, 10_000), summaryText, interaction, inlineGroups, targetRanges,
+    prompt: clean(payload.prompt, 1_000), choices, choiceParts, multiSelect: interactionContract.selection === "multi", responseType: type === "written_response" ? "written" : "choice", responseSlots, writingGuide,
+    passageText: cleanQuestionText(passageText), interaction: interactionContract.kind, interactionContract,
+    stimulus: renderSpec.extras.includes("stimulus") ? clean(payload.stimulus, 10_000) : "", summaryText, inlineGroups, targetRanges,
     bookmarked: studentState.bookmarked === true, lastResult: typeof studentState.lastResult === "boolean" ? studentState.lastResult : null,
     source: payload.source ? { exam: clean(payload.source.exam, 160), passageNo: Number(payload.source.passage_no) || null, questionNo: sourceQuestionNo, section: clean(payload.source.section, 20), setId: clean(payload.source.set_id, 120) || null } : null,
   };
@@ -745,24 +553,15 @@ async function submitAttempt(body: any, session: ReadySession) {
   await studentPassageAccess(examId, question.passage_id, student);
   const spec = publicQuestion(question); let response: any, answer: any, correct = false, aiFeedback = "", aiRequestId: string | null = null;
   if (question.type === "multiple_choice") {
-    if (spec.interaction === "inline_options") {
-      const selected = Array.isArray(body.inlineSelected) ? body.inlineSelected.map(Number) : [], expected = inlineAnswer(question.payload, spec.choices.length);
-      if (selected.length !== spec.inlineGroups.length || selected.some((value: number, index: number) => !Number.isInteger(value) || value < 0 || value >= spec.inlineGroups[index].options.length)) throw new ApiError(400, "본문의 모든 단어를 선택해 주세요.");
-      if (expected.length !== selected.length) throw new ApiError(500, "본문 선택형 정답을 해석하지 못했습니다.");
-      correct = selected.every((value: number, index: number) => value === expected[index]); response = { inlineSelected: selected }; answer = expected;
-    } else {
-      const selected = answerIndexes(body.selected, spec.choices.length); answer = answerIndexes(question.payload?.answer, spec.choices.length);
-      if (!spec.multiSelect && selected.length !== 1) throw new ApiError(400, "답을 하나만 선택해 주세요.");
-      correct = selected.length === answer.length && selected.every((value, index) => value === answer[index]); response = { selected };
-    }
+    response = spec.interaction === "inline_options" ? { inlineSelected: Array.isArray(body.inlineSelected) ? body.inlineSelected.map(Number) : [] } : { selected: answerIndexes(body.selected, spec.choices.length) };
+    const grade = deterministicGrade(question.payload, question.type, response);
+    if (!grade.valid) throw new ApiError(400, spec.interaction === "inline_options" ? "본문의 모든 선택지를 골라 주세요." : spec.multiSelect ? "필요한 답을 모두 선택해 주세요." : "답을 하나만 선택해 주세요.");
+    correct = grade.correct; answer = grade.answer;
   } else {
     const responses = cleanList(body.responses, 12, 2_000), accepted = Array.isArray(question.payload?.accepted_answers) ? question.payload.accepted_answers : [];
-    if (!responses.length || responses.length !== accepted.length) throw new ApiError(400, "모든 답을 입력해 주세요.");
-    const normalize = (value: unknown) => clean(value, 2_000).normalize("NFKC").toLowerCase().replace(/[“”‘’'".,!?;:()[\]{}]/g, "").replace(/\s+/g, " ").trim();
-    const acceptedSets = Array.isArray(question.payload?.accepted_response_sets) ? question.payload.accepted_response_sets : [];
-    correct = acceptedSets.length
-      ? acceptedSets.some((set: unknown) => Array.isArray(set) && set.length === responses.length && set.every((candidate, index) => normalize(candidate) === normalize(responses[index])))
-      : responses.every((value, index) => (Array.isArray(accepted[index]) ? accepted[index] : [accepted[index]]).some((candidate: unknown) => normalize(candidate) === normalize(value)));
+    const deterministic = deterministicGrade(question.payload, question.type, { responses });
+    if (!deterministic.valid) throw new ApiError(400, "모든 답을 입력해 주세요.");
+    correct = deterministic.correct;
     response = { responses }; answer = accepted.map((slot: unknown) => (Array.isArray(slot) ? slot : [slot]).map(candidate => clean(candidate, 2_000)));
     if (!correct) {
       const today = new Date(); today.setHours(0, 0, 0, 0);

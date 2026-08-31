@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>READY Interaction Contract QA</title>
+  <link rel="stylesheet" href="/ready/ready.css">
+</head>
+<body class="study-mode">
+  <main class="question-layout">
+    <div class="reader-shell">
+      <p class="eyebrow">PASSAGE · STRUCTURAL</p>
+      <article id="matrix-passage" class="reading-passage question-passage"></article>
+      <h1 class="question-prompt">윗글의 빈칸 (A), (B)에 들어갈 말로 알맞게 연결된 것은?</h1>
+      <section id="matrix-choices" class="question-answer-area choice-matrix"></section>
+      <h1 class="question-prompt">주어진 우리말을 조건에 맞게 영작하시오.</h1>
+      <section class="written-workspace sentence-parts">
+        <section class="writing-target"><strong>영작할 우리말</strong><p>그래서 그들은 사진 속에서 단서를 찾기 위해 소셜 미디어를 사용하기로 결정했습니다.</p></section>
+        <div id="written-controls" class="written-slot-list"></div>
+      </section>
+    </div>
+  </main>
+  <script type="module">
+    import { contractChoiceCopyHtml, contractPassageHtml, contractResponseControlHtml } from '/ready/interaction-runtime.js';
+    const escape=value=>String(value??'').replace(/[&<>"']/g,character=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[character]));
+    const matrix={kind:'choice_matrix',selection:'single',passage:{visible:true,segments:[{kind:'text',text:'The system was '},{kind:'blank',id:'(A)',label:'(A)',text:''},{kind:'text',text:' and the field kept '},{kind:'blank',id:'(B)',label:'(B)',text:''},{kind:'text',text:'.'}]},choices:{columns:['(A)','(B)'],rows:[{cells:['investigated','developing']},{cells:['tested','growing']},{cells:['ignored','shrinking']}]},response:{layout:'',slots:[]}};
+    const written={kind:'written_response',selection:'none',passage:{visible:false,segments:[{kind:'text',text:'Publisher answer remains private.'}]},choices:{columns:[],rows:[]},response:{layout:'sentence_parts',slots:[{id:'slot-1',label:'(1)',control:'text',placeholder:'답을 입력하세요'},{id:'slot-2',label:'(2)',control:'text',placeholder:'답을 입력하세요'}]}};
+    document.querySelector('#matrix-passage').innerHTML=contractPassageHtml(matrix,{escape});
+    document.querySelector('#matrix-choices').innerHTML=matrix.choices.rows.map((_row,index)=>`<div class="question-choice"><span class="question-choice-mark">${index+1}</span><span class="question-choice-copy">${contractChoiceCopyHtml(matrix,index,escape)}</span></div>`).join('');
+    document.querySelector('#written-controls').innerHTML=written.response.slots.map((slot,index)=>`<label><span>${escape(slot.label)}</span>${contractResponseControlHtml(written,index,{escape})}</label>`).join('');
+  </script>
+</body>
+</html>

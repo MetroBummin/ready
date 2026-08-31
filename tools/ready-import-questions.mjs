@@ -14,32 +14,14 @@ if(!file)usage();
 const bundle=JSON.parse(await readFile(file,'utf8'));
 const questions=Array.isArray(bundle)?bundle:bundle?.questions;
 if(!Array.isArray(questions)||!questions.length)throw new Error('Bundle must be a non-empty JSON array.');
-const written=questions.filter(item=>item?.type==='written_response');
-if(written.length&&!allowLegacy){
-  if(Array.isArray(bundle)||bundle?.ai_written_structure?.engine!=='codex-cli')throw new Error('Written responses must pass structure:written before import.');
-  if(bundle.ai_written_structure.mode!=='full')throw new Error('A representative sample gate cannot be imported; run the full written-response gate after all samples pass.');
-  const gate=bundle.ai_written_structure;
-  if(Number(gate.processed_questions)!==Number(gate.source_written_questions))throw new Error('The full written-response gate did not process every source question.');
-  if(Number(gate.ready)+Number(gate.dropped)!==Number(gate.processed_questions))throw new Error('Written-response gate totals are inconsistent.');
-  const finalWritten=bundle?.pipeline_validation?.written;
-  if(!finalWritten||Number(finalWritten.ready)!==written.length)throw new Error('Final written-response validation count does not match the import bundle.');
-  if(Number(finalWritten.ready)+Number(finalWritten.dropped)!==Number(finalWritten.source))throw new Error('Final written-response validation totals are inconsistent.');
+if(!allowLegacy){
+  const gate=bundle?.pipeline_validation?.interaction_contract,report=bundle?.pipeline_validation?.report;
+  if(Number(gate?.version)!==1)throw new Error('Executable interaction-contract validation is required before import.');
+  if(Number(gate.ready)!==questions.length)throw new Error('Interaction-contract READY count does not match the import bundle.');
+  if(Number(gate.ready)+Number(gate.dropped)!==Number(gate.source))throw new Error('Interaction-contract validation totals are inconsistent.');
+  if(Number(gate.actual_render_passed)!==Number(gate.ready)||Number(gate.publisher_grade_round_trip_passed)!==Number(gate.ready))throw new Error('Every READY question must pass actual render and publisher-answer grading round-trip.');
+  if(!Array.isArray(report)||report.length!==Number(gate.source)||report.filter(item=>item.status==='ready'&&item.round_trip==='pass').length!==Number(gate.ready))throw new Error('Interaction-contract validation report is incomplete.');
 }
-const objective=questions.filter(item=>item?.type==='multiple_choice');
-if(objective.length&&!allowLegacy){
-  const finalObjective=bundle?.pipeline_validation?.objective;
-  if(!finalObjective||Number(finalObjective.ready)!==objective.length)throw new Error('Final objective validation count does not match the import bundle.');
-  if(Number(finalObjective.ready)+Number(finalObjective.dropped)!==Number(finalObjective.source))throw new Error('Final objective validation totals are inconsistent.');
-  const deterministicRetained=Number(finalObjective.deterministic_retained ?? finalObjective.deterministic_ready);
-  if(deterministicRetained+Number(finalObjective.ai_recovered)!==Number(finalObjective.ready))throw new Error('Objective recovery totals are inconsistent.');
-  if(Number(finalObjective.ai_attempted)!==Number(finalObjective.source)-Number(finalObjective.deterministic_ready))throw new Error('Objective AI fallback must process deterministic drops only.');
-  if(Number(finalObjective.ai_attempted)>0){
-    const gate=bundle.ai_objective_fallback;
-    if(gate?.engine!=='codex-cli'||Number(gate.attempted)!==Number(finalObjective.ai_attempted)||Number(gate.recovered)!==Number(finalObjective.ai_recovered))throw new Error('Objective AI fallback audit does not match final validation.');
-    if(Number(gate.recovered)+Number(gate.dropped)!==Number(gate.attempted))throw new Error('Objective AI fallback totals are inconsistent.');
-  }
-}
-
 const identities=new Set();
 for(const [index,item] of questions.entries()){
   const source=item?.payload?.source||{};

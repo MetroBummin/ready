@@ -3,6 +3,7 @@ import { validateWrittenStructure } from '../tools/ready-written-contract.mjs';
 import { validateQuestionSpec } from '../server/ready/question-spec.mjs';
 import { buildStructuredSourceContract, sourceContractErrors } from '../tools/ready-source-contract.mjs';
 import { buildObjectiveSourceContract } from '../tools/ready-source-contract.mjs';
+import { compileInteractionContract } from '../tools/ready-interaction-contract.mjs';
 
 const canonical='His location settings were turned off. He used the last of his battery to send a text message.';
 const base={type:'written_response',payload:{
@@ -37,6 +38,7 @@ const renderPayload={prompt:'영작하시오.',set_text:'This is the approved so
 assert.equal(validateQuestionSpec(renderPayload,'written_response','available').ready,false);
 buildStructuredSourceContract({payload:renderPayload,structured:{passage_text:renderPayload.set_text,task_text:'문장을 쓰시오.',conditions:[],word_bank:[],summary_text:'',targets:[],response_slots:renderPayload.response_slots},sourceFileHash:'a'.repeat(64)});
 renderPayload.ai_structure={engine:'codex-cli',contract_version:2};
+compileInteractionContract(renderPayload,'written_response');
 assert.equal(validateQuestionSpec(renderPayload,'written_response','available').ready,true);
 
 const polluted=structuredClone(renderPayload);
@@ -51,6 +53,7 @@ assert(sourceContractErrors(missingProvenance,missingProvenance.spec).some(item=
 
 const objective={prompt:'윗글의 제목으로 알맞은 것은?',set_text:'His location settings were turned off.',taxonomy:'title',choices:['A','B','C','D','E'],answer:[0],multi_select:false,explanation:'해설',import_status:'ready',source:{exam:'시험',section:'1',source_question_no:1,document_sha256:'b'.repeat(64),page:1,bbox:[0,0,100,100]},spec:{renderer:'standard_mcq',passage:{source:'blocks',annotations:[]},extras:[],choiceMode:'single',responseMode:'choice',gradingMode:'exact'}};
 buildObjectiveSourceContract(objective);
+compileInteractionContract(objective,'multiple_choice');
 assert.equal(validateQuestionSpec(objective,'multiple_choice','available').ready,true);
 const KoreanPassage=structuredClone(objective);KoreanPassage.set_text+=' 우리말';buildObjectiveSourceContract(KoreanPassage);
 assert(sourceContractErrors(KoreanPassage,KoreanPassage.spec).some(item=>item.includes('Korean text')));

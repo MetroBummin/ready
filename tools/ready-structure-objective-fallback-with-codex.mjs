@@ -5,6 +5,7 @@ import { tmpdir } from 'node:os';
 import { resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { validateQuestionSpec } from '../server/ready/question-spec.mjs';
+import { compileAndValidateInteraction } from './ready-interaction-contract.mjs';
 import { buildObjectiveSourceContract } from './ready-source-contract.mjs';
 
 const compact=value=>String(value||'').normalize('NFKC').replace(/\s+/g,' ').trim();
@@ -38,6 +39,7 @@ for(const [index,question] of fallback.entries()){
     if(structured.stimulus_text)payload.stimulus=compact(structured.stimulus_text);else delete payload.stimulus;
     if(JSON.stringify({prompt:payload.prompt,choices:payload.choices,answer:payload.answer,multi_select:payload.multi_select})!==immutable)errors.push('immutable prompt, choices, or publisher answer key changed');
     buildObjectiveSourceContract(payload);
+    errors.push(...compileAndValidateInteraction(payload,question.type));
     const validation=validateQuestionSpec(payload,question.type,'available');errors.push(...validation.errors);
     const ready=!new Set(errors).size;payload.import_status=ready?'ready':'drop';payload.spec.importStatus=payload.import_status;question.status=ready?'available':'draft';
     delete payload._raw_question_text;
