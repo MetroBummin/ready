@@ -1,4 +1,4 @@
-import { INTERACTION_CONTRACT_VERSION, interactionContractErrors, promptDeviceLabels, publisherRoundTripErrors } from '../server/ready/interaction-contract.mjs';
+import { INTERACTION_CONTRACT_VERSION, interactionContractErrors, promptDeviceLabels, publisherRoundTripErrors, requiresPassageEvidence } from '../server/ready/interaction-contract.mjs';
 
 const text=value=>String(value||'').trim();
 const list=value=>Array.isArray(value)?value:[];
@@ -121,7 +121,8 @@ export function compileInteractionContract(payload={},type='multiple_choice'){
   if(type==='written_response'){
     const ranges=list(payload.target_ranges||payload?.writing_guide?.targets),layout=writtenLayout(payload);
     devices=ranges.length?annotationDevices(source,ranges):[];
-    payload.spec.interaction={version:INTERACTION_CONTRACT_VERSION,kind:'written_response',selection:'none',passage:{visible:!(text(payload?.writing_guide?.task_text)&&['sentence','sentence_parts'].includes(layout)),segments:tokenizePassage(source,devices)},choices:{columns:[],rows:[]},response:{layout,slots:writtenSlots(payload,layout),targetIds:devices.map(item=>item.id)}};
+    const sourceRequired=requiresPassageEvidence(payload),hideAnswerOnlySource=text(payload?.writing_guide?.task_text)&&['sentence','sentence_parts'].includes(layout);
+    payload.spec.interaction={version:INTERACTION_CONTRACT_VERSION,kind:'written_response',selection:'none',passage:{visible:sourceRequired||!hideAnswerOnlySource,segments:tokenizePassage(source,devices)},choices:{columns:[],rows:[]},response:{layout,slots:writtenSlots(payload,layout),targetIds:devices.map(item=>item.id)}};
     return payload.spec.interaction;
   }
 

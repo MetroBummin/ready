@@ -28,7 +28,7 @@ const GEMINI_MODEL = "gemini-3.5-flash-lite";
 const AI_DAILY_LIMIT = Math.max(1, Math.min(1_000, Number(Deno.env.get("AI_DAILY_LIMIT") ?? 100)));
 const AI_GRADING_DAILY_LIMIT = Math.max(1, Math.min(1_000, Number(Deno.env.get("AI_GRADING_DAILY_LIMIT") ?? 100)));
 const GEMINI_SYSTEM = "You are a precise bilingual dictionary for Korean learners reading English books. Reply with ONLY minified JSON. No markdown, no code fence, no commentary.";
-const GEMINI_GRADING_SYSTEM = "You grade Korean secondary-school English answers against a publisher-verified reference. Do not invent a new answer key. Accept a response only when its meaning, required grammar, conditions, slot boundaries, and required word counts satisfy the supplied rubric. Reply with ONLY minified JSON.";
+const GEMINI_GRADING_SYSTEM = "You grade Korean secondary-school English answers against a publisher-verified semantic reference. Do not invent a new answer key. Accept faithful synonyms and paraphrases unless the supplied rubric explicitly requires exact words, forms, or word counts. Required grammar, conditions, slot boundaries, and required word counts remain strict. Reply with ONLY minified JSON.";
 
 type ReadySession = { id: string; actor_type: "student" | "admin"; student_id: string | null; remembered: boolean; expires_at: string };
 type Student = { id: string; name: string; school: string; grade: string };
@@ -101,6 +101,9 @@ student_responses: ${JSON.stringify(responses)}
 
 판정 원칙:
 - 단순 대소문자, 문장부호, 앞뒤 공백 차이는 무시합니다.
+- reference_answers는 의미의 source of truth이지 암기해야 하는 고정 문자열이 아닙니다.
+- 문제 조건이 특정 어휘·어형·단어 수를 요구하지 않으면 같은 원인·사실을 나타내는 자연스러운 동의어와 바꿔쓰기를 정답으로 인정합니다.
+- 정답 의미에 필수적이지 않은 수식어가 생략되어도 핵심 사실과 인과관계가 보존되면 오답으로 만들지 않습니다.
 - 의미만 비슷하고 문제의 문법/어형/단어 수/제시어 조건을 어기면 오답입니다.
 - 복수 답칸은 각 답칸의 경계를 바꾸거나 합치지 않습니다.
 - reference_answers의 의미를 벗어난 새로운 해석을 만들지 않습니다.
@@ -426,6 +429,7 @@ function publicStoredWritingGuide(value: any) {
     wordBank: cleanWritingBank([...(Array.isArray(value.word_bank) ? value.word_bank : []), ...bankFromConditions]),
     targets: publicTargetRanges(value.targets),
     taskText: clean(value.task_text, 2_000),
+    taskLabel: clean(value.task_label, 80),
   };
   return guide.title || guide.slotLabels.length || guide.conditions.length || guide.wordBank.length || guide.targets.length || guide.taskText ? guide : null;
 }

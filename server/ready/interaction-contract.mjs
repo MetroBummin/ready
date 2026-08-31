@@ -8,6 +8,14 @@ const WRITTEN_LAYOUTS=new Set(['sentence','sentence_parts','short_answers','arra
 
 export const INTERACTION_CONTRACT_VERSION=1;
 
+export function requiresPassageEvidence(input={}){
+  const payload=input&&typeof input==='object'?input:{prompt:input};
+  const value=String(payload.prompt||'').replace(/\s+/g,' '),task=String(payload?.writing_guide?.task_text||'').trim();
+  const koreanWritingTarget=/[가-힣]/u.test(task)&&/(?:영작|우리말|문장(?:을|으로)?\s*(?:완성|작성))/u.test(value);
+  if(koreanWritingTarget)return false;
+  return /(?:본문(?:을|에서)|윗글|지문|글을\s*(?:읽고|바탕)|위\s*글)/u.test(value)||/\b(?:based on|according to)\s+(?:the\s+)?(?:passage|text)\b|\bread\s+(?:the\s+)?(?:passage|text)\b/i.test(value);
+}
+
 function publicSlot(slot,index){
   return {
     id:text(slot?.id)||`slot-${index+1}`,
@@ -103,6 +111,7 @@ export function interactionContractErrors(payload={},type='multiple_choice'){
     if(text(contract.selection)!=='none')errors.push('written response selection must be none');
     const layout=text(contract?.response?.layout),slots=list(contract?.response?.slots),accepted=list(payload.accepted_answers);
     if(!WRITTEN_LAYOUTS.has(layout))errors.push('written response layout is missing');
+    if(requiresPassageEvidence(payload)&&contract?.passage?.visible!==true)errors.push('written prompt requires visible passage evidence');
     if(slots.length!==accepted.length)errors.push('interaction response slots do not match answer slots');
     const ids=new Set();
     slots.forEach((slot,index)=>{
@@ -111,8 +120,10 @@ export function interactionContractErrors(payload={},type='multiple_choice'){
       if(!label)errors.push(`response slot ${index+1} label is missing`);
       if(!['text','textarea'].includes(control))errors.push(`response slot ${index+1} control is invalid`);
       if(!placeholder)errors.push(`response slot ${index+1} placeholder is missing`);
-      const variants=Array.isArray(accepted[index])?accepted[index]:[accepted[index]],counts=new Set(variants.map(wordCount));
-      if(Number(slot?.wordCount)&&(!counts.size||!counts.has(Number(slot.wordCount))))errors.push(`response slot ${index+1} word count does not match publisher answer`);
+      const variants=Array.isArray(accepted[index])?accepted[index]:[accepted[index]],variantCounts=variants.map(wordCount),counts=new Set(variantCounts);
+      if(!variants.length||variantCounts.some(count=>count<1))errors.push(`response slot ${index+1} has no lexical publisher answer`);
+      if(!Number.isInteger(Number(slot?.wordCount))||Number(slot?.wordCount)<1)errors.push(`response slot ${index+1} word count is invalid`);
+      else if(!counts.size||!counts.has(Number(slot.wordCount)))errors.push(`response slot ${index+1} word count does not match publisher answer`);
     });
     const guideKind=text(payload?.writing_guide?.kind).replace(/-/g,'_');
     const expectedLayout=guideKind==='summary'?'summary':guideKind==='arrangement'?'arrangement':guideKind==='multi_correction'?'multi_correction':guideKind==='correction'?'correction':slots.length>1?(list(payload?.writing_guide?.targets).length?'short_answers':'sentence_parts'):'sentence';

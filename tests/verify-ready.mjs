@@ -78,6 +78,19 @@ assert.equal(contractResponseComplete(written.spec.interaction,['first','']),fal
 assert.deepEqual(publisherRoundTripErrors(written,'written_response'),[]);
 assert.deepEqual(deterministicGrade(written,'written_response',{responses:['The police decided to use social media','to find clues in the picture']}),{valid:true,correct:true,answer:written.accepted_answers});
 
+const passageAnswer=structuredClone(written);
+passageAnswer.prompt='다음 본문을 읽고 영어 질문에 답하시오.';
+passageAnswer.writing_guide.task_text='What caused the police to use social media?';
+delete passageAnswer.spec.interaction;
+compileInteractionContract(passageAnswer,'written_response');
+assert.equal(passageAnswer.spec.interaction.passage.visible,true,'A passage-dependent prompt must render its approved evidence');
+
+const guidedTarget=structuredClone(written);
+guidedTarget.prompt='윗글의 우리말을 조건에 맞게 영작하시오.';
+delete guidedTarget.spec.interaction;
+compileInteractionContract(guidedTarget,'written_response');
+assert.equal(guidedTarget.spec.interaction.passage.visible,false,'Guided writing must not reveal its publisher answer even when the prompt refers to the passage');
+
 const staleSlots=structuredClone(written);
 staleSlots.accepted_answers=[['one'],['two'],['three']];
 assert(interactionContractErrors(staleSlots,'written_response').some(error=>error.includes('response slots do not match answer slots')));
@@ -92,6 +105,8 @@ for(const removed of ['inferredChoiceParts','CHOICE_PART_REPAIRS','WRITING_GUIDE
 }
 assert.match(app,/contractPassageHtml[\s\S]*contractChoiceCopyHtml[\s\S]*contractResponseComplete/);
 assert.match(edge,/publicInteractionContract[\s\S]*deterministicGrade/);
+assert.match(edge,/semantic reference[\s\S]*faithful synonyms and paraphrases/,'AI grading must treat publisher answers as semantic truth, not exact copy');
+assert.match(edge,/같은 원인·사실을 나타내는 자연스러운 동의어와 바꿔쓰기를 정답으로 인정/);
 assert.match(runtime,/data-contract-device[\s\S]*choice_matrix/);
 assert.doesNotMatch(css,/question-choice\.eliminated[^}]*text-decoration\s*:\s*line-through/,'Eliminated choices should remain readable');
 assert.match(css,/\.choice-cell[\s\S]*grid-template-columns/,'Choice matrices must have an explicit visual grid');

@@ -133,7 +133,8 @@ export function questionSpecErrors(spec, payload = {}, type = "multiple_choice")
     for (const [index, slot] of slots.entries()) {
       const variants = Array.isArray(accepted[index]) ? accepted[index] : [accepted[index]];
       const counts = new Set(variants.map(value => (text(value).match(/[A-Za-z0-9]+(?:['’][A-Za-z]+)?/g) || []).length));
-      if (counts.size === 1 && Number(slot?.word_count) && !counts.has(Number(slot.word_count))) errors.push(`written slot ${index + 1} word count mismatch`);
+      if (!variants.length || counts.has(0)) errors.push(`written slot ${index + 1} has no lexical publisher answer`);
+      if (!Number.isInteger(Number(slot?.word_count)) || Number(slot?.word_count) < 1 || !counts.has(Number(slot.word_count))) errors.push(`written slot ${index + 1} word count mismatch`);
     }
   }
   if (spec?.passage?.source === "authored_variant" && !text(payload.variant_text || payload.set_text)) errors.push("authored variant text is missing");

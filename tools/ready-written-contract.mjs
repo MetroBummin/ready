@@ -57,7 +57,14 @@ export function validateWrittenStructure(question,spec,canonical){
   if(spec.summary_text&&includesLoose(spec.passage_text,spec.summary_text))errors.push('summary leaked into student passage');
   if(spec.task_text&&includesLoose(spec.passage_text,spec.task_text))errors.push('Korean target leaked into student passage');
   if(spec.response_slots.length!==accepted.length)errors.push(`answer slot count ${spec.response_slots.length} != ${accepted.length}`);
-  spec.response_slots.forEach((slot,index)=>{if(counts[index]&&slot.word_count!==counts[index])errors.push(`slot ${index+1} word count ${slot.word_count} != ${counts[index]}`);});
+  accepted.forEach((slot,index)=>{
+    const candidates=variants(slot),candidateCounts=candidates.map(wordCount);
+    if(!candidates.length||candidateCounts.some(count=>count<1))errors.push(`answer slot ${index+1} has no lexical publisher answer`);
+  });
+  spec.response_slots.forEach((slot,index)=>{
+    if(!Number.isInteger(counts[index])||counts[index]<1)errors.push(`slot ${index+1} publisher word count is invalid`);
+    else if(slot.word_count!==counts[index])errors.push(`slot ${index+1} word count ${slot.word_count} != ${counts[index]}`);
+  });
   const seenLabels=new Set();
   for(const target of spec.targets||[]){
     if(!target.label||seenLabels.has(target.label))errors.push(`duplicate or missing target label ${target.label||'?'}`);
