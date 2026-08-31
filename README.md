@@ -4,7 +4,7 @@
 
 ## UI 개발 원칙
 
-Student 또는 Admin UI를 변경하기 전에 반드시 [`DESIGN.md`](./DESIGN.md)를 먼저 읽습니다. 현재 시각 구조와 기능 보존 경계는 [`UI_AUDIT.md`](./UI_AUDIT.md), 정적 컴포넌트 기준은 [`design-preview.html`](./design-preview.html), 의미 토큰의 기준값은 [`design-tokens.css`](./design-tokens.css)에 있습니다.
+Student 또는 Admin UI를 변경하기 전에 반드시 [`DESIGN.md`](./DESIGN.md)를 먼저 읽습니다. 현재 시각 구조와 기능 보존 경계는 [`UI_AUDIT.md`](./UI_AUDIT.md), 정적 컴포넌트 기준은 [`design-preview.html`](./design-preview.html), 의미 토큰의 기준값은 [`design-tokens.css`](./design-tokens.css)에 있습니다. 실제 READY 표현 계층은 [`ready/design.css`](./ready/design.css)에, 런타임이 요구하는 구조·동작 호환 규칙만 [`ready/ready.css`](./ready/ready.css)에 둡니다.
 
 시각 개편은 기존 Question Contract와 Interaction Contract의 표현 계층만 다룹니다. importer, validator, renderer 데이터 계약, grader, Attempt, READY/DROP, source filter, Shorts navigation, Workbook, authentication, API, DB를 디자인 때문에 다시 작성하거나 확장하지 않습니다.
 

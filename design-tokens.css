@@ -74,6 +74,85 @@
   --ready-ease: cubic-bezier(0.2, 0, 0, 1);
 }
 
+/* READY still shares a small set of structural primitives with the former
+   Breeze shell. These aliases keep behavior intact while the visual source of
+   truth remains the semantic READY token set above. */
+body[data-ready-mode] {
+  --ui: var(--ready-font-sans);
+  --ready-ui: var(--ready-font-sans);
+  --serif: var(--ready-font-sans);
+  --display: var(--ready-font-sans);
+  --mono: var(--ready-font-mono);
+  --paper: var(--ready-canvas);
+  --paper2: var(--ready-canvas-quiet);
+  --sheet: var(--ready-surface);
+  --field: var(--ready-surface);
+  --quiet: var(--ready-canvas-quiet);
+  --quiet-ink: var(--ready-body);
+  --hover-quiet: var(--ready-canvas-quiet);
+  --ink: var(--ready-ink);
+  --ink-body: var(--ready-body);
+  --soft: var(--ready-muted);
+  --soft2: var(--ready-muted);
+  --line: var(--ready-hairline);
+  --line2: var(--ready-hairline-strong);
+  --sheet-line: var(--ready-hairline);
+  --divider: var(--ready-hairline);
+  --brand: var(--ready-primary);
+  --brand-strong: var(--ready-primary);
+  --blue: var(--ready-primary);
+  --blue-deep: var(--ready-primary-hover);
+  --sky: color-mix(in srgb, var(--ready-primary) 7%, var(--ready-surface));
+  --sky2: color-mix(in srgb, var(--ready-primary) 12%, var(--ready-surface));
+  --blue-ring: color-mix(in srgb, var(--ready-focus) 24%, transparent);
+  --on-color: var(--ready-on-primary);
+  --success: var(--ready-success);
+  --success-bg: var(--ready-success-soft);
+  --danger: var(--ready-error);
+  --danger-strong: var(--ready-error);
+  --danger-bg: var(--ready-error-soft);
+  --danger-bg-hover: color-mix(in srgb, var(--ready-error) 15%, var(--ready-surface));
+  --danger-line: color-mix(in srgb, var(--ready-error) 35%, var(--ready-hairline));
+  --ready-warn: var(--ready-warning);
+  --ready-warn-bg: var(--ready-warning-soft);
+  --th: var(--ready-canvas-quiet);
+  --panel: var(--ready-surface);
+  --surface: var(--ready-surface);
+  --muted: var(--ready-muted);
+  --field-line: var(--ready-hairline);
+  --field-soft: var(--ready-surface);
+  --toast-bg: var(--ready-action);
+  --toast-ink: var(--ready-on-action);
+  --scrim: rgb(17 17 15 / 38%);
+  --shadow-card: none;
+  --shadow-soft: none;
+  --shadow-panel: var(--ready-shadow-float);
+  --shadow-sheet: -14px 0 36px rgb(17 17 15 / 12%);
+  --texture-opacity: 0;
+}
+
+body[data-ready-mode].dark {
+  --ready-canvas: #171713;
+  --ready-canvas-quiet: #20201b;
+  --ready-surface: #24241f;
+  --ready-ink: #f4f2ea;
+  --ready-body: #cbc8bd;
+  --ready-muted: #98958b;
+  --ready-hairline: #3a3932;
+  --ready-hairline-strong: #5a584f;
+  --ready-action: #f4f2ea;
+  --ready-action-hover: #ffffff;
+  --ready-on-action: #171713;
+  --ready-success: #61b890;
+  --ready-success-soft: #193428;
+  --ready-error: #e87972;
+  --ready-error-soft: #3b201e;
+  --ready-warning: #d9a84f;
+  --ready-warning-soft: #352b18;
+  --ready-focus: #f4f2ea;
+  color-scheme: dark;
+}
+
 @media (max-width: 560px) {
   :root {
     --ready-text-display: 28px;

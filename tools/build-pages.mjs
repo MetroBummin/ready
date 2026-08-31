@@ -10,6 +10,7 @@ await mkdir(output, { recursive: true });
 await cp(resolve(root, 'ready'), output, { recursive: true });
 await cp(resolve(root, 'styles'), resolve(output, 'styles'), { recursive: true });
 await cp(resolve(root, 'assets'), resolve(output, 'assets'), { recursive: true });
+await cp(resolve(root, 'design-tokens.css'), resolve(output, 'design-tokens.css'));
 
 async function replace(path, replacements) {
   let source = await readFile(path, 'utf8');
@@ -20,10 +21,12 @@ async function replace(path, replacements) {
 await replace(resolve(output, 'index.html'), [
   ['../assets/', 'assets/'],
   ['../styles/', 'styles/'],
+  ['../design-tokens.css', 'design-tokens.css'],
 ]);
 await replace(resolve(output, 'admin/index.html'), [
   ['../../assets/', '../assets/'],
   ['../../styles/', '../styles/'],
+  ['../../design-tokens.css', '../design-tokens.css'],
 ]);
 await writeFile(resolve(output, '.nojekyll'), '');
 

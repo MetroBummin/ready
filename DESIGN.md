@@ -109,6 +109,21 @@ The base grid is 4px.
 
 Student question content is comfortable; Admin tables and lists are compact. Do not create empty marketing space that delays the first useful action.
 
+### Padding contracts
+
+Padding is part of the component contract, not a last-minute visual adjustment:
+
+| Surface | Desktop | Mobile |
+| --- | --- | --- |
+| Page gutter | `24px` minimum | `16px` |
+| Rare bounded panel | `24px` | `16px` |
+| Answer row | `12px 16px` | `12px` |
+| Passage block | `24px 0` | `20px 0` |
+| Compact Admin row | `0 12px`, `48px` high | same, inside an overflow container |
+| Primary start row | `20px 24px` | `16px` |
+
+All sibling answer rows use the same full available width and padding. A semantic background must fill the complete row, not stop at the text width. Touch targets may extend beyond the visible padding, but visual padding must remain aligned to the reading column.
+
 ## 6. Corner radius
 
 - `--ready-radius-xs: 3px` — table cells, tags, indicators.

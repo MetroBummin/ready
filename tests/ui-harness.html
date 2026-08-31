@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <title>READY UI Harness</title>
+  <link rel="stylesheet" href="../styles/fonts.css">
+  <link rel="stylesheet" href="../styles/tokens.css">
+  <link rel="stylesheet" href="../styles/base.css">
+  <link rel="stylesheet" href="../design-tokens.css">
+  <link rel="stylesheet" href="../ready/ready.css">
+  <link rel="stylesheet" href="../ready/design.css">
+  <style>
+    .harness-stack{display:grid;gap:96px}
+    .harness-label{margin-bottom:20px;padding-bottom:8px;border-bottom:1px solid var(--ready-hairline);color:var(--ready-muted);font:700 10px/1.2 var(--ready-font-mono);letter-spacing:.1em;text-transform:uppercase}
+    body[data-ready-mode="student"] .admin-harness,body[data-ready-mode="admin"] .student-harness{display:none}
+  </style>
+</head>
+<body data-ready-mode="student">
+<div id="app">
+  <header id="topbar">
+    <button id="logo" class="brand-button" type="button"><span class="mark">READY</span><span class="family">Harness</span></button>
+    <nav id="student-nav" class="student-nav"><button type="button">Home</button><button type="button">Review <span>6</span></button></nav>
+    <nav id="admin-nav"><button class="navbtn" type="button">Students</button><button class="navbtn on" type="button">Passages</button><button class="navbtn" type="button">시험범위</button></nav>
+    <div class="session-actions"><button id="theme-toggle" class="icon-button" type="button" aria-label="색상 모드 바꾸기">◐</button><button class="button quiet small" type="button">로그아웃</button></div>
+  </header>
+  <main>
+    <div class="student-harness harness-stack">
+      <section id="student-sets">
+        <p class="harness-label">Student core / Home</p>
+        <div class="home-head"><span>학습할 지문</span><small>고려고 · 2학년</small></div>
+        <div class="home-content">
+          <button class="start-study" type="button"><span><strong>문제풀기</strong><small>출처와 문제유형을 고르고 Shorts로 시작합니다.</small></span><b>›</b></button>
+          <div class="passage-list">
+            <div class="passage-row"><button class="passage-open"><span><strong>18번 지문</strong><small>모의고사 · 지문 1</small></span><b>›</b></button><div class="passage-actions"><button class="passage-workbook">워크북</button><button class="passage-question">8문제</button></div></div>
+            <div class="passage-row"><button class="passage-open"><span><strong>19번 지문</strong><small>모의고사 · 지문 2</small></span><b>›</b></button><div class="passage-actions"><button class="passage-question">6문제</button></div></div>
+            <div class="passage-row"><button class="passage-open"><span><strong>20번 지문</strong><small>모의고사 · 지문 3</small></span><b>›</b></button><div class="passage-actions"><button class="passage-question" disabled>완료</button></div></div>
+          </div>
+        </div>
+      </section>
+
+      <section id="student-filters">
+        <p class="harness-label">Source filter</p>
+        <div class="filter-head"><button class="back-link">← Home</button><p class="eyebrow">READY · QUESTION SHORTS</p><h1>문제 선택</h1><p>출처 하나와 풀고 싶은 문제유형을 여러 개 선택하세요.</p></div>
+        <form class="question-filter-form"><fieldset><legend>문제 출처</legend><div class="question-source-grid"><label class="question-filter-option"><input type="radio" checked><span><strong>전체</strong><small>294문제</small></span></label><label class="question-filter-option"><input type="radio"><span><strong>Exam4you</strong><small>114문제</small></span></label><label class="question-filter-option"><input type="radio"><span><strong>너른터</strong><small>180문제</small></span></label></div></fieldset><fieldset><legend>문제유형 <small>중복 선택 가능 · 선택하지 않으면 전체</small></legend><div class="question-type-grid"><label class="question-filter-option"><input type="checkbox" checked><span><strong>어법</strong><small>42문제</small></span></label><label class="question-filter-option"><input type="checkbox"><span><strong>내용일치</strong><small>36문제</small></span></label><label class="question-filter-option"><input type="checkbox"><span><strong>서술형</strong><small>28문제</small></span></label></div></fieldset><button class="button primary question-filter-start">시작</button></form>
+      </section>
+
+      <section id="student-questions">
+        <p class="harness-label">Question renderer / submitted wrong</p>
+        <div class="question-layout" data-question-phase="submitted"><div class="reader-shell"><div class="question-topline"><span class="question-progress">08 / 42</span><span class="question-state"><i class="question-result-dot wrong"></i></span><button class="question-bookmark active" aria-label="북마크"><svg viewBox="0 0 24 24"><path d="M6 3h12v18l-6-4-6 4z"/></svg></button></div><p class="eyebrow">GRAMMAR · 너른터 · 18번 지문</p><h1 class="question-prompt">다음 글의 밑줄 친 부분 중, 어법상 틀린 것은?</h1><div class="reading-passage question-passage">People often assume that speed and precision are opposites. In a well-designed system, however, clear structure <span class="question-segment underline">allows</span> a learner to move quickly without losing attention. Each decision is visible, and feedback arrives while the reasoning is still fresh.</div><div class="question-answer-area"><button class="question-choice"><span class="question-choice-mark">①</span><span class="question-choice-copy">assume</span></button><button class="question-choice selected"><span class="question-choice-mark">②</span><span class="question-choice-copy">are · 선택됨</span></button><button class="question-choice correct"><span class="question-choice-mark">③</span><span class="question-choice-copy">allows · 정답</span></button><button class="question-choice wrong"><span class="question-choice-mark">④</span><span class="question-choice-copy">arrives · 내 답안</span></button></div><div class="question-feedback wrong"><strong>Incorrect / 오답</strong><span>내 답안 ④ · 정답 ③. 주어와 동사의 수 일치를 다시 확인하세요.</span><div class="feedback-actions"><button>해설 보기</button></div><p class="explanation-reveal">주어 clear structure는 단수이므로 동사 allows가 쓰입니다.</p></div><div class="shorts-cue"><span>↓</span><small>다음 문제</small></div></div></div>
+      </section>
+
+      <section id="matrix-written">
+        <p class="harness-label">Matrix / Written / AI grading</p>
+        <div class="question-layout"><div class="reader-shell"><h1 class="question-prompt">빈칸 (A), (B)에 들어갈 말로 가장 적절한 것은?</h1><div class="question-answer-area choice-matrix"><button class="question-choice"><span class="question-choice-mark">①</span><span class="question-choice-copy"><span class="choice-cell"><small>(A)</small><span>Instead</span></span><span class="choice-cell"><small>(B)</small><span>while</span></span></span></button><button class="question-choice selected"><span class="question-choice-mark">②</span><span class="question-choice-copy"><span class="choice-cell"><small>(A)</small><span>Nevertheless</span></span><span class="choice-cell"><small>(B)</small><span>since</span></span></span></button></div><div class="written-workspace sentence"><div class="writing-target"><strong>Target</strong><p>세심한 주의는 복잡한 일을 단순하게 느끼게 한다.</p></div><div class="writing-conditions"><strong>Conditions</strong><ul><li>관계대명사를 사용할 것</li><li>12단어로 작성할 것</li></ul></div><div class="writing-bank"><strong>Word bank</strong><div><span>attention</span><span>makes</span><span>complex</span><span>work</span><span>simple</span></div></div><label class="sentence-answer"><span>답안</span><textarea>Careful attention makes complex work feel simple.</textarea></label></div><div class="question-submit-row"><button class="button primary question-submit">채점 중 ···</button></div><div class="ai-grade-feedback"><strong>AI</strong><span>답안을 확인하고 있습니다. 제출한 문장은 그대로 유지됩니다.</span></div></div></div>
+      </section>
+
+      <section id="workbook">
+        <p class="harness-label">Workbook</p>
+        <div class="workbook-layout"><header class="workbook-head"><p class="eyebrow">READY · WORKBOOK</p><h1>NE 능률 영어 1과</h1><p>직접 쓰고 바로 확인하는 문장 연습입니다.</p></header><nav class="workbook-tabs"><button class="active"><span>1단계</span><b>4 / 8</b></button><button><span>2단계</span><b>0 / 8</b></button></nav><section class="workbook-card"><div class="workbook-meta"><span>빈칸 완성</span><b>5 / 8</b></div><p class="workbook-instruction">문맥에 맞는 표현을 직접 입력하세요.</p><blockquote>Attention makes difficult work easier to understand.</blockquote><div class="workbook-prompt">Careful <span class="workbook-blank"><input value="attention"></span> makes complex work feel simple.</div><div class="workbook-feedback correct"><strong>정답입니다.</strong><span>다음 문장으로 넘어가세요.</span></div><div class="workbook-actions"><button class="button primary">다음 문제</button></div></section></div>
+      </section>
+    </div>
+
+    <div class="admin-harness harness-stack">
+      <section><p class="harness-label">Admin / Passages</p><div class="page-head"><div><p class="eyebrow">PASSAGE LIBRARY</p><h1>지문</h1></div><button class="button quiet">새로고침</button></div><div class="filter-toolbar"><label>학년<select><option>전체</option></select></label><label>종류<select><option>전체</option></select></label><label>상태<select><option>READY</option></select></label></div><form class="question-import-form"><label><span>검증 완료 문제 번들</span><input type="file"></label><button class="button quiet">READY 문제 가져오기</button><small>최종 round-trip을 통과한 READY 문항만 가져옵니다.</small></form><div class="table-wrap"><table><thead><tr><th>Source</th><th>Total</th><th>Ready</th><th>Drop</th><th>Status</th><th></th></tr></thead><tbody><tr><td>Exam4you</td><td>305</td><td>114</td><td>191</td><td>READY</td><td><button class="button quiet small">편집</button></td></tr><tr><td>너른터</td><td>224</td><td>180</td><td>44</td><td>READY</td><td><button class="button quiet small">편집</button></td></tr><tr><td>Legacy</td><td>87</td><td>0</td><td>87</td><td>DROP</td><td><button class="button danger small">삭제</button></td></tr></tbody></table></div></section>
+      <section><p class="harness-label">Admin / Scope</p><div class="scope-school"><h2>고려고</h2><div class="scope-grid"><button class="card scope-card scope-card-button"><div class="card-head"><div><p class="eyebrow">CURRENT SCOPE</p><h3>1학년</h3><p class="lead compact">지문 8개</p></div><span class="scope-card-arrow">→</span></div><div class="passage-list"><div class="recent-row">18번 지문</div><div class="recent-row">19번 지문</div></div><span class="scope-card-cta">눌러서 지문 추가·제외</span></button><button class="card scope-card scope-card-button"><div class="card-head"><div><p class="eyebrow">CURRENT SCOPE</p><h3>2학년</h3><p class="lead compact">지문 6개</p></div><span class="scope-card-arrow">→</span></div><div class="passage-list"><div class="recent-row">20번 지문</div><div class="recent-row">21번 지문</div></div><span class="scope-card-cta">눌러서 지문 추가·제외</span></button></div></div></section>
+    </div>
+  </main>
+</div>
+<script>
+  const params=new URLSearchParams(location.search);
+  const mode=params.get('mode')==='admin'?'admin':'student';
+  document.body.dataset.readyMode=mode;
+  document.querySelector('#student-nav').hidden=mode!=='student';
+  document.querySelector('#admin-nav').hidden=mode!=='admin';
+  const focus=params.get('focus');
+  if(focus){
+    const targets={home:'student-sets',source:'student-filters',question:'student-questions',written:'matrix-written',workbook:'workbook'};
+    document.querySelectorAll('.harness-stack>section').forEach(section=>section.hidden=section.id!==targets[focus]);
+    document.querySelectorAll('.harness-stack').forEach(stack=>stack.style.gap='0');
+  }
+</script>
+</body>
+</html>

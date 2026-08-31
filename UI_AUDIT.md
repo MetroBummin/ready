@@ -103,3 +103,15 @@ Authenticated and contract-specific states require a fixture or valid local sess
 5. Restyle Admin navigation, forms, filters, tables/lists, scope screens, and sheets.
 6. Remove only verified dead CSS.
 7. Run complete tests/build and verify 390, 768, and 1440px with screenshots and console checks.
+
+## Implementation status — 2026-08-31
+
+Completed on `codex/ui-redesign` after merging `main` at `1e67d49`:
+
+- Wired the canonical `design-tokens.css` into Student, Admin, and the Pages build.
+- Added `ready/design.css` as the production-only presentation layer.
+- Reduced `ready/ready.css` from 381 lines of mixed Breeze/lexical/visual rules to 107 lines of structural compatibility rules.
+- Removed legacy lexical dock/sheet styling, sentence-card styling, old standalone review-list styling, Breeze typography, paper texture, oversized radii, and layered card shadows from READY.
+- Restyled Student chooser/PIN/Home/source filter, the existing Question renderer, choice matrix, written/AI feedback states, Review's shared renderer, Workbook, Admin login/forms/tables/scope screens, sheets, loading, empty, and error states.
+- Preserved `ready/app.js`, `ready/admin/app.js`, `ready/interaction-runtime.js`, importer, grader, API, migrations, and all Contract hooks relative to the merged `main`.
+- Added `tests/ui-harness.html` to visually exercise production selectors without creating a production route or bypassing authentication.
