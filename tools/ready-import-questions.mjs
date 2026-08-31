@@ -11,8 +11,18 @@ const apply=process.argv.includes('--apply');
 const allowLegacy=process.argv.includes('--allow-legacy');
 if(!file)usage();
 
-const questions=JSON.parse(await readFile(file,'utf8'));
+const bundle=JSON.parse(await readFile(file,'utf8'));
+const questions=Array.isArray(bundle)?bundle:bundle?.questions;
 if(!Array.isArray(questions)||!questions.length)throw new Error('Bundle must be a non-empty JSON array.');
+const written=questions.filter(item=>item?.type==='written_response');
+if(written.length&&!allowLegacy){
+  if(Array.isArray(bundle)||bundle?.ai_written_structure?.engine!=='codex-cli')throw new Error('Written responses must pass structure:written before import.');
+  if(bundle.ai_written_structure.mode!=='full')throw new Error('A representative sample gate cannot be imported; run the full written-response gate after all samples pass.');
+  const gate=bundle.ai_written_structure;
+  if(Number(gate.processed_questions)!==Number(gate.source_written_questions))throw new Error('The full written-response gate did not process every source question.');
+  if(Number(gate.ready)!==written.length||Number(gate.output_written_questions)!==written.length)throw new Error('Dropped written responses must not remain in the import bundle.');
+  if(Number(gate.ready)+Number(gate.dropped)!==Number(gate.processed_questions))throw new Error('Written-response gate totals are inconsistent.');
+}
 
 const identities=new Set();
 for(const [index,item] of questions.entries()){
@@ -30,7 +40,7 @@ for(const [index,item] of questions.entries()){
   const validation=validateQuestionSpec(item.payload,item.type,item.status||'draft');
   if(validation.errors.length)throw new Error(`Row ${index+1}: invalid render spec: ${validation.errors.join(', ')}.`);
   if(validation.spec.importStatus==='ready'&&item.status!=='available')throw new Error(`Row ${index+1}: ready questions must use status=available.`);
-  if(validation.spec.importStatus!=='ready'&&item.status==='available')throw new Error(`Row ${index+1}: review/unsupported questions cannot be published.`);
+  if(validation.spec.importStatus!=='ready'&&item.status==='available')throw new Error(`Row ${index+1}: dropped questions cannot be published.`);
 }
 
 const counts=questions.reduce((out,item)=>{const family=item.payload.family||item.type;out[family]=(out[family]||0)+1;return out;},{});

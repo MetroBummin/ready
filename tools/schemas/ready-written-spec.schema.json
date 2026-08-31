@@ -2,9 +2,12 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "type": "object",
   "additionalProperties": false,
-  "required": ["kind", "task_text", "targets", "conditions", "word_bank", "response_slots", "summary_text", "confidence", "issues"],
+  "required": ["kind", "prompt_text", "passage_mode", "passage_text", "task_text", "targets", "conditions", "word_bank", "response_slots", "summary_text", "confidence", "issues"],
   "properties": {
     "kind": { "enum": ["sentence", "arrangement", "correction", "multi-correction", "summary"] },
+    "prompt_text": { "type": "string", "minLength": 1 },
+    "passage_mode": { "enum": ["canonical_excerpt", "authored_variant"] },
+    "passage_text": { "type": "string", "minLength": 1 },
     "task_text": { "type": "string" },
     "targets": {
       "type": "array",

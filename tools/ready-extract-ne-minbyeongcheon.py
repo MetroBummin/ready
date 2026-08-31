@@ -111,6 +111,78 @@ def answer_table(reader: PdfReader) -> dict[int, list[int] | None]:
     return answers
 
 
+def answer_variants(value: str) -> list[str]:
+    """Expand publisher alternatives such as who[that] without guessing."""
+    value = re.sub(r"(?<![A-Za-z])(?:[A-Za-z] ){1,}[A-Za-z](?![A-Za-z])", lambda match: match.group(0).replace(" ", ""), value)
+    value = compact(value).replace("Com pean", "Compean")
+    for broken, repaired in {
+        "th at": "that", "tobe": "to be", "n owonder": "no wonder",
+        "c alled": "called", "ca lle d": "called", "sh e": "she", "m otherof": "mother of", "mo th erof": "mother of",
+        "fo re n sic": "forensic", "i n": "in", "t o": "to", "o f": "of", "s o": "so",
+    }.items():
+        value = re.sub(rf"\b{re.escape(broken)}\b", repaired, value, flags=re.I)
+    value = re.sub(r"\bcalled\s*,\s*mother\b", "called mother", value, flags=re.I)
+    variants = [value]
+    while any(re.search(r"(?:\b([A-Za-z]+))?\[([^\]]+)\]", item) for item in variants):
+        expanded = []
+        for item in variants:
+            match = re.search(r"(?:\b([A-Za-z]+)\s*)?\[([^\]]+)\]", item)
+            if not match:
+                expanded.append(item)
+                continue
+            base, alternative = match.group(1) or "", match.group(2)
+            before, after = item[:match.start()], item[match.end():]
+            expanded.extend([before + base + after, before + alternative + after])
+        variants = expanded
+    return list(dict.fromkeys(compact(item) for item in variants if compact(item)))
+
+
+def written_answer_table(reader: PdfReader, expected: set[int]) -> dict[int, list]:
+    """Read fixed written answers from the publisher answer table."""
+    text = "\n".join(page.extract_text() or "" for page in reader.pages)
+    marker = re.search(r"주관식\(서답형\)", text)
+    if not marker:
+        raise ValueError("written answer section not found")
+    area = text[marker.end():]
+    positions = []
+    cursor = 0
+    for number in sorted(expected):
+        match = re.search(rf"(?m)^\s*{number}\.\s+", area[cursor:])
+        if not match:
+            raise ValueError(f"written answer {number}: heading not found")
+        start, content_start = cursor + match.start(), cursor + match.end()
+        positions.append((number, start, content_start))
+        cursor = content_start
+    answers = {}
+    for index, (number, _start, content_start) in enumerate(positions):
+        end = positions[index + 1][1] if index + 1 < len(positions) else len(area)
+        block = re.split(r"(?m)^\s*-\s*\d+\s*-\s*$", area[content_start:end], maxsplit=1)[0]
+        block = re.sub(r"(?<![A-Za-z])(?:[A-Za-z] ){1,}[A-Za-z](?![A-Za-z])", lambda match: match.group(0).replace(" ", ""), block)
+        block = compact(block)
+        block = re.sub(r"\(\s*([1-9A-C])\s*\)", r"(\1)", block)
+        numbered = list(re.finditer(r"\((\d+)\)\s*(.*?)(?=\(\d+\)|$)", block))
+        labelled = list(re.finditer(r"\(([A-C])\)\s*(.*?)(?=\([A-C]\)|$)", block))
+        raw_slots = []
+        if numbered:
+            for item in numbered:
+                value = compact(item.group(2))
+                correction = re.match(r"([ⓐ-ⓕ])\s*.+?\s*(?:→|->)\s*(.+)$", value)
+                raw_slots.append(f"{correction.group(1)} {correction.group(2)}" if correction else value)
+        elif labelled:
+            raw_slots = [compact(item.group(2)) for item in labelled]
+        elif block.count(",") >= 2 and all(len(part.split()) <= 5 for part in block.split(",")):
+            raw_slots = [compact(part) for part in block.split(",")]
+        else:
+            raw_slots = [block]
+        answers[number] = []
+        for slot in raw_slots:
+            variants = answer_variants(slot)
+            answers[number].append(variants[0] if len(variants) == 1 else variants)
+    if set(answers) != expected:
+        raise ValueError(f"written answer table mismatch: {sorted(set(answers) ^ expected)}")
+    return answers
+
+
 def explanation_table(reader: PdfReader) -> dict[int, str]:
     """Extract the fixed, publisher-authored explanation for each question.
 
@@ -323,11 +395,12 @@ def source_kind(set_text: str, textbook_text: str) -> str:
     return "textbook_main" if coverage >= .34 else "supplemental"
 
 
-def extract_exam(path: Path, exam_index: int, written_answers: dict[str, list]) -> list[dict]:
+def extract_exam(path: Path, exam_index: int, written_answers: dict[str, list] | None = None) -> list[dict]:
     lesson = 1 if exam_index <= 4 else 2
     round_ = (exam_index - 1) % 4 + 1
     reader = PdfReader(str(path))
     answers = answer_table(reader)
+    embedded_written_answers = written_answer_table(reader, WRITTEN[exam_index - 1])
     explanations = explanation_table(reader)
     problem_text = problem_pages(path)
     positions = question_positions(problem_text)
@@ -354,7 +427,7 @@ def extract_exam(path: Path, exam_index: int, written_answers: dict[str, list]) 
             if (
                 inline_context
                 and len(english_tokens(inline_context)) >= 12
-                and re.match(r"^[A-Za-z“‘'\"]", inline_context)
+                and re.match(r"^(?:[A-Za-z“‘'\"]|\[[A-Za-z])", inline_context)
             ):
                 current_context = inline_context
             set_text = current_context
@@ -382,6 +455,13 @@ def extract_exam(path: Path, exam_index: int, written_answers: dict[str, list]) 
             "source": source,
             "explanation": explanations[number],
         }
+        if written:
+            # Preserve the complete private PDF evidence. A written question
+            # often keeps its marked Passage in the shared worksheet context
+            # while the current block contains only conditions/answer frames.
+            # The structurer, not the extractor, owns the student-facing split.
+            apparatus = clean_noise(body)
+            payload["_raw_question_text"] = set_text if apparatus in set_text else compact(f"{set_text} {apparatus}")
         if payload["skill"] == "insertion":
             stimulus = re.match(r"^(.+?[.!?])\s+(?=[A-Z(])", set_text)
             if stimulus:
@@ -389,7 +469,7 @@ def extract_exam(path: Path, exam_index: int, written_answers: dict[str, list]) 
                 payload["set_text"] = set_text[stimulus.end():].strip()
         if written:
             answer_key = f"{exam_index}:{number}"
-            accepted_answers = written_answers.get(answer_key)
+            accepted_answers = written_answers.get(answer_key) if written_answers else embedded_written_answers.get(number)
             if not isinstance(accepted_answers, list) or not accepted_answers:
                 raise ValueError(f"exam {exam_index} q{number}: missing private written answer")
             slots = response_slots(accepted_answers)
@@ -450,16 +530,18 @@ def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("textbook", type=Path)
     parser.add_argument("output", type=Path)
-    parser.add_argument("--written-answers", type=Path, required=True, help="Private JSON keyed by exam-index:question-number")
+    parser.add_argument("--written-answers", type=Path, help="Optional audited override JSON keyed by exam-index:question-number")
     parser.add_argument("--downloads", type=Path, default=Path("/Users/kosangbum/Downloads"))
     args = parser.parse_args()
     paths = source_paths(args.downloads)
-    missing = [str(path) for path in [args.textbook, args.written_answers, *paths] if not path.exists()]
+    missing = [str(path) for path in [args.textbook, *paths] if not path.exists()]
+    if args.written_answers and not args.written_answers.exists():
+        missing.append(str(args.written_answers))
     if missing:
         raise FileNotFoundError("\n".join(missing))
-    written_answers = json.loads(args.written_answers.read_text(encoding="utf-8"))
+    written_answers = json.loads(args.written_answers.read_text(encoding="utf-8")) if args.written_answers else None
     expected_written_keys = {f"{exam_index}:{number}" for exam_index, numbers in enumerate(WRITTEN, 1) for number in numbers}
-    if set(written_answers) != expected_written_keys:
+    if written_answers is not None and set(written_answers) != expected_written_keys:
         raise ValueError("private written-answer identity contract failed")
     manifest = {"lessons": textbook_lessons(args.textbook), "questions": []}
     for index, path in enumerate(paths, 1):

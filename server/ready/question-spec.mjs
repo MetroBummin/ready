@@ -19,7 +19,7 @@ export const READY_TAXONOMY = Object.freeze([
 
 const rendererSet = new Set(READY_RENDERERS);
 const taxonomySet = new Set(READY_TAXONOMY);
-const importStatusSet = new Set(["ready", "needs_review", "unsupported"]);
+const importStatusSet = new Set(["ready", "drop"]);
 const responseModeSet = new Set(["choice", "input"]);
 const choiceModeSet = new Set(["single", "multi", "none"]);
 const gradingModeSet = new Set(["exact", "exact_set", "normalized", "accepted_variants", "ai"]);
@@ -74,7 +74,7 @@ export function legacyQuestionSpec(payload = {}, type = "multiple_choice", rowSt
     version: 1,
     taxonomy,
     renderer,
-    importStatus: rowStatus === "available" ? "ready" : "needs_review",
+    importStatus: rowStatus === "available" ? "ready" : "drop",
     passage: { source, annotations, deviceMode: taxonomy.startsWith("blank_") ? "blank" : taxonomy === "sentence_insertion" ? "structural" : annotations.length ? "annotations" : "plain" },
     blocks: list(payload.content_blocks),
     extras: [payload.stimulus ? "stimulus" : "", payload.summary_text ? "summary" : ""].filter(Boolean),
@@ -92,7 +92,7 @@ export function normalizeQuestionSpec(payload = {}, type = "multiple_choice", ro
     version: 1,
     taxonomy: text(payload.taxonomy) || text(raw.taxonomy),
     renderer: text(raw.renderer),
-    importStatus: text(payload.import_status) || text(raw.importStatus) || "needs_review",
+    importStatus: text(payload.import_status) || text(raw.importStatus) || "drop",
     passage: {
       source: text(raw.passage?.source),
       annotations: list(raw.passage?.annotations),

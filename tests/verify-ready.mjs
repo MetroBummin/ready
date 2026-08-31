@@ -98,7 +98,7 @@ assert.match(app,/sentence-answer[\s\S]*textarea[\s\S]*완성한 영어 문장/,
 assert.match(app,/writtenSlotsHtml[\s\S]*multi-correction[\s\S]*summary-slots/,'Multi-slot summary and correction tasks are still flattened into one field');
 assert.match(app,/writingGuide\?\.title\|\|question\.prompt/,'Flattened PDF prompts still override structured writing titles');
 assert.doesNotMatch(app,/question-set-nav|questionSetKey|questionSetIndices|data-question-index/,'Questions are still bundled into a worksheet-set UI');
-assert.match(app,/questionBasePassage\(question\)[\s\S]*question\.setText\|\|question\.variantText\|\|question\.passageText/,'A question does not prefer its own immutable worksheet context');
+assert.match(app,/function questionBasePassage\(question\)[\s\S]*question\.setText\|\|question\.variantText\|\|canonical/,'A question does not prefer its own immutable worksheet context');
 assert.match(app,/function questionBasePassage[\s\S]*function currentQuestionPassage[\s\S]*function questionPassageHtml/,'Current-question Passage composition is missing');
 assert.match(app,/applyAlternativeOverlay[\s\S]*applyTargetOverlay[\s\S]*applyStructuralOverlay[\s\S]*pointedPassageHtml/,'Question overlays are not isolated by interaction type');
 assert.match(app,/target\.canonicalText\|\|target\.text/,'Target overlays cannot distinguish source anchors from displayed expressions');

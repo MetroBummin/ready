@@ -1,0 +1,9 @@
+[
+  {"exam":"공통영어2 NE능률(민병천) 1과 예상문제 1회","question":3,"kind":"guided_writing"},
+  {"exam":"공통영어2 NE능률(민병천) 1과 예상문제 1회","question":10,"kind":"arrangement"},
+  {"exam":"공통영어2 NE능률(민병천) 1과 예상문제 2회","question":6,"kind":"multi_correction"},
+  {"exam":"공통영어2 NE능률(민병천) 1과 예상문제 2회","question":10,"kind":"referent_three_slot"},
+  {"exam":"공통영어2 NE능률(민병천) 1과 예상문제 2회","question":16,"kind":"reading_two_slot"},
+  {"exam":"공통영어2 NE능률(민병천) 1과 예상문제 4회","question":20,"kind":"summary_three_slot"},
+  {"exam":"공통영어2 NE능률(민병천) 2과 예상문제 3회","question":15,"kind":"summary_four_slot"}
+]
