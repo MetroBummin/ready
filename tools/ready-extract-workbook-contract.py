@@ -34,6 +34,17 @@ def norm(value: str) -> str:
     return re.sub(r"\s+", " ", value.replace("’", "'").replace("‘", "'").replace("“", '"').replace("”", '"')).strip()
 
 
+def canonical_form(value: str) -> str:
+    """Normalize only typography that publisher text extraction can vary."""
+    value = re.sub(r"\s+([,.;:!?])", r"\1", norm(value).lower())
+    value = re.sub(r"\b(i|you|we|they)'re\b", r"\1 are", value)
+    value = re.sub(r"\b(i)'m\b", r"\1 am", value)
+    value = re.sub(r"\b(i|you|we|they)'ve\b", r"\1 have", value)
+    value = re.sub(r"\b(i|you|he|she|it|we|they)'ll\b", r"\1 will", value)
+    value = re.sub(r"\b(he|she|it|that|there|what|who)'s\b", r"\1 is", value)
+    return value
+
+
 def clean_page(value: str) -> str:
     value = re.sub(r"^.*?교과서 본문\s*", "", value, count=1, flags=re.S)
     value = re.sub(r"-\s*\d+\s*-", " ", value)
@@ -136,6 +147,47 @@ def marked(template: str, expression: str, token: str) -> tuple[str, list[str]]:
     return frame, groups
 
 
+def fill_frame(frame: str, answers: list[str]) -> str:
+    """Fill one publisher answer into each explicit workbook slot."""
+    parts = re.split(r"_{5,}", norm(frame))
+    if len(parts) - 1 != len(answers):
+        raise ValueError("answer slots and publisher answers differ")
+    output = [parts[0]]
+    for answer, tail in zip(answers, parts[1:]):
+        output.extend([answer, tail])
+    return norm("".join(output))
+
+
+def stage5_answer_items(reader: PdfReader, expected_count: int) -> list[list[str]]:
+    """Read slash-separated Stage 5 slot answers from the publisher Answer Key.
+
+    Some books contain a second supplementary Stage 5 section. The executable
+    textbook section is the unique answer-key block whose numbered row count
+    matches the Stage 5 exercise count extracted from the textbook pages.
+    """
+    answer_text = "\n".join((page.extract_text() or "") for page in reader.pages if "Answer Key" in (page.extract_text() or ""))
+    candidates: list[list[list[str]]] = []
+    for marker in re.finditer(r"워크북\s*5\s*동사형\s*연습", answer_text):
+        following = answer_text[marker.end():]
+        next_stage = re.search(r"워크북\s*6", following)
+        block = following[:next_stage.start() if next_stage else len(following)]
+        starts = list(re.finditer(r"(?<!\d)(\d+)\)\s*", block))
+        if [int(start.group(1)) for start in starts] != list(range(1, expected_count + 1)):
+            continue
+        rows = []
+        for index, start in enumerate(starts):
+            end = starts[index + 1].start() if index + 1 < len(starts) else len(block)
+            value = re.sub(r"\s*Answer Key.*$", "", block[start.end():end], flags=re.S)
+            answers = [norm(answer) for answer in value.split("/")]
+            if not answers or any(not answer for answer in answers):
+                raise ValueError(f"stage 5 item {index + 1}: empty publisher answer slot")
+            rows.append(answers)
+        candidates.append(rows)
+    if len(candidates) != 1:
+        raise ValueError(f"stage 5: found {len(candidates)} matching publisher answer-key blocks")
+    return candidates[0]
+
+
 def writing_frame(prompt: str, canonical: str) -> tuple[str, list[str]]:
     blank = prompt.find("_____")
     if blank < 0:
@@ -234,6 +286,8 @@ def compile_catalog(pdf: Path, key: str, title: str, prefix: str) -> tuple[dict,
     english = [source for source, _prompt in raw[2]]
     korean = [source for source, _prompt in raw[3]]
     corpus = norm(" ".join(english))
+    canonical_corpus = canonical_form(corpus)
+    stage5_answers = stage5_answer_items(reader, len(raw[5]))
     unpublished = []
     stages, statuses = [], {str(stage): {"source": len(items), "ready": 0, "invalid": 0} for stage, items in raw.items()}
     stage7 = stage7_items(reader, prefix)
@@ -255,11 +309,11 @@ def compile_catalog(pdf: Path, key: str, title: str, prefix: str) -> tuple[dict,
                     item = {"kind": "translation_ai", "source": english[index], "prompt": "우리말 해석을 입력하세요.", "answers": [korean[index]]}
                 elif stage == 5:
                     frame, hints = marked(prompt, r"\(([^()]*)\)", "blank")
-                    try:
-                        answers = cloze(frame, english[index])
-                    except (IndexError, ValueError):
-                        answers = cloze_in_corpus(frame, corpus)
-                    if len(hints) != len(answers): raise ValueError("verb hints and answers differ")
+                    answers = stage5_answers[index]
+                    if len(hints) != len(answers): raise ValueError("verb hints and publisher answer slots differ")
+                    reconstructed = fill_frame(frame, answers)
+                    if canonical_corpus.count(canonical_form(reconstructed)) != 1:
+                        raise ValueError("publisher slot answers do not uniquely reconstruct a canonical sentence")
                     item = {"kind": "verb_form", "source": source, "prompt": frame, "hints": hints, "answers": answers}
                 elif stage == 6:
                     groups = [[norm(option) for option in value.split("/")] for value in re.findall(r"\[([^\[\]]+)\]", prompt)]

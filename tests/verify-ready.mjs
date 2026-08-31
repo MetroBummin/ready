@@ -7,6 +7,7 @@ import { deterministicGrade, interactionContractErrors, publisherRoundTripErrors
 import { validateQuestionSpec } from '../server/ready/question-spec.mjs';
 import { compileAndValidateInteraction, compileInteractionContract } from '../tools/ready-interaction-contract.mjs';
 import { contractChoiceCopyHtml, contractPassageHtml, contractRenderCounts, contractResponseComplete } from '../ready/interaction-runtime.js';
+import { WORKBOOK_TRANSLATION_GRADING_POLICY, workbookTranslationPass } from '../server/ready/workbook-grading-policy.mjs';
 
 const root=resolve(dirname(fileURLToPath(import.meta.url)),'..');
 const read=path=>readFileSync(resolve(root,path),'utf8');
@@ -126,7 +127,6 @@ assert.doesNotMatch(app,/workbookChoiceHtml[^\n]*join\('<i>\/<\/i>'\)/,'Workbook
 assert.match(edge,/publicInteractionContract[\s\S]*deterministicGrade/);
 assert.match(edge,/semantic reference[\s\S]*faithful synonyms and paraphrases/,'AI grading must treat publisher answers as semantic truth, not exact copy');
 assert.match(edge,/같은 원인·사실을 나타내는 자연스러운 동의어와 바꿔쓰기를 정답으로 인정/);
-assert.match(edge,/ready_workbook_ai_grading_requests[\s\S]*status: "pending"[\s\S]*callGeminiGrade/,'Workbook answers must be persisted before AI inference');
 assert.match(app,/data-toggle-workbook-bookmark[\s\S]*data-review-workbook-passage/,'Workbook Review must reopen the original workbook renderer');
 assert.match(runtime,/data-contract-device[\s\S]*choice_matrix/);
 assert.doesNotMatch(css,/question-choice\.eliminated[^}]*text-decoration\s*:\s*line-through/,'Eliminated choices should remain readable');
@@ -135,23 +135,46 @@ assert.match(css,/\.choice-cell[\s\S]*grid-template-columns/,'Choice matrices mu
 const baseline=read('supabase/migrations/20260826150000_ready_current_baseline.sql');
 const questionMigration=read('supabase/migrations/20260828150000_ready_question_first.sql');
 const workbookReviewMigration=read('supabase/migrations/20260831233000_ready_workbook_review_ai.sql');
+const workbookGradeLinkMigration=read('supabase/migrations/20260901013000_ready_workbook_ai_grade_link.sql');
 assert.match(baseline,/ready_attempts_are_immutable[\s\S]*before update or delete/);
 assert.match(questionMigration,/ready_import_question_bundle[\s\S]*jsonb_array_elements/);
 assert.match(workbookReviewMigration,/ready_workbook_bookmarks[\s\S]*ready_workbook_ai_grading_requests/);
+assert.match(workbookGradeLinkMigration,/ai_grading_request_id[\s\S]*references public\.ready_workbook_ai_grading_requests/);
+assert.match(workbookGradeLinkMigration,/delete from ready_workbook_attempts[\s\S]*delete from ready_workbook_ai_grading_requests/,'Cascade must delete linked attempts before AI audit rows');
 
 const {NE_MINBYEONGCHEON_L1_WORKBOOK}=await import('../server/ready/workbook-ne-l1.mjs');
 const {NE_MINBYEONGCHEON_L2_WORKBOOK}=await import('../server/ready/workbook-ne-l2.mjs');
 const {YBM_PARKJUNEON_L1_WORKBOOK}=await import('../server/ready/workbook-ybm-l1.mjs');
 const {YBM_PARKJUNEON_L2_WORKBOOK}=await import('../server/ready/workbook-ybm-l2.mjs');
 const workbooks=[NE_MINBYEONGCHEON_L1_WORKBOOK,NE_MINBYEONGCHEON_L2_WORKBOOK,YBM_PARKJUNEON_L1_WORKBOOK,YBM_PARKJUNEON_L2_WORKBOOK];
-assert.deepEqual(workbooks.map(book=>book.stages.flatMap(stage=>stage.items).length),[289,364,317,302]);
+assert.deepEqual(workbooks.map(book=>book.stages.flatMap(stage=>stage.items).length),[295,364,327,394]);
 for(const book of workbooks)assert.deepEqual(book.stages.map(stage=>stage.stage),[2,3,4,5,6,7,8,9],`${book.workbookKey} must expose every requested workbook stage`);
 const workbookItems=workbooks.flatMap(book=>book.stages.flatMap(stage=>stage.items));
 assert.equal(new Set(workbookItems.map(item=>item.key)).size,workbookItems.length);
-for(const item of workbookItems){assert(item.answers.length>0);if(item.kind==='blank_input'||item.kind==='verb_form')assert.equal((item.prompt.match(/_{5,}/g)||[]).length,item.answers.length);if(item.kind==='choice_groups')assert.equal(item.groups.length,item.answers.length);if(item.kind==='correction_pairs')assert.equal(item.pairCount*2,item.answers.length);if(item.kind==='translation_ai')assert.equal(item.answers.length,1);}
+for(const item of workbookItems){assert(item.answers.length>0);if(item.kind==='blank_input'||item.kind==='verb_form')assert.equal((item.prompt.match(/_{5,}/g)||[]).length,item.answers.length);if(item.kind==='verb_form')assert.equal(item.hints.length,item.answers.length);if(item.kind==='choice_groups')assert.equal(item.groups.length,item.answers.length);if(item.kind==='correction_pairs')assert.equal(item.pairCount*2,item.answers.length);if(item.kind==='translation_ai')assert.equal(item.answers.length,1);}
 for(const book of workbooks){assert.equal(book.source.preserved,true);assert.match(book.source.sha256,/^[a-f0-9]{64}$/);for(const item of book.unpublishedExercises)assert.equal(item.status,'INVALID');}
+for(const book of workbooks)assert(book.stages.find(stage=>stage.stage===2).items.every(item=>item.kind==='blank_input'),'Stage 2 must remain deterministic blank input');
+const adjacentStage5=NE_MINBYEONGCHEON_L2_WORKBOOK.stages.find(stage=>stage.stage===5).items.find(item=>item.prompt.includes('The clues'));
+assert.deepEqual(adjacentStage5.answers,['are used','to find','committed'],'Stage 5 must preserve publisher slash-separated slot boundaries');
+const importer=read('tools/ready-extract-workbook-contract.py');
+assert.match(importer,/stage5_answer_items[\s\S]*value\.split\("\/"\)/,'Stage 5 answers must come from publisher Answer Key separators');
+assert.match(importer,/fill_frame\(frame, answers\)[\s\S]*canonical_corpus/,'Stage 5 publisher slots must round-trip to the canonical corpus');
 assert.match(app,/placeholder="\$\{esc\(hint\|\|'\'\)\}"/,'Stage 5 base verbs must be input placeholders, not exposed labels');
-assert.match(app,/filter\(\(\{chipIndex\}\)=>!chosenSet\.has\(chipIndex\)\)/,'Stage 8 selected chips must disappear from the remaining word bank');
-assert.match(edge,/reference가 "아주 작은"이고 학생이 "작은"이라고 써도 맞습니다/,'Translation AI grading must tolerate nonessential degree modifiers');
+assert.match(app,/workbook-order-bank-slot \$\{chosenSet\.has\(chipIndex\)\?'used'/,'Stage 8 must preserve every bank slot after selection');
+assert.match(app,/changeWorkbookOrder[\s\S]*refreshWorkbookOrderGroup\(group\)/,'Stage 8 chip changes must locally refresh only their group');
+assert.doesNotMatch(app,/changeWorkbookOrder[^\n]*renderWorkbook\(\)/,'Stage 8 chip changes must not rerender the full Workbook');
+assert.match(read('ready/design.css'),/workbook-order-bank-slot\.used\{visibility:hidden/,'Selected Stage 8 chips must keep their original geometry');
+assert.match(read('ready/design.css'),/--workbook-order-stable-height/,'Stage 8 built area must reserve the measured bank height');
+assert.equal(WORKBOOK_TRANSLATION_GRADING_POLICY.passScore,75);
+assert.equal(workbookTranslationPass(74,[]),false);
+assert.equal(workbookTranslationPass(75,[]),true);
+assert.equal(workbookTranslationPass(100,['negation_reversal']),false);
+assert.match(edge,/workbookTranslationPrompt[\s\S]*핵심 의미 60점[\s\S]*핵심 관계 30점[\s\S]*자연스러운 한국어 10점/);
+assert.match(edge,/정도 부사의 작은 생략[\s\S]*critical_errors[\s\S]*부정[\s\S]*인과/,'Translation rubric must cover modifier omission and critical reversals');
+assert.match(edge,/workbookTranslationPass\(grade\.score,grade\.criticalErrors\)/,'READY code, not the model, must make Workbook translation pass/fail');
+assert.match(edge,/callGeminiGrade\(question, spec, responses\)[\s\S]*grade\.correct/,'Question AI grading semantics must remain unchanged');
+assert.match(edge,/rubricSnapshot[\s\S]*publisherReferenceTranslation[\s\S]*gradingPolicy[\s\S]*passScore/);
+assert.match(edge,/ready_workbook_ai_grading_requests[\s\S]*status: "pending"[\s\S]*callGeminiTranslationGrade/,'Workbook translations must be persisted before AI inference');
+assert.match(edge,/ai_grading_request_id: aiRequestId/,'Workbook attempt must link to the AI grading request');
 
 console.log('READY executable Question contract checks passed');

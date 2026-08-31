@@ -30,8 +30,8 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
       },
       "5": {
         "source": 41,
-        "ready": 35,
-        "invalid": 6
+        "ready": 41,
+        "invalid": 0
       },
       "6": {
         "source": 41,
@@ -58,58 +58,9 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
       "1": "outside_requested_range",
       "10": "outside_requested_range"
     },
-    "ready": 289
+    "ready": 295
   },
-  "unpublishedExercises": [
-    {
-      "status": "INVALID",
-      "stage": 5,
-      "number": 4,
-      "source": "고마워요, Thomas. 저는 여기 Angeles National Forest 입구에 서 있습니다.",
-      "prompt": "Thank you, Thomas. I (be, stand) here at the entrance of Angeles National Forest.",
-      "reason": "frame has 0 publisher-corpus matches"
-    },
-    {
-      "status": "INVALID",
-      "stage": 5,
-      "number": 5,
-      "source": "여러분이 방금 들으셨듯이, Rene Compean은 최근 이 숲에서 구조되었습니다.",
-      "prompt": "As you just (hear), Rene Compean (recently, rescue) from this forest.",
-      "reason": "frame has 0 publisher-corpus matches"
-    },
-    {
-      "status": "INVALID",
-      "stage": 5,
-      "number": 9,
-      "source": "그는 약 2시간 정도만 등산할 계획이었으나, 밤이 찾아오고 있었습니다.",
-      "prompt": "He (have, plan) (hike) for only about two hours, but night (be, come).",
-      "reason": "frame has 0 publisher-corpus matches"
-    },
-    {
-      "status": "INVALID",
-      "stage": 5,
-      "number": 19,
-      "source": "밤샘 수색에도 불구하고, 그들은 여전히 Compean이 어디에 있는지 아무 짐작도 하지 못했습니다.",
-      "prompt": "Despite (search) through the night, they still (not, have) any idea where Compean (be).",
-      "reason": "frame has 0 publisher-corpus matches"
-    },
-    {
-      "status": "INVALID",
-      "stage": 5,
-      "number": 28,
-      "source": "그는 또한 어디서 사진이 찍혔는지와 영화가 어디서 촬영되었는지를 알아내는 것을 즐겼습니다.",
-      "prompt": "He also (enjoy) (determine) where pictures (take) and where movies (film).",
-      "reason": "frame has 0 publisher-corpus matches"
-    },
-    {
-      "status": "INVALID",
-      "stage": 5,
-      "number": 29,
-      "source": "그가 Compean의 사진을 보았을 때, 그는 바로 흥미를 느꼈습니다.",
-      "prompt": "When he (see) the picture of Compean, he (be) immediately (interest).",
-      "reason": "frame has 0 publisher-corpus matches"
-    }
-  ],
+  "unpublishedExercises": [],
   "stages": [
     {
       "stage": 2,
@@ -124,7 +75,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
             "실종된",
             "등산객"
           ],
-          "key": "ne-mb-l1-s2-01",
+          "key": "ne-l1-s2-01",
           "stage": 2,
           "number": 1
         },
@@ -136,7 +87,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
             "중요한 역할을 한",
             "으로 밝혀졌습니다"
           ],
-          "key": "ne-mb-l1-s2-02",
+          "key": "ne-l1-s2-02",
           "stage": 2,
           "number": 2
         },
@@ -148,7 +99,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
             "자세한 내용",
             "연결해"
           ],
-          "key": "ne-mb-l1-s2-03",
+          "key": "ne-l1-s2-03",
           "stage": 2,
           "number": 3
         },
@@ -159,7 +110,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
           "answers": [
             "입구"
           ],
-          "key": "ne-mb-l1-s2-04",
+          "key": "ne-l1-s2-04",
           "stage": 2,
           "number": 4
         },
@@ -170,7 +121,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
           "answers": [
             "구조되"
           ],
-          "key": "ne-mb-l1-s2-05",
+          "key": "ne-l1-s2-05",
           "stage": 2,
           "number": 5
         },
@@ -182,7 +133,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
             "숙련된",
             "등산에 나섰습니다"
           ],
-          "key": "ne-mb-l1-s2-06",
+          "key": "ne-l1-s2-06",
           "stage": 2,
           "number": 6
         },
@@ -194,7 +145,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
             "망가뜨렸",
             "길을 잘못 들"
           ],
-          "key": "ne-mb-l1-s2-07",
+          "key": "ne-l1-s2-07",
           "stage": 2,
           "number": 7
         },
@@ -206,7 +157,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
             "지나갈",
             "경우를 대비하여"
           ],
-          "key": "ne-mb-l1-s2-08",
+          "key": "ne-l1-s2-08",
           "stage": 2,
           "number": 8
         },
@@ -217,7 +168,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
           "answers": [
             "등산할"
           ],
-          "key": "ne-mb-l1-s2-09",
+          "key": "ne-l1-s2-09",
           "stage": 2,
           "number": 9
         },
@@ -228,7 +179,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
           "answers": [
             "기온"
           ],
-          "key": "ne-mb-l1-s2-10",
+          "key": "ne-l1-s2-10",
           "stage": 2,
           "number": 10
         },
@@ -239,7 +190,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
           "answers": [
             "신호"
           ],
-          "key": "ne-mb-l1-s2-11",
+          "key": "ne-l1-s2-11",
           "stage": 2,
           "number": 11
         },
@@ -250,7 +201,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
           "answers": [
             "설상가상으로"
           ],
-          "key": "ne-mb-l1-s2-12",
+          "key": "ne-l1-s2-12",
           "stage": 2,
           "number": 12
         },
@@ -261,7 +212,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
           "answers": [
             "곳"
           ],
-          "key": "ne-mb-l1-s2-13",
+          "key": "ne-l1-s2-13",
           "stage": 2,
           "number": 13
         },
@@ -272,7 +223,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
           "answers": [
             "문자 메시지"
           ],
-          "key": "ne-mb-l1-s2-14",
+          "key": "ne-l1-s2-14",
           "stage": 2,
           "number": 14
         },
@@ -283,7 +234,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
           "answers": [
             "길을 잃"
           ],
-          "key": "ne-mb-l1-s2-15",
+          "key": "ne-l1-s2-15",
           "stage": 2,
           "number": 15
         },
@@ -294,7 +245,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
           "answers": [
             "주변 환경"
           ],
-          "key": "ne-mb-l1-s2-16",
+          "key": "ne-l1-s2-16",
           "stage": 2,
           "number": 16
         },
@@ -305,7 +256,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
           "answers": [
             "지역"
           ],
-          "key": "ne-mb-l1-s2-17",
+          "key": "ne-l1-s2-17",
           "stage": 2,
           "number": 17
         },
@@ -317,7 +268,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
             "에 대해 보고받",
             "구조"
           ],
-          "key": "ne-mb-l1-s2-18",
+          "key": "ne-l1-s2-18",
           "stage": 2,
           "number": 18
         },
@@ -328,7 +279,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
           "answers": [
             "수색"
           ],
-          "key": "ne-mb-l1-s2-19",
+          "key": "ne-l1-s2-19",
           "stage": 2,
           "number": 19
         },
@@ -341,7 +292,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
             "가장자리",
             "걸쳐 있"
           ],
-          "key": "ne-mb-l1-s2-20",
+          "key": "ne-l1-s2-20",
           "stage": 2,
           "number": 20
         },
@@ -353,7 +304,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
             "재",
             "덮여 있"
           ],
-          "key": "ne-mb-l1-s2-21",
+          "key": "ne-l1-s2-21",
           "stage": 2,
           "number": 21
         },
@@ -365,7 +316,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
             "화질",
             "위치"
           ],
-          "key": "ne-mb-l1-s2-22",
+          "key": "ne-l1-s2-22",
           "stage": 2,
           "number": 22
         },
@@ -376,7 +327,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
           "answers": [
             "환경"
           ],
-          "key": "ne-mb-l1-s2-23",
+          "key": "ne-l1-s2-23",
           "stage": 2,
           "number": 23
         },
@@ -387,7 +338,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
           "answers": [
             "단서"
           ],
-          "key": "ne-mb-l1-s2-24",
+          "key": "ne-l1-s2-24",
           "stage": 2,
           "number": 24
         },
@@ -400,7 +351,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
             "풍경",
             "알아차릴"
           ],
-          "key": "ne-mb-l1-s2-25",
+          "key": "ne-l1-s2-25",
           "stage": 2,
           "number": 25
         },
@@ -412,7 +363,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
             "공유된",
             "라는 이름의"
           ],
-          "key": "ne-mb-l1-s2-26",
+          "key": "ne-l1-s2-26",
           "stage": 2,
           "number": 26
         },
@@ -425,7 +376,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
             "위성",
             "조사하"
           ],
-          "key": "ne-mb-l1-s2-27",
+          "key": "ne-l1-s2-27",
           "stage": 2,
           "number": 27
         },
@@ -437,7 +388,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
             "촬영되",
             "알아내는 것"
           ],
-          "key": "ne-mb-l1-s2-28",
+          "key": "ne-l1-s2-28",
           "stage": 2,
           "number": 28
         },
@@ -448,7 +399,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
           "answers": [
             "바로"
           ],
-          "key": "ne-mb-l1-s2-29",
+          "key": "ne-l1-s2-29",
           "stage": 2,
           "number": 29
         },
@@ -460,7 +411,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
             "에게",
             "을 떠올리게 했습니다"
           ],
-          "key": "ne-mb-l1-s2-30",
+          "key": "ne-l1-s2-30",
           "stage": 2,
           "number": 30
         },
@@ -472,7 +423,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
             "거의 정확한",
             "추론하"
           ],
-          "key": "ne-mb-l1-s2-31",
+          "key": "ne-l1-s2-31",
           "stage": 2,
           "number": 31
         },
@@ -485,7 +436,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
             "특징",
             "확인했"
           ],
-          "key": "ne-mb-l1-s2-32",
+          "key": "ne-l1-s2-32",
           "stage": 2,
           "number": 32
         },
@@ -496,7 +447,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
           "answers": [
             "추측했습니다"
           ],
-          "key": "ne-mb-l1-s2-33",
+          "key": "ne-l1-s2-33",
           "stage": 2,
           "number": 33
         },
@@ -507,7 +458,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
           "answers": [
             "골짜기들"
           ],
-          "key": "ne-mb-l1-s2-34",
+          "key": "ne-l1-s2-34",
           "stage": 2,
           "number": 34
         },
@@ -519,7 +470,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
             "을",
             "와 비교했습니다"
           ],
-          "key": "ne-mb-l1-s2-35",
+          "key": "ne-l1-s2-35",
           "stage": 2,
           "number": 35
         },
@@ -530,7 +481,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
           "answers": [
             "있을 법한"
           ],
-          "key": "ne-mb-l1-s2-36",
+          "key": "ne-l1-s2-36",
           "stage": 2,
           "number": 36
         },
@@ -541,7 +492,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
           "answers": [
             "지목된"
           ],
-          "key": "ne-mb-l1-s2-37",
+          "key": "ne-l1-s2-37",
           "stage": 2,
           "number": 37
         },
@@ -554,7 +505,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
             "로",
             "다치지 않은"
           ],
-          "key": "ne-mb-l1-s2-38",
+          "key": "ne-l1-s2-38",
           "stage": 2,
           "number": 38
         },
@@ -565,7 +516,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
           "answers": [
             "영상 통화"
           ],
-          "key": "ne-mb-l1-s2-39",
+          "key": "ne-l1-s2-39",
           "stage": 2,
           "number": 39
         },
@@ -576,7 +527,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
           "answers": [
             "경로"
           ],
-          "key": "ne-mb-l1-s2-40",
+          "key": "ne-l1-s2-40",
           "stage": 2,
           "number": 40
         },
@@ -587,7 +538,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
           "answers": [
             "다시"
           ],
-          "key": "ne-mb-l1-s2-41",
+          "key": "ne-l1-s2-41",
           "stage": 2,
           "number": 41
         }
@@ -606,7 +557,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
             "missing",
             "hiker"
           ],
-          "key": "ne-mb-l1-s3-01",
+          "key": "ne-l1-s3-01",
           "stage": 3,
           "number": 1
         },
@@ -622,7 +573,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
             "key",
             "role"
           ],
-          "key": "ne-mb-l1-s3-02",
+          "key": "ne-l1-s3-02",
           "stage": 3,
           "number": 2
         },
@@ -635,7 +586,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
             "over",
             "details"
           ],
-          "key": "ne-mb-l1-s3-03",
+          "key": "ne-l1-s3-03",
           "stage": 3,
           "number": 3
         },
@@ -646,7 +597,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
           "answers": [
             "entrance"
           ],
-          "key": "ne-mb-l1-s3-04",
+          "key": "ne-l1-s3-04",
           "stage": 3,
           "number": 4
         },
@@ -657,7 +608,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
           "answers": [
             "rescued"
           ],
-          "key": "ne-mb-l1-s3-05",
+          "key": "ne-l1-s3-05",
           "stage": 3,
           "number": 5
         },
@@ -672,7 +623,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
             "a",
             "hike"
           ],
-          "key": "ne-mb-l1-s3-06",
+          "key": "ne-l1-s3-06",
           "stage": 3,
           "number": 6
         },
@@ -687,7 +638,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
             "wrong",
             "turn"
           ],
-          "key": "ne-mb-l1-s3-07",
+          "key": "ne-l1-s3-07",
           "stage": 3,
           "number": 7
         },
@@ -701,7 +652,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
             "passed",
             "by"
           ],
-          "key": "ne-mb-l1-s3-08",
+          "key": "ne-l1-s3-08",
           "stage": 3,
           "number": 8
         },
@@ -712,7 +663,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
           "answers": [
             "hike"
           ],
-          "key": "ne-mb-l1-s3-09",
+          "key": "ne-l1-s3-09",
           "stage": 3,
           "number": 9
         },
@@ -723,7 +674,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
           "answers": [
             "temperature"
           ],
-          "key": "ne-mb-l1-s3-10",
+          "key": "ne-l1-s3-10",
           "stage": 3,
           "number": 10
         },
@@ -734,7 +685,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
           "answers": [
             "signal"
           ],
-          "key": "ne-mb-l1-s3-11",
+          "key": "ne-l1-s3-11",
           "stage": 3,
           "number": 11
         },
@@ -748,7 +699,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
             "matters",
             "worse"
           ],
-          "key": "ne-mb-l1-s3-12",
+          "key": "ne-l1-s3-12",
           "stage": 3,
           "number": 12
         },
@@ -759,7 +710,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
           "answers": [
             "spot"
           ],
-          "key": "ne-mb-l1-s3-13",
+          "key": "ne-l1-s3-13",
           "stage": 3,
           "number": 13
         },
@@ -771,7 +722,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
             "text",
             "message"
           ],
-          "key": "ne-mb-l1-s3-14",
+          "key": "ne-l1-s3-14",
           "stage": 3,
           "number": 14
         },
@@ -782,7 +733,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
           "answers": [
             "lost"
           ],
-          "key": "ne-mb-l1-s3-15",
+          "key": "ne-l1-s3-15",
           "stage": 3,
           "number": 15
         },
@@ -793,7 +744,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
           "answers": [
             "surroundings"
           ],
-          "key": "ne-mb-l1-s3-16",
+          "key": "ne-l1-s3-16",
           "stage": 3,
           "number": 16
         },
@@ -804,7 +755,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
           "answers": [
             "local"
           ],
-          "key": "ne-mb-l1-s3-17",
+          "key": "ne-l1-s3-17",
           "stage": 3,
           "number": 17
         },
@@ -817,7 +768,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
             "of",
             "rescue"
           ],
-          "key": "ne-mb-l1-s3-18",
+          "key": "ne-l1-s3-18",
           "stage": 3,
           "number": 18
         },
@@ -828,7 +779,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
           "answers": [
             "searching"
           ],
-          "key": "ne-mb-l1-s3-19",
+          "key": "ne-l1-s3-19",
           "stage": 3,
           "number": 19
         },
@@ -841,7 +792,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
             "edge",
             "canyon"
           ],
-          "key": "ne-mb-l1-s3-20",
+          "key": "ne-l1-s3-20",
           "stage": 3,
           "number": 20
         },
@@ -853,7 +804,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
             "covered",
             "ash"
           ],
-          "key": "ne-mb-l1-s3-21",
+          "key": "ne-l1-s3-21",
           "stage": 3,
           "number": 21
         },
@@ -865,7 +816,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
             "quality",
             "location"
           ],
-          "key": "ne-mb-l1-s3-22",
+          "key": "ne-l1-s3-22",
           "stage": 3,
           "number": 22
         },
@@ -876,7 +827,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
           "answers": [
             "conditions"
           ],
-          "key": "ne-mb-l1-s3-23",
+          "key": "ne-l1-s3-23",
           "stage": 3,
           "number": 23
         },
@@ -887,7 +838,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
           "answers": [
             "clues"
           ],
-          "key": "ne-mb-l1-s3-24",
+          "key": "ne-l1-s3-24",
           "stage": 3,
           "number": 24
         },
@@ -900,7 +851,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
             "recognized",
             "scenery"
           ],
-          "key": "ne-mb-l1-s3-25",
+          "key": "ne-l1-s3-25",
           "stage": 3,
           "number": 25
         },
@@ -912,7 +863,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
             "shared",
             "named"
           ],
-          "key": "ne-mb-l1-s3-26",
+          "key": "ne-l1-s3-26",
           "stage": 3,
           "number": 26
         },
@@ -925,7 +876,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
             "satellite",
             "track"
           ],
-          "key": "ne-mb-l1-s3-27",
+          "key": "ne-l1-s3-27",
           "stage": 3,
           "number": 27
         },
@@ -937,7 +888,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
             "determining",
             "filmed"
           ],
-          "key": "ne-mb-l1-s3-28",
+          "key": "ne-l1-s3-28",
           "stage": 3,
           "number": 28
         },
@@ -948,7 +899,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
           "answers": [
             "immediately"
           ],
-          "key": "ne-mb-l1-s3-29",
+          "key": "ne-l1-s3-29",
           "stage": 3,
           "number": 29
         },
@@ -960,7 +911,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
             "reminded",
             "of"
           ],
-          "key": "ne-mb-l1-s3-30",
+          "key": "ne-l1-s3-30",
           "stage": 3,
           "number": 30
         },
@@ -972,7 +923,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
             "infer",
             "approximate"
           ],
-          "key": "ne-mb-l1-s3-31",
+          "key": "ne-l1-s3-31",
           "stage": 3,
           "number": 31
         },
@@ -985,7 +936,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
             "checked",
             "features"
           ],
-          "key": "ne-mb-l1-s3-32",
+          "key": "ne-l1-s3-32",
           "stage": 3,
           "number": 32
         },
@@ -996,7 +947,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
           "answers": [
             "guessed"
           ],
-          "key": "ne-mb-l1-s3-33",
+          "key": "ne-l1-s3-33",
           "stage": 3,
           "number": 33
         },
@@ -1007,7 +958,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
           "answers": [
             "valleys"
           ],
-          "key": "ne-mb-l1-s3-34",
+          "key": "ne-l1-s3-34",
           "stage": 3,
           "number": 34
         },
@@ -1019,7 +970,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
             "compared",
             "with"
           ],
-          "key": "ne-mb-l1-s3-35",
+          "key": "ne-l1-s3-35",
           "stage": 3,
           "number": 35
         },
@@ -1030,7 +981,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
           "answers": [
             "probable"
           ],
-          "key": "ne-mb-l1-s3-36",
+          "key": "ne-l1-s3-36",
           "stage": 3,
           "number": 36
         },
@@ -1041,7 +992,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
           "answers": [
             "indicated"
           ],
-          "key": "ne-mb-l1-s3-37",
+          "key": "ne-l1-s3-37",
           "stage": 3,
           "number": 37
         },
@@ -1055,7 +1006,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
             "unusual",
             "unharmed"
           ],
-          "key": "ne-mb-l1-s3-38",
+          "key": "ne-l1-s3-38",
           "stage": 3,
           "number": 38
         },
@@ -1067,7 +1018,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
             "video",
             "call"
           ],
-          "key": "ne-mb-l1-s3-39",
+          "key": "ne-l1-s3-39",
           "stage": 3,
           "number": 39
         },
@@ -1078,7 +1029,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
           "answers": [
             "route"
           ],
-          "key": "ne-mb-l1-s3-40",
+          "key": "ne-l1-s3-40",
           "stage": 3,
           "number": 40
         },
@@ -1089,7 +1040,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
           "answers": [
             "back"
           ],
-          "key": "ne-mb-l1-s3-41",
+          "key": "ne-l1-s3-41",
           "stage": 3,
           "number": 41
         }
@@ -1107,7 +1058,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
           "answers": [
             "Rene Compean이라는 실종된 등산객이 화요일 Angeles National Forest(앤젤레스 국유림)에서 구조팀에 의해 안전한 상태로 발견되었습니다."
           ],
-          "key": "ne-mb-l1-s4-01",
+          "key": "ne-l1-s4-01",
           "stage": 4,
           "number": 1
         },
@@ -1118,7 +1069,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
           "answers": [
             "그의 생명을 구하는 데 한 장의 사진이 중요한 역할을 한 것으로 밝혀졌습니다."
           ],
-          "key": "ne-mb-l1-s4-02",
+          "key": "ne-l1-s4-02",
           "stage": 4,
           "number": 2
         },
@@ -1129,7 +1080,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
           "answers": [
             "이 사건에 대한 더욱 자세한 내용을 위해 Marissa Reynolds를 연결해 보겠습니다."
           ],
-          "key": "ne-mb-l1-s4-03",
+          "key": "ne-l1-s4-03",
           "stage": 4,
           "number": 3
         },
@@ -1140,7 +1091,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
           "answers": [
             "고마워요, Thomas. 저는 여기 Angeles National Forest 입구에 서 있습니다."
           ],
-          "key": "ne-mb-l1-s4-04",
+          "key": "ne-l1-s4-04",
           "stage": 4,
           "number": 4
         },
@@ -1151,7 +1102,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
           "answers": [
             "여러분이 방금 들으셨듯이, Rene Compean은 최근 이 숲에서 구조되었습니다."
           ],
-          "key": "ne-mb-l1-s4-05",
+          "key": "ne-l1-s4-05",
           "stage": 4,
           "number": 5
         },
@@ -1162,7 +1113,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
           "answers": [
             "Compean은 이 지역을 잘 알던 숙련된 등산객으로, 4월 12일 홀로 등산에 나섰습니다."
           ],
-          "key": "ne-mb-l1-s4-06",
+          "key": "ne-l1-s4-06",
           "stage": 4,
           "number": 6
         },
@@ -1173,7 +1124,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
           "answers": [
             "그러나, 최근의 산불이 몇몇 표지판을 망가뜨렸고, 그것이 그가 길을 잘못 들어 길을 잃게 했습니다."
           ],
-          "key": "ne-mb-l1-s4-07",
+          "key": "ne-l1-s4-07",
           "stage": 4,
           "number": 7
         },
@@ -1184,7 +1135,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
           "answers": [
             "그는 도움을 청하기 위해 소리를 지르기도 하고 심지어 비행기나 헬리콥터가 지나갈 경우를 대비하여 땅에 SOS를 쓰기도 했습니다."
           ],
-          "key": "ne-mb-l1-s4-08",
+          "key": "ne-l1-s4-08",
           "stage": 4,
           "number": 8
         },
@@ -1195,7 +1146,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
           "answers": [
             "그는 약 2시간 정도만 등산할 계획이었으나, 밤이 찾아오고 있었습니다."
           ],
-          "key": "ne-mb-l1-s4-09",
+          "key": "ne-l1-s4-09",
           "stage": 4,
           "number": 9
         },
@@ -1206,7 +1157,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
           "answers": [
             "강한 바람이 불기 시작했고 기온은 급격히 떨어지고 있었습니다."
           ],
-          "key": "ne-mb-l1-s4-10",
+          "key": "ne-l1-s4-10",
           "stage": 4,
           "number": 10
         },
@@ -1217,7 +1168,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
           "answers": [
             "Compean은 숲속 깊은 곳에 있었고, 그래서 그의 휴대폰은 신호를 받지 못했습니다."
           ],
-          "key": "ne-mb-l1-s4-11",
+          "key": "ne-l1-s4-11",
           "stage": 4,
           "number": 11
         },
@@ -1228,7 +1179,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
           "answers": [
             "설상가상으로, 그것의 배터리는 거의 방전되었습니다."
           ],
-          "key": "ne-mb-l1-s4-12",
+          "key": "ne-l1-s4-12",
           "stage": 4,
           "number": 12
         },
@@ -1239,7 +1190,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
           "answers": [
             "그는 더 높은 곳으로 올라갔고 약한 신호를 찾았습니다."
           ],
-          "key": "ne-mb-l1-s4-13",
+          "key": "ne-l1-s4-13",
           "stage": 4,
           "number": 13
         },
@@ -1250,7 +1201,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
           "answers": [
             "그는 그의 마지막 (남은) 배터리를 그의 친구에게 문자 메시지를 보내기 위해 사용했습니다."
           ],
-          "key": "ne-mb-l1-s4-14",
+          "key": "ne-l1-s4-14",
           "stage": 4,
           "number": 14
         },
@@ -1261,7 +1212,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
           "answers": [
             "메시지에, 그는 그가 길을 잃었으며 도움이 필요하다고 말했습니다."
           ],
-          "key": "ne-mb-l1-s4-15",
+          "key": "ne-l1-s4-15",
           "stage": 4,
           "number": 15
         },
@@ -1272,7 +1223,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
           "answers": [
             "그는 또한 그의 주변 환경을 보여 주기 위해 사진 한 장을 보냈습니다."
           ],
-          "key": "ne-mb-l1-s4-16",
+          "key": "ne-l1-s4-16",
           "stage": 4,
           "number": 16
         },
@@ -1283,7 +1234,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
           "answers": [
             "Compean의 친구는 그 메시지와 사진을 지역 경찰에게 공유했습니다."
           ],
-          "key": "ne-mb-l1-s4-17",
+          "key": "ne-l1-s4-17",
           "stage": 4,
           "number": 17
         },
@@ -1294,7 +1245,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
           "answers": [
             "지역 경찰이 실종된 등산객에 대해 보고받았을 때, 그들은 즉시 구조팀을 보냈습니다."
           ],
-          "key": "ne-mb-l1-s4-18",
+          "key": "ne-l1-s4-18",
           "stage": 4,
           "number": 18
         },
@@ -1305,7 +1256,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
           "answers": [
             "밤샘 수색에도 불구하고, 그들은 여전히 Compean이 어디에 있는지 아무 짐작도 하지 못했습니다."
           ],
-          "key": "ne-mb-l1-s4-19",
+          "key": "ne-l1-s4-19",
           "stage": 4,
           "number": 19
         },
@@ -1316,7 +1267,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
           "answers": [
             "사진에서, 그의 다리는 바위와 푸른 나무들이 있는 협곡의 가장자리에 걸쳐 있었습니다."
           ],
-          "key": "ne-mb-l1-s4-20",
+          "key": "ne-l1-s4-20",
           "stage": 4,
           "number": 20
         },
@@ -1327,7 +1278,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
           "answers": [
             "그의 다리는 최근의 산불로 생긴 검은 재로 덮여 있었습니다."
           ],
-          "key": "ne-mb-l1-s4-21",
+          "key": "ne-l1-s4-21",
           "stage": 4,
           "number": 21
         },
@@ -1338,7 +1289,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
           "answers": [
             "그러나, 그 사진은 경찰에게 크게 도움이 되지 못했는데 왜냐하면 약한 신호로 인해 화질이 나빴고, 그의 위치 설정도 꺼져 있었기 때문이었습니다."
           ],
-          "key": "ne-mb-l1-s4-22",
+          "key": "ne-l1-s4-22",
           "stage": 4,
           "number": 22
         },
@@ -1349,7 +1300,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
           "answers": [
             "Compean은 이미 힘든 환경에서 하룻밤을 보냈기 때문에, 경찰은 그가 두 번째 밤을 보낼 것에 대해 걱정했습니다."
           ],
-          "key": "ne-mb-l1-s4-23",
+          "key": "ne-l1-s4-23",
           "stage": 4,
           "number": 23
         },
@@ -1360,7 +1311,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
           "answers": [
             "그래서 그들은 누군가 사진 속에서 단서를 찾을 수 있는지 알아보기 위해 소셜 미디어를 사용하기로 결정했습니다."
           ],
-          "key": "ne-mb-l1-s4-24",
+          "key": "ne-l1-s4-24",
           "stage": 4,
           "number": 24
         },
@@ -1371,7 +1322,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
           "answers": [
             "그들은 그 사진을 게시하고 누군가 그 풍경을 알아차릴 수 있는지 물었습니다."
           ],
-          "key": "ne-mb-l1-s4-25",
+          "key": "ne-l1-s4-25",
           "stage": 4,
           "number": 25
         },
@@ -1382,7 +1333,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
           "answers": [
             "경찰에 의해 공유된 그 사진은 Ben Kuo라는 이름의 한 캘리포니아 사람에게 목격되었습니다."
           ],
-          "key": "ne-mb-l1-s4-26",
+          "key": "ne-l1-s4-26",
           "stage": 4,
           "number": 26
         },
@@ -1393,7 +1344,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
           "answers": [
             "그의 취미 중 하나는 산불을 추적하기 위해 위성 이미지를 조사하고 사람들에게 잠재적 위험에 대해 알리는 것입니다."
           ],
-          "key": "ne-mb-l1-s4-27",
+          "key": "ne-l1-s4-27",
           "stage": 4,
           "number": 27
         },
@@ -1404,7 +1355,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
           "answers": [
             "그는 또한 어디서 사진이 찍혔는지와 영화가 어디서 촬영되었는지를 알아내는 것을 즐겼습니다."
           ],
-          "key": "ne-mb-l1-s4-28",
+          "key": "ne-l1-s4-28",
           "stage": 4,
           "number": 28
         },
@@ -1415,7 +1366,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
           "answers": [
             "그가 Compean의 사진을 보았을 때, 그는 바로 흥미를 느꼈습니다."
           ],
-          "key": "ne-mb-l1-s4-29",
+          "key": "ne-l1-s4-29",
           "stage": 4,
           "number": 29
         },
@@ -1426,7 +1377,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
           "answers": [
             "Kuo가 Compean의 다리에 있는 검은 재를 보았을 때, 그것은 그에게 최근의 산불을 떠올리게 했습니다."
           ],
-          "key": "ne-mb-l1-s4-30",
+          "key": "ne-l1-s4-30",
           "stage": 4,
           "number": 30
         },
@@ -1437,7 +1388,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
           "answers": [
             "이것은 그가 Compean의 거의 정확한 위치를 추론하도록 도와주었습니다."
           ],
-          "key": "ne-mb-l1-s4-31",
+          "key": "ne-l1-s4-31",
           "stage": 4,
           "number": 31
         },
@@ -1448,7 +1399,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
           "answers": [
             "Kuo는 이 지역이 매우 익숙했는데 왜냐하면 그가 이전에 그 화재를 추적했었고 위성 이미지에서 그 지역의 특징을 확인했었기 때문입니다."
           ],
-          "key": "ne-mb-l1-s4-32",
+          "key": "ne-l1-s4-32",
           "stage": 4,
           "number": 32
         },
@@ -1459,7 +1410,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
           "answers": [
             "Compean의 사진 속 식물과 나무들로부터, Kuo는 그곳이 산의 남쪽 부분이 틀림없다고 추측했습니다."
           ],
-          "key": "ne-mb-l1-s4-33",
+          "key": "ne-l1-s4-33",
           "stage": 4,
           "number": 33
         },
@@ -1470,7 +1421,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
           "answers": [
             "북쪽 부분에는 사진 속의 것들과 같은 푸른 골짜기들이 없습니다."
           ],
-          "key": "ne-mb-l1-s4-34",
+          "key": "ne-l1-s4-34",
           "stage": 4,
           "number": 34
         },
@@ -1481,7 +1432,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
           "answers": [
             "마지막 단계로, Kuo는 Compean의 사진 속 풍경을 더 많은 위성 이미지와 비교했습니다."
           ],
-          "key": "ne-mb-l1-s4-35",
+          "key": "ne-l1-s4-35",
           "stage": 4,
           "number": 35
         },
@@ -1492,7 +1443,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
           "answers": [
             "마침내 그는 일치하는 곳을 찾았고 경찰에게 Compean이 있을 법한 위치를 제공했습니다."
           ],
-          "key": "ne-mb-l1-s4-36",
+          "key": "ne-l1-s4-36",
           "stage": 4,
           "number": 36
         },
@@ -1503,7 +1454,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
           "answers": [
             "경찰은 그 위치에 구조 헬리콥터를 보냈고 Kuo에 의해 지목된 지역으로부터 1마일도 채 떨어지지 않은 곳에서 Compean을 발견했습니다."
           ],
-          "key": "ne-mb-l1-s4-37",
+          "key": "ne-l1-s4-37",
           "stage": 4,
           "number": 37
         },
@@ -1514,7 +1465,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
           "answers": [
             "Kuo의 이례적인 기술로, Compean은 다치지 않은 채로 구조되었습니다."
           ],
-          "key": "ne-mb-l1-s4-38",
+          "key": "ne-l1-s4-38",
           "stage": 4,
           "number": 38
         },
@@ -1525,7 +1476,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
           "answers": [
             "그는 나중에 Kuo에게 영상 통화로 감사를 전했습니다."
           ],
-          "key": "ne-mb-l1-s4-39",
+          "key": "ne-l1-s4-39",
           "stage": 4,
           "number": 39
         },
@@ -1536,7 +1487,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
           "answers": [
             "이제 지역 경찰은 혼자 등산하는 등산객들에게 자신들의 계획된 경로를 다른 사람들에게 알리고 언제나 종이 지도를 가져오라고 상기시키고 있습니다."
           ],
-          "key": "ne-mb-l1-s4-40",
+          "key": "ne-l1-s4-40",
           "stage": 4,
           "number": 40
         },
@@ -1547,7 +1498,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
           "answers": [
             "지금까지 LA에서 Marissa Reynolds입니다. 이제 다시 스튜디오로 연결합니다."
           ],
-          "key": "ne-mb-l1-s4-41",
+          "key": "ne-l1-s4-41",
           "stage": 4,
           "number": 41
         }
@@ -1570,7 +1521,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
             "named",
             "was found"
           ],
-          "key": "ne-mb-l1-s5-01",
+          "key": "ne-l1-s5-01",
           "stage": 5,
           "number": 1
         },
@@ -1588,7 +1539,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
             "played",
             "saving"
           ],
-          "key": "ne-mb-l1-s5-02",
+          "key": "ne-l1-s5-02",
           "stage": 5,
           "number": 2
         },
@@ -1602,9 +1553,39 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
           "answers": [
             "go"
           ],
-          "key": "ne-mb-l1-s5-03",
+          "key": "ne-l1-s5-03",
           "stage": 5,
           "number": 3
+        },
+        {
+          "kind": "verb_form",
+          "source": "고마워요, Thomas. 저는 여기 Angeles National Forest 입구에 서 있습니다.",
+          "prompt": "Thank you, Thomas. I ______________ here at the entrance of Angeles National Forest.",
+          "hints": [
+            "be, stand"
+          ],
+          "answers": [
+            "am standing"
+          ],
+          "key": "ne-l1-s5-04",
+          "stage": 5,
+          "number": 4
+        },
+        {
+          "kind": "verb_form",
+          "source": "여러분이 방금 들으셨듯이, Rene Compean은 최근 이 숲에서 구조되었습니다.",
+          "prompt": "As you just ______________ , Rene Compean ______________ from this forest.",
+          "hints": [
+            "hear",
+            "recently, rescue"
+          ],
+          "answers": [
+            "heard",
+            "was recently rescued"
+          ],
+          "key": "ne-l1-s5-05",
+          "stage": 5,
+          "number": 5
         },
         {
           "kind": "verb_form",
@@ -1618,7 +1599,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
             "knew",
             "went"
           ],
-          "key": "ne-mb-l1-s5-06",
+          "key": "ne-l1-s5-06",
           "stage": 5,
           "number": 6
         },
@@ -1638,7 +1619,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
             "to take",
             "get"
           ],
-          "key": "ne-mb-l1-s5-07",
+          "key": "ne-l1-s5-07",
           "stage": 5,
           "number": 7
         },
@@ -1658,9 +1639,27 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
             "wrote",
             "passed"
           ],
-          "key": "ne-mb-l1-s5-08",
+          "key": "ne-l1-s5-08",
           "stage": 5,
           "number": 8
+        },
+        {
+          "kind": "verb_form",
+          "source": "그는 약 2시간 정도만 등산할 계획이었으나, 밤이 찾아오고 있었습니다.",
+          "prompt": "He ______________ ______________ for only about two hours, but night ______________ .",
+          "hints": [
+            "have, plan",
+            "hike",
+            "be, come"
+          ],
+          "answers": [
+            "had planned",
+            "to hike",
+            "was coming"
+          ],
+          "key": "ne-l1-s5-09",
+          "stage": 5,
+          "number": 9
         },
         {
           "kind": "verb_form",
@@ -1676,7 +1675,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
             "getting",
             "was dropping"
           ],
-          "key": "ne-mb-l1-s5-10",
+          "key": "ne-l1-s5-10",
           "stage": 5,
           "number": 10
         },
@@ -1692,7 +1691,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
             "was",
             "couldn't get"
           ],
-          "key": "ne-mb-l1-s5-11",
+          "key": "ne-l1-s5-11",
           "stage": 5,
           "number": 11
         },
@@ -1708,7 +1707,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
             "To make",
             "was"
           ],
-          "key": "ne-mb-l1-s5-12",
+          "key": "ne-l1-s5-12",
           "stage": 5,
           "number": 12
         },
@@ -1724,7 +1723,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
             "climbed",
             "found"
           ],
-          "key": "ne-mb-l1-s5-13",
+          "key": "ne-l1-s5-13",
           "stage": 5,
           "number": 13
         },
@@ -1740,7 +1739,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
             "used",
             "to send"
           ],
-          "key": "ne-mb-l1-s5-14",
+          "key": "ne-l1-s5-14",
           "stage": 5,
           "number": 14
         },
@@ -1758,7 +1757,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
             "was",
             "needed"
           ],
-          "key": "ne-mb-l1-s5-15",
+          "key": "ne-l1-s5-15",
           "stage": 5,
           "number": 15
         },
@@ -1774,7 +1773,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
             "sent",
             "to show"
           ],
-          "key": "ne-mb-l1-s5-16",
+          "key": "ne-l1-s5-16",
           "stage": 5,
           "number": 16
         },
@@ -1788,7 +1787,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
           "answers": [
             "shared"
           ],
-          "key": "ne-mb-l1-s5-17",
+          "key": "ne-l1-s5-17",
           "stage": 5,
           "number": 17
         },
@@ -1804,9 +1803,27 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
             "were informed",
             "sent"
           ],
-          "key": "ne-mb-l1-s5-18",
+          "key": "ne-l1-s5-18",
           "stage": 5,
           "number": 18
+        },
+        {
+          "kind": "verb_form",
+          "source": "밤샘 수색에도 불구하고, 그들은 여전히 Compean이 어디에 있는지 아무 짐작도 하지 못했습니다.",
+          "prompt": "Despite ______________ through the night, they still ______________ any idea where Compean ______________ .",
+          "hints": [
+            "search",
+            "not, have",
+            "be"
+          ],
+          "answers": [
+            "searching",
+            "didn't have",
+            "was"
+          ],
+          "key": "ne-l1-s5-19",
+          "stage": 5,
+          "number": 19
         },
         {
           "kind": "verb_form",
@@ -1818,7 +1835,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
           "answers": [
             "were hanging"
           ],
-          "key": "ne-mb-l1-s5-20",
+          "key": "ne-l1-s5-20",
           "stage": 5,
           "number": 20
         },
@@ -1832,7 +1849,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
           "answers": [
             "were covered"
           ],
-          "key": "ne-mb-l1-s5-21",
+          "key": "ne-l1-s5-21",
           "stage": 5,
           "number": 21
         },
@@ -1850,7 +1867,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
             "was",
             "were turned"
           ],
-          "key": "ne-mb-l1-s5-22",
+          "key": "ne-l1-s5-22",
           "stage": 5,
           "number": 22
         },
@@ -1866,7 +1883,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
             "had already spent",
             "worried"
           ],
-          "key": "ne-mb-l1-s5-23",
+          "key": "ne-l1-s5-23",
           "stage": 5,
           "number": 23
         },
@@ -1886,7 +1903,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
             "to find",
             "find"
           ],
-          "key": "ne-mb-l1-s5-24",
+          "key": "ne-l1-s5-24",
           "stage": 5,
           "number": 24
         },
@@ -1904,7 +1921,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
             "asked",
             "recognized"
           ],
-          "key": "ne-mb-l1-s5-25",
+          "key": "ne-l1-s5-25",
           "stage": 5,
           "number": 25
         },
@@ -1922,7 +1939,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
             "was seen",
             "named"
           ],
-          "key": "ne-mb-l1-s5-26",
+          "key": "ne-l1-s5-26",
           "stage": 5,
           "number": 26
         },
@@ -1942,9 +1959,47 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
             "to track",
             "informing"
           ],
-          "key": "ne-mb-l1-s5-27",
+          "key": "ne-l1-s5-27",
           "stage": 5,
           "number": 27
+        },
+        {
+          "kind": "verb_form",
+          "source": "그는 또한 어디서 사진이 찍혔는지와 영화가 어디서 촬영되었는지를 알아내는 것을 즐겼습니다.",
+          "prompt": "He also ______________ ______________ where pictures ______________ and where movies ______________ .",
+          "hints": [
+            "enjoy",
+            "determine",
+            "take",
+            "film"
+          ],
+          "answers": [
+            "enjoys",
+            "determining",
+            "were taken",
+            "were filmed"
+          ],
+          "key": "ne-l1-s5-28",
+          "stage": 5,
+          "number": 28
+        },
+        {
+          "kind": "verb_form",
+          "source": "그가 Compean의 사진을 보았을 때, 그는 바로 흥미를 느꼈습니다.",
+          "prompt": "When he ______________ the picture of Compean, he ______________ immediately ______________ .",
+          "hints": [
+            "see",
+            "be",
+            "interest"
+          ],
+          "answers": [
+            "saw",
+            "was",
+            "interested"
+          ],
+          "key": "ne-l1-s5-29",
+          "stage": 5,
+          "number": 29
         },
         {
           "kind": "verb_form",
@@ -1958,7 +2013,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
             "saw",
             "reminded"
           ],
-          "key": "ne-mb-l1-s5-30",
+          "key": "ne-l1-s5-30",
           "stage": 5,
           "number": 30
         },
@@ -1974,7 +2029,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
             "helped",
             "to infer"
           ],
-          "key": "ne-mb-l1-s5-31",
+          "key": "ne-l1-s5-31",
           "stage": 5,
           "number": 31
         },
@@ -1992,7 +2047,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
             "had tracked",
             "had checked"
           ],
-          "key": "ne-mb-l1-s5-32",
+          "key": "ne-l1-s5-32",
           "stage": 5,
           "number": 32
         },
@@ -2008,7 +2063,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
             "guessed",
             "be"
           ],
-          "key": "ne-mb-l1-s5-33",
+          "key": "ne-l1-s5-33",
           "stage": 5,
           "number": 33
         },
@@ -2022,7 +2077,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
           "answers": [
             "does not have"
           ],
-          "key": "ne-mb-l1-s5-34",
+          "key": "ne-l1-s5-34",
           "stage": 5,
           "number": 34
         },
@@ -2036,7 +2091,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
           "answers": [
             "compared"
           ],
-          "key": "ne-mb-l1-s5-35",
+          "key": "ne-l1-s5-35",
           "stage": 5,
           "number": 35
         },
@@ -2052,7 +2107,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
             "found",
             "provided"
           ],
-          "key": "ne-mb-l1-s5-36",
+          "key": "ne-l1-s5-36",
           "stage": 5,
           "number": 36
         },
@@ -2070,7 +2125,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
             "found",
             "indicated"
           ],
-          "key": "ne-mb-l1-s5-37",
+          "key": "ne-l1-s5-37",
           "stage": 5,
           "number": 37
         },
@@ -2084,7 +2139,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
           "answers": [
             "was rescued"
           ],
-          "key": "ne-mb-l1-s5-38",
+          "key": "ne-l1-s5-38",
           "stage": 5,
           "number": 38
         },
@@ -2098,7 +2153,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
           "answers": [
             "thanked"
           ],
-          "key": "ne-mb-l1-s5-39",
+          "key": "ne-l1-s5-39",
           "stage": 5,
           "number": 39
         },
@@ -2118,7 +2173,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
             "to inform",
             "to always bring"
           ],
-          "key": "ne-mb-l1-s5-40",
+          "key": "ne-l1-s5-40",
           "stage": 5,
           "number": 40
         },
@@ -2132,7 +2187,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
           "answers": [
             "is"
           ],
-          "key": "ne-mb-l1-s5-41",
+          "key": "ne-l1-s5-41",
           "stage": 5,
           "number": 41
         }
@@ -2166,7 +2221,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
             "was",
             "safe"
           ],
-          "key": "ne-mb-l1-s6-01",
+          "key": "ne-l1-s6-01",
           "stage": 6,
           "number": 1
         },
@@ -2193,7 +2248,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
             "played",
             "saving"
           ],
-          "key": "ne-mb-l1-s6-02",
+          "key": "ne-l1-s6-02",
           "stage": 6,
           "number": 2
         },
@@ -2210,7 +2265,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
           "answers": [
             "go"
           ],
-          "key": "ne-mb-l1-s6-03",
+          "key": "ne-l1-s6-03",
           "stage": 6,
           "number": 3
         },
@@ -2227,7 +2282,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
           "answers": [
             "standing"
           ],
-          "key": "ne-mb-l1-s6-04",
+          "key": "ne-l1-s6-04",
           "stage": 6,
           "number": 4
         },
@@ -2244,7 +2299,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
           "answers": [
             "rescued"
           ],
-          "key": "ne-mb-l1-s6-05",
+          "key": "ne-l1-s6-05",
           "stage": 6,
           "number": 5
         },
@@ -2266,7 +2321,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
             "who",
             "went"
           ],
-          "key": "ne-mb-l1-s6-06",
+          "key": "ne-l1-s6-06",
           "stage": 6,
           "number": 6
         },
@@ -2293,7 +2348,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
             "to take",
             "get"
           ],
-          "key": "ne-mb-l1-s6-07",
+          "key": "ne-l1-s6-07",
           "stage": 6,
           "number": 7
         },
@@ -2310,7 +2365,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
           "answers": [
             "wrote"
           ],
-          "key": "ne-mb-l1-s6-08",
+          "key": "ne-l1-s6-08",
           "stage": 6,
           "number": 8
         },
@@ -2327,7 +2382,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
           "answers": [
             "to hike"
           ],
-          "key": "ne-mb-l1-s6-09",
+          "key": "ne-l1-s6-09",
           "stage": 6,
           "number": 9
         },
@@ -2344,7 +2399,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
           "answers": [
             "dropping"
           ],
-          "key": "ne-mb-l1-s6-10",
+          "key": "ne-l1-s6-10",
           "stage": 6,
           "number": 10
         },
@@ -2361,7 +2416,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
           "answers": [
             "was"
           ],
-          "key": "ne-mb-l1-s6-11",
+          "key": "ne-l1-s6-11",
           "stage": 6,
           "number": 11
         },
@@ -2378,7 +2433,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
           "answers": [
             "was"
           ],
-          "key": "ne-mb-l1-s6-12",
+          "key": "ne-l1-s6-12",
           "stage": 6,
           "number": 12
         },
@@ -2395,7 +2450,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
           "answers": [
             "found"
           ],
-          "key": "ne-mb-l1-s6-13",
+          "key": "ne-l1-s6-13",
           "stage": 6,
           "number": 13
         },
@@ -2412,7 +2467,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
           "answers": [
             "send"
           ],
-          "key": "ne-mb-l1-s6-14",
+          "key": "ne-l1-s6-14",
           "stage": 6,
           "number": 14
         },
@@ -2434,7 +2489,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
             "that",
             "needed"
           ],
-          "key": "ne-mb-l1-s6-15",
+          "key": "ne-l1-s6-15",
           "stage": 6,
           "number": 15
         },
@@ -2451,7 +2506,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
           "answers": [
             "show"
           ],
-          "key": "ne-mb-l1-s6-16",
+          "key": "ne-l1-s6-16",
           "stage": 6,
           "number": 16
         },
@@ -2468,7 +2523,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
           "answers": [
             "shared"
           ],
-          "key": "ne-mb-l1-s6-17",
+          "key": "ne-l1-s6-17",
           "stage": 6,
           "number": 17
         },
@@ -2485,7 +2540,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
           "answers": [
             "were informed"
           ],
-          "key": "ne-mb-l1-s6-18",
+          "key": "ne-l1-s6-18",
           "stage": 6,
           "number": 18
         },
@@ -2507,7 +2562,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
             "searching",
             "Compean was"
           ],
-          "key": "ne-mb-l1-s6-19",
+          "key": "ne-l1-s6-19",
           "stage": 6,
           "number": 19
         },
@@ -2524,7 +2579,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
           "answers": [
             "hanging"
           ],
-          "key": "ne-mb-l1-s6-20",
+          "key": "ne-l1-s6-20",
           "stage": 6,
           "number": 20
         },
@@ -2541,7 +2596,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
           "answers": [
             "covered"
           ],
-          "key": "ne-mb-l1-s6-21",
+          "key": "ne-l1-s6-21",
           "stage": 6,
           "number": 21
         },
@@ -2563,7 +2618,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
             "because",
             "turned"
           ],
-          "key": "ne-mb-l1-s6-22",
+          "key": "ne-l1-s6-22",
           "stage": 6,
           "number": 22
         },
@@ -2585,7 +2640,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
             "worried",
             "spending"
           ],
-          "key": "ne-mb-l1-s6-23",
+          "key": "ne-l1-s6-23",
           "stage": 6,
           "number": 23
         },
@@ -2607,7 +2662,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
             "to use",
             "find"
           ],
-          "key": "ne-mb-l1-s6-24",
+          "key": "ne-l1-s6-24",
           "stage": 6,
           "number": 24
         },
@@ -2624,7 +2679,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
           "answers": [
             "asked"
           ],
-          "key": "ne-mb-l1-s6-25",
+          "key": "ne-l1-s6-25",
           "stage": 6,
           "number": 25
         },
@@ -2656,7 +2711,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
             "seen",
             "named"
           ],
-          "key": "ne-mb-l1-s6-26",
+          "key": "ne-l1-s6-26",
           "stage": 6,
           "number": 26
         },
@@ -2688,7 +2743,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
             "track",
             "informing"
           ],
-          "key": "ne-mb-l1-s6-27",
+          "key": "ne-l1-s6-27",
           "stage": 6,
           "number": 27
         },
@@ -2715,7 +2770,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
             "pictures were",
             "movies were"
           ],
-          "key": "ne-mb-l1-s6-28",
+          "key": "ne-l1-s6-28",
           "stage": 6,
           "number": 28
         },
@@ -2732,7 +2787,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
           "answers": [
             "interested"
           ],
-          "key": "ne-mb-l1-s6-29",
+          "key": "ne-l1-s6-29",
           "stage": 6,
           "number": 29
         },
@@ -2749,7 +2804,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
           "answers": [
             "reminded"
           ],
-          "key": "ne-mb-l1-s6-30",
+          "key": "ne-l1-s6-30",
           "stage": 6,
           "number": 30
         },
@@ -2766,7 +2821,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
           "answers": [
             "to infer"
           ],
-          "key": "ne-mb-l1-s6-31",
+          "key": "ne-l1-s6-31",
           "stage": 6,
           "number": 31
         },
@@ -2788,7 +2843,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
             "because",
             "checked"
           ],
-          "key": "ne-mb-l1-s6-32",
+          "key": "ne-l1-s6-32",
           "stage": 6,
           "number": 32
         },
@@ -2805,7 +2860,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
           "answers": [
             "that"
           ],
-          "key": "ne-mb-l1-s6-33",
+          "key": "ne-l1-s6-33",
           "stage": 6,
           "number": 33
         },
@@ -2822,7 +2877,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
           "answers": [
             "like"
           ],
-          "key": "ne-mb-l1-s6-34",
+          "key": "ne-l1-s6-34",
           "stage": 6,
           "number": 34
         },
@@ -2839,7 +2894,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
           "answers": [
             "compared"
           ],
-          "key": "ne-mb-l1-s6-35",
+          "key": "ne-l1-s6-35",
           "stage": 6,
           "number": 35
         },
@@ -2856,7 +2911,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
           "answers": [
             "provided"
           ],
-          "key": "ne-mb-l1-s6-36",
+          "key": "ne-l1-s6-36",
           "stage": 6,
           "number": 36
         },
@@ -2878,7 +2933,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
             "found",
             "indicated"
           ],
-          "key": "ne-mb-l1-s6-37",
+          "key": "ne-l1-s6-37",
           "stage": 6,
           "number": 37
         },
@@ -2895,7 +2950,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
           "answers": [
             "was rescued"
           ],
-          "key": "ne-mb-l1-s6-38",
+          "key": "ne-l1-s6-38",
           "stage": 6,
           "number": 38
         },
@@ -2912,7 +2967,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
           "answers": [
             "later thanked"
           ],
-          "key": "ne-mb-l1-s6-39",
+          "key": "ne-l1-s6-39",
           "stage": 6,
           "number": 39
         },
@@ -2949,7 +3004,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
             "inform",
             "bring"
           ],
-          "key": "ne-mb-l1-s6-40",
+          "key": "ne-l1-s6-40",
           "stage": 6,
           "number": 40
         },
@@ -2966,7 +3021,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
           "answers": [
             "is"
           ],
-          "key": "ne-mb-l1-s6-41",
+          "key": "ne-l1-s6-41",
           "stage": 6,
           "number": 41
         }
@@ -2978,7 +3033,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
       "instruction": "어색한 표현을 찾아 쓰고 알맞게 고쳐 쓰세요.",
       "items": [
         {
-          "key": "ne-mb-l1-s7-context-01",
+          "key": "ne-l1-s7-context-01",
           "stage": 7,
           "number": 1,
           "kind": "correction_pairs",
@@ -2996,7 +3051,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
           ]
         },
         {
-          "key": "ne-mb-l1-s7-context-02",
+          "key": "ne-l1-s7-context-02",
           "stage": 7,
           "number": 2,
           "kind": "correction_pairs",
@@ -3014,7 +3069,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
           ]
         },
         {
-          "key": "ne-mb-l1-s7-context-03",
+          "key": "ne-l1-s7-context-03",
           "stage": 7,
           "number": 3,
           "kind": "correction_pairs",
@@ -3032,7 +3087,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
           ]
         },
         {
-          "key": "ne-mb-l1-s7-context-04",
+          "key": "ne-l1-s7-context-04",
           "stage": 7,
           "number": 4,
           "kind": "correction_pairs",
@@ -3048,7 +3103,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
           ]
         },
         {
-          "key": "ne-mb-l1-s7-grammar-01",
+          "key": "ne-l1-s7-grammar-01",
           "stage": 7,
           "number": 5,
           "kind": "correction_pairs",
@@ -3066,7 +3121,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
           ]
         },
         {
-          "key": "ne-mb-l1-s7-grammar-02",
+          "key": "ne-l1-s7-grammar-02",
           "stage": 7,
           "number": 6,
           "kind": "correction_pairs",
@@ -3084,7 +3139,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
           ]
         },
         {
-          "key": "ne-mb-l1-s7-grammar-03",
+          "key": "ne-l1-s7-grammar-03",
           "stage": 7,
           "number": 7,
           "kind": "correction_pairs",
@@ -3102,7 +3157,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
           ]
         },
         {
-          "key": "ne-mb-l1-s7-grammar-04",
+          "key": "ne-l1-s7-grammar-04",
           "stage": 7,
           "number": 8,
           "kind": "correction_pairs",
@@ -3148,7 +3203,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
             "a missing hiker named Rene Compean",
             "was found safe"
           ],
-          "key": "ne-mb-l1-s8-01",
+          "key": "ne-l1-s8-01",
           "stage": 8,
           "number": 1
         },
@@ -3178,7 +3233,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
             "it turns out that a photo played a key role",
             "in saving his life"
           ],
-          "key": "ne-mb-l1-s8-02",
+          "key": "ne-l1-s8-02",
           "stage": 8,
           "number": 2
         },
@@ -3197,7 +3252,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
           "answers": [
             "let's go over to Marissa Reynolds"
           ],
-          "key": "ne-mb-l1-s8-03",
+          "key": "ne-l1-s8-03",
           "stage": 8,
           "number": 3
         },
@@ -3215,7 +3270,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
           "answers": [
             "I'm standing here"
           ],
-          "key": "ne-mb-l1-s8-04",
+          "key": "ne-l1-s8-04",
           "stage": 8,
           "number": 4
         },
@@ -3239,7 +3294,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
             "as you just heard",
             "Rene Compean was recently rescued"
           ],
-          "key": "ne-mb-l1-s8-05",
+          "key": "ne-l1-s8-05",
           "stage": 8,
           "number": 5
         },
@@ -3271,7 +3326,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
             "who knew the area well",
             "a hike went on alone"
           ],
-          "key": "ne-mb-l1-s8-06",
+          "key": "ne-l1-s8-06",
           "stage": 8,
           "number": 6
         },
@@ -3305,7 +3360,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
             "a recent forest fire had destroyed some signs",
             "a which caused him to take wrong turn and get lost"
           ],
-          "key": "ne-mb-l1-s8-07",
+          "key": "ne-l1-s8-07",
           "stage": 8,
           "number": 7
         },
@@ -3340,7 +3395,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
             "even wrote SOS on the ground",
             "or in case a plane helicopter passed by"
           ],
-          "key": "ne-mb-l1-s8-08",
+          "key": "ne-l1-s8-08",
           "stage": 8,
           "number": 8
         },
@@ -3364,7 +3419,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
             "he had planned to hike",
             "night was coming"
           ],
-          "key": "ne-mb-l1-s8-09",
+          "key": "ne-l1-s8-09",
           "stage": 8,
           "number": 9
         },
@@ -3390,7 +3445,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
             "it started getting very windy",
             "the temperature was dropping quickly"
           ],
-          "key": "ne-mb-l1-s8-10",
+          "key": "ne-l1-s8-10",
           "stage": 8,
           "number": 10
         },
@@ -3418,7 +3473,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
             "Compean was deep in the forest",
             "his cell phone couldn't get a signal"
           ],
-          "key": "ne-mb-l1-s8-11",
+          "key": "ne-l1-s8-11",
           "stage": 8,
           "number": 11
         },
@@ -3444,7 +3499,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
             "to make matters worse",
             "its battery was nearly dead"
           ],
-          "key": "ne-mb-l1-s8-12",
+          "key": "ne-l1-s8-12",
           "stage": 8,
           "number": 12
         },
@@ -3472,7 +3527,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
             "he climbed up to a higher spot",
             "a found weak signal"
           ],
-          "key": "ne-mb-l1-s8-13",
+          "key": "ne-l1-s8-13",
           "stage": 8,
           "number": 13
         },
@@ -3501,7 +3556,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
             "he used the last of his battery",
             "his to send a text message to friend"
           ],
-          "key": "ne-mb-l1-s8-14",
+          "key": "ne-l1-s8-14",
           "stage": 8,
           "number": 14
         },
@@ -3523,7 +3578,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
           "answers": [
             "he that was lost and needed help"
           ],
-          "key": "ne-mb-l1-s8-15",
+          "key": "ne-l1-s8-15",
           "stage": 8,
           "number": 15
         },
@@ -3547,7 +3602,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
             "he also sent a picture",
             "to show his surroundings"
           ],
-          "key": "ne-mb-l1-s8-16",
+          "key": "ne-l1-s8-16",
           "stage": 8,
           "number": 16
         },
@@ -3570,7 +3625,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
           "answers": [
             "Compean's friend shared the message and the picture with the local police"
           ],
-          "key": "ne-mb-l1-s8-17",
+          "key": "ne-l1-s8-17",
           "stage": 8,
           "number": 17
         },
@@ -3598,7 +3653,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
             "when the local police were informed of the missing hiker",
             "they immediately sent a rescue team"
           ],
-          "key": "ne-mb-l1-s8-18",
+          "key": "ne-l1-s8-18",
           "stage": 8,
           "number": 18
         },
@@ -3631,7 +3686,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
             "they still didn't have any idea",
             "where Compean was"
           ],
-          "key": "ne-mb-l1-s8-19",
+          "key": "ne-l1-s8-19",
           "stage": 8,
           "number": 19
         },
@@ -3650,7 +3705,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
           "answers": [
             "his legs were hanging"
           ],
-          "key": "ne-mb-l1-s8-20",
+          "key": "ne-l1-s8-20",
           "stage": 8,
           "number": 20
         },
@@ -3671,7 +3726,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
           "answers": [
             "his legs were covered in black ash"
           ],
-          "key": "ne-mb-l1-s8-21",
+          "key": "ne-l1-s8-21",
           "stage": 8,
           "number": 21
         },
@@ -3705,7 +3760,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
             "because the quality was poor",
             "his location settings were turned off"
           ],
-          "key": "ne-mb-l1-s8-22",
+          "key": "ne-l1-s8-22",
           "stage": 8,
           "number": 22
         },
@@ -3733,7 +3788,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
             "as Compean had already spent one night",
             "the police worried about his spending a second night"
           ],
-          "key": "ne-mb-l1-s8-23",
+          "key": "ne-l1-s8-23",
           "stage": 8,
           "number": 23
         },
@@ -3761,7 +3816,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
             "they decided to use social media",
             "to find out if anyone could find clues"
           ],
-          "key": "ne-mb-l1-s8-24",
+          "key": "ne-l1-s8-24",
           "stage": 8,
           "number": 24
         },
@@ -3787,7 +3842,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
             "they posted the picture",
             "asked if anyone recognized the scenery"
           ],
-          "key": "ne-mb-l1-s8-25",
+          "key": "ne-l1-s8-25",
           "stage": 8,
           "number": 25
         },
@@ -3813,7 +3868,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
             "the picture shared by the police",
             "by was seen a Californian"
           ],
-          "key": "ne-mb-l1-s8-26",
+          "key": "ne-l1-s8-26",
           "stage": 8,
           "number": 26
         },
@@ -3849,7 +3904,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
             "to track forest fires",
             "of informing people potential dangers"
           ],
-          "key": "ne-mb-l1-s8-27",
+          "key": "ne-l1-s8-27",
           "stage": 8,
           "number": 27
         },
@@ -3881,7 +3936,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
             "where pictures were taken",
             "where were movies filmed"
           ],
-          "key": "ne-mb-l1-s8-28",
+          "key": "ne-l1-s8-28",
           "stage": 8,
           "number": 28
         },
@@ -3908,7 +3963,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
             "when he saw the picture of Compean",
             "he was immediately interested"
           ],
-          "key": "ne-mb-l1-s8-29",
+          "key": "ne-l1-s8-29",
           "stage": 8,
           "number": 29
         },
@@ -3937,7 +3992,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
             "when Kuo saw the black ash",
             "a it reminded him of recent forest fire"
           ],
-          "key": "ne-mb-l1-s8-30",
+          "key": "ne-l1-s8-30",
           "stage": 8,
           "number": 30
         },
@@ -3959,7 +4014,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
           "answers": [
             "this helped him to infer Compean's approximate location"
           ],
-          "key": "ne-mb-l1-s8-31",
+          "key": "ne-l1-s8-31",
           "stage": 8,
           "number": 31
         },
@@ -3993,7 +4048,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
             "he because had tracked the fire",
             "the area had checked the features of"
           ],
-          "key": "ne-mb-l1-s8-32",
+          "key": "ne-l1-s8-32",
           "stage": 8,
           "number": 32
         },
@@ -4019,7 +4074,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
           "answers": [
             "the Kuo guessed that it must be south side of the mountain"
           ],
-          "key": "ne-mb-l1-s8-33",
+          "key": "ne-l1-s8-33",
           "stage": 8,
           "number": 33
         },
@@ -4043,7 +4098,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
           "answers": [
             "the north side does not have any green valleys"
           ],
-          "key": "ne-mb-l1-s8-34",
+          "key": "ne-l1-s8-34",
           "stage": 8,
           "number": 34
         },
@@ -4067,7 +4122,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
           "answers": [
             "in Kuo compared the view Compean's picture with more satellite images"
           ],
-          "key": "ne-mb-l1-s8-35",
+          "key": "ne-l1-s8-35",
           "stage": 8,
           "number": 35
         },
@@ -4094,7 +4149,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
             "he found a match",
             "provided the police with Compean's probable location"
           ],
-          "key": "ne-mb-l1-s8-36",
+          "key": "ne-l1-s8-36",
           "stage": 8,
           "number": 36
         },
@@ -4128,7 +4183,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
             "found Compean less than a mile",
             "the area indicated by Kuo"
           ],
-          "key": "ne-mb-l1-s8-37",
+          "key": "ne-l1-s8-37",
           "stage": 8,
           "number": 37
         },
@@ -4147,7 +4202,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
           "answers": [
             "Compean was rescued unharmed"
           ],
-          "key": "ne-mb-l1-s8-38",
+          "key": "ne-l1-s8-38",
           "stage": 8,
           "number": 38
         },
@@ -4167,7 +4222,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
           "answers": [
             "he later thanked Kuo on a video call"
           ],
-          "key": "ne-mb-l1-s8-39",
+          "key": "ne-l1-s8-39",
           "stage": 8,
           "number": 39
         },
@@ -4207,7 +4262,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
             "to inform others of their planned route",
             "to always bring a paper map"
           ],
-          "key": "ne-mb-l1-s8-40",
+          "key": "ne-l1-s8-40",
           "stage": 8,
           "number": 40
         },
@@ -4227,7 +4282,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
           "answers": [
             "this is Marissa Reynolds from LA"
           ],
-          "key": "ne-mb-l1-s8-41",
+          "key": "ne-l1-s8-41",
           "stage": 8,
           "number": 41
         }
@@ -4258,7 +4313,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
             "found",
             "safe"
           ],
-          "key": "ne-mb-l1-s9-01",
+          "key": "ne-l1-s9-01",
           "stage": 9,
           "number": 1
         },
@@ -4290,7 +4345,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
             "his",
             "life"
           ],
-          "key": "ne-mb-l1-s9-02",
+          "key": "ne-l1-s9-02",
           "stage": 9,
           "number": 2
         },
@@ -4307,7 +4362,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
             "go",
             "over"
           ],
-          "key": "ne-mb-l1-s9-03",
+          "key": "ne-l1-s9-03",
           "stage": 9,
           "number": 3
         },
@@ -4322,7 +4377,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
             "I'm",
             "standing"
           ],
-          "key": "ne-mb-l1-s9-04",
+          "key": "ne-l1-s9-04",
           "stage": 9,
           "number": 4
         },
@@ -4341,7 +4396,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
             "recently",
             "rescued"
           ],
-          "key": "ne-mb-l1-s9-05",
+          "key": "ne-l1-s9-05",
           "stage": 9,
           "number": 5
         },
@@ -4372,7 +4427,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
             "hike",
             "alone"
           ],
-          "key": "ne-mb-l1-s9-06",
+          "key": "ne-l1-s9-06",
           "stage": 9,
           "number": 6
         },
@@ -4415,7 +4470,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
             "get",
             "lost"
           ],
-          "key": "ne-mb-l1-s9-07",
+          "key": "ne-l1-s9-07",
           "stage": 9,
           "number": 7
         },
@@ -4446,7 +4501,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
             "passed",
             "by"
           ],
-          "key": "ne-mb-l1-s9-08",
+          "key": "ne-l1-s9-08",
           "stage": 9,
           "number": 8
         },
@@ -4470,7 +4525,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
             "was",
             "coming"
           ],
-          "key": "ne-mb-l1-s9-09",
+          "key": "ne-l1-s9-09",
           "stage": 9,
           "number": 9
         },
@@ -4496,7 +4551,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
             "was",
             "dropping"
           ],
-          "key": "ne-mb-l1-s9-10",
+          "key": "ne-l1-s9-10",
           "stage": 9,
           "number": 10
         },
@@ -4524,7 +4579,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
             "a",
             "signal"
           ],
-          "key": "ne-mb-l1-s9-11",
+          "key": "ne-l1-s9-11",
           "stage": 9,
           "number": 11
         },
@@ -4545,7 +4600,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
             "nearly",
             "dead"
           ],
-          "key": "ne-mb-l1-s9-12",
+          "key": "ne-l1-s9-12",
           "stage": 9,
           "number": 12
         },
@@ -4568,7 +4623,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
             "weak",
             "signal"
           ],
-          "key": "ne-mb-l1-s9-13",
+          "key": "ne-l1-s9-13",
           "stage": 9,
           "number": 13
         },
@@ -4597,7 +4652,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
             "text",
             "message"
           ],
-          "key": "ne-mb-l1-s9-14",
+          "key": "ne-l1-s9-14",
           "stage": 9,
           "number": 14
         },
@@ -4619,7 +4674,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
             "needed",
             "help"
           ],
-          "key": "ne-mb-l1-s9-15",
+          "key": "ne-l1-s9-15",
           "stage": 9,
           "number": 15
         },
@@ -4643,7 +4698,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
             "his",
             "surroundings"
           ],
-          "key": "ne-mb-l1-s9-16",
+          "key": "ne-l1-s9-16",
           "stage": 9,
           "number": 16
         },
@@ -4671,7 +4726,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
             "local",
             "police"
           ],
-          "key": "ne-mb-l1-s9-17",
+          "key": "ne-l1-s9-17",
           "stage": 9,
           "number": 17
         },
@@ -4704,7 +4759,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
             "rescue",
             "team"
           ],
-          "key": "ne-mb-l1-s9-18",
+          "key": "ne-l1-s9-18",
           "stage": 9,
           "number": 18
         },
@@ -4728,7 +4783,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
             "Compean",
             "was"
           ],
-          "key": "ne-mb-l1-s9-19",
+          "key": "ne-l1-s9-19",
           "stage": 9,
           "number": 19
         },
@@ -4746,7 +4801,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
             "were",
             "hanging"
           ],
-          "key": "ne-mb-l1-s9-20",
+          "key": "ne-l1-s9-20",
           "stage": 9,
           "number": 20
         },
@@ -4767,7 +4822,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
             "black",
             "ash"
           ],
-          "key": "ne-mb-l1-s9-21",
+          "key": "ne-l1-s9-21",
           "stage": 9,
           "number": 21
         },
@@ -4805,7 +4860,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
             "turned",
             "off"
           ],
-          "key": "ne-mb-l1-s9-22",
+          "key": "ne-l1-s9-22",
           "stage": 9,
           "number": 22
         },
@@ -4836,7 +4891,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
             "his",
             "spending"
           ],
-          "key": "ne-mb-l1-s9-23",
+          "key": "ne-l1-s9-23",
           "stage": 9,
           "number": 23
         },
@@ -4866,7 +4921,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
             "find",
             "clues"
           ],
-          "key": "ne-mb-l1-s9-24",
+          "key": "ne-l1-s9-24",
           "stage": 9,
           "number": 24
         },
@@ -4895,7 +4950,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
             "the",
             "scenery"
           ],
-          "key": "ne-mb-l1-s9-25",
+          "key": "ne-l1-s9-25",
           "stage": 9,
           "number": 25
         },
@@ -4919,7 +4974,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
             "was",
             "seen"
           ],
-          "key": "ne-mb-l1-s9-26",
+          "key": "ne-l1-s9-26",
           "stage": 9,
           "number": 26
         },
@@ -4953,7 +5008,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
             "potential",
             "dangers"
           ],
-          "key": "ne-mb-l1-s9-27",
+          "key": "ne-l1-s9-27",
           "stage": 9,
           "number": 27
         },
@@ -4982,7 +5037,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
             "were",
             "filmed"
           ],
-          "key": "ne-mb-l1-s9-28",
+          "key": "ne-l1-s9-28",
           "stage": 9,
           "number": 28
         },
@@ -5006,7 +5061,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
             "immediately",
             "interested"
           ],
-          "key": "ne-mb-l1-s9-29",
+          "key": "ne-l1-s9-29",
           "stage": 9,
           "number": 29
         },
@@ -5036,7 +5091,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
             "forest",
             "fire"
           ],
-          "key": "ne-mb-l1-s9-30",
+          "key": "ne-l1-s9-30",
           "stage": 9,
           "number": 30
         },
@@ -5060,7 +5115,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
             "approximate",
             "location."
           ],
-          "key": "ne-mb-l1-s9-31",
+          "key": "ne-l1-s9-31",
           "stage": 9,
           "number": 31
         },
@@ -5098,7 +5153,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
             "the",
             "area"
           ],
-          "key": "ne-mb-l1-s9-32",
+          "key": "ne-l1-s9-32",
           "stage": 9,
           "number": 32
         },
@@ -5125,7 +5180,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
             "south",
             "side"
           ],
-          "key": "ne-mb-l1-s9-33",
+          "key": "ne-l1-s9-33",
           "stage": 9,
           "number": 33
         },
@@ -5151,7 +5206,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
             "green",
             "valleys"
           ],
-          "key": "ne-mb-l1-s9-34",
+          "key": "ne-l1-s9-34",
           "stage": 9,
           "number": 34
         },
@@ -5175,7 +5230,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
             "satellite",
             "images"
           ],
-          "key": "ne-mb-l1-s9-35",
+          "key": "ne-l1-s9-35",
           "stage": 9,
           "number": 35
         },
@@ -5205,7 +5260,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
             "probable",
             "location"
           ],
-          "key": "ne-mb-l1-s9-36",
+          "key": "ne-l1-s9-36",
           "stage": 9,
           "number": 36
         },
@@ -5238,7 +5293,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
             "by",
             "Kuo"
           ],
-          "key": "ne-mb-l1-s9-37",
+          "key": "ne-l1-s9-37",
           "stage": 9,
           "number": 37
         },
@@ -5256,7 +5311,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
             "rescued",
             "unharmed"
           ],
-          "key": "ne-mb-l1-s9-38",
+          "key": "ne-l1-s9-38",
           "stage": 9,
           "number": 38
         },
@@ -5272,7 +5327,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
             "thanked",
             "Kuo"
           ],
-          "key": "ne-mb-l1-s9-39",
+          "key": "ne-l1-s9-39",
           "stage": 9,
           "number": 39
         },
@@ -5315,7 +5370,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
             "paper",
             "map"
           ],
-          "key": "ne-mb-l1-s9-40",
+          "key": "ne-l1-s9-40",
           "stage": 9,
           "number": 40
         },
@@ -5332,7 +5387,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
             "Marissa",
             "Reynolds"
           ],
-          "key": "ne-mb-l1-s9-41",
+          "key": "ne-l1-s9-41",
           "stage": 9,
           "number": 41
         }

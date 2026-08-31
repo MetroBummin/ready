@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <link rel="stylesheet" href="../styles/fonts.css">
+  <link rel="stylesheet" href="../styles/tokens.css">
+  <link rel="stylesheet" href="../styles/base.css">
+  <link rel="stylesheet" href="../design-tokens.css">
+  <link rel="stylesheet" href="../ready/ready.css">
+  <link rel="stylesheet" href="../ready/design.css">
+  <title>Workbook order geometry regression</title>
+</head>
+<body data-ready-mode="student">
+<main>
+  <div class="workbook-layout">
+    <section class="workbook-card">
+      <div class="workbook-prompt order-task">
+        <span class="workbook-order-group" data-workbook-order-group="0">
+          <span class="workbook-order-built"><em>단어를 순서대로 누르세요</em></span>
+          <span class="workbook-order-bank">
+            <span class="workbook-order-bank-slot"><button type="button">criminals</button></span>
+            <span class="workbook-order-bank-slot"><button type="button">never</button></span>
+            <span class="workbook-order-bank-slot"><button type="button">leave</button></span>
+            <span class="workbook-order-bank-slot"><button type="button">a crime scene</button></span>
+          </span>
+        </span>
+        <span>without</span>
+        <span class="workbook-order-group" data-workbook-order-group="1">
+          <span class="workbook-order-built"><em>단어를 순서대로 누르세요</em></span>
+          <span class="workbook-order-bank">
+            <span class="workbook-order-bank-slot"><button type="button">leaving behind</button></span>
+            <span class="workbook-order-bank-slot"><button type="button">traces</button></span>
+            <span class="workbook-order-bank-slot"><button type="button">of</button></span>
+            <span class="workbook-order-bank-slot"><button type="button">their presence</button></span>
+          </span>
+        </span>.
+      </div>
+      <output id="geometry-result">ready</output>
+    </section>
+  </div>
+</main>
+<script>
+  function stabilize(){document.querySelectorAll('.workbook-order-group').forEach(group=>{const bank=group.querySelector('.workbook-order-bank'),built=group.querySelector('.workbook-order-built'),style=getComputedStyle(built),chrome=Number.parseFloat(style.paddingTop)+Number.parseFloat(style.paddingBottom)+Number.parseFloat(style.borderTopWidth)+Number.parseFloat(style.borderBottomWidth);group.style.setProperty('--workbook-order-stable-height',`${Math.ceil(bank.getBoundingClientRect().height+chrome)}px`);});}
+  function rects(){return [...document.querySelectorAll('.workbook-order-group')].map(node=>{const r=node.getBoundingClientRect();return{x:r.x,y:r.y,width:r.width,height:r.height};});}
+  function same(a,b){return a.length===b.length&&a.every((r,i)=>['x','y','width','height'].every(key=>Math.abs(r[key]-b[i][key])<1));}
+  window.runGeometryRegression=()=>{stabilize();const before=rects(),group=document.querySelector('[data-workbook-order-group="0"]'),slot=group.querySelector('.workbook-order-bank-slot'),button=slot.querySelector('button'),built=group.querySelector('.workbook-order-built');built.querySelector('em')?.remove();built.append(button.cloneNode(true));slot.classList.add('used');const selected=rects();built.replaceChildren(Object.assign(document.createElement('em'),{textContent:'단어를 순서대로 누르세요'}));slot.classList.remove('used');const removed=rects(),pass=same(before,selected)&&same(before,removed),result={pass,before,selected,removed},output=document.querySelector('#geometry-result');output.textContent=pass?'PASS':'FAIL';output.dataset.details=JSON.stringify(result);return result;};
+  addEventListener('load',()=>requestAnimationFrame(()=>window.runGeometryRegression()));
+</script>
+</body>
+</html>

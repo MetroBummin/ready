@@ -1,56 +1,56 @@
 export const YBM_PARKJUNEON_L2_WORKBOOK = {
   "workbookKey": "ybm-parkjuneon-lesson-2",
-  "title": "공통영어2 YBM(박준언) 2과 워크북",
+  "title": "영어II YBM(박준언) 2과 워크북",
   "source": {
-    "sourceFile": "(2022개정)2025년_공통영어2_YBM(박준언)_2과_본문10단계 워크북 통합본(1~10)_(20251205수정).pdf",
-    "sha256": "4af7701ef4b36c766f38c98774b8b2319f21561d76969e4bb2b03af158c10219",
+    "sourceFile": "(2022개정)2026년_영어II_YBM(박준언)_2과_본문10단계 워크북 통합본(1~10).pdf",
+    "sha256": "fc3d6c9b1f12ce749ecde18df42fb70406e7a0cce4c75120d487e78de63abde2",
     "preserved": true
   },
   "importReport": {
     "source": {
-      "sourceFile": "(2022개정)2025년_공통영어2_YBM(박준언)_2과_본문10단계 워크북 통합본(1~10)_(20251205수정).pdf",
-      "sha256": "4af7701ef4b36c766f38c98774b8b2319f21561d76969e4bb2b03af158c10219",
+      "sourceFile": "(2022개정)2026년_영어II_YBM(박준언)_2과_본문10단계 워크북 통합본(1~10).pdf",
+      "sha256": "fc3d6c9b1f12ce749ecde18df42fb70406e7a0cce4c75120d487e78de63abde2",
       "preserved": true
     },
     "exerciseStatus": {
       "2": {
-        "source": 47,
-        "ready": 47,
+        "source": 55,
+        "ready": 55,
         "invalid": 0
       },
       "3": {
-        "source": 47,
-        "ready": 47,
+        "source": 55,
+        "ready": 55,
         "invalid": 0
       },
       "4": {
-        "source": 47,
-        "ready": 47,
+        "source": 55,
+        "ready": 55,
         "invalid": 0
       },
       "5": {
-        "source": 47,
-        "ready": 25,
-        "invalid": 22
+        "source": 55,
+        "ready": 55,
+        "invalid": 0
       },
       "6": {
-        "source": 36,
-        "ready": 36,
+        "source": 50,
+        "ready": 50,
         "invalid": 0
       },
       "8": {
-        "source": 47,
-        "ready": 47,
+        "source": 55,
+        "ready": 55,
         "invalid": 0
       },
       "9": {
-        "source": 47,
-        "ready": 43,
-        "invalid": 4
+        "source": 55,
+        "ready": 55,
+        "invalid": 0
       },
       "7": {
-        "source": 10,
-        "ready": 10,
+        "source": 14,
+        "ready": 14,
         "invalid": 0
       }
     },
@@ -58,218 +58,9 @@ export const YBM_PARKJUNEON_L2_WORKBOOK = {
       "1": "outside_requested_range",
       "10": "outside_requested_range"
     },
-    "ready": 302
+    "ready": 394
   },
-  "unpublishedExercises": [
-    {
-      "status": "INVALID",
-      "stage": 5,
-      "number": 1,
-      "source": "주방 수도꼭지가 이상한 소리를 낸다. 기침을 한다.",
-      "prompt": "The kitchen tap (make) strange sounds. It (cough).",
-      "reason": "frame has 0 publisher-corpus matches"
-    },
-    {
-      "status": "INVALID",
-      "stage": 5,
-      "number": 4,
-      "source": "\"Alyssa, 조용히 해!\" 엄마가 말한다. 엄마는 TV를 보고 있고, TV에서는 뉴스 앵커가 '물 공급 위기'에 대해 이야기하고 있다.",
-      "prompt": "\"Alyssa, shush!\" Mom (say). She (be, watch) the TV, where a news anchor (be, talk) about the \"flow crisis.\"",
-      "reason": "frame has 0 publisher-corpus matches"
-    },
-    {
-      "status": "INVALID",
-      "stage": 5,
-      "number": 8,
-      "source": "주차장에 차를 세우자 많은 사람이 눈에 들어온다. \"너희 둘은 들어가. 안에서 만나자.\"라고 Basil 삼촌이 말한다.",
-      "prompt": "As we (pull) into the parking lot, we (can, see) the crowd. \"You two (go) in. I (will, meet) you inside,\" Uncle Basil (say).",
-      "reason": "frame has 0 publisher-corpus matches"
-    },
-    {
-      "status": "INVALID",
-      "stage": 5,
-      "number": 9,
-      "source": "내부 풍경은 최악의 블랙 프라이데이와 비슷하지만, 오늘 사람들이 찾는 것은 텔레비전이나 비디오 게임이 아니다.",
-      "prompt": "Inside it (be) like Black Friday at its worst—but today it (be) not televisions and video games people (be) after.",
-      "reason": "frame has 0 publisher-corpus matches"
-    },
-    {
-      "status": "INVALID",
-      "stage": 5,
-      "number": 20,
-      "source": "\"미안하지만 우리가 먼저 왔어요.\" 그녀가 말한다. 그러자 그녀의 딸이 앞으로 나오는데, 축구팀에서 알고 있는 Hali Hartling이다.",
-      "prompt": "\"I (be) sorry, but we (be) here first,\" she (say). And then her daughter (step) forward—a girl I (recognize) from soccer—Hali Hartling.",
-      "reason": "frame has 0 publisher-corpus matches"
-    },
-    {
-      "status": "INVALID",
-      "stage": 5,
-      "number": 21,
-      "source": "엄마가 카트를 끌고 가자 Hali가 내게 몸을 기울인다. \"미안해, Alyssa.\"",
-      "prompt": "As her mother (pull) their cart away, Hali (lean) closer to me. \"I (be) sorry about that, Alyssa.\"",
-      "reason": "frame has 0 publisher-corpus matches"
-    },
-    {
-      "status": "INVALID",
-      "stage": 5,
-      "number": 24,
-      "source": "그녀는 이미 통로를 따라 이동하고 있는 어머니를 돌아보더니 고개를 절레절레 흔들며 내게로 돌아선다.",
-      "prompt": "She (look) back to her mother, who (be, already, move) down the aisle, then (turn) back to me (shake) her head.",
-      "reason": "frame has 0 publisher-corpus matches"
-    },
-    {
-      "status": "INVALID",
-      "stage": 5,
-      "number": 28,
-      "source": "나는 문을 열고 얼음 봉지를 잡는다. \"뭐 하는 거야? 우린 얼음이 아니라 물이 필요해.\" 동생이 내게 상기시켜 준다.",
-      "prompt": "I (open) the door and (reach) for a bag. \"What (be) you (do)? We (need) water, not ice,\" he (remind) me.",
-      "reason": "frame has 0 publisher-corpus matches"
-    },
-    {
-      "status": "INVALID",
-      "stage": 5,
-      "number": 29,
-      "source": "\"얼음은 물이야. 돕기나 해.\" 내가 말한다. Garrett과 나는 최대한 높이 쌓일 때까지 얼음 봉지를 카트에 담는다.",
-      "prompt": "\"Ice (be) water. Just (help) me,\" I (tell) him. Garrett and I (put) one bag of ice after another into our cart, until it (pile) as high as it (can, get).",
-      "reason": "frame has 0 publisher-corpus matches"
-    },
-    {
-      "status": "INVALID",
-      "stage": 5,
-      "number": 31,
-      "source": "이제 카트는 엄청나게 무거워져서 밀기가 거의 불가능할 정도이다.",
-      "prompt": "The cart (be) ridiculously heavy now, and almost impossible (push).",
-      "reason": "frame has 0 publisher-corpus matches"
-    },
-    {
-      "status": "INVALID",
-      "stage": 5,
-      "number": 32,
-      "source": "그때 정장 차림의 한 남자가 우리 뒤에서 나타난다. 그는 미소를 짓는다. \"도움이 필요한 것 같구나.\"",
-      "prompt": "Then, a man in a business suit (come) up behind us. He (smile). \"(Look) like you (could, use) some help.\"",
-      "reason": "frame has 0 publisher-corpus matches"
-    },
-    {
-      "status": "INVALID",
-      "stage": 5,
-      "number": 33,
-      "source": "그는 우리가 대답할 때까지 기다리지 않고 카트 손잡이를 잡는다. \"도와주셔서 감사합니다.\" 나는 그에게 말한다.",
-      "prompt": "He (not, wait) for us (answer) before (grab) the cart's handle. \"(Thank) you for (help) us,\" I (tell) him.",
-      "reason": "frame has 0 publisher-corpus matches"
-    },
-    {
-      "status": "INVALID",
-      "stage": 5,
-      "number": 36,
-      "source": "나는 호의에는 호의로 보답해야 한다고 결심한다. \"얼음 한 봉지 가져가세요.\" 내가 제안한다.",
-      "prompt": "I (decide) that one favor (deserve) another. \"Why don't you (take) a bag of ice for yourself,\" I (suggest).",
-      "reason": "frame has 0 publisher-corpus matches"
-    },
-    {
-      "status": "INVALID",
-      "stage": 5,
-      "number": 37,
-      "source": "그의 미소가 사라지지 않는다. \"더 좋은 생각이 있어.\" 그가 말한다.",
-      "prompt": "His smile (not, fade). \"I (have) a better idea,\" he (say).",
-      "reason": "frame has 0 publisher-corpus matches"
-    },
-    {
-      "status": "INVALID",
-      "stage": 5,
-      "number": 38,
-      "source": "\"너희가 얼음 한 봉지 가져가고 나머지는 내가 가질게.\"",
-      "prompt": "\"Why don't you (take) a bag of ice for yourselves, and I (will, keep) the rest.\"",
-      "reason": "frame has 0 publisher-corpus matches"
-    },
-    {
-      "status": "INVALID",
-      "stage": 5,
-      "number": 39,
-      "source": "잠시 나는 그가 농담하고 있다고 생각하지만, 곧 그가 진지하다는 것을 깨닫는다. \"네?\"",
-      "prompt": "For a moment I (think) he (be, joke), but then (realize) he (be) serious. \"(Excuse) me?\"",
-      "reason": "frame has 0 publisher-corpus matches"
-    },
-    {
-      "status": "INVALID",
-      "stage": 5,
-      "number": 40,
-      "source": "그는 여전히 웃고 있지만 그의 눈빛이 무섭다.",
-      "prompt": "He (be, still, smile), but his eyes (scare) me.",
-      "reason": "frame has 0 publisher-corpus matches"
-    },
-    {
-      "status": "INVALID",
-      "stage": 5,
-      "number": 41,
-      "source": "그의 손이 우리 카트 손잡이에 단단히 고정되어 있는 한, 카트가 그의 것이 아니라 우리 것임을 증명할 방법은 없다.",
-      "prompt": "As long as his hands (firmly, lock) on the handle of our cart, there (be) nothing (prove) that it (be) ours and not his.",
-      "reason": "frame has 0 publisher-corpus matches"
-    },
-    {
-      "status": "INVALID",
-      "stage": 5,
-      "number": 42,
-      "source": "\"무슨 문제 있나요?\" Basil 삼촌이다. 제시간에 맞춰 도착했다.",
-      "prompt": "\"(Be) there a problem here?\" It (be) Uncle Basil. He (have, arrive) just in time.",
-      "reason": "frame has 0 publisher-corpus matches"
-    },
-    {
-      "status": "INVALID",
-      "stage": 5,
-      "number": 43,
-      "source": "\"전혀요.\" 남자는 씁쓸한 표정으로 얼음을 바라보다가 자리를 뜬다.",
-      "prompt": "\"Not at all.\" The man (look) at the ice with a bitter face, then (leave).",
-      "reason": "frame has 0 publisher-corpus matches"
-    },
-    {
-      "status": "INVALID",
-      "stage": 5,
-      "number": 44,
-      "source": "*위 내용은 소설 <드라이>(Dry, 2018)의 도입부를 축약한 것이다.",
-      "prompt": "*The above (be) a (shorten) version of the opening of the novel Dry (2018).",
-      "reason": "frame has 0 publisher-corpus matches"
-    },
-    {
-      "status": "INVALID",
-      "stage": 5,
-      "number": 47,
-      "source": "기후 변화, 인구 증가, 농업용수 과다 사용 등 전 세계적으로 물 부족을 야기하는 요인들이 해결되지 않는다면 이 소설의 이야기가 현실이 될 수도 있다.",
-      "prompt": "Provided that the factors (contribute) to water shortages worldwide (not, address), including climate change, population growth, and (use) too much water for agriculture, it (be) possible that this story (can, become) a reality.",
-      "reason": "frame has 0 publisher-corpus matches"
-    },
-    {
-      "status": "INVALID",
-      "stage": 9,
-      "number": 22,
-      "source": "\"지난주 연습할 때 내가 물 나눠주지 않았니?\" 나는 그녀에게 지적한다.",
-      "prompt": "share, you, practice, point, to \"______________ ______________ ______________ ______________ ______________ ______________ ______________ ______________ ______________ ______________ last week?\" ______________ ______________ ______________ ______________ ______________",
-      "reason": "frame does not reproduce canonical sentence: '\" ______________ ______________ ______________ ______________ ______________ ______________ ______________ ______________ ______________ ______________ last week?\" ______________ ______________ "
-    },
-    {
-      "status": "INVALID",
-      "stage": 9,
-      "number": 37,
-      "source": "그의 미소가 사라지지 않는다. \"더 좋은 생각이 있어.\" 그가 말한다.",
-      "prompt": "have, better His smile does not fade. \"______________ ______________ ______________ ______________ ______________,\" he says.",
-      "reason": "frame does not reproduce canonical sentence: 'His smile does not fade. \" ______________ ______________ ______________ ______________ ______________,\" he says.'"
-    },
-    {
-      "status": "INVALID",
-      "stage": 9,
-      "number": 38,
-      "source": "\"너희가 얼음 한 봉지 가져가고 나머지는 내가 가질게.\"",
-      "prompt": "why, take, keep, the rest \"______________ ______________ ______________ ______________ ______________ ______________ ______________ ______________ for yourselves, and ______________ ______________ ______________ ______________.\"",
-      "reason": "frame does not reproduce canonical sentence: '\" ______________ ______________ ______________ ______________ ______________ ______________ ______________ ______________ for yourselves, and ______________ ______________ ______________ _______"
-    },
-    {
-      "status": "INVALID",
-      "stage": 9,
-      "number": 42,
-      "source": "\"무슨 문제 있나요?\" Basil 삼촌이다. 제시간에 맞춰 도착했다.",
-      "prompt": "there, problem, arrive \"______________ ______________ ______________ ______________ here?\" It is Uncle Basil. ______________ ______________ ______________ just in time.",
-      "reason": "frame does not reproduce canonical sentence: '\" ______________ ______________ ______________ ______________ here?\" It is Uncle Basil. ______________ ______________ ______________ just in time.'"
-    }
-  ],
+  "unpublishedExercises": [],
   "stages": [
     {
       "stage": 2,
@@ -278,551 +69,709 @@ export const YBM_PARKJUNEON_L2_WORKBOOK = {
       "items": [
         {
           "kind": "blank_input",
-          "source": "The kitchen tap makes strange sounds. It coughs.",
-          "prompt": "주방 ______________가 이상한 소리를 낸다. ______________.",
+          "source": "Jiyun, a high school student, starts her day by logging in to a music streaming service on her smartphone.",
+          "prompt": "고등학생인 지윤이는 그녀의 스마트폰에서 음악 ______________ 서비스에 ______________며 하루를 시작한다.",
           "answers": [
-            "수도꼭지",
-            "기침을 한다"
+            "스트리밍",
+            "로그인하"
           ],
-          "key": "ybm-pj-l2-s2-01",
+          "key": "ybm-l2-s2-01",
           "stage": 2,
           "number": 1
         },
         {
           "kind": "blank_input",
-          "source": "It spits once, and then goes silent.",
-          "prompt": "______________ 한 번 ______________더니 조용해진다.",
+          "source": "She enjoys listening to her favorite music, discovering new songs, and exploring new artists every day.",
+          "prompt": "그녀는 매일 자신이 선호하는 음악을 듣고, 새로운 노래들을 ______________고, 새로운 아티스트들을 ______________는 것을 즐긴다.",
           "answers": [
-            "침을",
-            "뱉"
+            "발견하",
+            "탐색하"
           ],
-          "key": "ybm-pj-l2-s2-02",
+          "key": "ybm-l2-s2-02",
           "stage": 2,
           "number": 2
         },
         {
           "kind": "blank_input",
-          "source": "\"Mom,\" I shout out into the living room, \"water is not coming out.\"",
-          "prompt": "“엄마,” 나는 거실을 향해 ______________. “물이 안 나와요.”",
+          "source": "For a healthy breakfast, Jiyun receives a delivery from a subscription service that provides fresh vegetables and fruits.",
+          "prompt": "______________ 아침 식사를 위해, 지윤이는 신선한 채소와 과일을 ______________는 ______________ 서비스로부터 ______________을 받는다.",
           "answers": [
-            "소리친다"
+            "건강한",
+            "공급하",
+            "구독",
+            "배송"
           ],
-          "key": "ybm-pj-l2-s2-03",
+          "key": "ybm-l2-s2-03",
           "stage": 2,
           "number": 3
         },
         {
           "kind": "blank_input",
-          "source": "\"Alyssa, shush!\" Mom says. She is watching the TV, where a news anchor is talking about the \"flow crisis.\"",
-          "prompt": "“Alyssa, ______________!” 엄마가 말한다. 엄마는 TV를 보고 있고, TV에서는 뉴스 ______________가 ‘물 공급 ______________’에 대해 이야기하고 있다.",
+          "source": "After school, Jiyun utilizes a video lecture service to expand her knowledge in whatever she finds interesting.",
+          "prompt": "방과 후에, 지윤이는 그녀가 흥미를 느끼는 것마다 그녀의 지식을 ______________기 위해 비디오 ______________ 서비스를 ______________.",
           "answers": [
-            "조용히 해",
-            "앵커",
-            "위기"
+            "확장하",
+            "강의",
+            "활용한다"
           ],
-          "key": "ybm-pj-l2-s2-04",
+          "key": "ybm-l2-s2-04",
           "stage": 2,
           "number": 4
         },
         {
           "kind": "blank_input",
-          "source": "This is what the media has been calling the drought ever since people got tired of hearing the word \"drought.\"",
-          "prompt": "사람들이 ‘______________’이라는 단어를 듣는 데 지친 이후로 ______________은 ______________을 이렇게 부르고 있다.",
+          "source": "For example, she watches various academic lectures to review her schoolwork and stay updated about the latest knowledge in her chosen field of study.",
+          "prompt": "예를 들어, 그녀는 학교 공부를 복습하고 그녀가 선택한 연구 ______________의 ______________ 지식에 대해 계속 ______________기 위해 다양한 ______________ ______________를 시청한다.",
           "answers": [
-            "가뭄",
-            "언론",
-            "가뭄"
+            "분야",
+            "최신",
+            "업데이트하",
+            "학술",
+            "강의"
           ],
-          "key": "ybm-pj-l2-s2-05",
+          "key": "ybm-l2-s2-05",
           "stage": 2,
           "number": 5
         },
         {
           "kind": "blank_input",
-          "source": "Now the crisis is entering a new stage. We have no running water out of the tap.",
-          "prompt": "이제 위기는 새로운 단계로 ______________고 있다. 수도꼭지______________ 수돗물이 나오지 않는다.",
+          "source": "During weekends, Jiyun and her family spend quality time together watching movies or dramas using a streaming service.",
+          "prompt": "주말에 지윤이와 그녀의 가족은 스트리밍 서비스를 사용하면서 함께 영화나 드라마를 시청하는 ______________ 시간을 보낸다.",
           "answers": [
-            "접어들",
-            "에서"
+            "좋은"
           ],
-          "key": "ybm-pj-l2-s2-06",
+          "key": "ybm-l2-s2-06",
           "stage": 2,
           "number": 6
         },
         {
           "kind": "blank_input",
-          "source": "\"To the mall!\" says Uncle Basil. My little brother Garrett and I jump in our uncle's truck.",
-          "prompt": "“______________로 가자!” Basil 삼촌이 말한다. 동생 Garrett과 나는 삼촌의 트럭에 올라탄다.",
+          "source": "Subscriptions are everywhere To be sure, the subscription economy is a popular economic model nowadays, and Jiyun is actively taking part in it.",
+          "prompt": "구독은 모든 곳에 있다 ______________, 구독 경제는 ______________ 인기 있는 ______________ 모델이고, 지윤이는 그것에 ______________ 참여하고 있다.",
           "answers": [
-            "쇼핑몰"
+            "분명히",
+            "요즈음",
+            "경제",
+            "적극적으로"
           ],
-          "key": "ybm-pj-l2-s2-07",
+          "key": "ybm-l2-s2-07",
           "stage": 2,
           "number": 7
         },
         {
           "kind": "blank_input",
-          "source": "As we pull into the parking lot, we can see the crowd. \"You two go in. I'll meet you inside,\" Uncle Basil says.",
-          "prompt": "______________에 ______________자 많은 사람이 눈에 들어온다. “너희 둘은 들어가. 안에서 만나자.”라고 Basil 삼촌이 말한다.",
+          "source": "The concept of business models based on subscriptions is not new. Initially it was limited to products such as milk and newspapers.",
+          "prompt": "구독 기반의 비즈니스 모델의 ______________은 새로운 것이 아니다. ______________ 그것은 우유와 신문 같은 제품들에 ______________었다.",
           "answers": [
-            "주차장",
-            "차를 세우"
+            "개념",
+            "처음에",
+            "한정되"
           ],
-          "key": "ybm-pj-l2-s2-08",
+          "key": "ybm-l2-s2-08",
           "stage": 2,
           "number": 8
         },
         {
           "kind": "blank_input",
-          "source": "Inside it's like Black Friday at its worst—but today it's not televisions and video games people are after.",
-          "prompt": "내부 풍경은 ______________ 블랙 프라이데이와 비슷하지만, 오늘 사람들이 ______________ 것은 텔레비전이나 비디오 게임이 아니다.",
+          "source": "However, these business models have expanded to all industries, including entertainment, technology, fashion, education, and much more.",
+          "prompt": "하지만, 이들 사업 모델은 엔터테인먼트, ______________, 패션, 교육, 그리고 훨씬 더 많은 것들을 포함한, 모든 ______________로 ______________었다.",
           "answers": [
-            "최악의",
-            "찾는"
+            "기술",
+            "산업들",
+            "확산되"
           ],
-          "key": "ybm-pj-l2-s2-09",
+          "key": "ybm-l2-s2-09",
           "stage": 2,
           "number": 9
         },
         {
           "kind": "blank_input",
-          "source": "What I see in the carts in the checkout line are mostly water bottles. The essentials of life.",
-          "prompt": "______________에 줄을 선 카트에 보이는 것은 대부분 물병이다. 생명의 ______________.",
+          "source": "Instead of creating a hit product that will be sold once, companies now prioritize providing continuing value, such as new content, more personalization, or access to updates.",
+          "prompt": "일회성으로 팔릴 히트 상품을 창출하는 대신에, 기업들은 지금 새 ______________, 보다 ______________, 또는 업데이트 ______________ 같은 ______________ 가치를 제공하는 것을 ______________.",
           "answers": [
-            "계산대",
-            "필수품"
+            "콘텐츠",
+            "개인 맞춤형",
+            "접근성",
+            "지속적",
+            "우선시한다"
           ],
-          "key": "ybm-pj-l2-s2-10",
+          "key": "ybm-l2-s2-10",
           "stage": 2,
           "number": 10
         },
         {
           "kind": "blank_input",
-          "source": "There is a look of impatience on the faces of the people in line.",
-          "prompt": "줄을 선 사람들의 얼굴에는 ______________ 표정이 역력하다.",
+          "source": "Customers pay for these benefits via a regular subscription.",
+          "prompt": "고객들은 ______________ 구독______________ 이러한 ______________에 대해 ______________.",
           "answers": [
-            "조급한"
+            "정기적",
+            "을 통해",
+            "혜택들",
+            "비용을 지불한다"
           ],
-          "key": "ybm-pj-l2-s2-11",
+          "key": "ybm-l2-s2-11",
           "stage": 2,
           "number": 11
         },
         {
           "kind": "blank_input",
-          "source": "There is even hostility, hidden by a thin layer of politeness. Even that politeness is stretched thin.",
-          "prompt": "심지어는 얇은 ______________ 뒤에 숨은 ______________까지 느껴진다. 그 ______________조차 얇아져 있다.",
+          "source": "The subscription economy brings advantages for both companies and consumers.",
+          "prompt": "구독 경제는 기업과 소비자 모두에게 ______________을 가져다준다.",
           "answers": [
-            "공손함",
-            "적대감",
-            "공손함"
+            "이점"
           ],
-          "key": "ybm-pj-l2-s2-12",
+          "key": "ybm-l2-s2-12",
           "stage": 2,
           "number": 12
         },
         {
           "kind": "blank_input",
-          "source": "As I approach the back of the store for water bottles, I realize I am too late.",
-          "prompt": "물병을 사러 매장 뒤편에 ______________을 때 나는 너무 늦었다는 것을 깨닫는다.",
+          "source": "Companies can have a stable revenue and build customer loyalty by using the subscription model.",
+          "prompt": "기업들은 구독 모델을 사용해서 ______________ ______________을 얻고 고객 ______________를 ______________ 수 있다.",
           "answers": [
-            "다다랐"
+            "안정적인",
+            "수입",
+            "충성도",
+            "구축할"
           ],
-          "key": "ybm-pj-l2-s2-13",
+          "key": "ybm-l2-s2-13",
           "stage": 2,
           "number": 13
         },
         {
           "kind": "blank_input",
-          "source": "The shelves are already empty.",
-          "prompt": "진열대는 이미 ______________다.",
+          "source": "From the consumers' perspective, they can enjoy a wider range of choices and personalized experiences.",
+          "prompt": "소비자의 ______________에서, 그들은 더욱 다양한 ______________의 선택과 개인 맞춤형 경험을 즐길 수 있다.",
           "answers": [
-            "비어 있"
+            "관점",
+            "범위"
           ],
-          "key": "ybm-pj-l2-s2-14",
+          "key": "ybm-l2-s2-14",
           "stage": 2,
           "number": 14
         },
         {
           "kind": "blank_input",
-          "source": "I manage my way to the side aisle, trying my luck.",
-          "prompt": "옆 ______________로 가서 운을 시험해 본다.",
+          "source": "They can also save money by having flexible subscription contracts.",
+          "prompt": "그들은 또한 ______________ 구독 ______________을 함으로써 돈을 ______________ 수 있다.",
           "answers": [
-            "통로"
+            "융통성 있는",
+            "계약",
+            "절약할"
           ],
-          "key": "ybm-pj-l2-s2-15",
+          "key": "ybm-l2-s2-15",
           "stage": 2,
           "number": 15
         },
         {
           "kind": "blank_input",
-          "source": "Sometimes people place unwanted items in the wrong shelves.",
-          "prompt": "가끔 사람들이 원하지 않는 물건을 엉뚱한 선반에 ______________ 경우가 있다.",
+          "source": "The rise of the subscription economy is closely connected to two major drivers: changes in consumption trends and the rapid growth of online platforms.",
+          "prompt": "구독 경제의 ______________은 두 개의 ______________ ______________들과 깊은 연관이 있다: 소비 ______________의 변화들과 온라인 플랫폼의 급______________.",
           "answers": [
-            "놓는"
+            "부상",
+            "주요한",
+            "동인",
+            "추세",
+            "성장"
           ],
-          "key": "ybm-pj-l2-s2-16",
+          "key": "ybm-l2-s2-16",
           "stage": 2,
           "number": 16
         },
         {
           "kind": "blank_input",
-          "source": "Lucky! I find a single case of water that someone abandoned there maybe yesterday, when it wasn't such a precious commodity.",
-          "prompt": "운이 좋다! 물이 그렇게 ______________ ______________이 아니었던 어제 누군가 그곳에 ______________ 생수 한 상자를 발견한다.",
+          "source": "People love the subscriptions The subscription economy is highly relevant to how people consume goods and services nowadays.",
+          "prompt": "사람들은 구독을 사랑한다 구독 경제는 요즘 사람들이 어떻게 재화와 서비스를 소비하는지와 ______________ ______________어 있다.",
           "answers": [
-            "귀한",
-            "물건",
-            "버린"
+            "상당히",
+            "관련되"
           ],
-          "key": "ybm-pj-l2-s2-17",
+          "key": "ybm-l2-s2-17",
           "stage": 2,
           "number": 17
         },
         {
           "kind": "blank_input",
-          "source": "I reach for it, only to find it pulled away at the last second by a woman.",
-          "prompt": "______________어 생수 상자를 집어 들려는 순간, 한 여자가 상자를 가져가는 것을 본다.",
+          "source": "More and more people prioritize experiences over owning things.",
+          "prompt": "점점 더 많은 사람이 물건을 ______________는 것보다 경험을 우선시한다.",
           "answers": [
-            "손을 뻗"
+            "소유하"
           ],
-          "key": "ybm-pj-l2-s2-18",
+          "key": "ybm-l2-s2-18",
           "stage": 2,
           "number": 18
         },
         {
           "kind": "blank_input",
-          "source": "She stacks it on top of her cart like a crown on top of her canned goods.",
-          "prompt": "그녀는 생수 상자를 카트에 담긴 ______________ 위에 마치 ______________처럼 ______________.",
+          "source": "This makes the subscription economy attractive to them because it offers access to services or content without the requirement of ownership.",
+          "prompt": "이것이 구독 경제를 그들에게 ______________ 것으로 만드는데 왜냐하면 그것은 ______________의 ______________ 없이 서비스나 콘텐츠에 대한 접근을 제공하기 때문이다.",
           "answers": [
-            "통조림",
-            "왕관",
-            "쌓아 놓는다"
+            "매력적인",
+            "소유",
+            "필요"
           ],
-          "key": "ybm-pj-l2-s2-19",
+          "key": "ybm-l2-s2-19",
           "stage": 2,
           "number": 19
         },
         {
           "kind": "blank_input",
-          "source": "\"I'm sorry, but we were here first,\" she says. And then her daughter steps forward—a girl I recognize from soccer—Hali Hartling.",
-          "prompt": "“미안하지만 우리가 먼저 왔어요.” 그녀가 말한다. 그러자 그녀의 딸이 앞으로 나오는데, 축구팀에서 ______________는 Hali Hartling이다.",
+          "source": "For example, by subscribing to a music streaming service, consumers can enjoy limitless music without the need for having disc albums.",
+          "prompt": "예를 들어, 음악 스트리밍 서비스를 구독함으로써, 소비자들은 디스크 앨범을 가질 ______________가 없이 ______________ 음악을 즐길 수 있다.",
           "answers": [
-            "알고 있"
+            "필요",
+            "무한한"
           ],
-          "key": "ybm-pj-l2-s2-20",
+          "key": "ybm-l2-s2-20",
           "stage": 2,
           "number": 20
         },
         {
           "kind": "blank_input",
-          "source": "As her mother pulls their cart away, Hali leans closer to me. \"I'm sorry about that, Alyssa.\"",
-          "prompt": "엄마가 카트를 끌고 가자 Hali가 내게 ______________다. “미안해, Alyssa.”",
+          "source": "Another example is subscribing to clothing services, where consumers can explore a variety of clothing styles without filling up their drawers.",
+          "prompt": "또 다른 예는 ______________ 서비스를 구독하는 것으로, 소비자들은 그들의 서랍______________지 않고 다양한 의류 스타일을 탐색할 수 있다.",
           "answers": [
-            "몸을 기울인"
+            "의류",
+            "을 채우"
           ],
-          "key": "ybm-pj-l2-s2-21",
+          "key": "ybm-l2-s2-21",
           "stage": 2,
           "number": 21
         },
         {
           "kind": "blank_input",
-          "source": "\"Didn't I share my water with you at the practice last week?\" I point out to her.",
-          "prompt": "“지난주 연습할 때 내가 물 나눠주지 않았니?” 나는 그녀에게 ______________.",
+          "source": "Moreover, consumers value diversity and customization.",
+          "prompt": "게다가, 소비자들은 ______________과 ______________에 가치를 둔다.",
           "answers": [
-            "지적한다"
+            "다양성",
+            "맞춤화"
           ],
-          "key": "ybm-pj-l2-s2-22",
+          "key": "ybm-l2-s2-22",
           "stage": 2,
           "number": 22
         },
         {
           "kind": "blank_input",
-          "source": "\"Maybe you could return the favor and share a few bottles with me.\"",
-          "prompt": "“너도 ______________를 갚아서 나랑 물 몇 병 나눠도 되겠네.”",
+          "source": "The subscription economy offers a diverse range of subscription options, enabling individuals to personalize their experiences based on their own preferences and interests.",
+          "prompt": "구독 경제는 ______________ 범위의 구독 ______________을 제공하여, ______________이 그들의 ______________와 ______________에 기초하여 그들의 경험들을 개별화할 수 있도록 해 준다.",
           "answers": [
-            "호의"
+            "다양한",
+            "선택",
+            "개인들",
+            "선호",
+            "관심"
           ],
-          "key": "ybm-pj-l2-s2-23",
+          "key": "ybm-l2-s2-23",
           "stage": 2,
           "number": 23
         },
         {
           "kind": "blank_input",
-          "source": "She looks back to her mother, who's already moving down the aisle, then turns back to me shaking her head.",
-          "prompt": "그녀는 이미 통로를 따라 이동하고 있는 어머니를 돌아보더니 고개를 절레절레 흔들며 내게로 ______________.",
+          "source": "This aspect of the subscription economy is more popular among younger generations, as they enjoy expressing their uniqueness and discovering valuable content and services that fit with their individual tastes.",
+          "prompt": "구독 경제의 이러한 ______________은 젊은 ______________가 그들의 ______________을 ______________고, 젊은 세대의 개별적 ______________에 부합하는 가치 있는 콘텐츠와 서비스들을 발견하는 것을 즐김에 따라, 젊은 세대 사이에 더욱 인기가 있다.",
           "answers": [
-            "돌아선다"
+            "측면",
+            "세대",
+            "고유함",
+            "표현하",
+            "취향"
           ],
-          "key": "ybm-pj-l2-s2-24",
+          "key": "ybm-l2-s2-24",
           "stage": 2,
           "number": 24
         },
         {
           "kind": "blank_input",
-          "source": "And then she gets a little bit red in the face, and turns to leave before it becomes a deep flush.",
-          "prompt": "그러고는 얼굴이 약간 붉어지더니 더 ______________기 전에 자리를 뜨려고 돌아선다.",
+          "source": "A popular example that has gained attention is the cosmetics subscription service.",
+          "prompt": "______________받고 있는 인기 사례는 ______________ 구독 서비스이다.",
           "answers": [
-            "붉어지"
+            "주목",
+            "화장품"
           ],
-          "key": "ybm-pj-l2-s2-25",
+          "key": "ybm-l2-s2-25",
           "stage": 2,
           "number": 25
         },
         {
           "kind": "blank_input",
-          "source": "I look for Garrett, whom I find in the frozen aisle. Then I see something.",
-          "prompt": "나는 냉동식품 통로에서 Garrett을 발견한다. 그러다 ______________를 발견한다.",
+          "source": "It stands out by thoroughly analyzing customers' current skin conditions and providing specialized recommendations, including manufacturing cosmetics created to address each individual's unique skin concerns.",
+          "prompt": "그것은 소비자의 현재 피부 상태를 ______________ 분석하고 개개인의 ______________ 피부 ______________을 ______________기 위해 만들어진 화장품 ______________를 포함한 전문적인 ______________을 제공하는 것이 ______________.",
           "answers": [
-            "뭔가"
+            "철저하게",
+            "고유한",
+            "고민",
+            "해결하",
+            "제조",
+            "추천",
+            "돋보인다"
           ],
-          "key": "ybm-pj-l2-s2-26",
+          "key": "ybm-l2-s2-26",
           "stage": 2,
           "number": 26
         },
         {
           "kind": "blank_input",
-          "source": "Just past the frozen vegetables and ice cream, there is a case packed with ice.",
-          "prompt": "냉동 야채와 아이스크림 바로 ______________ 얼음이 ______________ 상자가 있다.",
+          "source": "To come to the point, consumers receive a personalized experience that prioritizes their individual skin conditions, rather than a uniform purchasing process.",
+          "prompt": "______________, 소비자들은 ______________ 구매 과정 대신에, 그들 개인의 피부 조건을 우선시하는 개별화된 경험을 얻는다.",
           "answers": [
-            "지나서",
-            "가득 담긴"
+            "요점을 말하자면",
+            "획일화된"
           ],
-          "key": "ybm-pj-l2-s2-27",
+          "key": "ybm-l2-s2-27",
           "stage": 2,
           "number": 27
         },
         {
           "kind": "blank_input",
-          "source": "I open the door and reach for a bag. \"What are you doing? We need water, not ice,\" he reminds me.",
-          "prompt": "나는 문을 열고 얼음 봉지를 잡는다. “뭐 하는 거야? 우린 얼음이 아니라 물이 필요해.” 동생이 내게 ______________.",
+          "source": "Furthermore, consumers appreciate flexibility and convenience.",
+          "prompt": "______________, 소비자들은 ______________과 편의성을 ______________.",
           "answers": [
-            "상기시켜 준다"
+            "게다가",
+            "유연성",
+            "높이 평가한다"
           ],
-          "key": "ybm-pj-l2-s2-28",
+          "key": "ybm-l2-s2-28",
           "stage": 2,
           "number": 28
         },
         {
           "kind": "blank_input",
-          "source": "\"Ice is water. Just help me,\" I tell him. Garrett and I put one bag of ice after another into our cart, until it is piled as high as it can get.",
-          "prompt": "“얼음은 물이야. 돕기나 해.” 내가 말한다. Garrett과 나는 최대한 높이 ______________ 때까지 얼음 봉지를 카트에 담는다.",
+          "source": "In some subscription models, consumers can experience a variety of products or services for a fixed cost.",
+          "prompt": "일부 구독 모델에서는, 소비자들이 ______________ 비용으로 ______________ 제품과 서비스를 경험할 수 있다.",
           "answers": [
-            "쌓일"
+            "고정된",
+            "다양한"
           ],
-          "key": "ybm-pj-l2-s2-29",
+          "key": "ybm-l2-s2-29",
           "stage": 2,
           "number": 29
         },
         {
           "kind": "blank_input",
-          "source": "By now other people have taken notice and begin to empty the ice case.",
-          "prompt": "이제 다른 사람들도 ______________고 얼음 상자를 비우기 시작한다.",
+          "source": "In other models, they can flexibly adjust subscription fees by choosing only the necessary services or products when needed.",
+          "prompt": "다른 모델에서는, 필요할 때 필요한 서비스나 제품만 선택하여 구독 ______________을 ______________ ______________ 수 있다.",
           "answers": [
-            "눈치를 채"
+            "요금",
+            "유연하게",
+            "조정할"
           ],
-          "key": "ybm-pj-l2-s2-30",
+          "key": "ybm-l2-s2-30",
           "stage": 2,
           "number": 30
         },
         {
           "kind": "blank_input",
-          "source": "The cart is ridiculously heavy now, and almost impossible to push.",
-          "prompt": "이제 카트는 ______________ 무거워져서 밀기가 거의 불가능할 정도이다.",
+          "source": "This means they can either enjoy a range of offerings for a set price or save money by selecting only what they really need.",
+          "prompt": "이것은 ______________ 가격으로 다양한 제공을 즐길 수도 있고, 그들이 실제 필요한 것만 ______________으로써 돈을 절약할 수도 있음을 의미한다.",
           "answers": [
-            "엄청나게"
+            "정해진",
+            "선택함"
           ],
-          "key": "ybm-pj-l2-s2-31",
+          "key": "ybm-l2-s2-31",
           "stage": 2,
           "number": 31
         },
         {
           "kind": "blank_input",
-          "source": "Then, a man in a business suit comes up behind us. He smiles. \"Looks like you could use some help.\"",
-          "prompt": "그때 ______________ 차림의 한 남자가 우리 뒤에서 ______________. 그는 미소를 짓는다. “도움이 필요한 것 같구나.”",
+          "source": "Moreover, subscription services are made easily accessible by online platforms, enhancing consumers' convenience.",
+          "prompt": "게다가, 구독 서비스는 온라인 플랫폼을 통해 쉽게 ______________게 되어 소비자들의 편의를 ______________.",
           "answers": [
-            "정장",
-            "나타난다"
+            "접근할 수 있",
+            "증진시킨다"
           ],
-          "key": "ybm-pj-l2-s2-32",
+          "key": "ybm-l2-s2-32",
           "stage": 2,
           "number": 32
         },
         {
           "kind": "blank_input",
-          "source": "He doesn't wait for us to answer before grabbing the cart's handle. \"Thank you for helping us,\" I tell him.",
-          "prompt": "그는 우리가 대답할 때까지 기다리지 않고 카트 ______________를 ______________다. “도와주셔서 감사합니다.” 나는 그에게 말한다.",
+          "source": "With just a few clicks, consumers can receive services or products. If they wish to change their device model, they can do so.",
+          "prompt": "단지 몇 번의 클릭으로, 소비자들은 서비스나 제품을 ______________ 수 있다. 만약 그들이 그들의 ______________ 모델을 변경하기를 원하면, 그렇게 할 수 있다.",
           "answers": [
-            "손잡이",
-            "잡는"
+            "받을",
+            "기기"
           ],
-          "key": "ybm-pj-l2-s2-33",
+          "key": "ybm-l2-s2-33",
           "stage": 2,
           "number": 33
         },
         {
           "kind": "blank_input",
-          "source": "\"Not a problem. We all need to help one another.\" He smiles again, and I return the smile.",
-          "prompt": "“별거 아니야. 우리 모두 ______________ 도와야지.” 그는 다시 미소를 짓고 나도 미소로 화답한다.",
+          "source": "Whoever desires an upgrade can get it and experience the latest models.",
+          "prompt": "업그레이드를 ______________ 사람들은 누구든지 받을 수 있고 ______________ 모델을 경험할 수 있다.",
           "answers": [
-            "서로"
+            "원하는",
+            "최신"
           ],
-          "key": "ybm-pj-l2-s2-34",
+          "key": "ybm-l2-s2-34",
           "stage": 2,
           "number": 34
         },
         {
           "kind": "blank_input",
-          "source": "It is good to know that difficult times can bring out the best in people.",
-          "prompt": "어려운 시기에 사람들의 장점이 ______________는 것을 알게 되는 것은 좋은 일이다.",
+          "source": "Online platforms drive the subscription economy With the development of various digital devices centered on smartphones, consumers have been able to do numerous things with great ease.",
+          "prompt": "온라인 플랫폼들이 구독 경제를 구동한다 스마트폰을 ______________ 다양한 디지털 기기의 ______________과 함께 소비자들은 ______________ 것들을 아주 쉽게 할 수 있게 되었다.",
           "answers": [
-            "드러난다"
+            "중심으로 한",
+            "발전",
+            "많은"
           ],
-          "key": "ybm-pj-l2-s2-35",
+          "key": "ybm-l2-s2-35",
           "stage": 2,
           "number": 35
         },
         {
           "kind": "blank_input",
-          "source": "I decide that one favor deserves another. \"Why don't you take a bag of ice for yourself,\" I suggest.",
-          "prompt": "나는 호의에는 호의로 보답해야 한다고 결심한다. “얼음 한 봉지 가져가세요.” 내가 ______________.",
+          "source": "In the past, people had no choice but to go to the theater or purchase the videos they wanted to watch.",
+          "prompt": "과거에는, 사람들이 영화관에 가거나, 그들이 시청하기 원하는 비디오들을 구매______________.",
           "answers": [
-            "제안한다"
+            "할 수 밖에 없었다"
           ],
-          "key": "ybm-pj-l2-s2-36",
+          "key": "ybm-l2-s2-36",
           "stage": 2,
           "number": 36
         },
         {
           "kind": "blank_input",
-          "source": "His smile does not fade. \"I have a better idea,\" he says.",
-          "prompt": "그의 미소가 ______________지 않는다. “더 좋은 생각이 있어.” 그가 말한다.",
+          "source": "Today, whoever wants to watch a movie can access online media subscription platforms and enjoy a vast selection of movies on their smartphones or other digital devices.",
+          "prompt": "오늘날에는, 영화 시청을 원하는 사람들은 누구나 온라인 미디어 구독 플랫폼에 ______________서 그들의 스마트폰에서 또는 다른 디지털 기기에서 엄청난 양의 영화를 즐길 수 있다.",
           "answers": [
-            "사라지"
+            "접속해"
           ],
-          "key": "ybm-pj-l2-s2-37",
+          "key": "ybm-l2-s2-37",
           "stage": 2,
           "number": 37
         },
         {
           "kind": "blank_input",
-          "source": "\"Why don't you take a bag of ice for yourselves, and I'll keep the rest.\"",
-          "prompt": "“너희가 얼음 한 봉지 가져가고 ______________는 내가 가질게.”",
+          "source": "At the same time, these platforms make it easy for companies to offer customized products and services to customers.",
+          "prompt": "동시에, 이들 플랫폼들은 기업들이 고객들에게 ______________ 제품과 서비스를 제공하는 것을 ______________ 만든다.",
           "answers": [
-            "나머지"
+            "맞춤형",
+            "쉽게"
           ],
-          "key": "ybm-pj-l2-s2-38",
+          "key": "ybm-l2-s2-38",
           "stage": 2,
           "number": 38
         },
         {
           "kind": "blank_input",
-          "source": "For a moment I think he is joking, but then realize he is serious. \"Excuse me?\"",
-          "prompt": "잠시 나는 그가 농담하고 있다고 생각하지만, 곧 그가 ______________다는 것을 깨닫는다. “네?”",
+          "source": "By applying AI and big data algorithm technology, companies identify consumers' needs, tastes, and consumption patterns.",
+          "prompt": "인공지능과 빅데이터 ______________ 기술을 ______________여, 기업들은 고객들의 요구, ______________, 소비 ______________을 ______________.",
           "answers": [
-            "진지하"
+            "알고리즘",
+            "적용하",
+            "기호",
+            "패턴들",
+            "확인한다"
           ],
-          "key": "ybm-pj-l2-s2-39",
+          "key": "ybm-l2-s2-39",
           "stage": 2,
           "number": 39
         },
         {
           "kind": "blank_input",
-          "source": "He is still smiling, but his eyes scare me.",
-          "prompt": "그는 여전히 웃고 있지만 그의 눈빛이 ______________다.",
+          "source": "People appreciate having diverse choices and customization, which in turn enhances their satisfaction.",
+          "prompt": "사람들은 다양한 선택과 맞춤화를 환영하며 이는 ______________ 그들의 ______________을 ______________.",
           "answers": [
-            "무섭"
+            "결과적으로",
+            "만족",
+            "증진시킨다"
           ],
-          "key": "ybm-pj-l2-s2-40",
+          "key": "ybm-l2-s2-40",
           "stage": 2,
           "number": 40
         },
         {
           "kind": "blank_input",
-          "source": "As long as his hands are firmly locked on the handle of our cart, there is nothing to prove that it's ours and not his.",
-          "prompt": "그의 손이 우리 카트 손잡이에 ______________ ______________어 있______________, 카트가 그의 것이 아니라 우리 것임을 ______________ 방법은 없다.",
+          "source": "Services, such as suggesting personalized clothing styles based on customers' purchase history or recommending videos that match their movie and video viewing history, bring them great satisfaction.",
+          "prompt": "소비자의 구매 기록에 기반한 개인 맞춤화된 의류 스타일 ______________이나, 그들의 영화 및 비디오 시청 기록과 ______________는 비디오 추천과 같은 서비스는 그들에게 커다란 만족을 가져다준다.",
           "answers": [
-            "단단히",
-            "고정되",
-            "는 한",
-            "증명할"
+            "제안",
+            "부합하"
           ],
-          "key": "ybm-pj-l2-s2-41",
+          "key": "ybm-l2-s2-41",
           "stage": 2,
           "number": 41
         },
         {
           "kind": "blank_input",
-          "source": "\"Is there a problem here?\" It is Uncle Basil. He has arrived just in time.",
-          "prompt": "“무슨 문제 있나요?” Basil 삼촌이다. ______________ 맞춰 도착했다.",
+          "source": "Limitations of the subscription economy Although the subscription economy offers many advantages, there are also some disadvantages to consider. One concern is the potential for overconsumption.",
+          "prompt": "구독 경제의 제한점들 비록 구독 경제가 많은 장점을 제공하지만, 또한 고려해야 할 일부 ______________도 있다. 한 가지 ______________은 ______________ ______________이다.",
           "answers": [
-            "제시간에"
+            "단점들",
+            "우려 사항",
+            "과소비",
+            "가능성"
           ],
-          "key": "ybm-pj-l2-s2-42",
+          "key": "ybm-l2-s2-42",
           "stage": 2,
           "number": 42
         },
         {
           "kind": "blank_input",
-          "source": "\"Not at all.\" The man looks at the ice with a bitter face, then leaves.",
-          "prompt": "“전혀요.” 남자는 ______________ 표정으로 얼음을 바라보다가 자리를 뜬다.",
+          "source": "The convenience and accessibility of the subscription model make it easy for consumers to sign up for multiple services and use a lot of content or products.",
+          "prompt": "구독 모델의 ______________과 ______________은 소비자들이 ______________ 서비스______________고 많은 콘텐츠나 제품을 사용하는 것을 쉽게 만든다.",
           "answers": [
-            "씁쓸한"
+            "편리성",
+            "접근성",
+            "복수의",
+            "를 계약하"
           ],
-          "key": "ybm-pj-l2-s2-43",
+          "key": "ybm-l2-s2-43",
           "stage": 2,
           "number": 43
         },
         {
           "kind": "blank_input",
-          "source": "*The above is a shortened version of the opening of the novel Dry (2018).",
-          "prompt": "*위 내용은 ______________ <드라이>(Dry, 2018)의 도입부를 ______________ 것이다.",
+          "source": "This can result in excessive consumption and using more subscription services than actually needed.",
+          "prompt": "이것은 ______________ 소비와 ______________ 필요한 것보다 많은 구독 서비스 사용______________ 수 있다.",
           "answers": [
-            "소설",
-            "축약한"
+            "과도한",
+            "실제로",
+            "을 야기할"
           ],
-          "key": "ybm-pj-l2-s2-44",
+          "key": "ybm-l2-s2-44",
           "stage": 2,
           "number": 44
         },
         {
           "kind": "blank_input",
-          "source": "It tells the story of a girl who has to make tough choices for her family during a disastrous California drought.",
-          "prompt": "이 소설은 캘리포니아의 ______________ 가뭄 속에서 가족을 위해 힘든 선택을 해야 하는 한 소녀의 이야기이다.",
+          "source": "It is crucial to subscribe only to services that are truly necessary and avoid subscribing to similar services.",
+          "prompt": "진정으로 필요한 서비스들만 구독하고 ______________ 서비스들을 구독하는 것을 피하는 것이 ______________다.",
           "answers": [
-            "재앙적인"
+            "유사한",
+            "매우 중요하"
           ],
-          "key": "ybm-pj-l2-s2-45",
+          "key": "ybm-l2-s2-45",
           "stage": 2,
           "number": 45
         },
         {
           "kind": "blank_input",
-          "source": "Her unwanted adventure ends when the water supply resumes and life is back to normal.",
-          "prompt": "소녀의 원치 않는 ______________은 물 ______________이 재개되고 생활이 ______________으로 ______________면서 끝난다.",
+          "source": "Related to the concern of overconsumption is the financial burden that subscriptions can create.",
+          "prompt": "과소비의 우려______________ 것으로 구독이 창출할 수 있는 ______________ ______________이 있다.",
           "answers": [
-            "모험",
-            "공급",
-            "정상",
-            "돌아오"
+            "와 관련된",
+            "금융",
+            "부담"
           ],
-          "key": "ybm-pj-l2-s2-46",
+          "key": "ybm-l2-s2-46",
           "stage": 2,
           "number": 46
         },
         {
           "kind": "blank_input",
-          "source": "Provided that the factors contributing to water shortages worldwide are not addressed, including climate change, population growth, and using too much water for agriculture, it is possible that this story can become a reality.",
-          "prompt": "기후 변화, ______________ 증가, ______________용수 과다 사용 등 전 세계적으로 물 ______________을 ______________ 요인들이 ______________지 않는______________ 이 소설의 이야기가 현실이 될 수도 있다.",
+          "source": "While the cost of individual subscriptions may seem affordable, subscribing to multiple services can add up quickly.",
+          "prompt": "______________ 구독 비용은 ______________ 수 있어 보일 수 있지만, 복수의 서비스를 구독하는 것은 비용이 빠르게 증가할 수 있다.",
           "answers": [
-            "인구",
-            "농업",
-            "부족",
-            "야기하는",
-            "해결되",
-            "다면"
+            "개별",
+            "감당할"
           ],
-          "key": "ybm-pj-l2-s2-47",
+          "key": "ybm-l2-s2-47",
           "stage": 2,
           "number": 47
+        },
+        {
+          "kind": "blank_input",
+          "source": "It is important to carefully consider the costs of these subscriptions to avoid financial strain.",
+          "prompt": "재정적 ______________을 피하기 위해 이들 구독의 비용을 ______________ 고려하는 것이 중요하다.",
+          "answers": [
+            "부담",
+            "신중하게"
+          ],
+          "key": "ybm-l2-s2-48",
+          "stage": 2,
+          "number": 48
+        },
+        {
+          "kind": "blank_input",
+          "source": "Regularly reviewing and canceling unnecessary subscriptions can be beneficial.",
+          "prompt": "______________ ______________고 불필요한 구독들을 ______________이 ______________ 수 있다.",
+          "answers": [
+            "정기적으로",
+            "검토하",
+            "취소하는 것",
+            "유익할"
+          ],
+          "key": "ybm-l2-s2-49",
+          "stage": 2,
+          "number": 49
+        },
+        {
+          "kind": "blank_input",
+          "source": "Additionally, the subscription economy can contribute to environmental pollution.",
+          "prompt": "______________, 구독 경제는 환경 오염______________ 수 있다.",
+          "answers": [
+            "부가적으로",
+            "에 기여할"
+          ],
+          "key": "ybm-l2-s2-50",
+          "stage": 2,
+          "number": 50
+        },
+        {
+          "kind": "blank_input",
+          "source": "The regular delivery of products in packaging materials can increase the use of disposable packaging, which harms the environment.",
+          "prompt": "______________에 담긴 제품들을 정기적으로 배달하는 것은 ______________ ______________의 사용을 증가시킬 수 있어 이것이 환경을 ______________.",
+          "answers": [
+            "포장재",
+            "일회용",
+            "포장",
+            "해친다"
+          ],
+          "key": "ybm-l2-s2-51",
+          "stage": 2,
+          "number": 51
+        },
+        {
+          "kind": "blank_input",
+          "source": "Using environmentally friendly packaging materials and opting for reusable packaging can help reduce this problem.",
+          "prompt": "______________ 포장 재료를 사용하고 ______________ 포장을 ______________는 것은 이 문제를 줄이는 데 도움이 될 수 있다.",
+          "answers": [
+            "친환경",
+            "재사용 가능한",
+            "선택하"
+          ],
+          "key": "ybm-l2-s2-52",
+          "stage": 2,
+          "number": 52
+        },
+        {
+          "kind": "blank_input",
+          "source": "Despite the potential limitations of subscription services, they have become deeply embedded in our lives and more and more businesses are jumping onto the subscription economy model.",
+          "prompt": "구독 서비스들의 잠재적 ______________에도 불구하고, 그것은 우리의 삶에 깊숙이 ______________고 있으며 더욱더 많은 사업이 구독 경제 모델에 올라타고 있다.",
+          "answers": [
+            "제한점들",
+            "자리 잡"
+          ],
+          "key": "ybm-l2-s2-53",
+          "stage": 2,
+          "number": 53
+        },
+        {
+          "kind": "blank_input",
+          "source": "It is expected that new subscription services will be continuously provided to consumers in new areas in the future.",
+          "prompt": "미래에 새로운 영역들에서 소비자들에게 새로운 구독 서비스들이 ______________ 제공될 것으로 예상된다.",
+          "answers": [
+            "지속적으로"
+          ],
+          "key": "ybm-l2-s2-54",
+          "stage": 2,
+          "number": 54
+        },
+        {
+          "kind": "blank_input",
+          "source": "We need to have a deeper understanding of the subscription economy and become wise consumers who receive the services that are really needed.",
+          "prompt": "우리는 구독 경제에 대해 ______________ ______________를 가지고 정말 필요한 서비스들물 받는 ______________ 소비자가 되어야 한다.",
+          "answers": [
+            "보다",
+            "깊은 이해",
+            "현명한"
+          ],
+          "key": "ybm-l2-s2-55",
+          "stage": 2,
+          "number": 55
         }
       ]
     },
@@ -833,569 +782,732 @@ export const YBM_PARKJUNEON_L2_WORKBOOK = {
       "items": [
         {
           "kind": "blank_input",
-          "source": "주방 수도꼭지가 이상한 소리를 낸다. 기침을 한다.",
-          "prompt": "The kitchen ______________ makes strange sounds. It ______________.",
+          "source": "고등학생인 지윤이는 그녀의 스마트폰에서 음악 스트리밍 서비스에 로그인하며 하루를 시작한다.",
+          "prompt": "Jiyun, a high school student, starts her day by ______________ ______________ to a music ______________ service on her smartphone.",
           "answers": [
-            "tap",
-            "coughs"
+            "logging",
+            "in",
+            "streaming"
           ],
-          "key": "ybm-pj-l2-s3-01",
+          "key": "ybm-l2-s3-01",
           "stage": 3,
           "number": 1
         },
         {
           "kind": "blank_input",
-          "source": "침을 한 번 뱉더니 조용해진다.",
-          "prompt": "It ______________ once, and then goes silent.",
+          "source": "그녀는 매일 자신이 선호하는 음악을 듣고, 새로운 노래들을 발견하고, 새로운 아티스트들을 탐색하는 것을 즐긴다.",
+          "prompt": "She enjoys listening to her favorite music, ______________ new songs, and ______________ new artists every day.",
           "answers": [
-            "spits"
+            "discovering",
+            "exploring"
           ],
-          "key": "ybm-pj-l2-s3-02",
+          "key": "ybm-l2-s3-02",
           "stage": 3,
           "number": 2
         },
         {
           "kind": "blank_input",
-          "source": "\"엄마,\" 나는 거실을 향해 소리친다. \"물이 안 나와요.\"",
-          "prompt": "“Mom,” I ______________ ______________ into the living room, “water is not coming out.”",
+          "source": "건강한 아침 식사를 위해, 지윤이는 신선한 채소와 과일을 공급하는 구독 서비스로부터 배송을 받는다.",
+          "prompt": "For a ______________ breakfast, Jiyun receives a ______________ from a ______________ service that ______________ fresh vegetables and fruits.",
           "answers": [
-            "shout",
-            "out"
+            "healthy",
+            "delivery",
+            "subscription",
+            "provides"
           ],
-          "key": "ybm-pj-l2-s3-03",
+          "key": "ybm-l2-s3-03",
           "stage": 3,
           "number": 3
         },
         {
           "kind": "blank_input",
-          "source": "\"Alyssa, 조용히 해!\" 엄마가 말한다. 엄마는 TV를 보고 있고, TV에서는 뉴스 앵커가 '물 공급 위기'에 대해 이야기하고 있다.",
-          "prompt": "“Alyssa, ______________!” Mom says. She is watching the TV, where a news ______________ is talking about the “flow ______________.”",
+          "source": "방과 후에, 지윤이는 그녀가 흥미를 느끼는 것마다 그녀의 지식을 확장하기 위해 비디오 강의 서비스를 활용한다.",
+          "prompt": "After school, Jiyun ______________ a video ______________ service to ______________ her knowledge in whatever she finds interesting.",
           "answers": [
-            "shush",
-            "anchor",
-            "crisis"
+            "utilizes",
+            "lecture",
+            "expand"
           ],
-          "key": "ybm-pj-l2-s3-04",
+          "key": "ybm-l2-s3-04",
           "stage": 3,
           "number": 4
         },
         {
           "kind": "blank_input",
-          "source": "사람들이 '가뭄'이라는 단어를 듣는 데 지친 이후로 언론은 가뭄을 이렇게 부르고 있다.",
-          "prompt": "This is what the ______________ has been calling the ______________ ever since people got tired of hearing the word “______________.”",
+          "source": "예를 들어, 그녀는 학교 공부를 복습하고 그녀가 선택한 연구 분야의 최신 지식에 대해 계속 업데이트하기 위해 다양한 학술 강의를 시청한다.",
+          "prompt": "For example, she watches various ______________ ______________ to review her schoolwork and stay ______________ about the ______________ knowledge in her chosen ______________ of study.",
           "answers": [
-            "media",
-            "drought",
-            "drought"
+            "academic",
+            "lectures",
+            "updated",
+            "latest",
+            "field"
           ],
-          "key": "ybm-pj-l2-s3-05",
+          "key": "ybm-l2-s3-05",
           "stage": 3,
           "number": 5
         },
         {
           "kind": "blank_input",
-          "source": "이제 위기는 새로운 단계로 접어들고 있다. 수도꼭지에서 수돗물이 나오지 않는다.",
-          "prompt": "Now the crisis is ______________ a new stage. We have no running water ______________ ______________ the tap.",
+          "source": "주말에 지윤이와 그녀의 가족은 스트리밍 서비스를 사용하면서 함께 영화나 드라마를 시청하는 좋은 시간을 보낸다.",
+          "prompt": "During weekends, Jiyun and her family spend ______________ time together watching movies or dramas using a streaming service.",
           "answers": [
-            "entering",
-            "out",
-            "of"
+            "quality"
           ],
-          "key": "ybm-pj-l2-s3-06",
+          "key": "ybm-l2-s3-06",
           "stage": 3,
           "number": 6
         },
         {
           "kind": "blank_input",
-          "source": "\"쇼핑몰로 가자!\" Basil 삼촌이 말한다. 동생 Garrett과 나는 삼촌의 트럭에 올라탄다.",
-          "prompt": "“To the ______________!” says Uncle Basil. My little brother Garrett and I jump in our uncle’s truck.",
+          "source": "구독은 모든 곳에 있다 분명히, 구독 경제는 요즈음 인기 있는 경제 모델이고, 지윤이는 그것에 적극적으로 참여하고 있다.",
+          "prompt": "Subscriptions are everywhere ______________ ______________ ______________, the subscription economy is a popular ______________ model ______________, and Jiyun is ______________ taking part in it.",
           "answers": [
-            "mall"
+            "To",
+            "be",
+            "sure",
+            "economic",
+            "nowadays",
+            "actively"
           ],
-          "key": "ybm-pj-l2-s3-07",
+          "key": "ybm-l2-s3-07",
           "stage": 3,
           "number": 7
         },
         {
           "kind": "blank_input",
-          "source": "주차장에 차를 세우자 많은 사람이 눈에 들어온다. \"너희 둘은 들어가. 안에서 만나자.\"라고 Basil 삼촌이 말한다.",
-          "prompt": "As we ______________ ______________ the ______________ ______________, we can see the crowd. “You two go in. I’ll meet you inside,” Uncle Basil says.",
+          "source": "구독 기반의 비즈니스 모델의 개념은 새로운 것이 아니다. 처음에 그것은 우유와 신문 같은 제품들에 한정되었다.",
+          "prompt": "The ______________ of business models based on subscriptions is not new. ______________ it was ______________ to products such as milk and newspapers.",
           "answers": [
-            "pull",
-            "into",
-            "parking",
-            "lot"
+            "concept",
+            "Initially",
+            "limited"
           ],
-          "key": "ybm-pj-l2-s3-08",
+          "key": "ybm-l2-s3-08",
           "stage": 3,
           "number": 8
         },
         {
           "kind": "blank_input",
-          "source": "내부 풍경은 최악의 블랙 프라이데이와 비슷하지만, 오늘 사람들이 찾는 것은 텔레비전이나 비디오 게임이 아니다.",
-          "prompt": "Inside it’s like Black Friday ______________ ______________ ______________—but today it’s not televisions and video games people are ______________.",
+          "source": "하지만, 이들 사업 모델은 엔터테인먼트, 기술, 패션, 교육, 그리고 훨씬 더 많은 것들을 포함한, 모든 산업들로 확산되었다.",
+          "prompt": "However, these business models have ______________ to all ______________, including entertainment, ______________, fashion, education, and much more.",
           "answers": [
-            "at",
-            "its",
-            "worst",
-            "after"
+            "expanded",
+            "industries",
+            "technology"
           ],
-          "key": "ybm-pj-l2-s3-09",
+          "key": "ybm-l2-s3-09",
           "stage": 3,
           "number": 9
         },
         {
           "kind": "blank_input",
-          "source": "계산대에 줄을 선 카트에 보이는 것은 대부분 물병이다. 생명의 필수품.",
-          "prompt": "What I see in the carts in the ______________ line are mostly water bottles. The ______________ of life.",
+          "source": "일회성으로 팔릴 히트 상품을 창출하는 대신에, 기업들은 지금 새 콘텐츠, 보다 개인 맞춤형, 또는 업데이트 접근성 같은 지속적 가치를 제공하는 것을 우선시한다.",
+          "prompt": "Instead of creating a hit product that will be sold once, companies now ______________ providing ______________ value, such as new ______________, more ______________, or ______________ to updates.",
           "answers": [
-            "checkout",
-            "essentials"
+            "prioritize",
+            "continuing",
+            "content",
+            "personalization",
+            "access"
           ],
-          "key": "ybm-pj-l2-s3-10",
+          "key": "ybm-l2-s3-10",
           "stage": 3,
           "number": 10
         },
         {
           "kind": "blank_input",
-          "source": "줄을 선 사람들의 얼굴에는 조급한 표정이 역력하다.",
-          "prompt": "There is a look of ______________ on the faces of the people in line.",
+          "source": "고객들은 정기적 구독을 통해 이러한 혜택들에 대해 비용을 지불한다.",
+          "prompt": "Customers ______________ for these ______________ ______________ a ______________ subscription.",
           "answers": [
-            "impatience"
+            "pay",
+            "benefits",
+            "via",
+            "regular"
           ],
-          "key": "ybm-pj-l2-s3-11",
+          "key": "ybm-l2-s3-11",
           "stage": 3,
           "number": 11
         },
         {
           "kind": "blank_input",
-          "source": "심지어는 얇은 공손함 뒤에 숨은 적대감까지 느껴진다. 그 공손함조차 얇아져 있다.",
-          "prompt": "There is even ______________, hidden by a thin layer of ______________. Even that ______________ is stretched thin.",
+          "source": "구독 경제는 기업과 소비자 모두에게 이점을 가져다준다.",
+          "prompt": "The subscription economy brings ______________ for both companies and consumers.",
           "answers": [
-            "hostility",
-            "politeness",
-            "politeness"
+            "advantages"
           ],
-          "key": "ybm-pj-l2-s3-12",
+          "key": "ybm-l2-s3-12",
           "stage": 3,
           "number": 12
         },
         {
           "kind": "blank_input",
-          "source": "물병을 사러 매장 뒤편에 다다랐을 때 나는 너무 늦었다는 것을 깨닫는다.",
-          "prompt": "As I ______________ the back of the store for water bottles, I realize I am too late.",
+          "source": "기업들은 구독 모델을 사용해서 안정적인 수입을 얻고 고객 충성도를 구축할 수 있다.",
+          "prompt": "Companies can have a ______________ ______________ and ______________ customer ______________ by using the subscription model.",
           "answers": [
-            "approach"
+            "stable",
+            "revenue",
+            "build",
+            "loyalty"
           ],
-          "key": "ybm-pj-l2-s3-13",
+          "key": "ybm-l2-s3-13",
           "stage": 3,
           "number": 13
         },
         {
           "kind": "blank_input",
-          "source": "진열대는 이미 비어 있다.",
-          "prompt": "The shelves are already ______________.",
+          "source": "소비자의 관점에서, 그들은 더욱 다양한 범위의 선택과 개인 맞춤형 경험을 즐길 수 있다.",
+          "prompt": "From the consumers’ ______________, they can enjoy a wider ______________ of choices and personalized experiences.",
           "answers": [
-            "empty"
+            "perspective",
+            "range"
           ],
-          "key": "ybm-pj-l2-s3-14",
+          "key": "ybm-l2-s3-14",
           "stage": 3,
           "number": 14
         },
         {
           "kind": "blank_input",
-          "source": "옆 통로로 가서 운을 시험해 본다.",
-          "prompt": "I manage my way to the side ______________, trying my luck.",
+          "source": "그들은 또한 융통성 있는 구독 계약을 함으로써 돈을 절약할 수 있다.",
+          "prompt": "They can also ______________ money by having ______________ subscription ______________.",
           "answers": [
-            "aisle"
+            "save",
+            "flexible",
+            "contracts"
           ],
-          "key": "ybm-pj-l2-s3-15",
+          "key": "ybm-l2-s3-15",
           "stage": 3,
           "number": 15
         },
         {
           "kind": "blank_input",
-          "source": "가끔 사람들이 원하지 않는 물건을 엉뚱한 선반에 놓는 경우가 있다.",
-          "prompt": "Sometimes people ______________ unwanted items in the wrong shelves.",
+          "source": "구독 경제의 부상은 두 개의 주요한 동인들과 깊은 연관이 있다: 소비 추세의 변화들과 온라인 플랫폼의 급성장.",
+          "prompt": "The ______________ of the subscription economy is closely connected to two ______________ ______________: changes in consumption ______________ and the rapid ______________ of online platforms.",
           "answers": [
-            "place"
+            "rise",
+            "major",
+            "drivers",
+            "trends",
+            "growth"
           ],
-          "key": "ybm-pj-l2-s3-16",
+          "key": "ybm-l2-s3-16",
           "stage": 3,
           "number": 16
         },
         {
           "kind": "blank_input",
-          "source": "운이 좋다! 물이 그렇게 귀한 물건이 아니었던 어제 누군가 그곳에 버린 생수 한 상자를 발견한다.",
-          "prompt": "Lucky! I find a single case of water that someone ______________ there maybe yesterday, when it wasn’t such a ______________ ______________.",
+          "source": "사람들은 구독을 사랑한다 구독 경제는 요즘 사람들이 어떻게 재화와 서비스를 소비하는지와 상당히 관련되어 있다.",
+          "prompt": "People love the subscriptions The subscription economy is ______________ ______________ to how people consume goods and services nowadays.",
           "answers": [
-            "abandoned",
-            "precious",
-            "commodity"
+            "highly",
+            "relevant"
           ],
-          "key": "ybm-pj-l2-s3-17",
+          "key": "ybm-l2-s3-17",
           "stage": 3,
           "number": 17
         },
         {
           "kind": "blank_input",
-          "source": "손을 뻗어 생수 상자를 집어 들려는 순간, 한 여자가 상자를 가져가는 것을 본다.",
-          "prompt": "I ______________ ______________ it, only to find it pulled away at the last second by a woman.",
+          "source": "점점 더 많은 사람이 물건을 소유하는 것보다 경험을 우선시한다.",
+          "prompt": "More and more people prioritize experiences over ______________ things.",
           "answers": [
-            "reach",
-            "for"
+            "owning"
           ],
-          "key": "ybm-pj-l2-s3-18",
+          "key": "ybm-l2-s3-18",
           "stage": 3,
           "number": 18
         },
         {
           "kind": "blank_input",
-          "source": "그녀는 생수 상자를 카트에 담긴 통조림 위에 마치 왕관처럼 쌓아 놓는다.",
-          "prompt": "She ______________ it on top of her cart like a ______________ on top of her ______________ ______________.",
+          "source": "이것이 구독 경제를 그들에게 매력적인 것으로 만드는데 왜냐하면 그것은 소유의 필요 없이 서비스나 콘텐츠에 대한 접근을 제공하기 때문이다.",
+          "prompt": "This makes the subscription economy ______________ to them because it offers access to services or content without the ______________ of ______________.",
           "answers": [
-            "stacks",
-            "crown",
-            "canned",
-            "goods"
+            "attractive",
+            "requirement",
+            "ownership"
           ],
-          "key": "ybm-pj-l2-s3-19",
+          "key": "ybm-l2-s3-19",
           "stage": 3,
           "number": 19
         },
         {
           "kind": "blank_input",
-          "source": "\"미안하지만 우리가 먼저 왔어요.\" 그녀가 말한다. 그러자 그녀의 딸이 앞으로 나오는데, 축구팀에서 알고 있는 Hali Hartling이다.",
-          "prompt": "“I’m sorry, but we were here first,” she says. And then her daughter steps forward—a girl I ______________ from soccer—Hali Hartling.",
+          "source": "예를 들어, 음악 스트리밍 서비스를 구독함으로써, 소비자들은 디스크 앨범을 가질 필요가 없이 무한한 음악을 즐길 수 있다.",
+          "prompt": "For example, by subscribing to a music streaming service, consumers can enjoy ______________ music without the ______________ for having disc albums.",
           "answers": [
-            "recognize"
+            "limitless",
+            "need"
           ],
-          "key": "ybm-pj-l2-s3-20",
+          "key": "ybm-l2-s3-20",
           "stage": 3,
           "number": 20
         },
         {
           "kind": "blank_input",
-          "source": "엄마가 카트를 끌고 가자 Hali가 내게 몸을 기울인다. \"미안해, Alyssa.\"",
-          "prompt": "As her mother pulls their cart away, Hali ______________ closer to me. “I’m sorry about that, Alyssa.”",
+          "source": "또 다른 예는 의류 서비스를 구독하는 것으로, 소비자들은 그들의 서랍을 채우지 않고 다양한 의류 스타일을 탐색할 수 있다.",
+          "prompt": "Another example is subscribing to ______________ services, where consumers can explore a variety of clothing styles without ______________ ______________ their drawers.",
           "answers": [
-            "leans"
+            "clothing",
+            "filling",
+            "up"
           ],
-          "key": "ybm-pj-l2-s3-21",
+          "key": "ybm-l2-s3-21",
           "stage": 3,
           "number": 21
         },
         {
           "kind": "blank_input",
-          "source": "\"지난주 연습할 때 내가 물 나눠주지 않았니?\" 나는 그녀에게 지적한다.",
-          "prompt": "“Didn’t I share my water with you at the practice last week?” I ______________ ______________ to her.",
+          "source": "게다가, 소비자들은 다양성과 맞춤화에 가치를 둔다.",
+          "prompt": "Moreover, consumers value ______________ and ______________.",
           "answers": [
-            "point",
-            "out"
+            "diversity",
+            "customization"
           ],
-          "key": "ybm-pj-l2-s3-22",
+          "key": "ybm-l2-s3-22",
           "stage": 3,
           "number": 22
         },
         {
           "kind": "blank_input",
-          "source": "\"너도 호의를 갚아서 나랑 물 몇 병 나눠도 되겠네.\"",
-          "prompt": "“Maybe you could return the ______________ and share a few bottles with me.”",
+          "source": "구독 경제는 다양한 범위의 구독 선택을 제공하여, 개인들이 그들의 선호와 관심에 기초하여 그들의 경험들을 개별화할 수 있도록 해 준다.",
+          "prompt": "The subscription economy offers a ______________ range of subscription ______________, enabling ______________ to personalize their experiences based on their own ______________ and ______________.",
           "answers": [
-            "favor"
+            "diverse",
+            "options",
+            "individuals",
+            "preferences",
+            "interests"
           ],
-          "key": "ybm-pj-l2-s3-23",
+          "key": "ybm-l2-s3-23",
           "stage": 3,
           "number": 23
         },
         {
           "kind": "blank_input",
-          "source": "그녀는 이미 통로를 따라 이동하고 있는 어머니를 돌아보더니 고개를 절레절레 흔들며 내게로 돌아선다.",
-          "prompt": "She looks back to her mother, who’s already moving down the aisle, then ______________ ______________ to me shaking her head.",
+          "source": "구독 경제의 이러한 측면은 젊은 세대가 그들의 고유함을 표현하고, 젊은 세대의 개별적 취향에 부합하는 가치 있는 콘텐츠와 서비스들을 발견하는 것을 즐김에 따라, 젊은 세대 사이에 더욱 인기가 있다.",
+          "prompt": "This ______________ of the subscription economy is more popular among younger ______________, as they enjoy ______________ their ______________ and discovering valuable content and services that fit with their individual ______________.",
           "answers": [
-            "turns",
-            "back"
+            "aspect",
+            "generations",
+            "expressing",
+            "uniqueness",
+            "tastes"
           ],
-          "key": "ybm-pj-l2-s3-24",
+          "key": "ybm-l2-s3-24",
           "stage": 3,
           "number": 24
         },
         {
           "kind": "blank_input",
-          "source": "그러고는 얼굴이 약간 붉어지더니 더 붉어지기 전에 자리를 뜨려고 돌아선다.",
-          "prompt": "And then she gets a little bit red in the face, and turns to leave before it becomes a deep ______________.",
+          "source": "주목받고 있는 인기 사례는 화장품 구독 서비스이다.",
+          "prompt": "A popular example that has gained ______________ is the ______________ subscription service.",
           "answers": [
-            "flush"
+            "attention",
+            "cosmetics"
           ],
-          "key": "ybm-pj-l2-s3-25",
+          "key": "ybm-l2-s3-25",
           "stage": 3,
           "number": 25
         },
         {
           "kind": "blank_input",
-          "source": "나는 냉동식품 통로에서 Garrett을 발견한다. 그러다 뭔가를 발견한다.",
-          "prompt": "I look for Garrett, whom I find in the frozen aisle. Then I see ______________.",
+          "source": "그것은 소비자의 현재 피부 상태를 철저하게 분석하고 개개인의 고유한 피부 고민을 해결하기 위해 만들어진 화장품 제조를 포함한 전문적인 추천을 제공하는 것이 돋보인다.",
+          "prompt": "It ______________ ______________ by ______________ analyzing customers’ current skin conditions and providing specialized ______________, including ______________ cosmetics created to ______________ each individual’s ______________ skin ______________.",
           "answers": [
-            "something"
+            "stands",
+            "out",
+            "thoroughly",
+            "recommendations",
+            "manufacturing",
+            "address",
+            "unique",
+            "concerns"
           ],
-          "key": "ybm-pj-l2-s3-26",
+          "key": "ybm-l2-s3-26",
           "stage": 3,
           "number": 26
         },
         {
           "kind": "blank_input",
-          "source": "냉동 야채와 아이스크림 바로 지나서 얼음이 가득 담긴 상자가 있다.",
-          "prompt": "Just ______________ the frozen vegetables and ice cream, there is a case ______________ with ice.",
+          "source": "요점을 말하자면, 소비자들은 획일화된 구매 과정 대신에, 그들 개인의 피부 조건을 우선시하는 개별화된 경험을 얻는다.",
+          "prompt": "______________ ______________ ______________ ______________ ______________, consumers receive a personalized experience that prioritizes their individual skin conditions, rather than a ______________ purchasing process.",
           "answers": [
-            "past",
-            "packed"
+            "To",
+            "come",
+            "to",
+            "the",
+            "point",
+            "uniform"
           ],
-          "key": "ybm-pj-l2-s3-27",
+          "key": "ybm-l2-s3-27",
           "stage": 3,
           "number": 27
         },
         {
           "kind": "blank_input",
-          "source": "나는 문을 열고 얼음 봉지를 잡는다. \"뭐 하는 거야? 우린 얼음이 아니라 물이 필요해.\" 동생이 내게 상기시켜 준다.",
-          "prompt": "I open the door and reach for a bag. “What are you doing? We need water, not ice,” he ______________ me.",
+          "source": "게다가, 소비자들은 유연성과 편의성을 높이 평가한다.",
+          "prompt": "______________, consumers ______________ ______________ and convenience.",
           "answers": [
-            "reminds"
+            "Furthermore",
+            "appreciate",
+            "flexibility"
           ],
-          "key": "ybm-pj-l2-s3-28",
+          "key": "ybm-l2-s3-28",
           "stage": 3,
           "number": 28
         },
         {
           "kind": "blank_input",
-          "source": "\"얼음은 물이야. 돕기나 해.\" 내가 말한다. Garrett과 나는 최대한 높이 쌓일 때까지 얼음 봉지를 카트에 담는다.",
-          "prompt": "“Ice is water. Just help me,” I tell him. Garrett and I put one bag of ice after another into our cart, until it is ______________ as high as it can get.",
+          "source": "일부 구독 모델에서는, 소비자들이 고정된 비용으로 다양한 제품과 서비스를 경험할 수 있다.",
+          "prompt": "In some subscription models, consumers can experience ______________ ______________ ______________ products or services for a ______________ cost.",
           "answers": [
-            "piled"
+            "a",
+            "variety",
+            "of",
+            "fixed"
           ],
-          "key": "ybm-pj-l2-s3-29",
+          "key": "ybm-l2-s3-29",
           "stage": 3,
           "number": 29
         },
         {
           "kind": "blank_input",
-          "source": "이제 다른 사람들도 눈치를 채고 얼음 상자를 비우기 시작한다.",
-          "prompt": "By now other people have ______________ ______________ and begin to empty the ice case.",
+          "source": "다른 모델에서는, 필요할 때 필요한 서비스나 제품만 선택하여 구독 요금을 유연하게 조정할 수 있다.",
+          "prompt": "In other models, they can ______________ ______________ subscription ______________ by choosing only the necessary services or products when needed.",
           "answers": [
-            "taken",
-            "notice"
+            "flexibly",
+            "adjust",
+            "fees"
           ],
-          "key": "ybm-pj-l2-s3-30",
+          "key": "ybm-l2-s3-30",
           "stage": 3,
           "number": 30
         },
         {
           "kind": "blank_input",
-          "source": "이제 카트는 엄청나게 무거워져서 밀기가 거의 불가능할 정도이다.",
-          "prompt": "The cart is ______________ heavy now, and almost impossible to push.",
+          "source": "이것은 정해진 가격으로 다양한 제공을 즐길 수도 있고, 그들이 실제 필요한 것만 선택함으로써 돈을 절약할 수도 있음을 의미한다.",
+          "prompt": "This means they can either enjoy a range of offerings for a ______________ price or save money by ______________ only what they really need.",
           "answers": [
-            "ridiculously"
+            "set",
+            "selecting"
           ],
-          "key": "ybm-pj-l2-s3-31",
+          "key": "ybm-l2-s3-31",
           "stage": 3,
           "number": 31
         },
         {
           "kind": "blank_input",
-          "source": "그때 정장 차림의 한 남자가 우리 뒤에서 나타난다. 그는 미소를 짓는다. \"도움이 필요한 것 같구나.\"",
-          "prompt": "Then, a man in a ______________ ______________ ______________ ______________ behind us. He smiles. “Looks like you could use some help.”",
+          "source": "게다가, 구독 서비스는 온라인 플랫폼을 통해 쉽게 접근할 수 있게 되어 소비자들의 편의를 증진시킨다.",
+          "prompt": "Moreover, subscription services are made easily ______________ by online platforms, ______________ consumers’ convenience.",
           "answers": [
-            "business",
-            "suit",
-            "comes",
-            "up"
+            "accessible",
+            "enhancing"
           ],
-          "key": "ybm-pj-l2-s3-32",
+          "key": "ybm-l2-s3-32",
           "stage": 3,
           "number": 32
         },
         {
           "kind": "blank_input",
-          "source": "그는 우리가 대답할 때까지 기다리지 않고 카트 손잡이를 잡는다. \"도와주셔서 감사합니다.\" 나는 그에게 말한다.",
-          "prompt": "He doesn’t wait for us to answer before ______________ the cart’s ______________. “Thank you for helping us,” I tell him.",
+          "source": "단지 몇 번의 클릭으로, 소비자들은 서비스나 제품을 받을 수 있다. 만약 그들이 그들의 기기 모델을 변경하기를 원하면, 그렇게 할 수 있다.",
+          "prompt": "With just a few clicks, consumers can ______________ services or products. If they wish to change their ______________ model, they can do so.",
           "answers": [
-            "grabbing",
-            "handle"
+            "receive",
+            "device"
           ],
-          "key": "ybm-pj-l2-s3-33",
+          "key": "ybm-l2-s3-33",
           "stage": 3,
           "number": 33
         },
         {
           "kind": "blank_input",
-          "source": "\"별거 아니야. 우리 모두 서로 도와야지.\" 그는 다시 미소를 짓고 나도 미소로 화답한다.",
-          "prompt": "“Not a problem. We all need to help ______________ ______________.” He smiles again, and I return the smile.",
+          "source": "업그레이드를 원하는 사람들은 누구든지 받을 수 있고 최신 모델을 경험할 수 있다.",
+          "prompt": "Whoever ______________ an upgrade can get it and experience the ______________ models.",
           "answers": [
-            "one",
-            "another"
+            "desires",
+            "latest"
           ],
-          "key": "ybm-pj-l2-s3-34",
+          "key": "ybm-l2-s3-34",
           "stage": 3,
           "number": 34
         },
         {
           "kind": "blank_input",
-          "source": "어려운 시기에 사람들의 장점이 드러난다는 것을 알게 되는 것은 좋은 일이다.",
-          "prompt": "It is good to know that difficult times can ______________ ______________ the best in people.",
+          "source": "온라인 플랫폼들이 구독 경제를 구동한다 스마트폰을 중심으로 한 다양한 디지털 기기의 발전과 함께 소비자들은 많은 것들을 아주 쉽게 할 수 있게 되었다.",
+          "prompt": "Online platforms drive the subscription economy With the ______________ of various digital devices ______________ on smartphones, consumers have been able to do ______________ things with great ease.",
           "answers": [
-            "bring",
-            "out"
+            "development",
+            "centered",
+            "numerous"
           ],
-          "key": "ybm-pj-l2-s3-35",
+          "key": "ybm-l2-s3-35",
           "stage": 3,
           "number": 35
         },
         {
           "kind": "blank_input",
-          "source": "나는 호의에는 호의로 보답해야 한다고 결심한다. \"얼음 한 봉지 가져가세요.\" 내가 제안한다.",
-          "prompt": "I decide that one favor deserves another. “Why don’t you take a bag of ice for yourself,” I ______________.",
+          "source": "과거에는, 사람들이 영화관에 가거나, 그들이 시청하기 원하는 비디오들을 구매할 수 밖에 없었다.",
+          "prompt": "In the past, people ______________ ______________ ______________ ______________ ______________ go to the theater or purchase the videos they wanted to watch.",
           "answers": [
-            "suggest"
+            "had",
+            "no",
+            "choice",
+            "but",
+            "to"
           ],
-          "key": "ybm-pj-l2-s3-36",
+          "key": "ybm-l2-s3-36",
           "stage": 3,
           "number": 36
         },
         {
           "kind": "blank_input",
-          "source": "그의 미소가 사라지지 않는다. \"더 좋은 생각이 있어.\" 그가 말한다.",
-          "prompt": "His smile does not ______________. “I have a better idea,” he says.",
+          "source": "오늘날에는, 영화 시청을 원하는 사람들은 누구나 온라인 미디어 구독 플랫폼에 접속해서 그들의 스마트폰에서 또는 다른 디지털 기기에서 엄청난 양의 영화를 즐길 수 있다.",
+          "prompt": "Today, whoever wants to watch a movie can ______________ online media subscription platforms and enjoy a vast selection of movies on their smartphones or other digital devices.",
           "answers": [
-            "fade"
+            "access"
           ],
-          "key": "ybm-pj-l2-s3-37",
+          "key": "ybm-l2-s3-37",
           "stage": 3,
           "number": 37
         },
         {
           "kind": "blank_input",
-          "source": "\"너희가 얼음 한 봉지 가져가고 나머지는 내가 가질게.\"",
-          "prompt": "“Why don’t you take a bag of ice for yourselves, and I’ll keep the ______________.”",
+          "source": "동시에, 이들 플랫폼들은 기업들이 고객들에게 맞춤형 제품과 서비스를 제공하는 것을 쉽게 만든다.",
+          "prompt": "At the same time, these platforms make it ______________ for companies to offer ______________ products and services to customers.",
           "answers": [
-            "rest"
+            "easy",
+            "customized"
           ],
-          "key": "ybm-pj-l2-s3-38",
+          "key": "ybm-l2-s3-38",
           "stage": 3,
           "number": 38
         },
         {
           "kind": "blank_input",
-          "source": "잠시 나는 그가 농담하고 있다고 생각하지만, 곧 그가 진지하다는 것을 깨닫는다. \"네?\"",
-          "prompt": "For a moment I think he is joking, but then realize he is ______________. “Excuse me?”",
+          "source": "인공지능과 빅데이터 알고리즘 기술을 적용하여, 기업들은 고객들의 요구, 기호, 소비 패턴들을 확인한다.",
+          "prompt": "By ______________ AI and big data ______________ technology, companies ______________ consumers’ needs, ______________, and consumption ______________.",
           "answers": [
-            "serious"
+            "applying",
+            "algorithm",
+            "identify",
+            "tastes",
+            "patterns"
           ],
-          "key": "ybm-pj-l2-s3-39",
+          "key": "ybm-l2-s3-39",
           "stage": 3,
           "number": 39
         },
         {
           "kind": "blank_input",
-          "source": "그는 여전히 웃고 있지만 그의 눈빛이 무섭다.",
-          "prompt": "He is still smiling, but his eyes ______________ me.",
+          "source": "사람들은 다양한 선택과 맞춤화를 환영하며 이는 결과적으로 그들의 만족을 증진시킨다.",
+          "prompt": "People appreciate having diverse choices and customization, which ______________ ______________ ______________ their ______________.",
           "answers": [
-            "scare"
+            "in",
+            "turn",
+            "enhances",
+            "satisfaction"
           ],
-          "key": "ybm-pj-l2-s3-40",
+          "key": "ybm-l2-s3-40",
           "stage": 3,
           "number": 40
         },
         {
           "kind": "blank_input",
-          "source": "그의 손이 우리 카트 손잡이에 단단히 고정되어 있는 한, 카트가 그의 것이 아니라 우리 것임을 증명할 방법은 없다.",
-          "prompt": "______________ ______________ ______________ his hands are ______________ ______________ on the handle of our cart, there is nothing to ______________ that it’s ours and not his.",
+          "source": "소비자의 구매 기록에 기반한 개인 맞춤화된 의류 스타일 제안이나, 그들의 영화 및 비디오 시청 기록과 부합하는 비디오 추천과 같은 서비스는 그들에게 커다란 만족을 가져다준다.",
+          "prompt": "Services, such as ______________ personalized clothing styles based on customers’ purchase history or recommending videos that ______________ their movie and video viewing history, bring them great satisfaction.",
           "answers": [
-            "As",
-            "long",
-            "as",
-            "firmly",
-            "locked",
-            "prove"
+            "suggesting",
+            "match"
           ],
-          "key": "ybm-pj-l2-s3-41",
+          "key": "ybm-l2-s3-41",
           "stage": 3,
           "number": 41
         },
         {
           "kind": "blank_input",
-          "source": "\"무슨 문제 있나요?\" Basil 삼촌이다. 제시간에 맞춰 도착했다.",
-          "prompt": "“Is there a problem here?” It is Uncle Basil. He has arrived just ______________ ______________.",
+          "source": "구독 경제의 제한점들 비록 구독 경제가 많은 장점을 제공하지만, 또한 고려해야 할 일부 단점들도 있다. 한 가지 우려 사항은 과소비 가능성이다.",
+          "prompt": "Limitations of the subscription economy Although the subscription economy offers many advantages, there are also some ______________ to consider. One ______________ is the ______________ for ______________.",
           "answers": [
-            "in",
-            "time"
+            "disadvantages",
+            "concern",
+            "potential",
+            "overconsumption"
           ],
-          "key": "ybm-pj-l2-s3-42",
+          "key": "ybm-l2-s3-42",
           "stage": 3,
           "number": 42
         },
         {
           "kind": "blank_input",
-          "source": "\"전혀요.\" 남자는 씁쓸한 표정으로 얼음을 바라보다가 자리를 뜬다.",
-          "prompt": "“Not at all.” The man looks at the ice with a ______________ face, then leaves.",
+          "source": "구독 모델의 편리성과 접근성은 소비자들이 복수의 서비스를 계약하고 많은 콘텐츠나 제품을 사용하는 것을 쉽게 만든다.",
+          "prompt": "The ______________ and ______________ of the subscription model make it easy for consumers to ______________ ______________ ______________ ______________ services and use a lot of content or products.",
           "answers": [
-            "bitter"
+            "convenience",
+            "accessibility",
+            "sign",
+            "up",
+            "for",
+            "multiple"
           ],
-          "key": "ybm-pj-l2-s3-43",
+          "key": "ybm-l2-s3-43",
           "stage": 3,
           "number": 43
         },
         {
           "kind": "blank_input",
-          "source": "*위 내용은 소설 <드라이>(Dry, 2018)의 도입부를 축약한 것이다.",
-          "prompt": "*The above is a ______________ version of the opening of the ______________ Dry (2018).",
+          "source": "이것은 과도한 소비와 실제로 필요한 것보다 많은 구독 서비스 사용을 야기할 수 있다.",
+          "prompt": "This can ______________ ______________ ______________ consumption and using more subscription services than ______________ needed.",
           "answers": [
-            "shortened",
-            "novel"
+            "result",
+            "in",
+            "excessive",
+            "actually"
           ],
-          "key": "ybm-pj-l2-s3-44",
+          "key": "ybm-l2-s3-44",
           "stage": 3,
           "number": 44
         },
         {
           "kind": "blank_input",
-          "source": "이 소설은 캘리포니아의 재앙적인 가뭄 속에서 가족을 위해 힘든 선택을 해야 하는 한 소녀의 이야기이다.",
-          "prompt": "It tells the story of a girl who has to make tough choices for her family during a ______________ California drought.",
+          "source": "진정으로 필요한 서비스들만 구독하고 유사한 서비스들을 구독하는 것을 피하는 것이 매우 중요하다.",
+          "prompt": "It is ______________ to subscribe only to services that are truly necessary and avoid subscribing to ______________ services.",
           "answers": [
-            "disastrous"
+            "crucial",
+            "similar"
           ],
-          "key": "ybm-pj-l2-s3-45",
+          "key": "ybm-l2-s3-45",
           "stage": 3,
           "number": 45
         },
         {
           "kind": "blank_input",
-          "source": "소녀의 원치 않는 모험은 물 공급이 재개되고 생활이 정상으로 돌아오면서 끝난다.",
-          "prompt": "Her unwanted ______________ ends when the water ______________ ______________ and life is back to ______________.",
+          "source": "과소비의 우려와 관련된 것으로 구독이 창출할 수 있는 금융 부담이 있다.",
+          "prompt": "______________ ______________ the concern of overconsumption is the ______________ ______________ that subscriptions can create.",
           "answers": [
-            "adventure",
-            "supply",
-            "resumes",
-            "normal"
+            "Related",
+            "to",
+            "financial",
+            "burden"
           ],
-          "key": "ybm-pj-l2-s3-46",
+          "key": "ybm-l2-s3-46",
           "stage": 3,
           "number": 46
         },
         {
           "kind": "blank_input",
-          "source": "기후 변화, 인구 증가, 농업용수 과다 사용 등 전 세계적으로 물 부족을 야기하는 요인들이 해결되지 않는다면 이 소설의 이야기가 현실이 될 수도 있다.",
-          "prompt": "______________ ______________ the factors ______________ to water ______________ worldwide are not ______________, including climate change, ______________ growth, and using too much water for ______________, it is possible that this story can become a reality.",
+          "source": "개별 구독 비용은 감당할 수 있어 보일 수 있지만, 복수의 서비스를 구독하는 것은 비용이 빠르게 증가할 수 있다.",
+          "prompt": "While the cost of ______________ subscriptions may seem ______________, subscribing to multiple services can add up quickly.",
           "answers": [
-            "Provided",
-            "that",
-            "contributing",
-            "shortages",
-            "addressed",
-            "population",
-            "agriculture"
+            "individual",
+            "affordable"
           ],
-          "key": "ybm-pj-l2-s3-47",
+          "key": "ybm-l2-s3-47",
           "stage": 3,
           "number": 47
+        },
+        {
+          "kind": "blank_input",
+          "source": "재정적 부담을 피하기 위해 이들 구독의 비용을 신중하게 고려하는 것이 중요하다.",
+          "prompt": "It is important to ______________ consider the costs of these subscriptions to avoid financial ______________.",
+          "answers": [
+            "carefully",
+            "strain"
+          ],
+          "key": "ybm-l2-s3-48",
+          "stage": 3,
+          "number": 48
+        },
+        {
+          "kind": "blank_input",
+          "source": "정기적으로 검토하고 불필요한 구독들을 취소하는 것이 유익할 수 있다.",
+          "prompt": "______________ ______________ and ______________ unnecessary subscriptions can be ______________.",
+          "answers": [
+            "Regularly",
+            "reviewing",
+            "canceling",
+            "beneficial"
+          ],
+          "key": "ybm-l2-s3-49",
+          "stage": 3,
+          "number": 49
+        },
+        {
+          "kind": "blank_input",
+          "source": "부가적으로, 구독 경제는 환경 오염에 기여할 수 있다.",
+          "prompt": "______________, the subscription economy can ______________ ______________ environmental pollution.",
+          "answers": [
+            "Additionally",
+            "contribute",
+            "to"
+          ],
+          "key": "ybm-l2-s3-50",
+          "stage": 3,
+          "number": 50
+        },
+        {
+          "kind": "blank_input",
+          "source": "포장재에 담긴 제품들을 정기적으로 배달하는 것은 일회용 포장의 사용을 증가시킬 수 있어 이것이 환경을 해친다.",
+          "prompt": "The regular delivery of products in ______________ ______________ can increase the use of ______________ ______________, which ______________ the environment.",
+          "answers": [
+            "packaging",
+            "materials",
+            "disposable",
+            "packaging",
+            "harms"
+          ],
+          "key": "ybm-l2-s3-51",
+          "stage": 3,
+          "number": 51
+        },
+        {
+          "kind": "blank_input",
+          "source": "친환경 포장 재료를 사용하고 재사용 가능한 포장을 선택하는 것은 이 문제를 줄이는 데 도움이 될 수 있다.",
+          "prompt": "Using ______________ ______________ packaging materials and ______________ for ______________ packaging can help reduce this problem.",
+          "answers": [
+            "environmentally",
+            "friendly",
+            "opting",
+            "reusable"
+          ],
+          "key": "ybm-l2-s3-52",
+          "stage": 3,
+          "number": 52
+        },
+        {
+          "kind": "blank_input",
+          "source": "구독 서비스들의 잠재적 제한점들에도 불구하고, 그것은 우리의 삶에 깊숙이 자리 잡고 있으며 더욱더 많은 사업이 구독 경제 모델에 올라타고 있다.",
+          "prompt": "Despite the potential ______________ of subscription services, they have become deeply ______________ in our lives and more and more businesses are jumping onto the subscription economy model.",
+          "answers": [
+            "limitations",
+            "embedded"
+          ],
+          "key": "ybm-l2-s3-53",
+          "stage": 3,
+          "number": 53
+        },
+        {
+          "kind": "blank_input",
+          "source": "미래에 새로운 영역들에서 소비자들에게 새로운 구독 서비스들이 지속적으로 제공될 것으로 예상된다.",
+          "prompt": "It is expected that new subscription services will be ______________ provided to consumers in new areas in the future.",
+          "answers": [
+            "continuously"
+          ],
+          "key": "ybm-l2-s3-54",
+          "stage": 3,
+          "number": 54
+        },
+        {
+          "kind": "blank_input",
+          "source": "우리는 구독 경제에 대해 보다 깊은 이해를 가지고 정말 필요한 서비스들물 받는 현명한 소비자가 되어야 한다.",
+          "prompt": "We need to have a ______________ ______________ of the subscription economy and become ______________ consumers who receive the services that are really needed.",
+          "answers": [
+            "deeper",
+            "understanding",
+            "wise"
+          ],
+          "key": "ybm-l2-s3-55",
+          "stage": 3,
+          "number": 55
         }
       ]
     },
@@ -1406,520 +1518,608 @@ export const YBM_PARKJUNEON_L2_WORKBOOK = {
       "items": [
         {
           "kind": "translation_ai",
-          "source": "The kitchen tap makes strange sounds. It coughs.",
+          "source": "Jiyun, a high school student, starts her day by logging in to a music streaming service on her smartphone.",
           "prompt": "우리말 해석을 입력하세요.",
           "answers": [
-            "주방 수도꼭지가 이상한 소리를 낸다. 기침을 한다."
+            "고등학생인 지윤이는 그녀의 스마트폰에서 음악 스트리밍 서비스에 로그인하며 하루를 시작한다."
           ],
-          "key": "ybm-pj-l2-s4-01",
+          "key": "ybm-l2-s4-01",
           "stage": 4,
           "number": 1
         },
         {
           "kind": "translation_ai",
-          "source": "It spits once, and then goes silent.",
+          "source": "She enjoys listening to her favorite music, discovering new songs, and exploring new artists every day.",
           "prompt": "우리말 해석을 입력하세요.",
           "answers": [
-            "침을 한 번 뱉더니 조용해진다."
+            "그녀는 매일 자신이 선호하는 음악을 듣고, 새로운 노래들을 발견하고, 새로운 아티스트들을 탐색하는 것을 즐긴다."
           ],
-          "key": "ybm-pj-l2-s4-02",
+          "key": "ybm-l2-s4-02",
           "stage": 4,
           "number": 2
         },
         {
           "kind": "translation_ai",
-          "source": "\"Mom,\" I shout out into the living room, \"water is not coming out.\"",
+          "source": "For a healthy breakfast, Jiyun receives a delivery from a subscription service that provides fresh vegetables and fruits.",
           "prompt": "우리말 해석을 입력하세요.",
           "answers": [
-            "\"엄마,\" 나는 거실을 향해 소리친다. \"물이 안 나와요.\""
+            "건강한 아침 식사를 위해, 지윤이는 신선한 채소와 과일을 공급하는 구독 서비스로부터 배송을 받는다."
           ],
-          "key": "ybm-pj-l2-s4-03",
+          "key": "ybm-l2-s4-03",
           "stage": 4,
           "number": 3
         },
         {
           "kind": "translation_ai",
-          "source": "\"Alyssa, shush!\" Mom says. She is watching the TV, where a news anchor is talking about the \"flow crisis.\"",
+          "source": "After school, Jiyun utilizes a video lecture service to expand her knowledge in whatever she finds interesting.",
           "prompt": "우리말 해석을 입력하세요.",
           "answers": [
-            "\"Alyssa, 조용히 해!\" 엄마가 말한다. 엄마는 TV를 보고 있고, TV에서는 뉴스 앵커가 '물 공급 위기'에 대해 이야기하고 있다."
+            "방과 후에, 지윤이는 그녀가 흥미를 느끼는 것마다 그녀의 지식을 확장하기 위해 비디오 강의 서비스를 활용한다."
           ],
-          "key": "ybm-pj-l2-s4-04",
+          "key": "ybm-l2-s4-04",
           "stage": 4,
           "number": 4
         },
         {
           "kind": "translation_ai",
-          "source": "This is what the media has been calling the drought ever since people got tired of hearing the word \"drought.\"",
+          "source": "For example, she watches various academic lectures to review her schoolwork and stay updated about the latest knowledge in her chosen field of study.",
           "prompt": "우리말 해석을 입력하세요.",
           "answers": [
-            "사람들이 '가뭄'이라는 단어를 듣는 데 지친 이후로 언론은 가뭄을 이렇게 부르고 있다."
+            "예를 들어, 그녀는 학교 공부를 복습하고 그녀가 선택한 연구 분야의 최신 지식에 대해 계속 업데이트하기 위해 다양한 학술 강의를 시청한다."
           ],
-          "key": "ybm-pj-l2-s4-05",
+          "key": "ybm-l2-s4-05",
           "stage": 4,
           "number": 5
         },
         {
           "kind": "translation_ai",
-          "source": "Now the crisis is entering a new stage. We have no running water out of the tap.",
+          "source": "During weekends, Jiyun and her family spend quality time together watching movies or dramas using a streaming service.",
           "prompt": "우리말 해석을 입력하세요.",
           "answers": [
-            "이제 위기는 새로운 단계로 접어들고 있다. 수도꼭지에서 수돗물이 나오지 않는다."
+            "주말에 지윤이와 그녀의 가족은 스트리밍 서비스를 사용하면서 함께 영화나 드라마를 시청하는 좋은 시간을 보낸다."
           ],
-          "key": "ybm-pj-l2-s4-06",
+          "key": "ybm-l2-s4-06",
           "stage": 4,
           "number": 6
         },
         {
           "kind": "translation_ai",
-          "source": "\"To the mall!\" says Uncle Basil. My little brother Garrett and I jump in our uncle's truck.",
+          "source": "Subscriptions are everywhere To be sure, the subscription economy is a popular economic model nowadays, and Jiyun is actively taking part in it.",
           "prompt": "우리말 해석을 입력하세요.",
           "answers": [
-            "\"쇼핑몰로 가자!\" Basil 삼촌이 말한다. 동생 Garrett과 나는 삼촌의 트럭에 올라탄다."
+            "구독은 모든 곳에 있다 분명히, 구독 경제는 요즈음 인기 있는 경제 모델이고, 지윤이는 그것에 적극적으로 참여하고 있다."
           ],
-          "key": "ybm-pj-l2-s4-07",
+          "key": "ybm-l2-s4-07",
           "stage": 4,
           "number": 7
         },
         {
           "kind": "translation_ai",
-          "source": "As we pull into the parking lot, we can see the crowd. \"You two go in. I'll meet you inside,\" Uncle Basil says.",
+          "source": "The concept of business models based on subscriptions is not new. Initially it was limited to products such as milk and newspapers.",
           "prompt": "우리말 해석을 입력하세요.",
           "answers": [
-            "주차장에 차를 세우자 많은 사람이 눈에 들어온다. \"너희 둘은 들어가. 안에서 만나자.\"라고 Basil 삼촌이 말한다."
+            "구독 기반의 비즈니스 모델의 개념은 새로운 것이 아니다. 처음에 그것은 우유와 신문 같은 제품들에 한정되었다."
           ],
-          "key": "ybm-pj-l2-s4-08",
+          "key": "ybm-l2-s4-08",
           "stage": 4,
           "number": 8
         },
         {
           "kind": "translation_ai",
-          "source": "Inside it's like Black Friday at its worst—but today it's not televisions and video games people are after.",
+          "source": "However, these business models have expanded to all industries, including entertainment, technology, fashion, education, and much more.",
           "prompt": "우리말 해석을 입력하세요.",
           "answers": [
-            "내부 풍경은 최악의 블랙 프라이데이와 비슷하지만, 오늘 사람들이 찾는 것은 텔레비전이나 비디오 게임이 아니다."
+            "하지만, 이들 사업 모델은 엔터테인먼트, 기술, 패션, 교육, 그리고 훨씬 더 많은 것들을 포함한, 모든 산업들로 확산되었다."
           ],
-          "key": "ybm-pj-l2-s4-09",
+          "key": "ybm-l2-s4-09",
           "stage": 4,
           "number": 9
         },
         {
           "kind": "translation_ai",
-          "source": "What I see in the carts in the checkout line are mostly water bottles. The essentials of life.",
+          "source": "Instead of creating a hit product that will be sold once, companies now prioritize providing continuing value, such as new content, more personalization, or access to updates.",
           "prompt": "우리말 해석을 입력하세요.",
           "answers": [
-            "계산대에 줄을 선 카트에 보이는 것은 대부분 물병이다. 생명의 필수품."
+            "일회성으로 팔릴 히트 상품을 창출하는 대신에, 기업들은 지금 새 콘텐츠, 보다 개인 맞춤형, 또는 업데이트 접근성 같은 지속적 가치를 제공하는 것을 우선시한다."
           ],
-          "key": "ybm-pj-l2-s4-10",
+          "key": "ybm-l2-s4-10",
           "stage": 4,
           "number": 10
         },
         {
           "kind": "translation_ai",
-          "source": "There is a look of impatience on the faces of the people in line.",
+          "source": "Customers pay for these benefits via a regular subscription.",
           "prompt": "우리말 해석을 입력하세요.",
           "answers": [
-            "줄을 선 사람들의 얼굴에는 조급한 표정이 역력하다."
+            "고객들은 정기적 구독을 통해 이러한 혜택들에 대해 비용을 지불한다."
           ],
-          "key": "ybm-pj-l2-s4-11",
+          "key": "ybm-l2-s4-11",
           "stage": 4,
           "number": 11
         },
         {
           "kind": "translation_ai",
-          "source": "There is even hostility, hidden by a thin layer of politeness. Even that politeness is stretched thin.",
+          "source": "The subscription economy brings advantages for both companies and consumers.",
           "prompt": "우리말 해석을 입력하세요.",
           "answers": [
-            "심지어는 얇은 공손함 뒤에 숨은 적대감까지 느껴진다. 그 공손함조차 얇아져 있다."
+            "구독 경제는 기업과 소비자 모두에게 이점을 가져다준다."
           ],
-          "key": "ybm-pj-l2-s4-12",
+          "key": "ybm-l2-s4-12",
           "stage": 4,
           "number": 12
         },
         {
           "kind": "translation_ai",
-          "source": "As I approach the back of the store for water bottles, I realize I am too late.",
+          "source": "Companies can have a stable revenue and build customer loyalty by using the subscription model.",
           "prompt": "우리말 해석을 입력하세요.",
           "answers": [
-            "물병을 사러 매장 뒤편에 다다랐을 때 나는 너무 늦었다는 것을 깨닫는다."
+            "기업들은 구독 모델을 사용해서 안정적인 수입을 얻고 고객 충성도를 구축할 수 있다."
           ],
-          "key": "ybm-pj-l2-s4-13",
+          "key": "ybm-l2-s4-13",
           "stage": 4,
           "number": 13
         },
         {
           "kind": "translation_ai",
-          "source": "The shelves are already empty.",
+          "source": "From the consumers' perspective, they can enjoy a wider range of choices and personalized experiences.",
           "prompt": "우리말 해석을 입력하세요.",
           "answers": [
-            "진열대는 이미 비어 있다."
+            "소비자의 관점에서, 그들은 더욱 다양한 범위의 선택과 개인 맞춤형 경험을 즐길 수 있다."
           ],
-          "key": "ybm-pj-l2-s4-14",
+          "key": "ybm-l2-s4-14",
           "stage": 4,
           "number": 14
         },
         {
           "kind": "translation_ai",
-          "source": "I manage my way to the side aisle, trying my luck.",
+          "source": "They can also save money by having flexible subscription contracts.",
           "prompt": "우리말 해석을 입력하세요.",
           "answers": [
-            "옆 통로로 가서 운을 시험해 본다."
+            "그들은 또한 융통성 있는 구독 계약을 함으로써 돈을 절약할 수 있다."
           ],
-          "key": "ybm-pj-l2-s4-15",
+          "key": "ybm-l2-s4-15",
           "stage": 4,
           "number": 15
         },
         {
           "kind": "translation_ai",
-          "source": "Sometimes people place unwanted items in the wrong shelves.",
+          "source": "The rise of the subscription economy is closely connected to two major drivers: changes in consumption trends and the rapid growth of online platforms.",
           "prompt": "우리말 해석을 입력하세요.",
           "answers": [
-            "가끔 사람들이 원하지 않는 물건을 엉뚱한 선반에 놓는 경우가 있다."
+            "구독 경제의 부상은 두 개의 주요한 동인들과 깊은 연관이 있다: 소비 추세의 변화들과 온라인 플랫폼의 급성장."
           ],
-          "key": "ybm-pj-l2-s4-16",
+          "key": "ybm-l2-s4-16",
           "stage": 4,
           "number": 16
         },
         {
           "kind": "translation_ai",
-          "source": "Lucky! I find a single case of water that someone abandoned there maybe yesterday, when it wasn't such a precious commodity.",
+          "source": "People love the subscriptions The subscription economy is highly relevant to how people consume goods and services nowadays.",
           "prompt": "우리말 해석을 입력하세요.",
           "answers": [
-            "운이 좋다! 물이 그렇게 귀한 물건이 아니었던 어제 누군가 그곳에 버린 생수 한 상자를 발견한다."
+            "사람들은 구독을 사랑한다 구독 경제는 요즘 사람들이 어떻게 재화와 서비스를 소비하는지와 상당히 관련되어 있다."
           ],
-          "key": "ybm-pj-l2-s4-17",
+          "key": "ybm-l2-s4-17",
           "stage": 4,
           "number": 17
         },
         {
           "kind": "translation_ai",
-          "source": "I reach for it, only to find it pulled away at the last second by a woman.",
+          "source": "More and more people prioritize experiences over owning things.",
           "prompt": "우리말 해석을 입력하세요.",
           "answers": [
-            "손을 뻗어 생수 상자를 집어 들려는 순간, 한 여자가 상자를 가져가는 것을 본다."
+            "점점 더 많은 사람이 물건을 소유하는 것보다 경험을 우선시한다."
           ],
-          "key": "ybm-pj-l2-s4-18",
+          "key": "ybm-l2-s4-18",
           "stage": 4,
           "number": 18
         },
         {
           "kind": "translation_ai",
-          "source": "She stacks it on top of her cart like a crown on top of her canned goods.",
+          "source": "This makes the subscription economy attractive to them because it offers access to services or content without the requirement of ownership.",
           "prompt": "우리말 해석을 입력하세요.",
           "answers": [
-            "그녀는 생수 상자를 카트에 담긴 통조림 위에 마치 왕관처럼 쌓아 놓는다."
+            "이것이 구독 경제를 그들에게 매력적인 것으로 만드는데 왜냐하면 그것은 소유의 필요 없이 서비스나 콘텐츠에 대한 접근을 제공하기 때문이다."
           ],
-          "key": "ybm-pj-l2-s4-19",
+          "key": "ybm-l2-s4-19",
           "stage": 4,
           "number": 19
         },
         {
           "kind": "translation_ai",
-          "source": "\"I'm sorry, but we were here first,\" she says. And then her daughter steps forward—a girl I recognize from soccer—Hali Hartling.",
+          "source": "For example, by subscribing to a music streaming service, consumers can enjoy limitless music without the need for having disc albums.",
           "prompt": "우리말 해석을 입력하세요.",
           "answers": [
-            "\"미안하지만 우리가 먼저 왔어요.\" 그녀가 말한다. 그러자 그녀의 딸이 앞으로 나오는데, 축구팀에서 알고 있는 Hali Hartling이다."
+            "예를 들어, 음악 스트리밍 서비스를 구독함으로써, 소비자들은 디스크 앨범을 가질 필요가 없이 무한한 음악을 즐길 수 있다."
           ],
-          "key": "ybm-pj-l2-s4-20",
+          "key": "ybm-l2-s4-20",
           "stage": 4,
           "number": 20
         },
         {
           "kind": "translation_ai",
-          "source": "As her mother pulls their cart away, Hali leans closer to me. \"I'm sorry about that, Alyssa.\"",
+          "source": "Another example is subscribing to clothing services, where consumers can explore a variety of clothing styles without filling up their drawers.",
           "prompt": "우리말 해석을 입력하세요.",
           "answers": [
-            "엄마가 카트를 끌고 가자 Hali가 내게 몸을 기울인다. \"미안해, Alyssa.\""
+            "또 다른 예는 의류 서비스를 구독하는 것으로, 소비자들은 그들의 서랍을 채우지 않고 다양한 의류 스타일을 탐색할 수 있다."
           ],
-          "key": "ybm-pj-l2-s4-21",
+          "key": "ybm-l2-s4-21",
           "stage": 4,
           "number": 21
         },
         {
           "kind": "translation_ai",
-          "source": "\"Didn't I share my water with you at the practice last week?\" I point out to her.",
+          "source": "Moreover, consumers value diversity and customization.",
           "prompt": "우리말 해석을 입력하세요.",
           "answers": [
-            "\"지난주 연습할 때 내가 물 나눠주지 않았니?\" 나는 그녀에게 지적한다."
+            "게다가, 소비자들은 다양성과 맞춤화에 가치를 둔다."
           ],
-          "key": "ybm-pj-l2-s4-22",
+          "key": "ybm-l2-s4-22",
           "stage": 4,
           "number": 22
         },
         {
           "kind": "translation_ai",
-          "source": "\"Maybe you could return the favor and share a few bottles with me.\"",
+          "source": "The subscription economy offers a diverse range of subscription options, enabling individuals to personalize their experiences based on their own preferences and interests.",
           "prompt": "우리말 해석을 입력하세요.",
           "answers": [
-            "\"너도 호의를 갚아서 나랑 물 몇 병 나눠도 되겠네.\""
+            "구독 경제는 다양한 범위의 구독 선택을 제공하여, 개인들이 그들의 선호와 관심에 기초하여 그들의 경험들을 개별화할 수 있도록 해 준다."
           ],
-          "key": "ybm-pj-l2-s4-23",
+          "key": "ybm-l2-s4-23",
           "stage": 4,
           "number": 23
         },
         {
           "kind": "translation_ai",
-          "source": "She looks back to her mother, who's already moving down the aisle, then turns back to me shaking her head.",
+          "source": "This aspect of the subscription economy is more popular among younger generations, as they enjoy expressing their uniqueness and discovering valuable content and services that fit with their individual tastes.",
           "prompt": "우리말 해석을 입력하세요.",
           "answers": [
-            "그녀는 이미 통로를 따라 이동하고 있는 어머니를 돌아보더니 고개를 절레절레 흔들며 내게로 돌아선다."
+            "구독 경제의 이러한 측면은 젊은 세대가 그들의 고유함을 표현하고, 젊은 세대의 개별적 취향에 부합하는 가치 있는 콘텐츠와 서비스들을 발견하는 것을 즐김에 따라, 젊은 세대 사이에 더욱 인기가 있다."
           ],
-          "key": "ybm-pj-l2-s4-24",
+          "key": "ybm-l2-s4-24",
           "stage": 4,
           "number": 24
         },
         {
           "kind": "translation_ai",
-          "source": "And then she gets a little bit red in the face, and turns to leave before it becomes a deep flush.",
+          "source": "A popular example that has gained attention is the cosmetics subscription service.",
           "prompt": "우리말 해석을 입력하세요.",
           "answers": [
-            "그러고는 얼굴이 약간 붉어지더니 더 붉어지기 전에 자리를 뜨려고 돌아선다."
+            "주목받고 있는 인기 사례는 화장품 구독 서비스이다."
           ],
-          "key": "ybm-pj-l2-s4-25",
+          "key": "ybm-l2-s4-25",
           "stage": 4,
           "number": 25
         },
         {
           "kind": "translation_ai",
-          "source": "I look for Garrett, whom I find in the frozen aisle. Then I see something.",
+          "source": "It stands out by thoroughly analyzing customers' current skin conditions and providing specialized recommendations, including manufacturing cosmetics created to address each individual's unique skin concerns.",
           "prompt": "우리말 해석을 입력하세요.",
           "answers": [
-            "나는 냉동식품 통로에서 Garrett을 발견한다. 그러다 뭔가를 발견한다."
+            "그것은 소비자의 현재 피부 상태를 철저하게 분석하고 개개인의 고유한 피부 고민을 해결하기 위해 만들어진 화장품 제조를 포함한 전문적인 추천을 제공하는 것이 돋보인다."
           ],
-          "key": "ybm-pj-l2-s4-26",
+          "key": "ybm-l2-s4-26",
           "stage": 4,
           "number": 26
         },
         {
           "kind": "translation_ai",
-          "source": "Just past the frozen vegetables and ice cream, there is a case packed with ice.",
+          "source": "To come to the point, consumers receive a personalized experience that prioritizes their individual skin conditions, rather than a uniform purchasing process.",
           "prompt": "우리말 해석을 입력하세요.",
           "answers": [
-            "냉동 야채와 아이스크림 바로 지나서 얼음이 가득 담긴 상자가 있다."
+            "요점을 말하자면, 소비자들은 획일화된 구매 과정 대신에, 그들 개인의 피부 조건을 우선시하는 개별화된 경험을 얻는다."
           ],
-          "key": "ybm-pj-l2-s4-27",
+          "key": "ybm-l2-s4-27",
           "stage": 4,
           "number": 27
         },
         {
           "kind": "translation_ai",
-          "source": "I open the door and reach for a bag. \"What are you doing? We need water, not ice,\" he reminds me.",
+          "source": "Furthermore, consumers appreciate flexibility and convenience.",
           "prompt": "우리말 해석을 입력하세요.",
           "answers": [
-            "나는 문을 열고 얼음 봉지를 잡는다. \"뭐 하는 거야? 우린 얼음이 아니라 물이 필요해.\" 동생이 내게 상기시켜 준다."
+            "게다가, 소비자들은 유연성과 편의성을 높이 평가한다."
           ],
-          "key": "ybm-pj-l2-s4-28",
+          "key": "ybm-l2-s4-28",
           "stage": 4,
           "number": 28
         },
         {
           "kind": "translation_ai",
-          "source": "\"Ice is water. Just help me,\" I tell him. Garrett and I put one bag of ice after another into our cart, until it is piled as high as it can get.",
+          "source": "In some subscription models, consumers can experience a variety of products or services for a fixed cost.",
           "prompt": "우리말 해석을 입력하세요.",
           "answers": [
-            "\"얼음은 물이야. 돕기나 해.\" 내가 말한다. Garrett과 나는 최대한 높이 쌓일 때까지 얼음 봉지를 카트에 담는다."
+            "일부 구독 모델에서는, 소비자들이 고정된 비용으로 다양한 제품과 서비스를 경험할 수 있다."
           ],
-          "key": "ybm-pj-l2-s4-29",
+          "key": "ybm-l2-s4-29",
           "stage": 4,
           "number": 29
         },
         {
           "kind": "translation_ai",
-          "source": "By now other people have taken notice and begin to empty the ice case.",
+          "source": "In other models, they can flexibly adjust subscription fees by choosing only the necessary services or products when needed.",
           "prompt": "우리말 해석을 입력하세요.",
           "answers": [
-            "이제 다른 사람들도 눈치를 채고 얼음 상자를 비우기 시작한다."
+            "다른 모델에서는, 필요할 때 필요한 서비스나 제품만 선택하여 구독 요금을 유연하게 조정할 수 있다."
           ],
-          "key": "ybm-pj-l2-s4-30",
+          "key": "ybm-l2-s4-30",
           "stage": 4,
           "number": 30
         },
         {
           "kind": "translation_ai",
-          "source": "The cart is ridiculously heavy now, and almost impossible to push.",
+          "source": "This means they can either enjoy a range of offerings for a set price or save money by selecting only what they really need.",
           "prompt": "우리말 해석을 입력하세요.",
           "answers": [
-            "이제 카트는 엄청나게 무거워져서 밀기가 거의 불가능할 정도이다."
+            "이것은 정해진 가격으로 다양한 제공을 즐길 수도 있고, 그들이 실제 필요한 것만 선택함으로써 돈을 절약할 수도 있음을 의미한다."
           ],
-          "key": "ybm-pj-l2-s4-31",
+          "key": "ybm-l2-s4-31",
           "stage": 4,
           "number": 31
         },
         {
           "kind": "translation_ai",
-          "source": "Then, a man in a business suit comes up behind us. He smiles. \"Looks like you could use some help.\"",
+          "source": "Moreover, subscription services are made easily accessible by online platforms, enhancing consumers' convenience.",
           "prompt": "우리말 해석을 입력하세요.",
           "answers": [
-            "그때 정장 차림의 한 남자가 우리 뒤에서 나타난다. 그는 미소를 짓는다. \"도움이 필요한 것 같구나.\""
+            "게다가, 구독 서비스는 온라인 플랫폼을 통해 쉽게 접근할 수 있게 되어 소비자들의 편의를 증진시킨다."
           ],
-          "key": "ybm-pj-l2-s4-32",
+          "key": "ybm-l2-s4-32",
           "stage": 4,
           "number": 32
         },
         {
           "kind": "translation_ai",
-          "source": "He doesn't wait for us to answer before grabbing the cart's handle. \"Thank you for helping us,\" I tell him.",
+          "source": "With just a few clicks, consumers can receive services or products. If they wish to change their device model, they can do so.",
           "prompt": "우리말 해석을 입력하세요.",
           "answers": [
-            "그는 우리가 대답할 때까지 기다리지 않고 카트 손잡이를 잡는다. \"도와주셔서 감사합니다.\" 나는 그에게 말한다."
+            "단지 몇 번의 클릭으로, 소비자들은 서비스나 제품을 받을 수 있다. 만약 그들이 그들의 기기 모델을 변경하기를 원하면, 그렇게 할 수 있다."
           ],
-          "key": "ybm-pj-l2-s4-33",
+          "key": "ybm-l2-s4-33",
           "stage": 4,
           "number": 33
         },
         {
           "kind": "translation_ai",
-          "source": "\"Not a problem. We all need to help one another.\" He smiles again, and I return the smile.",
+          "source": "Whoever desires an upgrade can get it and experience the latest models.",
           "prompt": "우리말 해석을 입력하세요.",
           "answers": [
-            "\"별거 아니야. 우리 모두 서로 도와야지.\" 그는 다시 미소를 짓고 나도 미소로 화답한다."
+            "업그레이드를 원하는 사람들은 누구든지 받을 수 있고 최신 모델을 경험할 수 있다."
           ],
-          "key": "ybm-pj-l2-s4-34",
+          "key": "ybm-l2-s4-34",
           "stage": 4,
           "number": 34
         },
         {
           "kind": "translation_ai",
-          "source": "It is good to know that difficult times can bring out the best in people.",
+          "source": "Online platforms drive the subscription economy With the development of various digital devices centered on smartphones, consumers have been able to do numerous things with great ease.",
           "prompt": "우리말 해석을 입력하세요.",
           "answers": [
-            "어려운 시기에 사람들의 장점이 드러난다는 것을 알게 되는 것은 좋은 일이다."
+            "온라인 플랫폼들이 구독 경제를 구동한다 스마트폰을 중심으로 한 다양한 디지털 기기의 발전과 함께 소비자들은 많은 것들을 아주 쉽게 할 수 있게 되었다."
           ],
-          "key": "ybm-pj-l2-s4-35",
+          "key": "ybm-l2-s4-35",
           "stage": 4,
           "number": 35
         },
         {
           "kind": "translation_ai",
-          "source": "I decide that one favor deserves another. \"Why don't you take a bag of ice for yourself,\" I suggest.",
+          "source": "In the past, people had no choice but to go to the theater or purchase the videos they wanted to watch.",
           "prompt": "우리말 해석을 입력하세요.",
           "answers": [
-            "나는 호의에는 호의로 보답해야 한다고 결심한다. \"얼음 한 봉지 가져가세요.\" 내가 제안한다."
+            "과거에는, 사람들이 영화관에 가거나, 그들이 시청하기 원하는 비디오들을 구매할 수 밖에 없었다."
           ],
-          "key": "ybm-pj-l2-s4-36",
+          "key": "ybm-l2-s4-36",
           "stage": 4,
           "number": 36
         },
         {
           "kind": "translation_ai",
-          "source": "His smile does not fade. \"I have a better idea,\" he says.",
+          "source": "Today, whoever wants to watch a movie can access online media subscription platforms and enjoy a vast selection of movies on their smartphones or other digital devices.",
           "prompt": "우리말 해석을 입력하세요.",
           "answers": [
-            "그의 미소가 사라지지 않는다. \"더 좋은 생각이 있어.\" 그가 말한다."
+            "오늘날에는, 영화 시청을 원하는 사람들은 누구나 온라인 미디어 구독 플랫폼에 접속해서 그들의 스마트폰에서 또는 다른 디지털 기기에서 엄청난 양의 영화를 즐길 수 있다."
           ],
-          "key": "ybm-pj-l2-s4-37",
+          "key": "ybm-l2-s4-37",
           "stage": 4,
           "number": 37
         },
         {
           "kind": "translation_ai",
-          "source": "\"Why don't you take a bag of ice for yourselves, and I'll keep the rest.\"",
+          "source": "At the same time, these platforms make it easy for companies to offer customized products and services to customers.",
           "prompt": "우리말 해석을 입력하세요.",
           "answers": [
-            "\"너희가 얼음 한 봉지 가져가고 나머지는 내가 가질게.\""
+            "동시에, 이들 플랫폼들은 기업들이 고객들에게 맞춤형 제품과 서비스를 제공하는 것을 쉽게 만든다."
           ],
-          "key": "ybm-pj-l2-s4-38",
+          "key": "ybm-l2-s4-38",
           "stage": 4,
           "number": 38
         },
         {
           "kind": "translation_ai",
-          "source": "For a moment I think he is joking, but then realize he is serious. \"Excuse me?\"",
+          "source": "By applying AI and big data algorithm technology, companies identify consumers' needs, tastes, and consumption patterns.",
           "prompt": "우리말 해석을 입력하세요.",
           "answers": [
-            "잠시 나는 그가 농담하고 있다고 생각하지만, 곧 그가 진지하다는 것을 깨닫는다. \"네?\""
+            "인공지능과 빅데이터 알고리즘 기술을 적용하여, 기업들은 고객들의 요구, 기호, 소비 패턴들을 확인한다."
           ],
-          "key": "ybm-pj-l2-s4-39",
+          "key": "ybm-l2-s4-39",
           "stage": 4,
           "number": 39
         },
         {
           "kind": "translation_ai",
-          "source": "He is still smiling, but his eyes scare me.",
+          "source": "People appreciate having diverse choices and customization, which in turn enhances their satisfaction.",
           "prompt": "우리말 해석을 입력하세요.",
           "answers": [
-            "그는 여전히 웃고 있지만 그의 눈빛이 무섭다."
+            "사람들은 다양한 선택과 맞춤화를 환영하며 이는 결과적으로 그들의 만족을 증진시킨다."
           ],
-          "key": "ybm-pj-l2-s4-40",
+          "key": "ybm-l2-s4-40",
           "stage": 4,
           "number": 40
         },
         {
           "kind": "translation_ai",
-          "source": "As long as his hands are firmly locked on the handle of our cart, there is nothing to prove that it's ours and not his.",
+          "source": "Services, such as suggesting personalized clothing styles based on customers' purchase history or recommending videos that match their movie and video viewing history, bring them great satisfaction.",
           "prompt": "우리말 해석을 입력하세요.",
           "answers": [
-            "그의 손이 우리 카트 손잡이에 단단히 고정되어 있는 한, 카트가 그의 것이 아니라 우리 것임을 증명할 방법은 없다."
+            "소비자의 구매 기록에 기반한 개인 맞춤화된 의류 스타일 제안이나, 그들의 영화 및 비디오 시청 기록과 부합하는 비디오 추천과 같은 서비스는 그들에게 커다란 만족을 가져다준다."
           ],
-          "key": "ybm-pj-l2-s4-41",
+          "key": "ybm-l2-s4-41",
           "stage": 4,
           "number": 41
         },
         {
           "kind": "translation_ai",
-          "source": "\"Is there a problem here?\" It is Uncle Basil. He has arrived just in time.",
+          "source": "Limitations of the subscription economy Although the subscription economy offers many advantages, there are also some disadvantages to consider. One concern is the potential for overconsumption.",
           "prompt": "우리말 해석을 입력하세요.",
           "answers": [
-            "\"무슨 문제 있나요?\" Basil 삼촌이다. 제시간에 맞춰 도착했다."
+            "구독 경제의 제한점들 비록 구독 경제가 많은 장점을 제공하지만, 또한 고려해야 할 일부 단점들도 있다. 한 가지 우려 사항은 과소비 가능성이다."
           ],
-          "key": "ybm-pj-l2-s4-42",
+          "key": "ybm-l2-s4-42",
           "stage": 4,
           "number": 42
         },
         {
           "kind": "translation_ai",
-          "source": "\"Not at all.\" The man looks at the ice with a bitter face, then leaves.",
+          "source": "The convenience and accessibility of the subscription model make it easy for consumers to sign up for multiple services and use a lot of content or products.",
           "prompt": "우리말 해석을 입력하세요.",
           "answers": [
-            "\"전혀요.\" 남자는 씁쓸한 표정으로 얼음을 바라보다가 자리를 뜬다."
+            "구독 모델의 편리성과 접근성은 소비자들이 복수의 서비스를 계약하고 많은 콘텐츠나 제품을 사용하는 것을 쉽게 만든다."
           ],
-          "key": "ybm-pj-l2-s4-43",
+          "key": "ybm-l2-s4-43",
           "stage": 4,
           "number": 43
         },
         {
           "kind": "translation_ai",
-          "source": "*The above is a shortened version of the opening of the novel Dry (2018).",
+          "source": "This can result in excessive consumption and using more subscription services than actually needed.",
           "prompt": "우리말 해석을 입력하세요.",
           "answers": [
-            "*위 내용은 소설 <드라이>(Dry, 2018)의 도입부를 축약한 것이다."
+            "이것은 과도한 소비와 실제로 필요한 것보다 많은 구독 서비스 사용을 야기할 수 있다."
           ],
-          "key": "ybm-pj-l2-s4-44",
+          "key": "ybm-l2-s4-44",
           "stage": 4,
           "number": 44
         },
         {
           "kind": "translation_ai",
-          "source": "It tells the story of a girl who has to make tough choices for her family during a disastrous California drought.",
+          "source": "It is crucial to subscribe only to services that are truly necessary and avoid subscribing to similar services.",
           "prompt": "우리말 해석을 입력하세요.",
           "answers": [
-            "이 소설은 캘리포니아의 재앙적인 가뭄 속에서 가족을 위해 힘든 선택을 해야 하는 한 소녀의 이야기이다."
+            "진정으로 필요한 서비스들만 구독하고 유사한 서비스들을 구독하는 것을 피하는 것이 매우 중요하다."
           ],
-          "key": "ybm-pj-l2-s4-45",
+          "key": "ybm-l2-s4-45",
           "stage": 4,
           "number": 45
         },
         {
           "kind": "translation_ai",
-          "source": "Her unwanted adventure ends when the water supply resumes and life is back to normal.",
+          "source": "Related to the concern of overconsumption is the financial burden that subscriptions can create.",
           "prompt": "우리말 해석을 입력하세요.",
           "answers": [
-            "소녀의 원치 않는 모험은 물 공급이 재개되고 생활이 정상으로 돌아오면서 끝난다."
+            "과소비의 우려와 관련된 것으로 구독이 창출할 수 있는 금융 부담이 있다."
           ],
-          "key": "ybm-pj-l2-s4-46",
+          "key": "ybm-l2-s4-46",
           "stage": 4,
           "number": 46
         },
         {
           "kind": "translation_ai",
-          "source": "Provided that the factors contributing to water shortages worldwide are not addressed, including climate change, population growth, and using too much water for agriculture, it is possible that this story can become a reality.",
+          "source": "While the cost of individual subscriptions may seem affordable, subscribing to multiple services can add up quickly.",
           "prompt": "우리말 해석을 입력하세요.",
           "answers": [
-            "기후 변화, 인구 증가, 농업용수 과다 사용 등 전 세계적으로 물 부족을 야기하는 요인들이 해결되지 않는다면 이 소설의 이야기가 현실이 될 수도 있다."
+            "개별 구독 비용은 감당할 수 있어 보일 수 있지만, 복수의 서비스를 구독하는 것은 비용이 빠르게 증가할 수 있다."
           ],
-          "key": "ybm-pj-l2-s4-47",
+          "key": "ybm-l2-s4-47",
           "stage": 4,
           "number": 47
+        },
+        {
+          "kind": "translation_ai",
+          "source": "It is important to carefully consider the costs of these subscriptions to avoid financial strain.",
+          "prompt": "우리말 해석을 입력하세요.",
+          "answers": [
+            "재정적 부담을 피하기 위해 이들 구독의 비용을 신중하게 고려하는 것이 중요하다."
+          ],
+          "key": "ybm-l2-s4-48",
+          "stage": 4,
+          "number": 48
+        },
+        {
+          "kind": "translation_ai",
+          "source": "Regularly reviewing and canceling unnecessary subscriptions can be beneficial.",
+          "prompt": "우리말 해석을 입력하세요.",
+          "answers": [
+            "정기적으로 검토하고 불필요한 구독들을 취소하는 것이 유익할 수 있다."
+          ],
+          "key": "ybm-l2-s4-49",
+          "stage": 4,
+          "number": 49
+        },
+        {
+          "kind": "translation_ai",
+          "source": "Additionally, the subscription economy can contribute to environmental pollution.",
+          "prompt": "우리말 해석을 입력하세요.",
+          "answers": [
+            "부가적으로, 구독 경제는 환경 오염에 기여할 수 있다."
+          ],
+          "key": "ybm-l2-s4-50",
+          "stage": 4,
+          "number": 50
+        },
+        {
+          "kind": "translation_ai",
+          "source": "The regular delivery of products in packaging materials can increase the use of disposable packaging, which harms the environment.",
+          "prompt": "우리말 해석을 입력하세요.",
+          "answers": [
+            "포장재에 담긴 제품들을 정기적으로 배달하는 것은 일회용 포장의 사용을 증가시킬 수 있어 이것이 환경을 해친다."
+          ],
+          "key": "ybm-l2-s4-51",
+          "stage": 4,
+          "number": 51
+        },
+        {
+          "kind": "translation_ai",
+          "source": "Using environmentally friendly packaging materials and opting for reusable packaging can help reduce this problem.",
+          "prompt": "우리말 해석을 입력하세요.",
+          "answers": [
+            "친환경 포장 재료를 사용하고 재사용 가능한 포장을 선택하는 것은 이 문제를 줄이는 데 도움이 될 수 있다."
+          ],
+          "key": "ybm-l2-s4-52",
+          "stage": 4,
+          "number": 52
+        },
+        {
+          "kind": "translation_ai",
+          "source": "Despite the potential limitations of subscription services, they have become deeply embedded in our lives and more and more businesses are jumping onto the subscription economy model.",
+          "prompt": "우리말 해석을 입력하세요.",
+          "answers": [
+            "구독 서비스들의 잠재적 제한점들에도 불구하고, 그것은 우리의 삶에 깊숙이 자리 잡고 있으며 더욱더 많은 사업이 구독 경제 모델에 올라타고 있다."
+          ],
+          "key": "ybm-l2-s4-53",
+          "stage": 4,
+          "number": 53
+        },
+        {
+          "kind": "translation_ai",
+          "source": "It is expected that new subscription services will be continuously provided to consumers in new areas in the future.",
+          "prompt": "우리말 해석을 입력하세요.",
+          "answers": [
+            "미래에 새로운 영역들에서 소비자들에게 새로운 구독 서비스들이 지속적으로 제공될 것으로 예상된다."
+          ],
+          "key": "ybm-l2-s4-54",
+          "stage": 4,
+          "number": 54
+        },
+        {
+          "kind": "translation_ai",
+          "source": "We need to have a deeper understanding of the subscription economy and become wise consumers who receive the services that are really needed.",
+          "prompt": "우리말 해석을 입력하세요.",
+          "answers": [
+            "우리는 구독 경제에 대해 보다 깊은 이해를 가지고 정말 필요한 서비스들물 받는 현명한 소비자가 되어야 한다."
+          ],
+          "key": "ybm-l2-s4-55",
+          "stage": 4,
+          "number": 55
         }
       ]
     },
@@ -1930,433 +2130,979 @@ export const YBM_PARKJUNEON_L2_WORKBOOK = {
       "items": [
         {
           "kind": "verb_form",
-          "source": "침을 한 번 뱉더니 조용해진다.",
-          "prompt": "It ______________ once, and then ______________ silent.",
+          "source": "고등학생인 지윤이는 그녀의 스마트폰에서 음악 스트리밍 서비스에 로그인하며 하루를 시작한다.",
+          "prompt": "Jiyun, a high school student, ______________ her day by ______________ in to a music streaming service on her smartphone.",
           "hints": [
-            "spit",
-            "go"
+            "start",
+            "log"
           ],
           "answers": [
-            "spits",
-            "goes"
+            "starts",
+            "logging"
           ],
-          "key": "ybm-pj-l2-s5-02",
+          "key": "ybm-l2-s5-01",
+          "stage": 5,
+          "number": 1
+        },
+        {
+          "kind": "verb_form",
+          "source": "그녀는 매일 자신이 선호하는 음악을 듣고, 새로운 노래들을 발견하고, 새로운 아티스트들을 탐색하는 것을 즐긴다.",
+          "prompt": "She ______________ ______________ to her favorite music, ______________ new songs, and ______________ new artists every day.",
+          "hints": [
+            "enjoy",
+            "listen",
+            "discover",
+            "explore"
+          ],
+          "answers": [
+            "enjoys",
+            "listening",
+            "discovering",
+            "exploring"
+          ],
+          "key": "ybm-l2-s5-02",
           "stage": 5,
           "number": 2
         },
         {
           "kind": "verb_form",
-          "source": "\"엄마,\" 나는 거실을 향해 소리친다. \"물이 안 나와요.\"",
-          "prompt": "\"Mom,\" I ______________ out into the living room, \"water ______________ out.\"",
+          "source": "건강한 아침 식사를 위해, 지윤이는 신선한 채소와 과일을 공급하는 구독 서비스로부터 배송을 받는다.",
+          "prompt": "For a healthy breakfast, Jiyun ______________ a delivery from a subscription service that ______________ fresh vegetables and fruits.",
           "hints": [
-            "shout",
-            "be, not, come"
+            "receive",
+            "provide"
           ],
           "answers": [
-            "shout",
-            "is not coming"
+            "receives",
+            "provides"
           ],
-          "key": "ybm-pj-l2-s5-03",
+          "key": "ybm-l2-s5-03",
           "stage": 5,
           "number": 3
         },
         {
           "kind": "verb_form",
-          "source": "사람들이 '가뭄'이라는 단어를 듣는 데 지친 이후로 언론은 가뭄을 이렇게 부르고 있다.",
-          "prompt": "This ______________ what the media ______________ the drought ever since people ______________ ______________ of ______________ the word \"drought.\"",
+          "source": "방과 후에, 지윤이는 그녀가 흥미를 느끼는 것마다 그녀의 지식을 확장하기 위해 비디오 강의 서비스를 활용한다.",
+          "prompt": "After school, Jiyun ______________ a video lecture service ______________ her knowledge in whatever she ______________ ______________ .",
           "hints": [
-            "be",
-            "have, be, call",
-            "get",
-            "tire",
-            "hear"
+            "utilize",
+            "expand",
+            "find",
+            "interest"
           ],
           "answers": [
-            "is",
-            "has been calling",
-            "got",
-            "tired",
-            "hearing"
+            "utilizes",
+            "to expand",
+            "finds",
+            "interesting"
           ],
-          "key": "ybm-pj-l2-s5-05",
+          "key": "ybm-l2-s5-04",
+          "stage": 5,
+          "number": 4
+        },
+        {
+          "kind": "verb_form",
+          "source": "예를 들어, 그녀는 학교 공부를 복습하고 그녀가 선택한 연구 분야의 최신 지식에 대해 계속 업데이트하기 위해 다양한 학술 강의를 시청한다.",
+          "prompt": "For example, she ______________ various academic lectures ______________ her schoolwork and ______________ updated about the latest knowledge in her ______________ field of study.",
+          "hints": [
+            "watch",
+            "review",
+            "stay",
+            "choose"
+          ],
+          "answers": [
+            "watches",
+            "to review",
+            "stay",
+            "chosen"
+          ],
+          "key": "ybm-l2-s5-05",
           "stage": 5,
           "number": 5
         },
         {
           "kind": "verb_form",
-          "source": "이제 위기는 새로운 단계로 접어들고 있다. 수도꼭지에서 수돗물이 나오지 않는다.",
-          "prompt": "Now the crisis ______________ a new stage. We ______________ no ______________ water out of the tap.",
+          "source": "주말에 지윤이와 그녀의 가족은 스트리밍 서비스를 사용하면서 함께 영화나 드라마를 시청하는 좋은 시간을 보낸다.",
+          "prompt": "During weekends, Jiyun and her family ______________ quality time together ______________ movies or dramas ______________ a streaming service.",
           "hints": [
-            "be, enter",
-            "have",
-            "run"
+            "spend",
+            "watch",
+            "use"
           ],
           "answers": [
-            "is entering",
-            "have",
-            "running"
+            "spend",
+            "watching",
+            "using"
           ],
-          "key": "ybm-pj-l2-s5-06",
+          "key": "ybm-l2-s5-06",
           "stage": 5,
           "number": 6
         },
         {
           "kind": "verb_form",
-          "source": "\"쇼핑몰로 가자!\" Basil 삼촌이 말한다. 동생 Garrett과 나는 삼촌의 트럭에 올라탄다.",
-          "prompt": "\"To the mall!\" ______________ Uncle Basil. My little brother Garrett and I ______________ in our uncle's truck.",
+          "source": "구독은 모든 곳에 있다 분명히, 구독 경제는 요즈음 인기 있는 경제 모델이고, 지윤이는 그것에 적극적으로 참여하고 있다.",
+          "prompt": "Subscriptions are everywhere ______________ sure, the subscription economy ______________ a popular economic model nowadays, and Jiyun ______________ part in it.",
           "hints": [
-            "say",
-            "jump"
+            "Be",
+            "be",
+            "be, actively, take"
           ],
           "answers": [
-            "says",
-            "jump"
+            "To be",
+            "is",
+            "is actively taking"
           ],
-          "key": "ybm-pj-l2-s5-07",
+          "key": "ybm-l2-s5-07",
           "stage": 5,
           "number": 7
         },
         {
           "kind": "verb_form",
-          "source": "계산대에 줄을 선 카트에 보이는 것은 대부분 물병이다. 생명의 필수품.",
-          "prompt": "What I ______________ in the carts in the checkout line ______________ mostly water bottles. The essentials of life.",
+          "source": "구독 기반의 비즈니스 모델의 개념은 새로운 것이 아니다. 처음에 그것은 우유와 신문 같은 제품들에 한정되었다.",
+          "prompt": "The concept of business models based on subscriptions ______________ not new. Initially it ______________ to products such as milk and newspapers.",
           "hints": [
-            "see",
-            "be"
+            "be",
+            "limit"
           ],
           "answers": [
-            "see",
-            "are"
+            "is",
+            "was limited"
           ],
-          "key": "ybm-pj-l2-s5-10",
+          "key": "ybm-l2-s5-08",
+          "stage": 5,
+          "number": 8
+        },
+        {
+          "kind": "verb_form",
+          "source": "하지만, 이들 사업 모델은 엔터테인먼트, 기술, 패션, 교육, 그리고 훨씬 더 많은 것들을 포함한, 모든 산업들로 확산되었다.",
+          "prompt": "However, these business models ______________ to all industries, including entertainment, technology, fashion, education, and much more.",
+          "hints": [
+            "have, expand"
+          ],
+          "answers": [
+            "have expanded"
+          ],
+          "key": "ybm-l2-s5-09",
+          "stage": 5,
+          "number": 9
+        },
+        {
+          "kind": "verb_form",
+          "source": "일회성으로 팔릴 히트 상품을 창출하는 대신에, 기업들은 지금 새 콘텐츠, 보다 개인 맞춤형, 또는 업데이트 접근성 같은 지속적 가치를 제공하는 것을 우선시한다.",
+          "prompt": "Instead of ______________ a hit product that ______________ once, companies now prioritize ______________ continuing value, such as new content, more personalization, or access to updates.",
+          "hints": [
+            "create",
+            "will, sell",
+            "provide"
+          ],
+          "answers": [
+            "creating",
+            "will be sold",
+            "providing"
+          ],
+          "key": "ybm-l2-s5-10",
           "stage": 5,
           "number": 10
         },
         {
           "kind": "verb_form",
-          "source": "줄을 선 사람들의 얼굴에는 조급한 표정이 역력하다.",
-          "prompt": "There ______________ a look of impatience on the faces of the people in line.",
+          "source": "고객들은 정기적 구독을 통해 이러한 혜택들에 대해 비용을 지불한다.",
+          "prompt": "Customers ______________ for these benefits via a regular subscription.",
           "hints": [
-            "be"
+            "pay"
           ],
           "answers": [
-            "is"
+            "pay"
           ],
-          "key": "ybm-pj-l2-s5-11",
+          "key": "ybm-l2-s5-11",
           "stage": 5,
           "number": 11
         },
         {
           "kind": "verb_form",
-          "source": "심지어는 얇은 공손함 뒤에 숨은 적대감까지 느껴진다. 그 공손함조차 얇아져 있다.",
-          "prompt": "There ______________ even hostility, ______________ by a thin layer of politeness. Even that politeness ______________ ______________ thin.",
+          "source": "구독 경제는 기업과 소비자 모두에게 이점을 가져다준다.",
+          "prompt": "The subscription economy ______________ advantages for both companies and consumers.",
           "hints": [
-            "be",
-            "hide",
-            "be",
-            "stretch"
+            "bring"
           ],
           "answers": [
-            "is",
-            "hidden",
-            "is",
-            "stretched"
+            "brings"
           ],
-          "key": "ybm-pj-l2-s5-12",
+          "key": "ybm-l2-s5-12",
           "stage": 5,
           "number": 12
         },
         {
           "kind": "verb_form",
-          "source": "물병을 사러 매장 뒤편에 다다랐을 때 나는 너무 늦었다는 것을 깨닫는다.",
-          "prompt": "As I ______________ the back of the store for water bottles, I ______________ I ______________ too late.",
+          "source": "기업들은 구독 모델을 사용해서 안정적인 수입을 얻고 고객 충성도를 구축할 수 있다.",
+          "prompt": "Companies ______________ a stable revenue and ______________ customer loyalty by ______________ the subscription model.",
           "hints": [
-            "approach",
-            "realize",
-            "be"
+            "can, have",
+            "build",
+            "use"
           ],
           "answers": [
-            "approach",
-            "realize",
-            "am"
+            "can have",
+            "build",
+            "using"
           ],
-          "key": "ybm-pj-l2-s5-13",
+          "key": "ybm-l2-s5-13",
           "stage": 5,
           "number": 13
         },
         {
           "kind": "verb_form",
-          "source": "진열대는 이미 비어 있다.",
-          "prompt": "The shelves ______________ already empty.",
+          "source": "소비자의 관점에서, 그들은 더욱 다양한 범위의 선택과 개인 맞춤형 경험을 즐길 수 있다.",
+          "prompt": "From the consumers' perspective, they ______________ a wider range of choices and ______________ experiences.",
           "hints": [
-            "be"
+            "can, enjoy",
+            "personalize"
           ],
           "answers": [
-            "are"
+            "can enjoy",
+            "personalized"
           ],
-          "key": "ybm-pj-l2-s5-14",
+          "key": "ybm-l2-s5-14",
           "stage": 5,
           "number": 14
         },
         {
           "kind": "verb_form",
-          "source": "옆 통로로 가서 운을 시험해 본다.",
-          "prompt": "I ______________ my way to the side aisle, ______________ my luck.",
+          "source": "그들은 또한 융통성 있는 구독 계약을 함으로써 돈을 절약할 수 있다.",
+          "prompt": "They ______________ money by ______________ flexible subscription contracts.",
           "hints": [
-            "manage",
-            "try"
+            "can, also, save",
+            "have"
           ],
           "answers": [
-            "manage",
-            "trying"
+            "can also save",
+            "having"
           ],
-          "key": "ybm-pj-l2-s5-15",
+          "key": "ybm-l2-s5-15",
           "stage": 5,
           "number": 15
         },
         {
           "kind": "verb_form",
-          "source": "가끔 사람들이 원하지 않는 물건을 엉뚱한 선반에 놓는 경우가 있다.",
-          "prompt": "Sometimes people ______________ unwanted items in the wrong shelves.",
+          "source": "구독 경제의 부상은 두 개의 주요한 동인들과 깊은 연관이 있다: 소비 추세의 변화들과 온라인 플랫폼의 급성장.",
+          "prompt": "The rise of the subscription economy ______________ to two major drivers: changes in consumption trends and the rapid growth of online platforms.",
           "hints": [
-            "place"
+            "closely, connect"
           ],
           "answers": [
-            "place"
+            "is closely connected"
           ],
-          "key": "ybm-pj-l2-s5-16",
+          "key": "ybm-l2-s5-16",
           "stage": 5,
           "number": 16
         },
         {
           "kind": "verb_form",
-          "source": "운이 좋다! 물이 그렇게 귀한 물건이 아니었던 어제 누군가 그곳에 버린 생수 한 상자를 발견한다.",
-          "prompt": "Lucky! I ______________ a single case of water that someone ______________ there maybe yesterday, when it ______________ such a precious commodity.",
+          "source": "사람들은 구독을 사랑한다 구독 경제는 요즘 사람들이 어떻게 재화와 서비스를 소비하는지와 상당히 관련되어 있다.",
+          "prompt": "People ______________ the subscriptions The subscription economy ______________ highly relevant to how people ______________ goods and services nowadays.",
           "hints": [
-            "find",
-            "abandon",
-            "not, be"
+            "love",
+            "be",
+            "consume"
           ],
           "answers": [
-            "find",
-            "abandoned",
-            "wasn't"
+            "love",
+            "is",
+            "consume"
           ],
-          "key": "ybm-pj-l2-s5-17",
+          "key": "ybm-l2-s5-17",
           "stage": 5,
           "number": 17
         },
         {
           "kind": "verb_form",
-          "source": "손을 뻗어 생수 상자를 집어 들려는 순간, 한 여자가 상자를 가져가는 것을 본다.",
-          "prompt": "I ______________ for it, only ______________ it ______________ away at the last second by a woman.",
+          "source": "점점 더 많은 사람이 물건을 소유하는 것보다 경험을 우선시한다.",
+          "prompt": "More and more people ______________ experiences over ______________ things.",
           "hints": [
-            "reach",
-            "find",
-            "pull"
+            "prioritize",
+            "own"
           ],
           "answers": [
-            "reach",
-            "to find",
-            "pulled"
+            "prioritize",
+            "owning"
           ],
-          "key": "ybm-pj-l2-s5-18",
+          "key": "ybm-l2-s5-18",
           "stage": 5,
           "number": 18
         },
         {
           "kind": "verb_form",
-          "source": "그녀는 생수 상자를 카트에 담긴 통조림 위에 마치 왕관처럼 쌓아 놓는다.",
-          "prompt": "She ______________ it on top of her cart like a crown on top of her canned goods.",
+          "source": "이것이 구독 경제를 그들에게 매력적인 것으로 만드는데 왜냐하면 그것은 소유의 필요 없이 서비스나 콘텐츠에 대한 접근을 제공하기 때문이다.",
+          "prompt": "This ______________ the subscription economy attractive to them because it ______________ access to services or content without the requirement of ownership.",
           "hints": [
-            "stack"
+            "make",
+            "offer"
           ],
           "answers": [
-            "stacks"
+            "makes",
+            "offers"
           ],
-          "key": "ybm-pj-l2-s5-19",
+          "key": "ybm-l2-s5-19",
           "stage": 5,
           "number": 19
         },
         {
           "kind": "verb_form",
-          "source": "\"지난주 연습할 때 내가 물 나눠주지 않았니?\" 나는 그녀에게 지적한다.",
-          "prompt": "\"Didn't I ______________ my water with you at the practice last week?\" I ______________ out to her.",
+          "source": "예를 들어, 음악 스트리밍 서비스를 구독함으로써, 소비자들은 디스크 앨범을 가질 필요가 없이 무한한 음악을 즐길 수 있다.",
+          "prompt": "For example, by ______________ to a music streaming service, consumers ______________ limitless music without the need for ______________ disc albums.",
           "hints": [
-            "share",
-            "point"
+            "subscribe",
+            "can, enjoy",
+            "have"
           ],
           "answers": [
-            "share",
-            "point"
+            "subscribing",
+            "can enjoy",
+            "having"
           ],
-          "key": "ybm-pj-l2-s5-22",
+          "key": "ybm-l2-s5-20",
+          "stage": 5,
+          "number": 20
+        },
+        {
+          "kind": "verb_form",
+          "source": "또 다른 예는 의류 서비스를 구독하는 것으로, 소비자들은 그들의 서랍을 채우지 않고 다양한 의류 스타일을 탐색할 수 있다.",
+          "prompt": "Another example ______________ ______________ to clothing services, where consumers ______________ a variety of clothing styles without ______________ up their drawers.",
+          "hints": [
+            "be",
+            "subscribe",
+            "can, explore",
+            "fill"
+          ],
+          "answers": [
+            "is",
+            "subscribing",
+            "can explore",
+            "filling"
+          ],
+          "key": "ybm-l2-s5-21",
+          "stage": 5,
+          "number": 21
+        },
+        {
+          "kind": "verb_form",
+          "source": "게다가, 소비자들은 다양성과 맞춤화에 가치를 둔다.",
+          "prompt": "Moreover, consumers ______________ diversity and customization.",
+          "hints": [
+            "value"
+          ],
+          "answers": [
+            "value"
+          ],
+          "key": "ybm-l2-s5-22",
           "stage": 5,
           "number": 22
         },
         {
           "kind": "verb_form",
-          "source": "\"너도 호의를 갚아서 나랑 물 몇 병 나눠도 되겠네.\"",
-          "prompt": "\"Maybe you ______________ the favor and ______________ a few bottles with me.\"",
+          "source": "구독 경제는 다양한 범위의 구독 선택을 제공하여, 개인들이 그들의 선호와 관심에 기초하여 그들의 경험들을 개별화할 수 있도록 해 준다.",
+          "prompt": "The subscription economy ______________ a diverse range of subscription options, ______________ individuals ______________ their experiences based on their own preferences and interests.",
           "hints": [
-            "could, return",
-            "share"
+            "offer",
+            "enable",
+            "personalize"
           ],
           "answers": [
-            "could return",
-            "share"
+            "offers",
+            "enabling",
+            "to personalize"
           ],
-          "key": "ybm-pj-l2-s5-23",
+          "key": "ybm-l2-s5-23",
           "stage": 5,
           "number": 23
         },
         {
           "kind": "verb_form",
-          "source": "그러고는 얼굴이 약간 붉어지더니 더 붉어지기 전에 자리를 뜨려고 돌아선다.",
-          "prompt": "And then she ______________ a little bit red in the face, and ______________ ______________ before it ______________ a deep flush.",
+          "source": "구독 경제의 이러한 측면은 젊은 세대가 그들의 고유함을 표현하고, 젊은 세대의 개별적 취향에 부합하는 가치 있는 콘텐츠와 서비스들을 발견하는 것을 즐김에 따라, 젊은 세대 사이에 더욱 인기가 있다.",
+          "prompt": "This aspect of the subscription economy ______________ more popular among younger generations, as they ______________ ______________ their uniqueness and ______________ valuable content and services that ______________ with their individual tastes.",
           "hints": [
-            "get",
-            "turn",
-            "leave",
-            "become"
+            "be",
+            "enjoy",
+            "express",
+            "discover",
+            "fit"
           ],
           "answers": [
-            "gets",
-            "turns",
-            "to leave",
-            "becomes"
+            "is",
+            "enjoy",
+            "expressing",
+            "discovering",
+            "fit"
           ],
-          "key": "ybm-pj-l2-s5-25",
+          "key": "ybm-l2-s5-24",
+          "stage": 5,
+          "number": 24
+        },
+        {
+          "kind": "verb_form",
+          "source": "주목받고 있는 인기 사례는 화장품 구독 서비스이다.",
+          "prompt": "A popular example that ______________ attention is the cosmetics subscription service.",
+          "hints": [
+            "have, gain"
+          ],
+          "answers": [
+            "has gained"
+          ],
+          "key": "ybm-l2-s5-25",
           "stage": 5,
           "number": 25
         },
         {
           "kind": "verb_form",
-          "source": "나는 냉동식품 통로에서 Garrett을 발견한다. 그러다 뭔가를 발견한다.",
-          "prompt": "I ______________ for Garrett, whom I ______________ in the ______________ aisle. Then I ______________ something.",
+          "source": "그것은 소비자의 현재 피부 상태를 철저하게 분석하고 개개인의 고유한 피부 고민을 해결하기 위해 만들어진 화장품 제조를 포함한 전문적인 추천을 제공하는 것이 돋보인다.",
+          "prompt": "It ______________ out by thoroughly ______________ customers' current skin conditions and ______________ ______________ recommendations, including manufacturing cosmetics ______________ ______________ each individual's unique skin concerns.",
           "hints": [
-            "look",
-            "find",
-            "freeze",
-            "see"
+            "stand",
+            "analyze",
+            "provide",
+            "specialize",
+            "create",
+            "address"
           ],
           "answers": [
-            "look",
-            "find",
-            "frozen",
-            "see"
+            "stands",
+            "analyzing",
+            "providing",
+            "specialized",
+            "created",
+            "to address"
           ],
-          "key": "ybm-pj-l2-s5-26",
+          "key": "ybm-l2-s5-26",
           "stage": 5,
           "number": 26
         },
         {
           "kind": "verb_form",
-          "source": "냉동 야채와 아이스크림 바로 지나서 얼음이 가득 담긴 상자가 있다.",
-          "prompt": "Just past the ______________ vegetables and ice cream, there ______________ a case ______________ with ice.",
+          "source": "요점을 말하자면, 소비자들은 획일화된 구매 과정 대신에, 그들 개인의 피부 조건을 우선시하는 개별화된 경험을 얻는다.",
+          "prompt": "To come to the point, consumers ______________ a ______________ experience that ______________ their individual skin conditions, rather than a uniform purchasing process.",
           "hints": [
-            "freeze",
-            "be",
-            "pack"
+            "receive",
+            "personalize",
+            "prioritize"
           ],
           "answers": [
-            "frozen",
-            "is",
-            "packed"
+            "receive",
+            "personalized",
+            "prioritizes"
           ],
-          "key": "ybm-pj-l2-s5-27",
+          "key": "ybm-l2-s5-27",
           "stage": 5,
           "number": 27
         },
         {
           "kind": "verb_form",
-          "source": "이제 다른 사람들도 눈치를 채고 얼음 상자를 비우기 시작한다.",
-          "prompt": "By now other people ______________ notice and ______________ ______________ the ice case.",
+          "source": "게다가, 소비자들은 유연성과 편의성을 높이 평가한다.",
+          "prompt": "Furthermore, consumers ______________ flexibility and convenience.",
           "hints": [
-            "have, take",
-            "begin",
-            "empty"
+            "appreciate"
           ],
           "answers": [
-            "have taken",
-            "begin",
-            "to empty"
+            "appreciate"
           ],
-          "key": "ybm-pj-l2-s5-30",
+          "key": "ybm-l2-s5-28",
+          "stage": 5,
+          "number": 28
+        },
+        {
+          "kind": "verb_form",
+          "source": "일부 구독 모델에서는, 소비자들이 고정된 비용으로 다양한 제품과 서비스를 경험할 수 있다.",
+          "prompt": "In some subscription models, consumers ______________ a variety of products or services for a fixed cost.",
+          "hints": [
+            "can, experience"
+          ],
+          "answers": [
+            "can experience"
+          ],
+          "key": "ybm-l2-s5-29",
+          "stage": 5,
+          "number": 29
+        },
+        {
+          "kind": "verb_form",
+          "source": "다른 모델에서는, 필요할 때 필요한 서비스나 제품만 선택하여 구독 요금을 유연하게 조정할 수 있다.",
+          "prompt": "In other models, they ______________ subscription fees by ______________ only the necessary services or products when ______________ .",
+          "hints": [
+            "can, flexibly, adjust",
+            "choose",
+            "need"
+          ],
+          "answers": [
+            "can flexibly adjust",
+            "choosing",
+            "needed"
+          ],
+          "key": "ybm-l2-s5-30",
           "stage": 5,
           "number": 30
         },
         {
           "kind": "verb_form",
-          "source": "\"별거 아니야. 우리 모두 서로 도와야지.\" 그는 다시 미소를 짓고 나도 미소로 화답한다.",
-          "prompt": "\"Not a problem. We all ______________ ______________ one another.\" He ______________ again, and I ______________ the smile.",
+          "source": "이것은 정해진 가격으로 다양한 제공을 즐길 수도 있고, 그들이 실제 필요한 것만 선택함으로써 돈을 절약할 수도 있음을 의미한다.",
+          "prompt": "This ______________ they ______________ a range of offerings for a set price or ______________ money by ______________ only what they really ______________ .",
           "hints": [
-            "need",
-            "help",
-            "smile",
-            "return"
+            "mean",
+            "can, either, enjoy",
+            "save",
+            "select",
+            "need"
           ],
           "answers": [
-            "need",
-            "to help",
-            "smiles",
-            "return"
+            "means",
+            "can either enjoy",
+            "save",
+            "selecting",
+            "need"
           ],
-          "key": "ybm-pj-l2-s5-34",
+          "key": "ybm-l2-s5-31",
+          "stage": 5,
+          "number": 31
+        },
+        {
+          "kind": "verb_form",
+          "source": "게다가, 구독 서비스는 온라인 플랫폼을 통해 쉽게 접근할 수 있게 되어 소비자들의 편의를 증진시킨다.",
+          "prompt": "Moreover, subscription services ______________ easily accessible by online platforms, ______________ consumers' convenience.",
+          "hints": [
+            "make",
+            "enhance"
+          ],
+          "answers": [
+            "are made",
+            "enhancing"
+          ],
+          "key": "ybm-l2-s5-32",
+          "stage": 5,
+          "number": 32
+        },
+        {
+          "kind": "verb_form",
+          "source": "단지 몇 번의 클릭으로, 소비자들은 서비스나 제품을 받을 수 있다. 만약 그들이 그들의 기기 모델을 변경하기를 원하면, 그렇게 할 수 있다.",
+          "prompt": "With just a few clicks, consumers ______________ services or products. If they ______________ ______________ their device model, they ______________ so.",
+          "hints": [
+            "can, receive",
+            "wish",
+            "change",
+            "can, do"
+          ],
+          "answers": [
+            "can receive",
+            "wish",
+            "to change",
+            "can do"
+          ],
+          "key": "ybm-l2-s5-33",
+          "stage": 5,
+          "number": 33
+        },
+        {
+          "kind": "verb_form",
+          "source": "업그레이드를 원하는 사람들은 누구든지 받을 수 있고 최신 모델을 경험할 수 있다.",
+          "prompt": "Whoever ______________ an upgrade ______________ it and ______________ the latest models.",
+          "hints": [
+            "desire",
+            "can, get",
+            "experience"
+          ],
+          "answers": [
+            "desires",
+            "can get",
+            "experience"
+          ],
+          "key": "ybm-l2-s5-34",
           "stage": 5,
           "number": 34
         },
         {
           "kind": "verb_form",
-          "source": "어려운 시기에 사람들의 장점이 드러난다는 것을 알게 되는 것은 좋은 일이다.",
-          "prompt": "It ______________ good ______________ that difficult times ______________ out the best in people.",
+          "source": "온라인 플랫폼들이 구독 경제를 구동한다 스마트폰을 중심으로 한 다양한 디지털 기기의 발전과 함께 소비자들은 많은 것들을 아주 쉽게 할 수 있게 되었다.",
+          "prompt": "Online platforms ______________ the subscription economy With the development of various digital devices ______________ on smartphones, consumers ______________ able ______________ numerous things with great ease.",
           "hints": [
-            "be",
-            "know",
-            "can, bring"
+            "drive",
+            "center",
+            "have, be",
+            "do"
           ],
           "answers": [
-            "is",
-            "to know",
-            "can bring"
+            "drive",
+            "centered",
+            "have been",
+            "to do"
           ],
-          "key": "ybm-pj-l2-s5-35",
+          "key": "ybm-l2-s5-35",
           "stage": 5,
           "number": 35
         },
         {
           "kind": "verb_form",
-          "source": "이 소설은 캘리포니아의 재앙적인 가뭄 속에서 가족을 위해 힘든 선택을 해야 하는 한 소녀의 이야기이다.",
-          "prompt": "It ______________ the story of a girl who ______________ tough choices for her family during a disastrous California drought.",
+          "source": "과거에는, 사람들이 영화관에 가거나, 그들이 시청하기 원하는 비디오들을 구매할 수 밖에 없었다.",
+          "prompt": "In the past, people had no choice but to ______________ to the theater or ______________ the videos they ______________ ______________ .",
           "hints": [
-            "tell",
-            "have to, make"
+            "go",
+            "purchase",
+            "want",
+            "watch"
           ],
           "answers": [
-            "tells",
-            "has to make"
+            "go",
+            "purchase",
+            "wanted",
+            "to watch"
           ],
-          "key": "ybm-pj-l2-s5-45",
+          "key": "ybm-l2-s5-36",
+          "stage": 5,
+          "number": 36
+        },
+        {
+          "kind": "verb_form",
+          "source": "오늘날에는, 영화 시청을 원하는 사람들은 누구나 온라인 미디어 구독 플랫폼에 접속해서 그들의 스마트폰에서 또는 다른 디지털 기기에서 엄청난 양의 영화를 즐길 수 있다.",
+          "prompt": "Today, whoever ______________ ______________ a movie ______________ online media subscription platforms and ______________ a vast selection of movies on their smartphones or other digital devices.",
+          "hints": [
+            "want",
+            "watch",
+            "can, access",
+            "enjoy"
+          ],
+          "answers": [
+            "wants",
+            "to watch",
+            "can access",
+            "enjoy"
+          ],
+          "key": "ybm-l2-s5-37",
+          "stage": 5,
+          "number": 37
+        },
+        {
+          "kind": "verb_form",
+          "source": "동시에, 이들 플랫폼들은 기업들이 고객들에게 맞춤형 제품과 서비스를 제공하는 것을 쉽게 만든다.",
+          "prompt": "At the same time, these platforms ______________ it easy for companies ______________ ______________ products and services to customers.",
+          "hints": [
+            "make",
+            "offer",
+            "customize"
+          ],
+          "answers": [
+            "make",
+            "to offer",
+            "customized"
+          ],
+          "key": "ybm-l2-s5-38",
+          "stage": 5,
+          "number": 38
+        },
+        {
+          "kind": "verb_form",
+          "source": "인공지능과 빅데이터 알고리즘 기술을 적용하여, 기업들은 고객들의 요구, 기호, 소비 패턴들을 확인한다.",
+          "prompt": "By ______________ AI and big data algorithm technology, companies ______________ consumers' needs, tastes, and consumption patterns.",
+          "hints": [
+            "apply",
+            "identify"
+          ],
+          "answers": [
+            "applying",
+            "identify"
+          ],
+          "key": "ybm-l2-s5-39",
+          "stage": 5,
+          "number": 39
+        },
+        {
+          "kind": "verb_form",
+          "source": "사람들은 다양한 선택과 맞춤화를 환영하며 이는 결과적으로 그들의 만족을 증진시킨다.",
+          "prompt": "People ______________ ______________ diverse choices and customization, which in turn ______________ their satisfaction.",
+          "hints": [
+            "appreciate",
+            "have",
+            "enhance"
+          ],
+          "answers": [
+            "appreciate",
+            "having",
+            "enhances"
+          ],
+          "key": "ybm-l2-s5-40",
+          "stage": 5,
+          "number": 40
+        },
+        {
+          "kind": "verb_form",
+          "source": "소비자의 구매 기록에 기반한 개인 맞춤화된 의류 스타일 제안이나, 그들의 영화 및 비디오 시청 기록과 부합하는 비디오 추천과 같은 서비스는 그들에게 커다란 만족을 가져다준다.",
+          "prompt": "Services, such as ______________ ______________ clothing styles based on customers' purchase history or ______________ videos that ______________ their movie and video viewing history, ______________ them great satisfaction.",
+          "hints": [
+            "suggest",
+            "personalize",
+            "recommend",
+            "match",
+            "bring"
+          ],
+          "answers": [
+            "suggesting",
+            "personalized",
+            "recommending",
+            "match",
+            "bring"
+          ],
+          "key": "ybm-l2-s5-41",
+          "stage": 5,
+          "number": 41
+        },
+        {
+          "kind": "verb_form",
+          "source": "구독 경제의 제한점들 비록 구독 경제가 많은 장점을 제공하지만, 또한 고려해야 할 일부 단점들도 있다. 한 가지 우려 사항은 과소비 가능성이다.",
+          "prompt": "Limitations of the subscription economy Although the subscription economy ______________ many advantages, there ______________ also some disadvantages ______________ . One concern ______________ the potential for overconsumption.",
+          "hints": [
+            "offer",
+            "be",
+            "consider",
+            "be"
+          ],
+          "answers": [
+            "offers",
+            "are",
+            "to consider",
+            "is"
+          ],
+          "key": "ybm-l2-s5-42",
+          "stage": 5,
+          "number": 42
+        },
+        {
+          "kind": "verb_form",
+          "source": "구독 모델의 편리성과 접근성은 소비자들이 복수의 서비스를 계약하고 많은 콘텐츠나 제품을 사용하는 것을 쉽게 만든다.",
+          "prompt": "The convenience and accessibility of the subscription model ______________ it easy for consumers ______________ up for multiple services and ______________ a lot of content or products.",
+          "hints": [
+            "make",
+            "sign",
+            "use"
+          ],
+          "answers": [
+            "make",
+            "to sign",
+            "use"
+          ],
+          "key": "ybm-l2-s5-43",
+          "stage": 5,
+          "number": 43
+        },
+        {
+          "kind": "verb_form",
+          "source": "이것은 과도한 소비와 실제로 필요한 것보다 많은 구독 서비스 사용을 야기할 수 있다.",
+          "prompt": "This ______________ in excessive consumption and ______________ more subscription services than actually ______________ .",
+          "hints": [
+            "can, result",
+            "use",
+            "need"
+          ],
+          "answers": [
+            "can result",
+            "using",
+            "needed"
+          ],
+          "key": "ybm-l2-s5-44",
+          "stage": 5,
+          "number": 44
+        },
+        {
+          "kind": "verb_form",
+          "source": "진정으로 필요한 서비스들만 구독하고 유사한 서비스들을 구독하는 것을 피하는 것이 매우 중요하다.",
+          "prompt": "It ______________ crucial ______________ only to services that ______________ truly necessary and ______________ ______________ to similar services.",
+          "hints": [
+            "be",
+            "subscribe",
+            "be",
+            "avoid",
+            "subscribe"
+          ],
+          "answers": [
+            "is",
+            "to subscribe",
+            "are",
+            "avoid",
+            "subscribing"
+          ],
+          "key": "ybm-l2-s5-45",
           "stage": 5,
           "number": 45
         },
         {
           "kind": "verb_form",
-          "source": "소녀의 원치 않는 모험은 물 공급이 재개되고 생활이 정상으로 돌아오면서 끝난다.",
-          "prompt": "Her unwanted adventure ______________ when the water supply ______________ and life ______________ back to normal.",
+          "source": "과소비의 우려와 관련된 것으로 구독이 창출할 수 있는 금융 부담이 있다.",
+          "prompt": "______________ to the concern of overconsumption ______________ the financial burden that subscriptions ______________ .",
           "hints": [
-            "end",
-            "resume",
-            "be"
+            "Relate",
+            "be",
+            "can, create"
           ],
           "answers": [
-            "ends",
-            "resumes",
-            "is"
+            "Related",
+            "is",
+            "can create"
           ],
-          "key": "ybm-pj-l2-s5-46",
+          "key": "ybm-l2-s5-46",
           "stage": 5,
           "number": 46
+        },
+        {
+          "kind": "verb_form",
+          "source": "개별 구독 비용은 감당할 수 있어 보일 수 있지만, 복수의 서비스를 구독하는 것은 비용이 빠르게 증가할 수 있다.",
+          "prompt": "While the cost of individual subscriptions ______________ affordable, ______________ to multiple services ______________ up quickly.",
+          "hints": [
+            "may, seem",
+            "subscribe",
+            "can, add"
+          ],
+          "answers": [
+            "may seem",
+            "subscribing",
+            "can add"
+          ],
+          "key": "ybm-l2-s5-47",
+          "stage": 5,
+          "number": 47
+        },
+        {
+          "kind": "verb_form",
+          "source": "재정적 부담을 피하기 위해 이들 구독의 비용을 신중하게 고려하는 것이 중요하다.",
+          "prompt": "It ______________ important ______________ the costs of these subscriptions ______________ financial strain.",
+          "hints": [
+            "be",
+            "carefully, consider",
+            "avoid"
+          ],
+          "answers": [
+            "is",
+            "to carefully consider",
+            "to avoid"
+          ],
+          "key": "ybm-l2-s5-48",
+          "stage": 5,
+          "number": 48
+        },
+        {
+          "kind": "verb_form",
+          "source": "정기적으로 검토하고 불필요한 구독들을 취소하는 것이 유익할 수 있다.",
+          "prompt": "Regularly ______________ and ______________ unnecessary subscriptions ______________ beneficial.",
+          "hints": [
+            "review",
+            "cancel",
+            "can, be"
+          ],
+          "answers": [
+            "reviewing",
+            "canceling",
+            "can be"
+          ],
+          "key": "ybm-l2-s5-49",
+          "stage": 5,
+          "number": 49
+        },
+        {
+          "kind": "verb_form",
+          "source": "부가적으로, 구독 경제는 환경 오염에 기여할 수 있다.",
+          "prompt": "Additionally, the subscription economy ______________ to environmental pollution.",
+          "hints": [
+            "can, contribute"
+          ],
+          "answers": [
+            "can contribute"
+          ],
+          "key": "ybm-l2-s5-50",
+          "stage": 5,
+          "number": 50
+        },
+        {
+          "kind": "verb_form",
+          "source": "포장재에 담긴 제품들을 정기적으로 배달하는 것은 일회용 포장의 사용을 증가시킬 수 있어 이것이 환경을 해친다.",
+          "prompt": "The regular delivery of products in packaging materials ______________ the use of disposable packaging, which ______________ the environment.",
+          "hints": [
+            "can, increase",
+            "harm"
+          ],
+          "answers": [
+            "can increase",
+            "harms"
+          ],
+          "key": "ybm-l2-s5-51",
+          "stage": 5,
+          "number": 51
+        },
+        {
+          "kind": "verb_form",
+          "source": "친환경 포장 재료를 사용하고 재사용 가능한 포장을 선택하는 것은 이 문제를 줄이는 데 도움이 될 수 있다.",
+          "prompt": "______________ environmentally friendly packaging materials and ______________ for reusable packaging ______________ ______________ this problem.",
+          "hints": [
+            "Use",
+            "opt",
+            "can, help",
+            "reduce"
+          ],
+          "answers": [
+            "Using",
+            "opting",
+            "can help",
+            "reduce"
+          ],
+          "key": "ybm-l2-s5-52",
+          "stage": 5,
+          "number": 52
+        },
+        {
+          "kind": "verb_form",
+          "source": "구독 서비스들의 잠재적 제한점들에도 불구하고, 그것은 우리의 삶에 깊숙이 자리 잡고 있으며 더욱더 많은 사업이 구독 경제 모델에 올라타고 있다.",
+          "prompt": "Despite the potential limitations of subscription services, they ______________ in our lives and more and more businesses ______________ onto the subscription economy model.",
+          "hints": [
+            "have, become, deeply, embed",
+            "be, jump"
+          ],
+          "answers": [
+            "have become deeply embedded",
+            "are jumping"
+          ],
+          "key": "ybm-l2-s5-53",
+          "stage": 5,
+          "number": 53
+        },
+        {
+          "kind": "verb_form",
+          "source": "미래에 새로운 영역들에서 소비자들에게 새로운 구독 서비스들이 지속적으로 제공될 것으로 예상된다.",
+          "prompt": "It ______________ that new subscription services ______________ to consumers in new areas in the future.",
+          "hints": [
+            "expect",
+            "will, continuously, provide"
+          ],
+          "answers": [
+            "is expected",
+            "will be continuously provided"
+          ],
+          "key": "ybm-l2-s5-54",
+          "stage": 5,
+          "number": 54
+        },
+        {
+          "kind": "verb_form",
+          "source": "우리는 구독 경제에 대해 보다 깊은 이해를 가지고 정말 필요한 서비스들물 받는 현명한 소비자가 되어야 한다.",
+          "prompt": "We ______________ ______________ a deeper understanding of the subscription economy and ______________ wise consumers who ______________ the services that ______________ .",
+          "hints": [
+            "need",
+            "have",
+            "become",
+            "receive",
+            "really, need"
+          ],
+          "answers": [
+            "need",
+            "to have",
+            "become",
+            "receive",
+            "are really needed"
+          ],
+          "key": "ybm-l2-s5-55",
+          "stage": 5,
+          "number": 55
         }
       ]
     },
@@ -2367,690 +3113,1018 @@ export const YBM_PARKJUNEON_L2_WORKBOOK = {
       "items": [
         {
           "kind": "choice_groups",
-          "source": "주방 수도꼭지가 이상한 소리를 낸다. 기침을 한다.",
-          "prompt": "The kitchen tap makes ⟦CHOICE:0⟧ sounds. It coughs.",
+          "source": "고등학생인 지윤이는 그녀의 스마트폰에서 음악 스트리밍 서비스에 로그인하며 하루를 시작한다.",
+          "prompt": "Jiyun, a high school student, ⟦CHOICE:0⟧ her day by logging in to a music streaming service on her smartphone.",
           "groups": [
             [
-              "strange",
-              "strangely"
+              "starts",
+              "start"
             ]
           ],
           "answers": [
-            "strange"
+            "starts"
           ],
-          "key": "ybm-pj-l2-s6-01",
+          "key": "ybm-l2-s6-01",
           "stage": 6,
           "number": 1
         },
         {
           "kind": "choice_groups",
-          "source": "침을 한 번 뱉더니 조용해진다. \"엄마,\" 나는 거실을 향해 소리친다. \"물이 안 나와요.\"",
-          "prompt": "It spits once, and then goes ⟦CHOICE:0⟧. \"Mom,\" I shout out into the living room, \"water is not coming out.\"",
+          "source": "그녀는 매일 자신이 선호하는 음악을 듣고, 새로운 노래들을 발견하고, 새로운 아티스트들을 탐색하는 것을 즐긴다.",
+          "prompt": "She enjoys listening to her favorite music, discovering new songs, and ⟦CHOICE:0⟧ new artists every day.",
           "groups": [
             [
-              "silent",
-              "silently"
+              "explored",
+              "exploring"
             ]
           ],
           "answers": [
-            "silent"
+            "exploring"
           ],
-          "key": "ybm-pj-l2-s6-02",
+          "key": "ybm-l2-s6-02",
           "stage": 6,
           "number": 2
         },
         {
           "kind": "choice_groups",
-          "source": "\"Alyssa, 조용히 해!\" 엄마가 말한다. 엄마는 TV를 보고 있고, TV에서는 뉴스 앵커가 '물 공급 위기'에 대해 이야기하고 있다.",
-          "prompt": "\"Alyssa, shush!\" Mom says. She is watching the TV, ⟦CHOICE:0⟧ a news anchor is talking about the \"flow crisis.\"",
+          "source": "건강한 아침 식사를 위해, 지윤이는 신선한 채소와 과일을 공급하는 구독 서비스로부터 배송을 받는다.",
+          "prompt": "For a healthy breakfast, Jiyun receives a delivery from a subscription service that ⟦CHOICE:0⟧ fresh vegetables and fruits.",
           "groups": [
+            [
+              "provide",
+              "provides"
+            ]
+          ],
+          "answers": [
+            "provides"
+          ],
+          "key": "ybm-l2-s6-03",
+          "stage": 6,
+          "number": 3
+        },
+        {
+          "kind": "choice_groups",
+          "source": "방과 후에, 지윤이는 그녀가 흥미를 느끼는 것마다 그녀의 지식을 확장하기 위해 비디오 강의 서비스를 활용한다.",
+          "prompt": "After school, Jiyun utilizes a video lecture service to expand her knowledge in ⟦CHOICE:0⟧ she finds interesting.",
+          "groups": [
+            [
+              "whatever",
+              "whomever"
+            ]
+          ],
+          "answers": [
+            "whatever"
+          ],
+          "key": "ybm-l2-s6-04",
+          "stage": 6,
+          "number": 4
+        },
+        {
+          "kind": "choice_groups",
+          "source": "예를 들어, 그녀는 학교 공부를 복습하고 그녀가 선택한 연구 분야의 최신 지식에 대해 계속 업데이트하기 위해 다양한 학술 강의를 시청한다.",
+          "prompt": "For example, she watches various academic lectures to review her schoolwork and ⟦CHOICE:0⟧ updated about the latest knowledge in her chosen field of study.",
+          "groups": [
+            [
+              "stay",
+              "staying"
+            ]
+          ],
+          "answers": [
+            "stay"
+          ],
+          "key": "ybm-l2-s6-05",
+          "stage": 6,
+          "number": 5
+        },
+        {
+          "kind": "choice_groups",
+          "source": "주말에 지윤이와 그녀의 가족은 스트리밍 서비스를 사용하면서 함께 영화나 드라마를 시청하는 좋은 시간을 보낸다.",
+          "prompt": "During weekends, Jiyun and her family spend quality time together ⟦CHOICE:0⟧ movies or dramas ⟦CHOICE:1⟧ a streaming service.",
+          "groups": [
+            [
+              "to watch",
+              "watching"
+            ],
+            [
+              "used",
+              "using"
+            ]
+          ],
+          "answers": [
+            "watching",
+            "using"
+          ],
+          "key": "ybm-l2-s6-06",
+          "stage": 6,
+          "number": 6
+        },
+        {
+          "kind": "choice_groups",
+          "source": "구독은 모든 곳에 있다 분명히, 구독 경제는 요즈음 인기 있는 경제 모델이고, 지윤이는 그것에 적극적으로 참여하고 있다.",
+          "prompt": "Subscriptions are everywhere To be sure, the subscription economy is a popular economic model nowadays, and Jiyun is actively ⟦CHOICE:0⟧ part in it.",
+          "groups": [
+            [
+              "taking",
+              "taken"
+            ]
+          ],
+          "answers": [
+            "taking"
+          ],
+          "key": "ybm-l2-s6-07",
+          "stage": 6,
+          "number": 7
+        },
+        {
+          "kind": "choice_groups",
+          "source": "구독 기반의 비즈니스 모델의 개념은 새로운 것이 아니다. 처음에 그것은 우유와 신문 같은 제품들에 한정되었다.",
+          "prompt": "The concept of business models based on subscriptions ⟦CHOICE:0⟧ not new. Initially it was ⟦CHOICE:1⟧ to products such as milk and newspapers.",
+          "groups": [
+            [
+              "is",
+              "are"
+            ],
+            [
+              "limited",
+              "limiting"
+            ]
+          ],
+          "answers": [
+            "is",
+            "limited"
+          ],
+          "key": "ybm-l2-s6-08",
+          "stage": 6,
+          "number": 8
+        },
+        {
+          "kind": "choice_groups",
+          "source": "하지만, 이들 사업 모델은 엔터테인먼트, 기술, 패션, 교육, 그리고 훨씬 더 많은 것들을 포함한, 모든 산업들로 확산되었다.",
+          "prompt": "However, these business models have ⟦CHOICE:0⟧ to all industries, including entertainment, technology, fashion, education, and much more.",
+          "groups": [
+            [
+              "expanding",
+              "expanded"
+            ]
+          ],
+          "answers": [
+            "expanded"
+          ],
+          "key": "ybm-l2-s6-09",
+          "stage": 6,
+          "number": 9
+        },
+        {
+          "kind": "choice_groups",
+          "source": "일회성으로 팔릴 히트 상품을 창출하는 대신에, 기업들은 지금 새 콘텐츠, 보다 개인 맞춤형, 또는 업데이트 접근성 같은 지속적 가치를 제공하는 것을 우선시한다. 고객들은 정기적 구독을 통해 이러한 혜택들에 대해 비용을 지불한다.",
+          "prompt": "Instead of creating a hit product that will be ⟦CHOICE:0⟧ once, companies now prioritize providing continuing value, such as new content, more personalization, or access to updates. Customers pay for these benefits via a regular subscription.",
+          "groups": [
+            [
+              "selling",
+              "sold"
+            ]
+          ],
+          "answers": [
+            "sold"
+          ],
+          "key": "ybm-l2-s6-10",
+          "stage": 6,
+          "number": 10
+        },
+        {
+          "kind": "choice_groups",
+          "source": "구독 경제는 기업과 소비자 모두에게 이점을 가져다준다. 기업들은 구독 모델을 사용해서 안정적인 수입을 얻고 고객 충성도를 구축할 수 있다.",
+          "prompt": "The subscription economy brings advantages for both companies and consumers. Companies can have a stable revenue and ⟦CHOICE:0⟧ customer loyalty by using the subscription model.",
+          "groups": [
+            [
+              "building",
+              "build"
+            ]
+          ],
+          "answers": [
+            "build"
+          ],
+          "key": "ybm-l2-s6-11",
+          "stage": 6,
+          "number": 11
+        },
+        {
+          "kind": "choice_groups",
+          "source": "소비자의 관점에서, 그들은 더욱 다양한 범위의 선택과 개인 맞춤형 경험을 즐길 수 있다. 그들은 또한 융통성 있는 구독 계약을 함으로써 돈을 절약할 수 있다.",
+          "prompt": "From the consumers' perspective, they can enjoy a wider range of choices and ⟦CHOICE:0⟧ experiences. They can also save money by having flexible subscription contracts.",
+          "groups": [
+            [
+              "personalized",
+              "personalizing"
+            ]
+          ],
+          "answers": [
+            "personalized"
+          ],
+          "key": "ybm-l2-s6-12",
+          "stage": 6,
+          "number": 12
+        },
+        {
+          "kind": "choice_groups",
+          "source": "구독 경제의 부상은 두 개의 주요한 동인들과 깊은 연관이 있다: 소비 추세의 변화들과 온라인 플랫폼의 급성장.",
+          "prompt": "The rise of the subscription economy ⟦CHOICE:0⟧ closely ⟦CHOICE:1⟧ to two major ⟦CHOICE:2⟧: changes in consumption trends and the rapid growth of online platforms.",
+          "groups": [
+            [
+              "is",
+              "are"
+            ],
+            [
+              "connecting",
+              "connected"
+            ],
+            [
+              "drivers",
+              "driver"
+            ]
+          ],
+          "answers": [
+            "is",
+            "connected",
+            "drivers"
+          ],
+          "key": "ybm-l2-s6-13",
+          "stage": 6,
+          "number": 13
+        },
+        {
+          "kind": "choice_groups",
+          "source": "사람들은 구독을 사랑한다 구독 경제는 요즘 사람들이 어떻게 재화와 서비스를 소비하는지와 상당히 관련되어 있다.",
+          "prompt": "People love the subscriptions The subscription economy is highly ⟦CHOICE:0⟧ to how people consume goods and services nowadays.",
+          "groups": [
+            [
+              "relevant",
+              "relevantly"
+            ]
+          ],
+          "answers": [
+            "relevant"
+          ],
+          "key": "ybm-l2-s6-14",
+          "stage": 6,
+          "number": 14
+        },
+        {
+          "kind": "choice_groups",
+          "source": "점점 더 많은 사람이 물건을 소유하는 것보다 경험을 우선시한다.",
+          "prompt": "More and more people ⟦CHOICE:0⟧ experiences over owning things.",
+          "groups": [
+            [
+              "prioritizing",
+              "prioritize"
+            ]
+          ],
+          "answers": [
+            "prioritize"
+          ],
+          "key": "ybm-l2-s6-15",
+          "stage": 6,
+          "number": 15
+        },
+        {
+          "kind": "choice_groups",
+          "source": "이것이 구독 경제를 그들에게 매력적인 것으로 만드는데 왜냐하면 그것은 소유의 필요 없이 서비스나 콘텐츠에 대한 접근을 제공하기 때문이다.",
+          "prompt": "This makes the subscription economy ⟦CHOICE:0⟧ to them because it offers access to services or content without the requirement of ownership.",
+          "groups": [
+            [
+              "attractively",
+              "attractive"
+            ]
+          ],
+          "answers": [
+            "attractive"
+          ],
+          "key": "ybm-l2-s6-16",
+          "stage": 6,
+          "number": 16
+        },
+        {
+          "kind": "choice_groups",
+          "source": "예를 들어, 음악 스트리밍 서비스를 구독함으로써, 소비자들은 디스크 앨범을 가질 필요가 없이 무한한 음악을 즐길 수 있다.",
+          "prompt": "For example, by ⟦CHOICE:0⟧ a music streaming service, consumers can enjoy limitless music without the need for having disc albums.",
+          "groups": [
+            [
+              "subscribing",
+              "subscribing to"
+            ]
+          ],
+          "answers": [
+            "subscribing to"
+          ],
+          "key": "ybm-l2-s6-17",
+          "stage": 6,
+          "number": 17
+        },
+        {
+          "kind": "choice_groups",
+          "source": "또 다른 예는 의류 서비스를 구독하는 것으로, 소비자들은 그들의 서랍을 채우지 않고 다양한 의류 스타일을 탐색할 수 있다.",
+          "prompt": "Another example is ⟦CHOICE:0⟧ to clothing services, ⟦CHOICE:1⟧ consumers can explore a variety of clothing styles without filling up their drawers.",
+          "groups": [
+            [
+              "subscribed",
+              "subscribing"
+            ],
             [
               "which",
               "where"
             ]
           ],
           "answers": [
+            "subscribing",
             "where"
           ],
-          "key": "ybm-pj-l2-s6-03",
-          "stage": 6,
-          "number": 3
-        },
-        {
-          "kind": "choice_groups",
-          "source": "사람들이 '가뭄'이라는 단어를 듣는 데 지친 이후로 언론은 가뭄을 이렇게 부르고 있다.",
-          "prompt": "This is ⟦CHOICE:0⟧ the media has been ⟦CHOICE:1⟧ the drought ever since people got ⟦CHOICE:2⟧ of ⟦CHOICE:3⟧ the word \"drought.\"",
-          "groups": [
-            [
-              "that",
-              "what"
-            ],
-            [
-              "calling",
-              "called"
-            ],
-            [
-              "tired",
-              "tiring"
-            ],
-            [
-              "hear",
-              "hearing"
-            ]
-          ],
-          "answers": [
-            "what",
-            "calling",
-            "tired",
-            "hearing"
-          ],
-          "key": "ybm-pj-l2-s6-04",
-          "stage": 6,
-          "number": 4
-        },
-        {
-          "kind": "choice_groups",
-          "source": "이제 위기는 새로운 단계로 접어들고 있다. 수도꼭지에서 수돗물이 나오지 않는다.",
-          "prompt": "Now the crisis is ⟦CHOICE:0⟧ a new stage. We have no running water out of the tap.",
-          "groups": [
-            [
-              "entered",
-              "entering"
-            ]
-          ],
-          "answers": [
-            "entering"
-          ],
-          "key": "ybm-pj-l2-s6-05",
-          "stage": 6,
-          "number": 5
-        },
-        {
-          "kind": "choice_groups",
-          "source": "\"쇼핑몰로 가자!\" Basil 삼촌이 말한다. 동생 Garrett과 나는 삼촌의 트럭에 올라탄다.",
-          "prompt": "\"To the mall!\" says Uncle Basil. My little brother Garrett and I ⟦CHOICE:0⟧ in our uncle's truck.",
-          "groups": [
-            [
-              "jump",
-              "jumps"
-            ]
-          ],
-          "answers": [
-            "jump"
-          ],
-          "key": "ybm-pj-l2-s6-06",
-          "stage": 6,
-          "number": 6
-        },
-        {
-          "kind": "choice_groups",
-          "source": "주차장에 차를 세우자 많은 사람이 눈에 들어온다. \"너희 둘은 들어가. 안에서 만나자.\"라고 Basil 삼촌이 말한다. 내부 풍경은 최악의 블랙 프라이데이와 비슷하지만, 오늘 사람들이 찾는 것은 텔레비전이나 비디오 게임이 아니다.",
-          "prompt": "As we ⟦CHOICE:0⟧ into the parking lot, we can see the crowd. \"You two go in. I'll meet you inside,\" Uncle Basil says. Inside it's like Black Friday at its worst—but today it's not televisions and video games people are after.",
-          "groups": [
-            [
-              "are pulled",
-              "pull"
-            ]
-          ],
-          "answers": [
-            "pull"
-          ],
-          "key": "ybm-pj-l2-s6-07",
-          "stage": 6,
-          "number": 7
-        },
-        {
-          "kind": "choice_groups",
-          "source": "계산대에 줄을 선 카트에 보이는 것은 대부분 물병이다. 생명의 필수품.",
-          "prompt": "⟦CHOICE:0⟧ I see in the carts in the checkout line are mostly water bottles. The essentials of life.",
-          "groups": [
-            [
-              "That",
-              "What"
-            ]
-          ],
-          "answers": [
-            "What"
-          ],
-          "key": "ybm-pj-l2-s6-08",
-          "stage": 6,
-          "number": 8
-        },
-        {
-          "kind": "choice_groups",
-          "source": "줄을 선 사람들의 얼굴에는 조급한 표정이 역력하다.",
-          "prompt": "There ⟦CHOICE:0⟧ a look of impatience on the faces of the people in line.",
-          "groups": [
-            [
-              "are",
-              "is"
-            ]
-          ],
-          "answers": [
-            "is"
-          ],
-          "key": "ybm-pj-l2-s6-09",
-          "stage": 6,
-          "number": 9
-        },
-        {
-          "kind": "choice_groups",
-          "source": "심지어는 얇은 공손함 뒤에 숨은 적대감까지 느껴진다. 그 공손함조차 얇아져 있다. 물병을 사러 매장 뒤편에 다다랐을 때 나는 너무 늦었다는 것을 깨닫는다.",
-          "prompt": "There is even hostility, ⟦CHOICE:0⟧ by a thin layer of politeness. Even that politeness is stretched thin. As I approach the back of the store for water bottles, I realize I am too late.",
-          "groups": [
-            [
-              "hiding",
-              "hidden"
-            ]
-          ],
-          "answers": [
-            "hidden"
-          ],
-          "key": "ybm-pj-l2-s6-10",
-          "stage": 6,
-          "number": 10
-        },
-        {
-          "kind": "choice_groups",
-          "source": "진열대는 이미 비어 있다. 옆 통로로 가서 운을 시험해 본다. 가끔 사람들이 원하지 않는 물건을 엉뚱한 선반에 놓는 경우가 있다.",
-          "prompt": "The shelves are already empty. I manage my way to the side aisle, ⟦CHOICE:0⟧ my luck. Sometimes people place unwanted items in the wrong shelves.",
-          "groups": [
-            [
-              "tried",
-              "trying"
-            ]
-          ],
-          "answers": [
-            "trying"
-          ],
-          "key": "ybm-pj-l2-s6-11",
-          "stage": 6,
-          "number": 11
-        },
-        {
-          "kind": "choice_groups",
-          "source": "운이 좋다! 물이 그렇게 귀한 물건이 아니었던 어제 누군가 그곳에 버린 생수 한 상자를 발견한다.",
-          "prompt": "Lucky! I find a single case of water ⟦CHOICE:0⟧ someone abandoned there maybe yesterday, when it wasn't ⟦CHOICE:1⟧ a precious commodity.",
-          "groups": [
-            [
-              "what",
-              "that"
-            ],
-            [
-              "so",
-              "such"
-            ]
-          ],
-          "answers": [
-            "that",
-            "such"
-          ],
-          "key": "ybm-pj-l2-s6-12",
-          "stage": 6,
-          "number": 12
-        },
-        {
-          "kind": "choice_groups",
-          "source": "손을 뻗어 생수 상자를 집어 들려는 순간, 한 여자가 상자를 가져가는 것을 본다.",
-          "prompt": "I reach for it, only to find it ⟦CHOICE:0⟧ away at the last second by a woman.",
-          "groups": [
-            [
-              "pulled",
-              "pulling"
-            ]
-          ],
-          "answers": [
-            "pulled"
-          ],
-          "key": "ybm-pj-l2-s6-13",
-          "stage": 6,
-          "number": 13
-        },
-        {
-          "kind": "choice_groups",
-          "source": "그녀는 생수 상자를 카트에 담긴 통조림 위에 마치 왕관처럼 쌓아 놓는다. \"미안하지만 우리가 먼저 왔어요.\" 그녀가 말한다. 그러자 그녀의 딸이 앞으로 나오는데, 축구팀에서 알고 있는 Hali Hartling이다.",
-          "prompt": "She stacks it on top of her cart like a crown on top of her ⟦CHOICE:0⟧ goods. \"I'm sorry, but we were here first,\" she says. And then her daughter steps forward—a girl I recognize from soccer—Hali Hartling.",
-          "groups": [
-            [
-              "canning",
-              "canned"
-            ]
-          ],
-          "answers": [
-            "canned"
-          ],
-          "key": "ybm-pj-l2-s6-14",
-          "stage": 6,
-          "number": 14
-        },
-        {
-          "kind": "choice_groups",
-          "source": "엄마가 카트를 끌고 가자 Hali가 내게 몸을 기울인다. \"미안해, Alyssa.\" \"지난주 연습할 때 내가 물 나눠주지 않았니?\" 나는 그녀에게 지적한다.",
-          "prompt": "As her mother pulls their cart away, Hali leans closer to me. \"I'm sorry about that, Alyssa.\" \"⟦CHOICE:0⟧ my water with you at the practice last week?\" I point out to her.",
-          "groups": [
-            [
-              "Didn't I share",
-              "Haven't I shared"
-            ]
-          ],
-          "answers": [
-            "Didn't I share"
-          ],
-          "key": "ybm-pj-l2-s6-15",
-          "stage": 6,
-          "number": 15
-        },
-        {
-          "kind": "choice_groups",
-          "source": "\"너도 호의를 갚아서 나랑 물 몇 병 나눠도 되겠네.\"",
-          "prompt": "\"Maybe you could return the favor and ⟦CHOICE:0⟧ a few bottles with me.\"",
-          "groups": [
-            [
-              "share",
-              "shared"
-            ]
-          ],
-          "answers": [
-            "share"
-          ],
-          "key": "ybm-pj-l2-s6-16",
-          "stage": 6,
-          "number": 16
-        },
-        {
-          "kind": "choice_groups",
-          "source": "그녀는 이미 통로를 따라 이동하고 있는 어머니를 돌아보더니 고개를 절레절레 흔들며 내게로 돌아선다.",
-          "prompt": "She looks back to her mother, ⟦CHOICE:0⟧ already moving down the aisle, then ⟦CHOICE:1⟧ back to me ⟦CHOICE:2⟧ her head.",
-          "groups": [
-            [
-              "that's",
-              "who's"
-            ],
-            [
-              "turning",
-              "turns"
-            ],
-            [
-              "shaking",
-              "shaken"
-            ]
-          ],
-          "answers": [
-            "who's",
-            "turns",
-            "shaking"
-          ],
-          "key": "ybm-pj-l2-s6-17",
-          "stage": 6,
-          "number": 17
-        },
-        {
-          "kind": "choice_groups",
-          "source": "그러고는 얼굴이 약간 붉어지더니 더 붉어지기 전에 자리를 뜨려고 돌아선다.",
-          "prompt": "And then she gets a little bit red in the face, and ⟦CHOICE:0⟧ to leave before it becomes a deep flush.",
-          "groups": [
-            [
-              "turns",
-              "turning"
-            ]
-          ],
-          "answers": [
-            "turns"
-          ],
-          "key": "ybm-pj-l2-s6-18",
+          "key": "ybm-l2-s6-18",
           "stage": 6,
           "number": 18
         },
         {
           "kind": "choice_groups",
-          "source": "나는 냉동식품 통로에서 Garrett을 발견한다. 그러다 뭔가를 발견한다.",
-          "prompt": "I look for Garrett, ⟦CHOICE:0⟧ I find in the frozen aisle. Then I see something.",
+          "source": "게다가, 소비자들은 다양성과 맞춤화에 가치를 둔다. 구독 경제는 다양한 범위의 구독 선택을 제공하여, 개인들이 그들의 선호와 관심에 기초하여 그들의 경험들을 개별화할 수 있도록 해 준다.",
+          "prompt": "Moreover, consumers value diversity and customization. The subscription economy offers a diverse range of subscription options, ⟦CHOICE:0⟧ individuals ⟦CHOICE:1⟧ their experiences based on their own preferences and interests.",
           "groups": [
             [
-              "whose",
-              "whom"
+              "enabled",
+              "enabling"
+            ],
+            [
+              "to personalize",
+              "personalize"
             ]
           ],
           "answers": [
-            "whom"
+            "enabling",
+            "to personalize"
           ],
-          "key": "ybm-pj-l2-s6-19",
+          "key": "ybm-l2-s6-19",
           "stage": 6,
           "number": 19
         },
         {
           "kind": "choice_groups",
-          "source": "냉동 야채와 아이스크림 바로 지나서 얼음이 가득 담긴 상자가 있다. 나는 문을 열고 얼음 봉지를 잡는다. \"뭐 하는 거야? 우린 얼음이 아니라 물이 필요해.\" 동생이 내게 상기시켜 준다.",
-          "prompt": "Just past the ⟦CHOICE:0⟧ vegetables and ice cream, there is a case ⟦CHOICE:1⟧ with ice. I open the door and reach for a bag. \"What are you doing? We need water, not ice,\" he reminds me.",
+          "source": "구독 경제의 이러한 측면은 젊은 세대가 그들의 고유함을 표현하고, 젊은 세대의 개별적 취향에 부합하는 가치 있는 콘텐츠와 서비스들을 발견하는 것을 즐김에 따라, 젊은 세대 사이에 더욱 인기가 있다.",
+          "prompt": "This aspect of the subscription economy ⟦CHOICE:0⟧ more popular among younger generations, as they enjoy expressing their uniqueness and ⟦CHOICE:1⟧ valuable content and services that ⟦CHOICE:2⟧ with their individual tastes.",
           "groups": [
             [
-              "freezing",
-              "frozen"
+              "are",
+              "is"
             ],
             [
-              "packed",
-              "packing"
+              "discover",
+              "discovering"
+            ],
+            [
+              "fits",
+              "fit"
             ]
           ],
           "answers": [
-            "frozen",
-            "packed"
+            "is",
+            "discovering",
+            "fit"
           ],
-          "key": "ybm-pj-l2-s6-20",
+          "key": "ybm-l2-s6-20",
           "stage": 6,
           "number": 20
         },
         {
           "kind": "choice_groups",
-          "source": "\"얼음은 물이야. 돕기나 해.\" 내가 말한다. Garrett과 나는 최대한 높이 쌓일 때까지 얼음 봉지를 카트에 담는다.",
-          "prompt": "\"Ice is water. Just help me,\" I tell him. Garrett and I put one bag of ice after another into our cart, until it is ⟦CHOICE:0⟧ as high as it can get.",
+          "source": "주목받고 있는 인기 사례는 화장품 구독 서비스이다.",
+          "prompt": "A popular example that has ⟦CHOICE:0⟧ attention ⟦CHOICE:1⟧ the cosmetics subscription service.",
           "groups": [
             [
-              "piled",
-              "piling"
+              "gained",
+              "been gained"
+            ],
+            [
+              "are",
+              "is"
             ]
           ],
           "answers": [
-            "piled"
+            "gained",
+            "is"
           ],
-          "key": "ybm-pj-l2-s6-21",
+          "key": "ybm-l2-s6-21",
           "stage": 6,
           "number": 21
         },
         {
           "kind": "choice_groups",
-          "source": "이제 다른 사람들도 눈치를 채고 얼음 상자를 비우기 시작한다.",
-          "prompt": "By now other people have taken notice and ⟦CHOICE:0⟧ to empty the ice case.",
+          "source": "그것은 소비자의 현재 피부 상태를 철저하게 분석하고 개개인의 고유한 피부 고민을 해결하기 위해 만들어진 화장품 제조를 포함한 전문적인 추천을 제공하는 것이 돋보인다.",
+          "prompt": "It stands out by thoroughly analyzing customers' current skin conditions and ⟦CHOICE:0⟧ specialized recommendations, including manufacturing cosmetics ⟦CHOICE:1⟧ to address each individual's unique skin concerns.",
           "groups": [
             [
-              "begun",
-              "begin"
+              "provided",
+              "providing"
+            ],
+            [
+              "created",
+              "creating"
             ]
           ],
           "answers": [
-            "begin"
+            "providing",
+            "created"
           ],
-          "key": "ybm-pj-l2-s6-22",
+          "key": "ybm-l2-s6-22",
           "stage": 6,
           "number": 22
         },
         {
           "kind": "choice_groups",
-          "source": "이제 카트는 엄청나게 무거워져서 밀기가 거의 불가능할 정도이다.",
-          "prompt": "The cart is ridiculously heavy now, and almost ⟦CHOICE:0⟧ to push.",
+          "source": "요점을 말하자면, 소비자들은 획일화된 구매 과정 대신에, 그들 개인의 피부 조건을 우선시하는 개별화된 경험을 얻는다.",
+          "prompt": "To come to the point, consumers receive a personalized experience that ⟦CHOICE:0⟧ their individual skin conditions, rather than a uniform purchasing process.",
           "groups": [
             [
-              "impossible",
-              "impossibly"
+              "prioritize",
+              "prioritizes"
             ]
           ],
           "answers": [
-            "impossible"
+            "prioritizes"
           ],
-          "key": "ybm-pj-l2-s6-23",
+          "key": "ybm-l2-s6-23",
           "stage": 6,
           "number": 23
         },
         {
           "kind": "choice_groups",
-          "source": "그때 정장 차림의 한 남자가 우리 뒤에서 나타난다. 그는 미소를 짓는다. \"도움이 필요한 것 같구나.\"",
-          "prompt": "Then, a man in a business suit ⟦CHOICE:0⟧ up behind us. He smiles. \"Looks like you could use some help.\"",
+          "source": "게다가, 소비자들은 유연성과 편의성을 높이 평가한다. 일부 구독 모델에서는, 소비자들이 고정된 비용으로 다양한 제품과 서비스를 경험할 수 있다.",
+          "prompt": "Furthermore, consumers appreciate flexibility and convenience. In some subscription models, consumers can experience a variety of products or services for a ⟦CHOICE:0⟧ cost.",
           "groups": [
             [
-              "come",
-              "comes"
+              "fixing",
+              "fixed"
             ]
           ],
           "answers": [
-            "comes"
+            "fixed"
           ],
-          "key": "ybm-pj-l2-s6-24",
+          "key": "ybm-l2-s6-24",
           "stage": 6,
           "number": 24
         },
         {
           "kind": "choice_groups",
-          "source": "그는 우리가 대답할 때까지 기다리지 않고 카트 손잡이를 잡는다. \"도와주셔서 감사합니다.\" 나는 그에게 말한다.",
-          "prompt": "He doesn't wait ⟦CHOICE:0⟧ us to answer before ⟦CHOICE:1⟧ the cart's handle. \"Thank you for ⟦CHOICE:2⟧ us,\" I tell him.",
+          "source": "다른 모델에서는, 필요할 때 필요한 서비스나 제품만 선택하여 구독 요금을 유연하게 조정할 수 있다.",
+          "prompt": "In other models, they can flexibly adjust subscription fees by choosing only the necessary services or products when ⟦CHOICE:0⟧.",
           "groups": [
             [
-              "for",
-              "of"
-            ],
-            [
-              "grabbed",
-              "grabbing"
-            ],
-            [
-              "helping",
-              "help"
+              "needed",
+              "needing"
             ]
           ],
           "answers": [
-            "for",
-            "grabbing",
-            "helping"
+            "needed"
           ],
-          "key": "ybm-pj-l2-s6-25",
+          "key": "ybm-l2-s6-25",
           "stage": 6,
           "number": 25
         },
         {
           "kind": "choice_groups",
-          "source": "\"별거 아니야. 우리 모두 서로 도와야지.\" 그는 다시 미소를 짓고 나도 미소로 화답한다. 어려운 시기에 사람들의 장점이 드러난다는 것을 알게 되는 것은 좋은 일이다.",
-          "prompt": "\"Not a problem. We all need to help one another.\" He smiles again, and I return the smile. It is good to know ⟦CHOICE:0⟧ difficult times can bring out the best in people.",
+          "source": "이것은 정해진 가격으로 다양한 제공을 즐길 수도 있고, 그들이 실제 필요한 것만 선택함으로써 돈을 절약할 수도 있음을 의미한다.",
+          "prompt": "This means they can either enjoy a range of offerings for a set price or ⟦CHOICE:0⟧ money by selecting only ⟦CHOICE:1⟧ they really need.",
           "groups": [
+            [
+              "save",
+              "saving"
+            ],
             [
               "what",
               "that"
             ]
           ],
           "answers": [
-            "that"
+            "save",
+            "what"
           ],
-          "key": "ybm-pj-l2-s6-26",
+          "key": "ybm-l2-s6-26",
           "stage": 6,
           "number": 26
         },
         {
           "kind": "choice_groups",
-          "source": "나는 호의에는 호의로 보답해야 한다고 결심한다. \"얼음 한 봉지 가져가세요.\" 내가 제안한다.",
-          "prompt": "I decide ⟦CHOICE:0⟧ one favor deserves another. \"Why don't you ⟦CHOICE:1⟧ a bag of ice for yourself,\" I suggest.",
+          "source": "게다가, 구독 서비스는 온라인 플랫폼을 통해 쉽게 접근할 수 있게 되어 소비자들의 편의를 증진시킨다.",
+          "prompt": "Moreover, subscription services are ⟦CHOICE:0⟧ easily accessible by online platforms, ⟦CHOICE:1⟧ consumers' convenience.",
           "groups": [
             [
-              "that",
-              "what"
+              "made",
+              "making"
             ],
             [
-              "take",
-              "taking"
+              "enhancing",
+              "enhanced"
             ]
           ],
           "answers": [
-            "that",
-            "take"
+            "made",
+            "enhancing"
           ],
-          "key": "ybm-pj-l2-s6-27",
+          "key": "ybm-l2-s6-27",
           "stage": 6,
           "number": 27
         },
         {
           "kind": "choice_groups",
-          "source": "그의 미소가 사라지지 않는다. \"더 좋은 생각이 있어.\" 그가 말한다. \"너희가 얼음 한 봉지 가져가고 나머지는 내가 가질게.\"",
-          "prompt": "His smile does not fade. \"I have a better idea,\" he says. \"Why don't you ⟦CHOICE:0⟧ a bag of ice for yourselves, and I'll keep the rest.\"",
+          "source": "단지 몇 번의 클릭으로, 소비자들은 서비스나 제품을 받을 수 있다. 만약 그들이 그들의 기기 모델을 변경하기를 원하면, 그렇게 할 수 있다.",
+          "prompt": "With just a few clicks, consumers can receive services or products. If they ⟦CHOICE:0⟧ ⟦CHOICE:1⟧ their device model, they can do so.",
           "groups": [
             [
-              "taking",
-              "take"
+              "had wished",
+              "wish"
+            ],
+            [
+              "to change",
+              "changing"
             ]
           ],
           "answers": [
-            "take"
+            "wish",
+            "to change"
           ],
-          "key": "ybm-pj-l2-s6-28",
+          "key": "ybm-l2-s6-28",
           "stage": 6,
           "number": 28
         },
         {
           "kind": "choice_groups",
-          "source": "잠시 나는 그가 농담하고 있다고 생각하지만, 곧 그가 진지하다는 것을 깨닫는다. \"네?\" 그는 여전히 웃고 있지만 그의 눈빛이 무섭다.",
-          "prompt": "For a moment I think he is joking, but then ⟦CHOICE:0⟧ he is serious. \"Excuse me?\" He is still smiling, but his eyes scare me.",
+          "source": "업그레이드를 원하는 사람들은 누구든지 받을 수 있고 최신 모델을 경험할 수 있다.",
+          "prompt": "⟦CHOICE:0⟧ desires an upgrade can get it and experience the latest models.",
           "groups": [
             [
-              "realize",
-              "realizing"
+              "Whoever",
+              "Whomever"
             ]
           ],
           "answers": [
-            "realize"
+            "Whoever"
           ],
-          "key": "ybm-pj-l2-s6-29",
+          "key": "ybm-l2-s6-29",
           "stage": 6,
           "number": 29
         },
         {
           "kind": "choice_groups",
-          "source": "그의 손이 우리 카트 손잡이에 단단히 고정되어 있는 한, 카트가 그의 것이 아니라 우리 것임을 증명할 방법은 없다.",
-          "prompt": "As long as his hands are firmly ⟦CHOICE:0⟧ on the handle of our cart, there is nothing to prove ⟦CHOICE:1⟧ it's ours and not his.",
+          "source": "온라인 플랫폼들이 구독 경제를 구동한다 스마트폰을 중심으로 한 다양한 디지털 기기의 발전과 함께 소비자들은 많은 것들을 아주 쉽게 할 수 있게 되었다.",
+          "prompt": "Online platforms drive the subscription economy With the development of various digital devices ⟦CHOICE:0⟧ on smartphones, consumers have been able to ⟦CHOICE:1⟧ numerous things with great ease.",
           "groups": [
             [
-              "locked",
-              "locking"
+              "centered",
+              "centering"
             ],
             [
-              "that",
-              "what"
+              "doing",
+              "do"
             ]
           ],
           "answers": [
-            "locked",
-            "that"
+            "centered",
+            "do"
           ],
-          "key": "ybm-pj-l2-s6-30",
+          "key": "ybm-l2-s6-30",
           "stage": 6,
           "number": 30
         },
         {
           "kind": "choice_groups",
-          "source": "\"무슨 문제 있나요?\" Basil 삼촌이다. 제시간에 맞춰 도착했다.",
-          "prompt": "\"⟦CHOICE:0⟧ there a problem here?\" It is Uncle Basil. He has arrived just in time.",
+          "source": "과거에는, 사람들이 영화관에 가거나, 그들이 시청하기 원하는 비디오들을 구매할 수 밖에 없었다.",
+          "prompt": "In the past, people had no choice but to ⟦CHOICE:0⟧ to the theater or purchase the videos they wanted to watch.",
           "groups": [
             [
-              "Is",
-              "Are"
+              "going",
+              "go"
             ]
           ],
           "answers": [
-            "Is"
+            "go"
           ],
-          "key": "ybm-pj-l2-s6-31",
+          "key": "ybm-l2-s6-31",
           "stage": 6,
           "number": 31
         },
         {
           "kind": "choice_groups",
-          "source": "\"전혀요.\" 남자는 씁쓸한 표정으로 얼음을 바라보다가 자리를 뜬다.",
-          "prompt": "\"Not at all.\" The man looks at the ice with a bitter face, then ⟦CHOICE:0⟧.",
+          "source": "오늘날에는, 영화 시청을 원하는 사람들은 누구나 온라인 미디어 구독 플랫폼에 접속해서 그들의 스마트폰에서 또는 다른 디지털 기기에서 엄청난 양의 영화를 즐길 수 있다.",
+          "prompt": "Today, ⟦CHOICE:0⟧ wants to watch a movie can access online media subscription platforms and ⟦CHOICE:1⟧ a vast selection of movies on their smartphones or ⟦CHOICE:2⟧ digital devices.",
           "groups": [
             [
-              "leaves",
-              "leaving"
+              "whomever",
+              "whoever"
+            ],
+            [
+              "enjoying",
+              "enjoy"
+            ],
+            [
+              "another",
+              "other"
             ]
           ],
           "answers": [
-            "leaves"
+            "whoever",
+            "enjoy",
+            "other"
           ],
-          "key": "ybm-pj-l2-s6-32",
+          "key": "ybm-l2-s6-32",
           "stage": 6,
           "number": 32
         },
         {
           "kind": "choice_groups",
-          "source": "*위 내용은 소설 <드라이>(Dry, 2018)의 도입부를 축약한 것이다.",
-          "prompt": "*The above is a ⟦CHOICE:0⟧ version of the opening of the novel Dry (2018).",
+          "source": "동시에, 이들 플랫폼들은 기업들이 고객들에게 맞춤형 제품과 서비스를 제공하는 것을 쉽게 만든다.",
+          "prompt": "At the same time, these platforms make it ⟦CHOICE:0⟧ for companies ⟦CHOICE:1⟧ ⟦CHOICE:2⟧ products and services to customers.",
           "groups": [
             [
-              "shortening",
-              "shortened"
+              "easy",
+              "easily"
+            ],
+            [
+              "to offer",
+              "offering"
+            ],
+            [
+              "customized",
+              "customizing"
             ]
           ],
           "answers": [
-            "shortened"
+            "easy",
+            "to offer",
+            "customized"
           ],
-          "key": "ybm-pj-l2-s6-33",
+          "key": "ybm-l2-s6-33",
           "stage": 6,
           "number": 33
         },
         {
           "kind": "choice_groups",
-          "source": "이 소설은 캘리포니아의 재앙적인 가뭄 속에서 가족을 위해 힘든 선택을 해야 하는 한 소녀의 이야기이다.",
-          "prompt": "It tells the story of a girl ⟦CHOICE:0⟧ has to make tough choices for her family ⟦CHOICE:1⟧ a disastrous California drought.",
+          "source": "인공지능과 빅데이터 알고리즘 기술을 적용하여, 기업들은 고객들의 요구, 기호, 소비 패턴들을 확인한다.",
+          "prompt": "By applying AI and big data algorithm technology, companies ⟦CHOICE:0⟧ consumers' needs, tastes, and consumption patterns.",
           "groups": [
             [
-              "who",
-              "whom"
-            ],
-            [
-              "for",
-              "during"
+              "identify",
+              "are identified"
             ]
           ],
           "answers": [
-            "who",
-            "during"
+            "identify"
           ],
-          "key": "ybm-pj-l2-s6-34",
+          "key": "ybm-l2-s6-34",
           "stage": 6,
           "number": 34
         },
         {
           "kind": "choice_groups",
-          "source": "소녀의 원치 않는 모험은 물 공급이 재개되고 생활이 정상으로 돌아오면서 끝난다.",
-          "prompt": "Her unwanted adventure ends when the water supply resumes and life is back to ⟦CHOICE:0⟧.",
+          "source": "사람들은 다양한 선택과 맞춤화를 환영하며 이는 결과적으로 그들의 만족을 증진시킨다.",
+          "prompt": "People appreciate having diverse choices and customization, ⟦CHOICE:0⟧ in turn ⟦CHOICE:1⟧ their satisfaction.",
           "groups": [
             [
-              "normal",
-              "normally"
+              "that",
+              "which"
+            ],
+            [
+              "enhance",
+              "enhances"
             ]
           ],
           "answers": [
-            "normal"
+            "which",
+            "enhances"
           ],
-          "key": "ybm-pj-l2-s6-35",
+          "key": "ybm-l2-s6-35",
           "stage": 6,
           "number": 35
         },
         {
           "kind": "choice_groups",
-          "source": "기후 변화, 인구 증가, 농업용수 과다 사용 등 전 세계적으로 물 부족을 야기하는 요인들이 해결되지 않는다면 이 소설의 이야기가 현실이 될 수도 있다.",
-          "prompt": "Provided that the factors ⟦CHOICE:0⟧ to water shortages worldwide ⟦CHOICE:1⟧ not ⟦CHOICE:2⟧, including climate change, population growth, and ⟦CHOICE:3⟧ too much water for agriculture, it is possible that this story can become a reality.",
+          "source": "소비자의 구매 기록에 기반한 개인 맞춤화된 의류 스타일 제안이나, 그들의 영화 및 비디오 시청 기록과 부합하는 비디오 추천과 같은 서비스는 그들에게 커다란 만족을 가져다준다.",
+          "prompt": "Services, such as suggesting ⟦CHOICE:0⟧ clothing styles based on customers' purchase history or recommending videos that ⟦CHOICE:1⟧ their movie and video viewing history, ⟦CHOICE:2⟧ them great satisfaction.",
           "groups": [
             [
-              "contributed",
-              "contributing"
+              "personalized",
+              "personalizing"
+            ],
+            [
+              "matches",
+              "match"
+            ],
+            [
+              "brings",
+              "bring"
+            ]
+          ],
+          "answers": [
+            "personalized",
+            "match",
+            "bring"
+          ],
+          "key": "ybm-l2-s6-36",
+          "stage": 6,
+          "number": 36
+        },
+        {
+          "kind": "choice_groups",
+          "source": "구독 경제의 제한점들 비록 구독 경제가 많은 장점을 제공하지만, 또한 고려해야 할 일부 단점들도 있다. 한 가지 우려 사항은 과소비 가능성이다.",
+          "prompt": "Limitations of the subscription economy ⟦CHOICE:0⟧ the subscription economy offers many advantages, there ⟦CHOICE:1⟧ also some disadvantages to consider. One concern is the potential for overconsumption.",
+          "groups": [
+            [
+              "Although",
+              "Despite"
             ],
             [
               "are",
               "is"
-            ],
-            [
-              "addressed",
-              "addressing"
-            ],
-            [
-              "using",
-              "use"
             ]
           ],
           "answers": [
-            "contributing",
-            "are",
-            "addressed",
+            "Although",
+            "are"
+          ],
+          "key": "ybm-l2-s6-37",
+          "stage": 6,
+          "number": 37
+        },
+        {
+          "kind": "choice_groups",
+          "source": "구독 모델의 편리성과 접근성은 소비자들이 복수의 서비스를 계약하고 많은 콘텐츠나 제품을 사용하는 것을 쉽게 만든다.",
+          "prompt": "The convenience and accessibility of the subscription model make it ⟦CHOICE:0⟧ for consumers ⟦CHOICE:1⟧ up for multiple services and use a lot of content or products.",
+          "groups": [
+            [
+              "easily",
+              "easy"
+            ],
+            [
+              "signing",
+              "to sign"
+            ]
+          ],
+          "answers": [
+            "easy",
+            "to sign"
+          ],
+          "key": "ybm-l2-s6-38",
+          "stage": 6,
+          "number": 38
+        },
+        {
+          "kind": "choice_groups",
+          "source": "이것은 과도한 소비와 실제로 필요한 것보다 많은 구독 서비스 사용을 야기할 수 있다.",
+          "prompt": "This can result in excessive consumption and ⟦CHOICE:0⟧ more subscription services than actually needed.",
+          "groups": [
+            [
+              "using",
+              "used"
+            ]
+          ],
+          "answers": [
             "using"
           ],
-          "key": "ybm-pj-l2-s6-36",
+          "key": "ybm-l2-s6-39",
           "stage": 6,
-          "number": 36
+          "number": 39
+        },
+        {
+          "kind": "choice_groups",
+          "source": "진정으로 필요한 서비스들만 구독하고 유사한 서비스들을 구독하는 것을 피하는 것이 매우 중요하다.",
+          "prompt": "It is crucial ⟦CHOICE:0⟧ only to services that ⟦CHOICE:1⟧ truly necessary and avoid subscribing to similar services.",
+          "groups": [
+            [
+              "to subscribe",
+              "subscribing"
+            ],
+            [
+              "is",
+              "are"
+            ]
+          ],
+          "answers": [
+            "to subscribe",
+            "are"
+          ],
+          "key": "ybm-l2-s6-40",
+          "stage": 6,
+          "number": 40
+        },
+        {
+          "kind": "choice_groups",
+          "source": "과소비의 우려와 관련된 것으로 구독이 창출할 수 있는 금융 부담이 있다.",
+          "prompt": "Related to the concern of overconsumption ⟦CHOICE:0⟧ the financial burden ⟦CHOICE:1⟧ subscriptions can create.",
+          "groups": [
+            [
+              "is",
+              "are"
+            ],
+            [
+              "what",
+              "that"
+            ]
+          ],
+          "answers": [
+            "is",
+            "that"
+          ],
+          "key": "ybm-l2-s6-41",
+          "stage": 6,
+          "number": 41
+        },
+        {
+          "kind": "choice_groups",
+          "source": "개별 구독 비용은 감당할 수 있어 보일 수 있지만, 복수의 서비스를 구독하는 것은 비용이 빠르게 증가할 수 있다.",
+          "prompt": "While the cost of individual subscriptions may seem ⟦CHOICE:0⟧, ⟦CHOICE:1⟧ to multiple services can add up quickly.",
+          "groups": [
+            [
+              "affordable",
+              "affordably"
+            ],
+            [
+              "subscribe",
+              "subscribing"
+            ]
+          ],
+          "answers": [
+            "affordable",
+            "subscribing"
+          ],
+          "key": "ybm-l2-s6-42",
+          "stage": 6,
+          "number": 42
+        },
+        {
+          "kind": "choice_groups",
+          "source": "재정적 부담을 피하기 위해 이들 구독의 비용을 신중하게 고려하는 것이 중요하다.",
+          "prompt": "It is important to carefully ⟦CHOICE:0⟧ the costs of these subscriptions to avoid financial strain.",
+          "groups": [
+            [
+              "consider",
+              "considering"
+            ]
+          ],
+          "answers": [
+            "consider"
+          ],
+          "key": "ybm-l2-s6-43",
+          "stage": 6,
+          "number": 43
+        },
+        {
+          "kind": "choice_groups",
+          "source": "정기적으로 검토하고 불필요한 구독들을 취소하는 것이 유익할 수 있다.",
+          "prompt": "Regularly ⟦CHOICE:0⟧ and canceling ⟦CHOICE:1⟧ subscriptions can be beneficial.",
+          "groups": [
+            [
+              "reviewing",
+              "review"
+            ],
+            [
+              "unnecessary",
+              "unnecessarily"
+            ]
+          ],
+          "answers": [
+            "reviewing",
+            "unnecessary"
+          ],
+          "key": "ybm-l2-s6-44",
+          "stage": 6,
+          "number": 44
+        },
+        {
+          "kind": "choice_groups",
+          "source": "부가적으로, 구독 경제는 환경 오염에 기여할 수 있다.",
+          "prompt": "Additionally, the subscription economy can ⟦CHOICE:0⟧ environmental pollution.",
+          "groups": [
+            [
+              "contribute",
+              "contribute to"
+            ]
+          ],
+          "answers": [
+            "contribute to"
+          ],
+          "key": "ybm-l2-s6-45",
+          "stage": 6,
+          "number": 45
+        },
+        {
+          "kind": "choice_groups",
+          "source": "포장재에 담긴 제품들을 정기적으로 배달하는 것은 일회용 포장의 사용을 증가시킬 수 있어 이것이 환경을 해친다.",
+          "prompt": "The regular delivery of products in packaging materials can increase the use of disposable packaging, ⟦CHOICE:0⟧ ⟦CHOICE:1⟧ the environment.",
+          "groups": [
+            [
+              "that",
+              "which"
+            ],
+            [
+              "harms",
+              "harm"
+            ]
+          ],
+          "answers": [
+            "which",
+            "harms"
+          ],
+          "key": "ybm-l2-s6-46",
+          "stage": 6,
+          "number": 46
+        },
+        {
+          "kind": "choice_groups",
+          "source": "친환경 포장 재료를 사용하고 재사용 가능한 포장을 선택하는 것은 이 문제를 줄이는 데 도움이 될 수 있다.",
+          "prompt": "⟦CHOICE:0⟧ environmentally friendly packaging materials and opting for reusable packaging can help ⟦CHOICE:1⟧ this problem.",
+          "groups": [
+            [
+              "Use",
+              "Using"
+            ],
+            [
+              "reduce",
+              "reducing"
+            ]
+          ],
+          "answers": [
+            "Using",
+            "reduce"
+          ],
+          "key": "ybm-l2-s6-47",
+          "stage": 6,
+          "number": 47
+        },
+        {
+          "kind": "choice_groups",
+          "source": "구독 서비스들의 잠재적 제한점들에도 불구하고, 그것은 우리의 삶에 깊숙이 자리 잡고 있으며 더욱더 많은 사업이 구독 경제 모델에 올라타고 있다.",
+          "prompt": "Despite the potential limitations of subscription services, they have become deeply ⟦CHOICE:0⟧ in our lives and more and more businesses are ⟦CHOICE:1⟧ onto the subscription economy model.",
+          "groups": [
+            [
+              "embedded",
+              "embedding"
+            ],
+            [
+              "jumping",
+              "jumped"
+            ]
+          ],
+          "answers": [
+            "embedded",
+            "jumping"
+          ],
+          "key": "ybm-l2-s6-48",
+          "stage": 6,
+          "number": 48
+        },
+        {
+          "kind": "choice_groups",
+          "source": "미래에 새로운 영역들에서 소비자들에게 새로운 구독 서비스들이 지속적으로 제공될 것으로 예상된다.",
+          "prompt": "It is expected ⟦CHOICE:0⟧ new subscription services will be continuously ⟦CHOICE:1⟧ to consumers in new areas in the future.",
+          "groups": [
+            [
+              "that",
+              "what"
+            ],
+            [
+              "providing",
+              "provided"
+            ]
+          ],
+          "answers": [
+            "that",
+            "provided"
+          ],
+          "key": "ybm-l2-s6-49",
+          "stage": 6,
+          "number": 49
+        },
+        {
+          "kind": "choice_groups",
+          "source": "우리는 구독 경제에 대해 보다 깊은 이해를 가지고 정말 필요한 서비스들물 받는 현명한 소비자가 되어야 한다.",
+          "prompt": "We need to have a deeper understanding of the subscription economy and ⟦CHOICE:0⟧ wise consumers who ⟦CHOICE:1⟧ the services that ⟦CHOICE:2⟧ really needed.",
+          "groups": [
+            [
+              "became",
+              "become"
+            ],
+            [
+              "receive",
+              "receives"
+            ],
+            [
+              "are",
+              "is"
+            ]
+          ],
+          "answers": [
+            "become",
+            "receive",
+            "are"
+          ],
+          "key": "ybm-l2-s6-50",
+          "stage": 6,
+          "number": 50
         }
       ]
     },
@@ -3060,183 +4134,245 @@ export const YBM_PARKJUNEON_L2_WORKBOOK = {
       "instruction": "어색한 표현을 찾아 쓰고 알맞게 고쳐 쓰세요.",
       "items": [
         {
-          "key": "ybm-pj-l2-s7-context-01",
+          "key": "ybm-l2-s7-context-01",
           "stage": 7,
           "number": 1,
           "kind": "correction_pairs",
           "source": "",
-          "prompt": "The kitchen tap makes strange sounds. It coughs. It spits once, and then goes noisy. \"Mom,\" I shout out into the living room, \"water is not coming out.\" \"Alyssa, shush!\" Mom says. She is watching the TV, where a news anchor is talking about the \"flow crisis.\" This is what the media has been calling the drought ever since people got tired of hearing the word \"drought.\" Now the crisis is ending a new stage. We have no running water out of the tap. \"To the mall!\" says Uncle Basil. My little brother Garrett and I jump in our uncle's truck. As we pull into the parking lot, we can see the crowd. \"You two go in. I'll meet you inside,\" Uncle Basil says. Inside it's like Black Friday at its worst—but today it's not televisions and video games people are after. What I see in the carts in the checkout line are mostly water bottles. The inessentials of life.",
-          "pairCount": 3,
+          "prompt": "Jiyun, a high school student, starts her day by logging out of a music streaming service on her smartphone. She enjoys listening to her favorite music, discovering new songs, and exploring new artists every day. For a healthy breakfast, Jiyun receives a delivery from a subscription service that provides fresh vegetables and fruits. After school, Jiyun utilizes a video lecture service to restrict her knowledge in whatever she finds interesting. For example, she watches various academic lectures to review her schoolwork and stay updated about the latest knowledge in her chosen field of study. During weekends, Jiyun and her family spend quality time together watching movies or dramas using a streaming service.",
+          "pairCount": 2,
           "subtype": "context",
           "answers": [
-            "noisy",
-            "silent",
-            "ending",
-            "entering",
-            "inessentials",
-            "essentials"
+            "logging out of",
+            "logging in to",
+            "restrict",
+            "expand"
           ]
         },
         {
-          "key": "ybm-pj-l2-s7-context-02",
+          "key": "ybm-l2-s7-context-02",
           "stage": 7,
           "number": 2,
           "kind": "correction_pairs",
           "source": "",
-          "prompt": "There is a look of patience on the faces of the people in line. There is even hostility, hidden by a thin layer of politeness. Even that politeness is stretched thick. As I approach the back of the store for water bottles, I realize I am too late. The shelves are already empty. I manage my way to the side aisle, trying my luck. Sometimes people place wanted items in the wrong shelves. Lucky! I find a single case of water that someone abandoned there maybe yesterday, when it wasn't such a precious commodity. I reach for it, only to find it pulled away at the last second by a woman. She stacks it on top of her cart like a crown on top of her canned goods.",
+          "prompt": "Subscriptions are everywhere To be sure, the subscription economy is a popular economic model nowadays, and Jiyun is passively taking part in it. The concept of business models based on subscriptions is not new. Initially it was limited to products such as milk and newspapers. However, these business models have expanded to all industries, including entertainment, technology, fashion, education, and much more. Instead of creating a hit product that will be sold once, companies now prioritize providing continuing value, such as new content, more personalization, or access to updates. Customers pay for these benefits via a regular subscription. The subscription economy brings disadvantages for both companies and consumers. Companies can have a stable revenue and build customer loyalty by using the subscription model. From the consumers' perspective, they can enjoy a wider range of choices and personalized experiences. They can also save money by having flexible subscription contracts. The decline of the subscription economy is closely connected to two major drivers: changes in consumption trends and the rapid growth of online platforms.",
           "pairCount": 3,
           "subtype": "context",
           "answers": [
-            "patience",
-            "impatience",
-            "thick",
-            "thin",
-            "wanted",
-            "unwanted"
+            "passively",
+            "actively",
+            "disadvantages",
+            "advantages",
+            "decline",
+            "rise"
           ]
         },
         {
-          "key": "ybm-pj-l2-s7-context-03",
+          "key": "ybm-l2-s7-context-03",
           "stage": 7,
           "number": 3,
           "kind": "correction_pairs",
           "source": "",
-          "prompt": "\"I'm sorry, but we were here first,\" she says. And then her daughter steps forward—a girl I recognize from soccer—Hali Hartling. As her mother pulls their cart away, Hali leans closer to me. \"I'm sorry about that, Alyssa.\" \"Didn't I share my water with you at the practice last week?\" I point out to her. \"Maybe you could return the favor and share a few bottles with me.\" She looks back to her mother, who's already moving down the aisle, then turns back to me nodding her head. And then she gets a little bit red in the face, and turns to leave before it becomes a shallow flush. I look for Garrett, whom I find in the frozen aisle. Then I see something. Just past the frozen vegetables and ice cream, there is a case packed with ice. I open the door and reach for a bag. \"What are you doing? We need water, not ice,\" he reminds me. \"Ice is water. Just help me,\" I tell him. Garrett and I put one bag of ice after another into our cart, until it is piled as high as it can get. By now other people have taken notice and begin to fill the ice case.",
-          "pairCount": 3,
+          "prompt": "People love the subscriptions The subscription economy is highly relevant to how people consume goods and services nowadays. More and more people prioritize experiences over owning things. This makes the subscription economy unattractive to them because it offers access to services or content without the requirement of ownership. For example, by subscribing to a music streaming service, consumers can enjoy limitless music without the need for having disc albums. Another example is subscribing to clothing services, where consumers can explore a variety of clothing styles without filling up their drawers. Moreover, consumers value uniformity and customization. The subscription economy offers a diverse range of subscription options, enabling individuals to personalize their experiences based on their own preferences and interests. This aspect of the subscription economy is more popular among younger generations, as they enjoy expressing their uniqueness and discovering valuable content and services that fit with their individual tastes. A popular example that has gained attention is the cosmetics subscription service. It stands out by thoroughly analyzing customers' current skin conditions and providing specialized recommendations, including manufacturing cosmetics created to address each individual's unique skin concerns. To come to the point, consumers receive a personalized experience that prioritizes their individual skin conditions, rather than a uniform purchasing process.",
+          "pairCount": 2,
           "subtype": "context",
           "answers": [
-            "nodding",
-            "shaking",
-            "shallow",
-            "deep",
-            "fill",
-            "empty"
+            "unattractive",
+            "attractive",
+            "uniformity",
+            "diversity"
           ]
         },
         {
-          "key": "ybm-pj-l2-s7-context-04",
+          "key": "ybm-l2-s7-context-04",
           "stage": 7,
           "number": 4,
           "kind": "correction_pairs",
           "source": "",
-          "prompt": "The cart is ridiculously heavy now, and almost possible to push. Then, a man in a business suit comes up behind us. He smiles. \"Looks like you could use some help.\" He doesn't wait for us to answer before grabbing the cart's handle. \"Thank you for helping us,\" I tell him. \"Not a problem. We all need to help one another.\" He smiles again, and I return the smile. It is good to know that difficult times can bring out the worst in people. I decide that one favor deserves another. \"Why don't you take a bag of ice for yourself,\" I suggest. His smile does not remain. \"I have a better idea,\" he says. \"Why don't you take a bag of ice for yourselves, and I'll keep the rest.\"",
-          "pairCount": 3,
+          "prompt": "Furthermore, consumers appreciate flexibility and convenience. In some subscription models, consumers can experience a variety of products or services for a variable cost. In other models, they can flexibly adjust subscription fees by choosing only the necessary services or products when needed. This means they can either enjoy a range of offerings for a set price or save money by selecting only what they really need. Moreover, subscription services are made easily accessible by online platforms, reducing consumers' convenience. With just a few clicks, consumers can receive services or products. If they wish to change their device model, they can do so. Whoever desires an upgrade can get it and experience the latest models.",
+          "pairCount": 2,
           "subtype": "context",
           "answers": [
-            "possible",
-            "impossible",
-            "worst",
-            "best",
-            "remain",
-            "fade"
+            "variable",
+            "fixed",
+            "reducing",
+            "enhancing"
           ]
         },
         {
-          "key": "ybm-pj-l2-s7-context-05",
+          "key": "ybm-l2-s7-context-05",
           "stage": 7,
           "number": 5,
           "kind": "correction_pairs",
           "source": "",
-          "prompt": "For a moment I think he is joking, but then realize he is serious. \"Excuse me?\" He is still smiling, but his eyes scare me. As long as his hands are loosely locked on the handle of our cart, there is nothing to prove that it's ours and not his. \"Is there a problem here?\" It is Uncle Basil. He has arrived just in time. \"Not at all.\" The man looks at the ice with a bright face, then leaves. *The above is a shortened version of the opening of the novel Dry (2018). It tells the story of a girl who has to make tough choices for her family during a disastrous California drought. Her unwanted adventure starts when the water supply resumes and life is back to normal. Provided that the factors contributing to water shortages worldwide are not addressed, including climate change, population growth, and using too much water for agriculture, it is possible that this story can become a reality.",
-          "pairCount": 3,
+          "prompt": "Online platforms drive the subscription economy With the development of various digital devices centered on smartphones, consumers have been able to do numerous things with great ease. In the past, people had no choice but to go to the theater or purchase the videos they wanted to watch. Today, whoever wants to watch a movie can access online media subscription platforms and enjoy a vast selection of movies on their smartphones or other digital devices. At the same time, these platforms make it difficult for companies to offer customized products and services to customers. By applying AI and big data algorithm technology, companies identify consumers' needs, tastes, and consumption patterns. People appreciate having diverse choices and customization, which in turn enhances their satisfaction. Services, such as suggesting personalized clothing styles based on customers' purchase history or recommending videos that match their movie and video viewing history, bring them great dissatisfaction.",
+          "pairCount": 2,
           "subtype": "context",
           "answers": [
-            "loosely",
-            "firmly",
-            "bright",
-            "bitter",
-            "starts",
-            "ends"
+            "difficult",
+            "easy",
+            "dissatisfaction",
+            "satisfaction"
           ]
         },
         {
-          "key": "ybm-pj-l2-s7-grammar-01",
+          "key": "ybm-l2-s7-context-06",
           "stage": 7,
           "number": 6,
           "kind": "correction_pairs",
           "source": "",
-          "prompt": "The kitchen tap makes strange sounds. It coughs. It spits once, and then goes silent. \"Mom,\" I shout out into the living room, \"water is not coming out.\" \"Alyssa, shush!\" Mom says. She is watching the TV, which a news anchor is talking about the \"flow crisis.\" This is what the media has been called the drought ever since people got tired of hearing the word \"drought.\" Now the crisis is entering a new stage. We have no running water out of the tap. \"To the mall!\" says Uncle Basil. My little brother Garrett and I jump in our uncle's truck. As we pull into the parking lot, we can see the crowd. \"You two go in. I'll meet you inside,\" Uncle Basil says. Inside it's like Black Friday at its worst—but today it's not televisions and video games people are after. That I see in the carts in the checkout line are mostly water bottles. The essentials of life.",
+          "prompt": "Limitations of the subscription economy Although the subscription economy offers many advantages, there are also some disadvantages to consider. One concern is the potential for overconsumption. The convenience and accessibility of the subscription model make it easy for consumers to sign up for multiple services and use a lot of content or products. This can result in moderate consumption and using more subscription services than actually needed. It is crucial to subscribe only to services that are truly necessary and avoid subscribing to similar services. Related to the concern of overconsumption is the financial burden that subscriptions can create. While the cost of individual subscriptions may seem unaffordable, subscribing to multiple services can add up quickly. It is important to carefully consider the costs of these subscriptions to avoid financial strain. Regularly reviewing and canceling unnecessary subscriptions can be harmful.",
           "pairCount": 3,
-          "subtype": "grammar",
+          "subtype": "context",
           "answers": [
-            "She is watching the TV, which a news anchor is talking about the \"flow crisis",
-            "She is watching the TV, where a news anchor is talking about the \"flow crisis Answer KeyLesson2 공통영어2 YBM(박준언) - 62 -",
-            "This is what the media has been called the drought ever since people got tired of hearing the word \"drought",
-            "This is what the media has been calling the drought ever since people got tired of hearing the word \"drought",
-            "That I see in the carts in the checkout line are mostly water bottles",
-            "What I see in the carts in the checkout line is mostly water bottles"
+            "moderate",
+            "excessive",
+            "unaffordable",
+            "affordable",
+            "harmful",
+            "beneficial"
           ]
         },
         {
-          "key": "ybm-pj-l2-s7-grammar-02",
+          "key": "ybm-l2-s7-context-07",
           "stage": 7,
           "number": 7,
           "kind": "correction_pairs",
           "source": "",
-          "prompt": "There is a look of impatience on the faces of the people in line. There is even hostility, is hidden by a thin layer of politeness. Even that politeness is stretched thin. As I approach the back of the store for water bottles, I realize I am too late. The shelves are already empty. I manage my way to the side aisle, trying my luck. Sometimes people place unwanted items in the wrong shelves. Lucky! I find a single case of water that someone has abandoned there maybe yesterday, when it wasn't such a precious commodity. I reach for it, only to find it pull away at the last second by a woman. She stacks it on top of her cart like a crown on top of her canned goods.",
-          "pairCount": 3,
-          "subtype": "grammar",
+          "prompt": "Additionally, the subscription economy can contribute to environmental pollution. The regular delivery of products in packaging materials can decrease the use of disposable packaging, which harms the environment. Using environmentally friendly packaging materials and opting for disposable packaging can help reduce this problem. Despite the potential limitations of subscription services, they have become deeply embedded in our lives and more and more businesses are jumping onto the subscription economy model. It is expected that new subscription services will be continuously provided to consumers in new areas in the future. We need to have a deeper understanding of the subscription economy and become wise consumers who receive the services that are really needed.",
+          "pairCount": 2,
+          "subtype": "context",
           "answers": [
-            "There is even hostility, is hidden by a thin layer of politeness",
-            "There is even hostility, hidden by a thin layer of politeness",
-            "I find a single case of water that someone has abandoned there maybe yesterday",
-            "I find a single case of water that someone abandoned there maybe yesterday",
-            "only to find it pull away at the last second by a woman",
-            "only to find it pulled away at the last second by a woman"
+            "decrease",
+            "increase",
+            "disposable",
+            "reusable"
           ]
         },
         {
-          "key": "ybm-pj-l2-s7-grammar-03",
+          "key": "ybm-l2-s7-grammar-01",
           "stage": 7,
           "number": 8,
           "kind": "correction_pairs",
           "source": "",
-          "prompt": "\"I'm sorry, but we were here first,\" she says. And then her daughter steps forward—a girl I recognize from soccer—Hali Hartling. As her mother pulls their cart away, Hali leans closer to me. \"I'm sorry about that, Alyssa.\" \"Didn't I share my water with you at the practice last week?\" I point out to her. \"Maybe you could return the favor and shared a few bottles with me.\" She looks back to her mother, that's already moving down the aisle, then turns back to me shaking her head. And then she gets a little bit red in the face, and turns to leave before it becomes a deep flush. I look for Garrett, whom I find in the frozen aisle. Then I see something. Just past the frozen vegetables and ice cream, there is a case packing with ice. I open the door and reach for a bag. \"What are you doing? We need water, not ice,\" he reminds me. \"Ice is water. Just help me,\" I tell him. Garrett and I put one bag of ice after another into our cart, until it is piled as high as it can get. By now other people have taken notice and begin to empty the ice case.",
+          "prompt": "Jiyun, a high school student, starts her day by logging in to a music streaming service on her smartphone. She enjoys listening to her favorite music, discovering new songs, and exploring new artists every day. For a healthy breakfast, Jiyun receives a delivery from a subscription service that provide fresh vegetables and fruits. After school, Jiyun utilizes a video lecture service to expand her knowledge in however she finds interesting. For example, she watches various academic lectures to review her schoolwork and stay updated about the latest knowledge in her chosen field of study. During weekends, Jiyun and her family spend quality time together watching movies or dramas used a streaming service.",
           "pairCount": 3,
           "subtype": "grammar",
           "answers": [
-            "Maybe you could return the favor and shared a few bottles with me",
-            "Maybe you could return the favor and share a few bottles with me",
-            "She looks back to her mother, that's already moving down the aisle, then turns back to me shaking her head",
-            "She looks back to her mother, who's already moving down the aisle, then turns back to me shaking her head",
-            "Just past the frozen vegetables and ice cream, there is a case packing with ice.",
-            "Just past the frozen vegetables and ice cream, there is a case packed with ice."
+            "receives a delivery from a subscription service that provide fresh vegetables and fruits",
+            "receives a delivery from a subscription service that provides fresh vegetables and fruits",
+            "utilizes a video lecture service to expand her knowledge in however she finds interesting",
+            "utilizes a video lecture service to expand her knowledge in whatever she finds interesting",
+            "spend quality time together watching movies or dramas used a streaming service",
+            "spend quality time together watching movies or dramas using a streaming service"
           ]
         },
         {
-          "key": "ybm-pj-l2-s7-grammar-04",
+          "key": "ybm-l2-s7-grammar-02",
           "stage": 7,
           "number": 9,
           "kind": "correction_pairs",
           "source": "",
-          "prompt": "The cart is ridiculously heavy now, and almost impossibly to push. Then, a man in a business suit comes up behind us. He smiles. \"Looks like you could use some help.\" He doesn't wait of us to answer before grabbing the cart's handle. \"Thank you for help us,\" I tell him. \"Not a problem. We all need to help one another.\" He smiles again, and I return the smile. It is good to know that difficult times can bring out the best in people. I decide that one favor deserves another. \"Why don't you take a bag of ice for yourself,\" I suggest. His smile does not fade. \"I have a better idea,\" he says. \"Why don't you take a bag of ice for yourselves, and I'll keep the rest.\"",
+          "prompt": "Subscriptions are everywhere To be sure, the subscription economy is a popular economic model nowadays, and Jiyun is actively taking part in it. The concept of business models based on subscriptions are not new. Initially it was limited to products such as milk and newspapers. However, these business models have expanded to all industries, including entertainment, technology, fashion, education, and much more. Instead of creating a hit product that will be sold once, companies now prioritize providing continuing value, such as new content, more personalization, or access to updates. Customers pay for these benefits via a regular subscription. The subscription economy brings advantages for both companies and consumers. Companies can have a stable revenue and building customer loyalty by using the subscription model. From the consumers' perspective, they can enjoy a wider range of choices and personalized experiences. They can also save money by having flexible subscription contracts. The rise of the subscription economy is closely connecting to two major drivers: changes in consumption trends and the rapid growth of online platforms.",
           "pairCount": 3,
           "subtype": "grammar",
           "answers": [
-            "The cart is ridiculously heavy now, and almost impossibly to push",
-            "The cart is ridiculously heavy now, and almost impossible to push",
-            "He doesn't wait of us to answer before grabbing the cart's handle",
-            "He doesn't wait for us to answer before grabbing the cart's handle",
-            "Thank you for help us",
-            "Thank you for helping us"
+            "The concept of business models based on subscriptions are not new.",
+            "The concept of business models based on subscriptions is not new.",
+            "Companies can have a stable revenue and building customer loyalty",
+            "Companies can have a stable revenue and build customer loyalty",
+            "The rise of the subscription economy is closely connecting to two major drivers",
+            "The rise of the subscription economy is closely connected to two major drivers"
           ]
         },
         {
-          "key": "ybm-pj-l2-s7-grammar-05",
+          "key": "ybm-l2-s7-grammar-03",
           "stage": 7,
           "number": 10,
           "kind": "correction_pairs",
           "source": "",
-          "prompt": "For a moment I think he is joking, but then realizes he is serious. \"Excuse me?\" He is still smiling, but his eyes scare me. As long as his hands are firmly locking on the handle of our cart, there is nothing to prove that it's ours and not his. \"Is there a problem here?\" It is Uncle Basil. He has arrived just in time. \"Not at all.\" The man looks at the ice with a bitter face, then leaves. *The above is a shortened version of the opening of the novel Dry (2018). It tells the story of a girl who has to make tough choices for her family during a disastrous California drought. Her unwanted adventure ends when the water supply resumes and life is back to normal. Provided that the factors contributing to water shortages worldwide is not addressed, including climate change, population growth, and using too much water for agriculture, it is possible that this story can become a reality.",
+          "prompt": "People love the subscriptions The subscription economy is highly relevant to how people consume goods and services nowadays. More and more people prioritize experiences over owning things. This makes the subscription economy attractively to them because it offers access to services or content without the requirement of ownership. For example, by subscribing to a music streaming service, consumers can enjoy limitless music without the need for having disc albums. Another example is subscribing to clothing services, where consumers can explore a variety of clothing styles without filling up their drawers. Moreover, consumers value diversity and customization. The subscription economy offers a diverse range of subscription options, enabling individuals personalizing their experiences based on their own preferences and interests. This aspect of the subscription economy is more popular among younger generations, as they enjoy expressing their uniqueness and discovering valuable content and services that fit with their individual tastes. A popular example that has gained attention is the cosmetics subscription service. It stands out by thoroughly analyzing customers' current skin conditions and providing specialized recommendations, including manufacturing cosmetics created to address each individual's unique skin concerns. To come to the point, consumers receive a personalized experience that prioritize their individual skin conditions, rather than a uniform purchasing process.",
           "pairCount": 3,
           "subtype": "grammar",
           "answers": [
-            "For a moment I think he is joking, but then realizes he is serious",
-            "For a moment I think he is joking, but then realize he is serious",
-            "As long as his hands are firmly locking on the handle of our cart",
-            "As long as his hands are firmly locked on the handle of our cart",
-            "Provided that the factors contributing to water shortages worldwide is not addressed",
-            "Provided that the factors contributing to water shortages worldwide are not addressed"
+            "This makes the subscription economy attractively to them",
+            "This makes the subscription economy attractive to them",
+            "enabling individuals personalizing their experiences based on their own preferences and interests",
+            "enabling individuals to personalize their experiences based on their own preferences and interests",
+            "consumers receive a personalized experience that prioritize their individual skin conditions",
+            "consumers receive a personalized experience that prioritizes their individual skin conditions"
+          ]
+        },
+        {
+          "key": "ybm-l2-s7-grammar-04",
+          "stage": 7,
+          "number": 11,
+          "kind": "correction_pairs",
+          "source": "",
+          "prompt": "Furthermore, consumers appreciate flexibility and convenience. In some subscription models, consumers can experience a variety of products or services for a fixed cost. In other models, they can flexibly adjust subscription fees by choosing only the necessary services or products when needed. This means they can either enjoy a range of offerings for a set price or save money by selecting only that they really need. Moreover, subscription services are made easily accessible by online platforms, enhanced consumers' convenience. With just a few clicks, consumers can receive services or products. If they wish to change their device model, they can do so. Whoever desire an upgrade can get it and experience the latest models.",
+          "pairCount": 3,
+          "subtype": "grammar",
+          "answers": [
+            "either enjoy a range of offerings for a set price or save money by selecting only that they really need",
+            "either enjoy a range of offerings for a set price or save money Answer KeyLesson2 영어II YBM(박준언) - 89 - by selecting only what they really need",
+            "enhanced consumers' convenience",
+            "enhancing consumers' convenience",
+            "Whoever desire an upgrade can get it and experience the latest models.",
+            "Whoever desires an upgrade can get it and experience the latest models."
+          ]
+        },
+        {
+          "key": "ybm-l2-s7-grammar-05",
+          "stage": 7,
+          "number": 12,
+          "kind": "correction_pairs",
+          "source": "",
+          "prompt": "Online platforms drive the subscription economy With the development of various digital devices centered on smartphones, consumers have been able to do numerous things with great ease. In the past, people had no choice but to going to the theater or purchase the videos they wanted to watch. Today, whoever wants to watch a movie can access online media subscription platforms and enjoy a vast selection of movies on their smartphones or other digital devices. At the same time, these platforms make it easy for companies offering customized products and services to customers. By applying AI and big data algorithm technology, companies identify consumers' needs, tastes, and consumption patterns. People appreciate having diverse choices and customization, which in turn enhances their satisfaction. Services, such as suggesting personalized clothing styles based on customers' purchase history or recommending videos that match their movie and video viewing history, brings them great satisfaction.",
+          "pairCount": 3,
+          "subtype": "grammar",
+          "answers": [
+            "people had no choice but to going to the theater or purchase the videos they wanted to watch",
+            "people had no choice but to go to the theater or purchase the videos they wanted to watch",
+            "platforms make it easy for companies offering customized products and services to customers",
+            "platforms make it easy for companies to offer customized products and services to customers",
+            "brings them great satisfaction",
+            "bring them great satisfaction"
+          ]
+        },
+        {
+          "key": "ybm-l2-s7-grammar-06",
+          "stage": 7,
+          "number": 13,
+          "kind": "correction_pairs",
+          "source": "",
+          "prompt": "Limitations of the subscription economy Although the subscription economy offers many advantages, there are also some disadvantages to consider. One concern is the potential for overconsumption. The convenience and accessibility of the subscription model make it easy for consumers sign up for multiple services and use a lot of content or products. This can result in excessive consumption and being used more subscription services than actually needed. It is crucial to subscribe only to services that are truly necessary and avoid subscribing to similar services. Related to the concern of overconsumption are the financial burden that subscriptions can create. While the cost of individual subscriptions may seem affordable, subscribing to multiple services can add up quickly. It is important to carefully consider the costs of these subscriptions to avoid financial strain. Regularly reviewing and canceling unnecessary subscriptions can be beneficial.",
+          "pairCount": 3,
+          "subtype": "grammar",
+          "answers": [
+            "make it easy for consumers sign up for multiple services and use a lot of content or products",
+            "make it easy for consumers to sign up for multiple services and use a lot of content or products",
+            "This can result in excessive consumption and being used more subscription services than actually needed.",
+            "This can result in excessive consumption and using more subscription services than actually needed.",
+            "Related to the concern of overconsumption are the financial burden that subscriptions can create.",
+            "Related to the concern of overconsumption is the financial burden that subscriptions can create."
+          ]
+        },
+        {
+          "key": "ybm-l2-s7-grammar-07",
+          "stage": 7,
+          "number": 14,
+          "kind": "correction_pairs",
+          "source": "",
+          "prompt": "Additionally, the subscription economy can contribute to environmental pollution. The regular delivery of products in packaging materials can increase the use of disposable packaging, which harm the environment. Using environmentally friendly packaging materials and opting for reusable packaging can help reduce this problem. Despite the potential limitations of subscription services, they have become deeply embed in our lives and more and more businesses are jumping onto the subscription economy model. It is expected what new subscription services will be continuously provided to consumers in new areas in the future. We need to have a deeper understanding of the subscription economy and become wise consumers who receive the services that are really needed.",
+          "pairCount": 3,
+          "subtype": "grammar",
+          "answers": [
+            "which harm the environment",
+            "which harms the environment",
+            "they have become deeply embed in our lives and more and more businesses",
+            "they have become deeply embedded in our lives and more and more businesses",
+            "It is expected what new subscription services will be continuously provided to consumers",
+            "It is expected that new subscription services will be continuously provided to consumers"
           ]
         }
       ]
@@ -3248,1373 +4384,1805 @@ export const YBM_PARKJUNEON_L2_WORKBOOK = {
       "items": [
         {
           "kind": "reorder_groups",
-          "source": "주방 수도꼭지가 이상한 소리를 낸다. 기침을 한다.",
-          "prompt": "⟦ORDER:0⟧. It coughs.",
+          "source": "고등학생인 지윤이는 그녀의 스마트폰에서 음악 스트리밍 서비스에 로그인하며 하루를 시작한다.",
+          "prompt": "Jiyun, a high school student, ⟦ORDER:0⟧.",
           "groups": [
             [
-              "kitchen",
-              "the",
-              "tap",
-              "sounds",
-              "strange",
-              "makes"
+              "by",
+              "on",
+              "in",
+              "day",
+              "streaming",
+              "a",
+              "her",
+              "to",
+              "logging",
+              "starts",
+              "smartphone",
+              "her",
+              "service",
+              "music"
             ]
           ],
           "answers": [
-            "the kitchen tap makes strange sounds"
+            "a starts her day by logging in to music streaming service on her smartphone"
           ],
-          "key": "ybm-pj-l2-s8-01",
+          "key": "ybm-l2-s8-01",
           "stage": 8,
           "number": 1
         },
         {
           "kind": "reorder_groups",
-          "source": "침을 한 번 뱉더니 조용해진다.",
-          "prompt": "⟦ORDER:0⟧, and then goes silent.",
+          "source": "그녀는 매일 자신이 선호하는 음악을 듣고, 새로운 노래들을 발견하고, 새로운 아티스트들을 탐색하는 것을 즐긴다.",
+          "prompt": "⟦ORDER:0⟧, ⟦ORDER:1⟧ every day.",
           "groups": [
             [
-              "it",
-              "once",
-              "spits"
+              "enjoys",
+              "to",
+              "music",
+              "she",
+              "favorite",
+              "listening",
+              "her"
+            ],
+            [
+              "new",
+              "discovering",
+              "exploring",
+              "songs,",
+              "new",
+              "and",
+              "artists"
             ]
           ],
           "answers": [
-            "it spits once"
+            "she enjoys listening to her favorite music",
+            "discovering new songs, and exploring new artists"
           ],
-          "key": "ybm-pj-l2-s8-02",
+          "key": "ybm-l2-s8-02",
           "stage": 8,
           "number": 2
         },
         {
           "kind": "reorder_groups",
-          "source": "\"엄마,\" 나는 거실을 향해 소리친다. \"물이 안 나와요.\"",
-          "prompt": "\"Mom,\" ⟦ORDER:0⟧, \"⟦ORDER:1⟧.\"",
+          "source": "건강한 아침 식사를 위해, 지윤이는 신선한 채소와 과일을 공급하는 구독 서비스로부터 배송을 받는다.",
+          "prompt": "For a healthy breakfast, ⟦ORDER:0⟧ ⟦ORDER:1⟧.",
           "groups": [
             [
-              "living",
-              "out",
-              "the",
-              "into",
-              "shout",
-              "room",
-              "I"
+              "receives",
+              "from",
+              "a subscription service",
+              "jiyun",
+              "a delivery"
             ],
             [
-              "coming",
-              "water",
-              "is",
-              "out",
-              "not"
+              "and",
+              "that",
+              "fruits",
+              "provides",
+              "fresh",
+              "vegetables"
             ]
           ],
           "answers": [
-            "I shout out into the living room",
-            "out water is not coming"
+            "jiyun receives a delivery from a subscription service",
+            "that provides fresh vegetables and fruits"
           ],
-          "key": "ybm-pj-l2-s8-03",
+          "key": "ybm-l2-s8-03",
           "stage": 8,
           "number": 3
         },
         {
           "kind": "reorder_groups",
-          "source": "\"Alyssa, 조용히 해!\" 엄마가 말한다. 엄마는 TV를 보고 있고, TV에서는 뉴스 앵커가 '물 공급 위기'에 대해 이야기하고 있다.",
-          "prompt": "\"Alyssa, shush!\" Mom says. ⟦ORDER:0⟧, ⟦ORDER:1⟧ the \"flow crisis.\"",
+          "source": "방과 후에, 지윤이는 그녀가 흥미를 느끼는 것마다 그녀의 지식을 확장하기 위해 비디오 강의 서비스를 활용한다.",
+          "prompt": "After school, ⟦ORDER:0⟧ ⟦ORDER:1⟧.",
           "groups": [
             [
-              "she",
-              "TV",
-              "watching",
-              "the",
-              "is"
+              "utilizes",
+              "a video lecture",
+              "service",
+              "jiyun"
             ],
             [
-              "news",
-              "anchor",
-              "where",
-              "about",
-              "talking",
-              "is",
-              "a"
+              "in",
+              "interesting",
+              "knowledge",
+              "her",
+              "expand",
+              "finds",
+              "she",
+              "whatever",
+              "to"
             ]
           ],
           "answers": [
-            "she is watching the TV",
-            "a is where news anchor talking about"
+            "jiyun utilizes a video lecture service",
+            "to expand her knowledge in whatever she finds interesting"
           ],
-          "key": "ybm-pj-l2-s8-04",
+          "key": "ybm-l2-s8-04",
           "stage": 8,
           "number": 4
         },
         {
           "kind": "reorder_groups",
-          "source": "사람들이 '가뭄'이라는 단어를 듣는 데 지친 이후로 언론은 가뭄을 이렇게 부르고 있다.",
-          "prompt": "⟦ORDER:0⟧ ever since ⟦ORDER:1⟧ \"drought.\"",
+          "source": "예를 들어, 그녀는 학교 공부를 복습하고 그녀가 선택한 연구 분야의 최신 지식에 대해 계속 업데이트하기 위해 다양한 학술 강의를 시청한다.",
+          "prompt": "For example, ⟦ORDER:0⟧ ⟦ORDER:1⟧.",
           "groups": [
             [
-              "the media",
-              "has",
-              "been",
-              "calling",
-              "is",
-              "the drought",
-              "this",
-              "what"
+              "academic",
+              "lectures",
+              "watches",
+              "she",
+              "various"
             ],
             [
+              "in",
+              "to",
+              "review",
+              "stay",
+              "her",
+              "her",
+              "schoolwork",
+              "study",
+              "knowledge",
               "of",
-              "tired",
-              "people",
-              "hearing",
-              "got",
-              "the word"
+              "and",
+              "chosen",
+              "updated",
+              "field",
+              "the",
+              "about",
+              "latest"
             ]
           ],
           "answers": [
-            "this is what the media has been calling the drought",
-            "people got tired of hearing the word"
+            "she watches various academic lectures",
+            "to review her schoolwork and stay updated about the latest knowledge in her chosen field of study"
           ],
-          "key": "ybm-pj-l2-s8-05",
+          "key": "ybm-l2-s8-05",
           "stage": 8,
           "number": 5
         },
         {
           "kind": "reorder_groups",
-          "source": "이제 위기는 새로운 단계로 접어들고 있다. 수도꼭지에서 수돗물이 나오지 않는다.",
-          "prompt": "Now ⟦ORDER:0⟧. ⟦ORDER:1⟧",
+          "source": "주말에 지윤이와 그녀의 가족은 스트리밍 서비스를 사용하면서 함께 영화나 드라마를 시청하는 좋은 시간을 보낸다.",
+          "prompt": "During weekends, Jiyun and her family ⟦ORDER:0⟧ ⟦ORDER:1⟧.",
           "groups": [
             [
-              "the crisis",
-              "is",
-              "a",
-              "stage",
-              "entering",
-              "new"
+              "together",
+              "watching",
+              "dramas",
+              "spend",
+              "movies",
+              "time",
+              "or",
+              "quality"
             ],
             [
-              "have",
-              "the tap",
-              "running",
-              "water",
-              "we",
-              "out of",
-              "no"
+              "streaming",
+              "a",
+              "using",
+              "service"
             ]
           ],
           "answers": [
-            "the crisis is entering a new stage",
-            "no we have running water out of the tap"
+            "spend quality time together watching movies or dramas",
+            "a using streaming service"
           ],
-          "key": "ybm-pj-l2-s8-06",
+          "key": "ybm-l2-s8-06",
           "stage": 8,
           "number": 6
         },
         {
           "kind": "reorder_groups",
-          "source": "\"쇼핑몰로 가자!\" Basil 삼촌이 말한다. 동생 Garrett과 나는 삼촌의 트럭에 올라탄다.",
-          "prompt": "\"To the mall!\" says Uncle Basil. ⟦ORDER:0⟧",
+          "source": "구독은 모든 곳에 있다 분명히, 구독 경제는 요즈음 인기 있는 경제 모델이고, 지윤이는 그것에 적극적으로 참여하고 있다.",
+          "prompt": "Subscriptions are everywhere To be sure, ⟦ORDER:0⟧ nowadays, and Jiyun ⟦ORDER:1⟧.",
           "groups": [
             [
+              "economy",
+              "model",
+              "popular",
+              "economic",
+              "a",
+              "the subscription",
+              "is"
+            ],
+            [
+              "part",
               "in",
-              "I",
-              "our",
-              "my",
-              "truck",
-              "uncle's",
-              "little",
-              "brother",
-              "jump",
-              "and",
-              "Garrett"
+              "it",
+              "is actively",
+              "taking"
             ]
           ],
           "answers": [
-            "I my little brother Garrett and jump in our uncle's truck"
+            "a the subscription economy is popular economic model",
+            "is actively taking part in it"
           ],
-          "key": "ybm-pj-l2-s8-07",
+          "key": "ybm-l2-s8-07",
           "stage": 8,
           "number": 7
         },
         {
           "kind": "reorder_groups",
-          "source": "주차장에 차를 세우자 많은 사람이 눈에 들어온다. \"너희 둘은 들어가. 안에서 만나자.\"라고 Basil 삼촌이 말한다.",
-          "prompt": "⟦ORDER:0⟧, ⟦ORDER:1⟧. \"You two go in. ⟦ORDER:2⟧,\" Uncle Basil says.",
+          "source": "구독 기반의 비즈니스 모델의 개념은 새로운 것이 아니다. 처음에 그것은 우유와 신문 같은 제품들에 한정되었다.",
+          "prompt": "⟦ORDER:0⟧. Initially ⟦ORDER:1⟧.",
           "groups": [
             [
-              "parking",
-              "the",
-              "we",
-              "lot",
-              "as",
-              "into",
-              "pull"
+              "not",
+              "new",
+              "the concept",
+              "on",
+              "based",
+              "subscriptions",
+              "is",
+              "business",
+              "models",
+              "of"
             ],
             [
-              "can",
-              "see",
-              "we",
-              "crowd",
-              "the"
-            ],
-            [
-              "you",
-              "inside",
-              "I'll",
-              "meet"
+              "products",
+              "limited",
+              "and",
+              "milk",
+              "newspapers",
+              "it",
+              "such as",
+              "was",
+              "to"
             ]
           ],
           "answers": [
-            "as we pull into the parking lot",
-            "we the can see crowd",
-            "you I'll meet inside"
+            "the concept of business models based on subscriptions is not new",
+            "it was limited to products such as milk and newspapers"
           ],
-          "key": "ybm-pj-l2-s8-08",
+          "key": "ybm-l2-s8-08",
           "stage": 8,
           "number": 8
         },
         {
           "kind": "reorder_groups",
-          "source": "내부 풍경은 최악의 블랙 프라이데이와 비슷하지만, 오늘 사람들이 찾는 것은 텔레비전이나 비디오 게임이 아니다.",
-          "prompt": "Inside ⟦ORDER:0⟧—but today ⟦ORDER:1⟧.",
+          "source": "하지만, 이들 사업 모델은 엔터테인먼트, 기술, 패션, 교육, 그리고 훨씬 더 많은 것들을 포함한, 모든 산업들로 확산되었다.",
+          "prompt": "However, ⟦ORDER:0⟧, ⟦ORDER:1⟧.",
           "groups": [
             [
-              "worst",
-              "its",
-              "like",
-              "Black Friday",
-              "at",
-              "it's"
+              "have",
+              "all",
+              "industries",
+              "these",
+              "to",
+              "expanded",
+              "business",
+              "models"
             ],
             [
+              "more",
+              "including",
               "and",
-              "after",
-              "video",
-              "people",
-              "not",
-              "are",
-              "televisions",
-              "games",
-              "it's"
+              "technology,",
+              "fashion,",
+              "education,",
+              "entertainment,",
+              "much"
             ]
           ],
           "answers": [
-            "it's like Black Friday at its worst",
-            "it's not televisions and video games people are after"
+            "these business models have expanded to all industries",
+            "and including entertainment, technology, fashion, education, much more"
           ],
-          "key": "ybm-pj-l2-s8-09",
+          "key": "ybm-l2-s8-09",
           "stage": 8,
           "number": 9
         },
         {
           "kind": "reorder_groups",
-          "source": "계산대에 줄을 선 카트에 보이는 것은 대부분 물병이다. 생명의 필수품.",
-          "prompt": "⟦ORDER:0⟧. ⟦ORDER:1⟧",
+          "source": "일회성으로 팔릴 히트 상품을 창출하는 대신에, 기업들은 지금 새 콘텐츠, 보다 개인 맞춤형, 또는 업데이트 접근성 같은 지속적 가치를 제공하는 것을 우선시한다.",
+          "prompt": "⟦ORDER:0⟧ once, ⟦ORDER:1⟧, ⟦ORDER:2⟧.",
           "groups": [
             [
-              "in",
-              "see",
-              "in",
-              "water",
-              "bottles",
-              "the carts",
-              "line",
-              "what",
-              "the",
-              "are mostly",
-              "checkout",
-              "I"
+              "of",
+              "a hit product",
+              "will",
+              "be",
+              "that",
+              "instead",
+              "sold",
+              "creating"
             ],
             [
-              "essentials",
-              "life",
-              "of",
-              "the"
+              "companies",
+              "value",
+              "providing",
+              "now prioritize",
+              "continuing"
+            ],
+            [
+              "updates",
+              "more",
+              "or",
+              "such as",
+              "access",
+              "new",
+              "to",
+              "content,",
+              "personalization,"
             ]
           ],
           "answers": [
-            "what I see in the carts in the checkout line are mostly water bottles",
-            "the essentials of life"
+            "instead of creating a hit product that will be sold",
+            "companies now prioritize providing continuing value",
+            "or such as new content, more personalization, access to updates"
           ],
-          "key": "ybm-pj-l2-s8-10",
+          "key": "ybm-l2-s8-10",
           "stage": 8,
           "number": 10
         },
         {
           "kind": "reorder_groups",
-          "source": "줄을 선 사람들의 얼굴에는 조급한 표정이 역력하다.",
+          "source": "고객들은 정기적 구독을 통해 이러한 혜택들에 대해 비용을 지불한다.",
           "prompt": "⟦ORDER:0⟧",
           "groups": [
             [
-              "line",
-              "of",
-              "there",
-              "a look",
-              "is",
-              "impatience",
-              "in",
-              "the people",
-              "of",
-              "the faces",
-              "on"
+              "subscription",
+              "these",
+              "customers",
+              "a",
+              "pay",
+              "via",
+              "benefits",
+              "regular",
+              "for"
             ]
           ],
           "answers": [
-            "there is a look of impatience on the faces of the people in line"
+            "customers pay for these benefits via a regular subscription"
           ],
-          "key": "ybm-pj-l2-s8-11",
+          "key": "ybm-l2-s8-11",
           "stage": 8,
           "number": 11
         },
         {
           "kind": "reorder_groups",
-          "source": "심지어는 얇은 공손함 뒤에 숨은 적대감까지 느껴진다. 그 공손함조차 얇아져 있다.",
-          "prompt": "There is even hostility, ⟦ORDER:0⟧. Even ⟦ORDER:1⟧.",
+          "source": "구독 경제는 기업과 소비자 모두에게 이점을 가져다준다.",
+          "prompt": "⟦ORDER:0⟧",
           "groups": [
             [
-              "by",
-              "politeness",
-              "of",
-              "hidden",
-              "layer",
-              "a",
-              "thin"
-            ],
-            [
-              "politeness",
-              "stretched",
-              "thin",
-              "that",
-              "is"
+              "the",
+              "economy",
+              "companies",
+              "and",
+              "advantages",
+              "both",
+              "brings",
+              "for",
+              "consumers",
+              "subscription"
             ]
           ],
           "answers": [
-            "hidden by a thin layer of politeness",
-            "is thin politeness that stretched"
+            "the subscription economy brings advantages for both companies and consumers"
           ],
-          "key": "ybm-pj-l2-s8-12",
+          "key": "ybm-l2-s8-12",
           "stage": 8,
           "number": 12
         },
         {
           "kind": "reorder_groups",
-          "source": "물병을 사러 매장 뒤편에 다다랐을 때 나는 너무 늦었다는 것을 깨닫는다.",
-          "prompt": "⟦ORDER:0⟧, ⟦ORDER:1⟧",
+          "source": "기업들은 구독 모델을 사용해서 안정적인 수입을 얻고 고객 충성도를 구축할 수 있다.",
+          "prompt": "⟦ORDER:0⟧ ⟦ORDER:1⟧",
           "groups": [
             [
-              "water",
-              "the store",
-              "approach",
-              "as",
-              "bottles",
-              "the back",
-              "of",
-              "for",
-              "I"
+              "can",
+              "a stable revenue",
+              "companies",
+              "have"
             ],
             [
-              "realize",
-              "late",
-              "I",
-              "I",
-              "am",
-              "too"
+              "build",
+              "by",
+              "using",
+              "loyalty",
+              "the subscription model",
+              "customer",
+              "and"
             ]
           ],
           "answers": [
-            "as I approach the back of the store for water bottles",
-            "I I realize am too late"
+            "companies can have a stable revenue",
+            "and build customer loyalty by using the subscription model"
           ],
-          "key": "ybm-pj-l2-s8-13",
+          "key": "ybm-l2-s8-13",
           "stage": 8,
           "number": 13
         },
         {
           "kind": "reorder_groups",
-          "source": "진열대는 이미 비어 있다.",
-          "prompt": "⟦ORDER:0⟧",
+          "source": "소비자의 관점에서, 그들은 더욱 다양한 범위의 선택과 개인 맞춤형 경험을 즐길 수 있다.",
+          "prompt": "From the consumers' perspective, ⟦ORDER:0⟧.",
           "groups": [
             [
-              "empty",
-              "shelves",
-              "already",
-              "the",
-              "are"
+              "personalized",
+              "wider",
+              "a",
+              "range",
+              "enjoy",
+              "they",
+              "can",
+              "of",
+              "and",
+              "experiences",
+              "choices"
             ]
           ],
           "answers": [
-            "the shelves are already empty"
+            "they can enjoy a wider range of choices and personalized experiences"
           ],
-          "key": "ybm-pj-l2-s8-14",
+          "key": "ybm-l2-s8-14",
           "stage": 8,
           "number": 14
         },
         {
           "kind": "reorder_groups",
-          "source": "옆 통로로 가서 운을 시험해 본다.",
-          "prompt": "⟦ORDER:0⟧, trying my luck.",
+          "source": "그들은 또한 융통성 있는 구독 계약을 함으로써 돈을 절약할 수 있다.",
+          "prompt": "They ⟦ORDER:0⟧.",
           "groups": [
             [
-              "side",
-              "aisle",
-              "my",
-              "way",
-              "I",
-              "manage",
-              "to",
-              "the"
+              "save",
+              "having",
+              "subscription",
+              "flexible",
+              "contracts",
+              "by",
+              "can also",
+              "money"
             ]
           ],
           "answers": [
-            "I manage my way to the side aisle"
+            "can also save money by having flexible subscription contracts"
           ],
-          "key": "ybm-pj-l2-s8-15",
+          "key": "ybm-l2-s8-15",
           "stage": 8,
           "number": 15
         },
         {
           "kind": "reorder_groups",
-          "source": "가끔 사람들이 원하지 않는 물건을 엉뚱한 선반에 놓는 경우가 있다.",
-          "prompt": "Sometimes ⟦ORDER:0⟧.",
+          "source": "구독 경제의 부상은 두 개의 주요한 동인들과 깊은 연관이 있다: 소비 추세의 변화들과 온라인 플랫폼의 급성장.",
+          "prompt": "⟦ORDER:0⟧: ⟦ORDER:1⟧ and ⟦ORDER:2⟧.",
           "groups": [
             [
-              "wrong",
-              "people",
-              "in",
-              "place",
+              "connected",
+              "economy",
+              "drivers",
               "the",
-              "shelves",
-              "unwanted",
-              "items"
+              "the rise",
+              "of",
+              "major",
+              "two",
+              "subscription",
+              "to",
+              "is closely"
+            ],
+            [
+              "changes",
+              "in",
+              "consumption",
+              "trends"
+            ],
+            [
+              "growth",
+              "of",
+              "online",
+              "rapid",
+              "the",
+              "platforms"
             ]
           ],
           "answers": [
-            "people place unwanted items in the wrong shelves"
+            "the rise of the subscription economy is closely connected to two major drivers",
+            "changes in consumption trends",
+            "the of rapid growth online platforms"
           ],
-          "key": "ybm-pj-l2-s8-16",
+          "key": "ybm-l2-s8-16",
           "stage": 8,
           "number": 16
         },
         {
           "kind": "reorder_groups",
-          "source": "운이 좋다! 물이 그렇게 귀한 물건이 아니었던 어제 누군가 그곳에 버린 생수 한 상자를 발견한다.",
-          "prompt": "Lucky! ⟦ORDER:0⟧ there maybe yesterday, when ⟦ORDER:1⟧.",
+          "source": "사람들은 구독을 사랑한다 구독 경제는 요즘 사람들이 어떻게 재화와 서비스를 소비하는지와 상당히 관련되어 있다.",
+          "prompt": "People love the subscriptions ⟦ORDER:0⟧ ⟦ORDER:1⟧ nowadays.",
           "groups": [
             [
-              "find",
-              "someone",
-              "abandoned",
-              "single",
-              "water",
-              "a",
-              "case",
-              "that",
-              "of",
-              "I"
+              "the",
+              "economy",
+              "to",
+              "relevant",
+              "is highly",
+              "subscription"
             ],
             [
-              "such",
-              "wasn't",
-              "a",
-              "precious",
-              "commodity",
-              "it"
+              "consume",
+              "services",
+              "goods",
+              "people",
+              "how",
+              "and"
             ]
           ],
           "answers": [
-            "I find a single case of water that someone abandoned",
-            "a it wasn't such precious commodity"
+            "the subscription economy is highly relevant to",
+            "people how consume goods and services"
           ],
-          "key": "ybm-pj-l2-s8-17",
+          "key": "ybm-l2-s8-17",
           "stage": 8,
           "number": 17
         },
         {
           "kind": "reorder_groups",
-          "source": "손을 뻗어 생수 상자를 집어 들려는 순간, 한 여자가 상자를 가져가는 것을 본다.",
-          "prompt": "⟦ORDER:0⟧, ⟦ORDER:1⟧ at the last second by a woman.",
+          "source": "점점 더 많은 사람이 물건을 소유하는 것보다 경험을 우선시한다.",
+          "prompt": "⟦ORDER:0⟧",
           "groups": [
             [
-              "for",
-              "reach",
-              "I",
-              "it"
-            ],
-            [
-              "away",
-              "to",
-              "find",
-              "only",
-              "pulled",
-              "it"
+              "experiences",
+              "owning",
+              "and",
+              "things",
+              "more",
+              "more",
+              "people",
+              "over",
+              "prioritize"
             ]
           ],
           "answers": [
-            "I reach for it",
-            "it only to find pulled away"
+            "more and more people prioritize experiences over owning things"
           ],
-          "key": "ybm-pj-l2-s8-18",
+          "key": "ybm-l2-s8-18",
           "stage": 8,
           "number": 18
         },
         {
           "kind": "reorder_groups",
-          "source": "그녀는 생수 상자를 카트에 담긴 통조림 위에 마치 왕관처럼 쌓아 놓는다.",
-          "prompt": "⟦ORDER:0⟧ on top of her canned goods.",
+          "source": "이것이 구독 경제를 그들에게 매력적인 것으로 만드는데 왜냐하면 그것은 소유의 필요 없이 서비스나 콘텐츠에 대한 접근을 제공하기 때문이다.",
+          "prompt": "⟦ORDER:0⟧ ⟦ORDER:1⟧",
           "groups": [
             [
-              "she",
+              "attractive",
+              "makes",
+              "them",
+              "this",
+              "subscription",
+              "to",
+              "the",
+              "economy"
+            ],
+            [
+              "content",
               "it",
-              "like",
-              "top",
-              "crown",
-              "stacks",
-              "a",
-              "cart",
-              "on",
-              "her",
-              "of"
+              "of",
+              "ownership",
+              "to",
+              "access",
+              "the requirement",
+              "services",
+              "because",
+              "or",
+              "offers",
+              "without"
             ]
           ],
           "answers": [
-            "she stacks it on top of her cart like a crown"
+            "this makes the subscription economy attractive to them",
+            "to because it offers access services or content without the requirement of ownership"
           ],
-          "key": "ybm-pj-l2-s8-19",
+          "key": "ybm-l2-s8-19",
           "stage": 8,
           "number": 19
         },
         {
           "kind": "reorder_groups",
-          "source": "\"미안하지만 우리가 먼저 왔어요.\" 그녀가 말한다. 그러자 그녀의 딸이 앞으로 나오는데, 축구팀에서 알고 있는 Hali Hartling이다.",
-          "prompt": "\"I'm sorry, but we were here first,\" she says. And then ⟦ORDER:0⟧—⟦ORDER:1⟧—Hali Hartling.",
+          "source": "예를 들어, 음악 스트리밍 서비스를 구독함으로써, 소비자들은 디스크 앨범을 가질 필요가 없이 무한한 음악을 즐길 수 있다.",
+          "prompt": "For example, ⟦ORDER:0⟧, consumers ⟦ORDER:1⟧.",
           "groups": [
             [
-              "steps",
-              "her",
-              "forward",
-              "daughter"
+              "subscribing",
+              "service",
+              "to",
+              "music",
+              "streaming",
+              "a",
+              "by"
             ],
             [
-              "recognize",
-              "soccer",
-              "a",
-              "girl",
-              "I",
-              "from"
+              "music",
+              "for",
+              "having",
+              "enjoy",
+              "disc",
+              "albums",
+              "can",
+              "the need",
+              "without",
+              "limitless"
             ]
           ],
           "answers": [
-            "her daughter steps forward",
-            "I a girl recognize from soccer"
+            "a by subscribing to music streaming service",
+            "for music can enjoy limitless without the need having disc albums"
           ],
-          "key": "ybm-pj-l2-s8-20",
+          "key": "ybm-l2-s8-20",
           "stage": 8,
           "number": 20
         },
         {
           "kind": "reorder_groups",
-          "source": "엄마가 카트를 끌고 가자 Hali가 내게 몸을 기울인다. \"미안해, Alyssa.\"",
-          "prompt": "⟦ORDER:0⟧, ⟦ORDER:1⟧. \"⟦ORDER:2⟧, Alyssa.\"",
+          "source": "또 다른 예는 의류 서비스를 구독하는 것으로, 소비자들은 그들의 서랍을 채우지 않고 다양한 의류 스타일을 탐색할 수 있다.",
+          "prompt": "⟦ORDER:0⟧, ⟦ORDER:1⟧",
           "groups": [
             [
-              "as",
-              "pulls",
-              "her",
-              "away",
-              "mother",
-              "their",
-              "cart"
+              "subscribing",
+              "to",
+              "example",
+              "another",
+              "clothing",
+              "is",
+              "services"
             ],
             [
-              "Hali",
-              "closer",
-              "me",
-              "leans",
-              "to"
-            ],
-            [
-              "sorry",
-              "that",
-              "about",
-              "I'm"
+              "drawers",
+              "consumers",
+              "up",
+              "where",
+              "filling",
+              "explore",
+              "a variety of",
+              "clothing",
+              "without",
+              "styles",
+              "can",
+              "their"
             ]
           ],
           "answers": [
-            "as her mother pulls their cart away",
-            "Hali leans closer to me",
-            "I'm sorry about that"
+            "another example is subscribing to clothing services",
+            "clothing where consumers can explore a variety of styles without filling up their drawers"
           ],
-          "key": "ybm-pj-l2-s8-21",
+          "key": "ybm-l2-s8-21",
           "stage": 8,
           "number": 21
         },
         {
           "kind": "reorder_groups",
-          "source": "\"지난주 연습할 때 내가 물 나눠주지 않았니?\" 나는 그녀에게 지적한다.",
-          "prompt": "\"⟦ORDER:0⟧ last week?\" ⟦ORDER:1⟧",
+          "source": "게다가, 소비자들은 다양성과 맞춤화에 가치를 둔다.",
+          "prompt": "Moreover, ⟦ORDER:0⟧.",
           "groups": [
             [
-              "I",
-              "share",
-              "didn't",
-              "my",
-              "at",
-              "the practice",
-              "with",
-              "you",
-              "water"
-            ],
-            [
-              "her",
-              "point",
-              "out",
-              "to",
-              "I"
+              "consumers",
+              "customization",
+              "and",
+              "diversity",
+              "value"
             ]
           ],
           "answers": [
-            "didn't I share my water with you at the practice",
-            "I point out to her"
+            "consumers value diversity and customization"
           ],
-          "key": "ybm-pj-l2-s8-22",
+          "key": "ybm-l2-s8-22",
           "stage": 8,
           "number": 22
         },
         {
           "kind": "reorder_groups",
-          "source": "\"너도 호의를 갚아서 나랑 물 몇 병 나눠도 되겠네.\"",
-          "prompt": "\"Maybe ⟦ORDER:0⟧.\"",
+          "source": "구독 경제는 다양한 범위의 구독 선택을 제공하여, 개인들이 그들의 선호와 관심에 기초하여 그들의 경험들을 개별화할 수 있도록 해 준다.",
+          "prompt": "The subscription economy ⟦ORDER:0⟧, ⟦ORDER:1⟧ ⟦ORDER:2⟧.",
           "groups": [
             [
-              "share",
-              "return",
-              "with",
-              "you",
-              "bottles",
-              "could",
-              "the favor",
-              "a few",
-              "and",
-              "me"
+              "offers",
+              "diverse",
+              "a",
+              "options",
+              "range",
+              "subscription",
+              "of"
+            ],
+            [
+              "individuals",
+              "personalize",
+              "experiences",
+              "their",
+              "enabling",
+              "to"
+            ],
+            [
+              "based on",
+              "their",
+              "interests",
+              "preferences",
+              "own",
+              "and"
             ]
           ],
           "answers": [
-            "you could return the favor and share a few bottles with me"
+            "subscription offers a diverse range of options",
+            "enabling individuals to personalize their experiences",
+            "their based on own preferences and interests"
           ],
-          "key": "ybm-pj-l2-s8-23",
+          "key": "ybm-l2-s8-23",
           "stage": 8,
           "number": 23
         },
         {
           "kind": "reorder_groups",
-          "source": "그녀는 이미 통로를 따라 이동하고 있는 어머니를 돌아보더니 고개를 절레절레 흔들며 내게로 돌아선다.",
-          "prompt": "⟦ORDER:0⟧, ⟦ORDER:1⟧, then ⟦ORDER:2⟧.",
+          "source": "구독 경제의 이러한 측면은 젊은 세대가 그들의 고유함을 표현하고, 젊은 세대의 개별적 취향에 부합하는 가치 있는 콘텐츠와 서비스들을 발견하는 것을 즐김에 따라, 젊은 세대 사이에 더욱 인기가 있다.",
+          "prompt": "⟦ORDER:0⟧ among younger generations, ⟦ORDER:1⟧ ⟦ORDER:2⟧.",
           "groups": [
             [
-              "back",
-              "she",
-              "mother",
-              "her",
-              "looks",
-              "to"
-            ],
-            [
-              "already",
-              "who's",
-              "moving",
-              "aisle",
-              "down",
+              "aspect",
+              "of",
+              "this",
+              "subscription",
+              "is",
+              "economy",
+              "more",
+              "popular",
               "the"
             ],
             [
-              "her",
-              "me",
-              "turns",
-              "back",
-              "shaking",
-              "head",
-              "to"
+              "services",
+              "discovering",
+              "and",
+              "they",
+              "and",
+              "valuable",
+              "expressing",
+              "content",
+              "their",
+              "enjoy",
+              "as",
+              "uniqueness"
+            ],
+            [
+              "individual",
+              "fit",
+              "with",
+              "tastes",
+              "their",
+              "that"
             ]
           ],
           "answers": [
-            "she looks back to her mother",
-            "the who's already moving down aisle",
-            "back to her turns me shaking head"
+            "this aspect of the subscription economy is more popular",
+            "as they enjoy expressing their uniqueness and discovering valuable content and services",
+            "their that fit with individual tastes"
           ],
-          "key": "ybm-pj-l2-s8-24",
+          "key": "ybm-l2-s8-24",
           "stage": 8,
           "number": 24
         },
         {
           "kind": "reorder_groups",
-          "source": "그러고는 얼굴이 약간 붉어지더니 더 붉어지기 전에 자리를 뜨려고 돌아선다.",
-          "prompt": "And then ⟦ORDER:0⟧ in the face, and turns to leave ⟦ORDER:1⟧.",
+          "source": "주목받고 있는 인기 사례는 화장품 구독 서비스이다.",
+          "prompt": "⟦ORDER:0⟧",
           "groups": [
             [
               "a",
-              "gets",
-              "bit",
-              "red",
-              "she",
-              "little"
-            ],
-            [
-              "a",
-              "flush",
-              "it",
-              "before",
-              "deep",
-              "becomes"
+              "example",
+              "has",
+              "is",
+              "service",
+              "attention",
+              "that",
+              "gained",
+              "popular",
+              "the",
+              "subscription",
+              "cosmetics"
             ]
           ],
           "answers": [
-            "a she gets little bit red",
-            "a it before becomes deep flush"
+            "a popular example that has gained attention is the cosmetics subscription service"
           ],
-          "key": "ybm-pj-l2-s8-25",
+          "key": "ybm-l2-s8-25",
           "stage": 8,
           "number": 25
         },
         {
           "kind": "reorder_groups",
-          "source": "나는 냉동식품 통로에서 Garrett을 발견한다. 그러다 뭔가를 발견한다.",
-          "prompt": "I look for Garrett, ⟦ORDER:0⟧. Then I see something.",
+          "source": "그것은 소비자의 현재 피부 상태를 철저하게 분석하고 개개인의 고유한 피부 고민을 해결하기 위해 만들어진 화장품 제조를 포함한 전문적인 추천을 제공하는 것이 돋보인다.",
+          "prompt": "It ⟦ORDER:0⟧, ⟦ORDER:1⟧.",
           "groups": [
             [
-              "aisle",
-              "frozen",
-              "the",
-              "whom",
-              "I",
-              "in",
-              "find"
+              "recommendations",
+              "and",
+              "out",
+              "customers'",
+              "thoroughly analyzing",
+              "skin",
+              "providing",
+              "conditions",
+              "stands",
+              "by",
+              "specialized",
+              "current"
+            ],
+            [
+              "concerns",
+              "cosmetics",
+              "skin",
+              "to",
+              "including",
+              "unique",
+              "created",
+              "individual's",
+              "each",
+              "address",
+              "manufacturing"
             ]
           ],
           "answers": [
-            "I whom find in the frozen aisle"
+            "stands out by thoroughly analyzing customers' current skin conditions and providing specialized recommendations",
+            "to skin including manufacturing cosmetics created address each individual's unique concerns"
           ],
-          "key": "ybm-pj-l2-s8-26",
+          "key": "ybm-l2-s8-26",
           "stage": 8,
           "number": 26
         },
         {
           "kind": "reorder_groups",
-          "source": "냉동 야채와 아이스크림 바로 지나서 얼음이 가득 담긴 상자가 있다.",
-          "prompt": "Just past the frozen vegetables and ice cream, ⟦ORDER:0⟧.",
+          "source": "요점을 말하자면, 소비자들은 획일화된 구매 과정 대신에, 그들 개인의 피부 조건을 우선시하는 개별화된 경험을 얻는다.",
+          "prompt": "⟦ORDER:0⟧, ⟦ORDER:1⟧ ⟦ORDER:2⟧, ⟦ORDER:3⟧",
           "groups": [
             [
-              "with",
-              "a case",
-              "there",
-              "is",
-              "ice",
-              "packed"
+              "to",
+              "to",
+              "come",
+              "point",
+              "the"
+            ],
+            [
+              "personalized",
+              "experience",
+              "a",
+              "consumers",
+              "receive"
+            ],
+            [
+              "that",
+              "conditions",
+              "individual",
+              "prioritizes",
+              "their",
+              "skin"
+            ],
+            [
+              "than",
+              "rather",
+              "process",
+              "a",
+              "uniform",
+              "purchasing"
             ]
           ],
           "answers": [
-            "ice there is a case packed with"
+            "to come to the point",
+            "consumers receive a personalized experience",
+            "that prioritizes their individual skin conditions",
+            "a rather than uniform purchasing process"
           ],
-          "key": "ybm-pj-l2-s8-27",
+          "key": "ybm-l2-s8-27",
           "stage": 8,
           "number": 27
         },
         {
           "kind": "reorder_groups",
-          "source": "나는 문을 열고 얼음 봉지를 잡는다. \"뭐 하는 거야? 우린 얼음이 아니라 물이 필요해.\" 동생이 내게 상기시켜 준다.",
-          "prompt": "⟦ORDER:0⟧. \"⟦ORDER:1⟧? We need water, not ice,\" he reminds me.",
+          "source": "게다가, 소비자들은 유연성과 편의성을 높이 평가한다.",
+          "prompt": "Furthermore, ⟦ORDER:0⟧.",
           "groups": [
             [
+              "convenience",
+              "flexibility",
               "and",
-              "open",
-              "the door",
-              "for",
-              "I",
-              "reach",
-              "a bag"
-            ],
-            [
-              "are",
-              "you",
-              "what",
-              "doing"
+              "appreciate",
+              "consumers"
             ]
           ],
           "answers": [
-            "I open the door and reach for a bag",
-            "what are you doing"
+            "consumers appreciate flexibility and convenience"
           ],
-          "key": "ybm-pj-l2-s8-28",
+          "key": "ybm-l2-s8-28",
           "stage": 8,
           "number": 28
         },
         {
           "kind": "reorder_groups",
-          "source": "\"얼음은 물이야. 돕기나 해.\" 내가 말한다. Garrett과 나는 최대한 높이 쌓일 때까지 얼음 봉지를 카트에 담는다.",
-          "prompt": "\"Ice is water. Just help me,\" I tell him. Garrett and I ⟦ORDER:0⟧, until ⟦ORDER:1⟧.",
+          "source": "일부 구독 모델에서는, 소비자들이 고정된 비용으로 다양한 제품과 서비스를 경험할 수 있다.",
+          "prompt": "In some subscription models, ⟦ORDER:0⟧.",
           "groups": [
             [
-              "ice",
-              "one",
-              "of",
-              "after",
-              "put",
-              "bag",
-              "our",
-              "cart",
-              "into",
-              "another"
-            ],
-            [
-              "is",
-              "as",
+              "consumers",
+              "variety",
               "can",
-              "high",
-              "as",
-              "piled",
-              "get",
-              "it",
-              "it"
+              "a",
+              "fixed",
+              "a",
+              "for",
+              "cost",
+              "products",
+              "experience",
+              "services",
+              "of",
+              "or"
             ]
           ],
           "answers": [
-            "ice put one bag of after another into our cart",
-            "is it piled as high as it can get"
+            "consumers can experience a variety of products or services for a fixed cost"
           ],
-          "key": "ybm-pj-l2-s8-29",
+          "key": "ybm-l2-s8-29",
           "stage": 8,
           "number": 29
         },
         {
           "kind": "reorder_groups",
-          "source": "이제 다른 사람들도 눈치를 채고 얼음 상자를 비우기 시작한다.",
-          "prompt": "By now ⟦ORDER:0⟧ and ⟦ORDER:1⟧.",
+          "source": "다른 모델에서는, 필요할 때 필요한 서비스나 제품만 선택하여 구독 요금을 유연하게 조정할 수 있다.",
+          "prompt": "In other models, ⟦ORDER:0⟧ ⟦ORDER:1⟧ when needed.",
           "groups": [
             [
-              "other",
-              "notice",
-              "people",
-              "have",
-              "taken"
+              "they",
+              "can",
+              "fees",
+              "subscription",
+              "flexibly adjust"
             ],
             [
+              "choosing only",
               "the",
-              "case",
-              "empty",
-              "begin",
-              "to",
-              "ice"
+              "by",
+              "products",
+              "services",
+              "necessary",
+              "or"
             ]
           ],
           "answers": [
-            "other people have taken notice",
-            "the ice begin to empty case"
+            "they can flexibly adjust subscription fees",
+            "the by choosing only necessary services or products"
           ],
-          "key": "ybm-pj-l2-s8-30",
+          "key": "ybm-l2-s8-30",
           "stage": 8,
           "number": 30
         },
         {
           "kind": "reorder_groups",
-          "source": "이제 카트는 엄청나게 무거워져서 밀기가 거의 불가능할 정도이다.",
-          "prompt": "⟦ORDER:0⟧ now, and almost impossible to push.",
+          "source": "이것은 정해진 가격으로 다양한 제공을 즐길 수도 있고, 그들이 실제 필요한 것만 선택함으로써 돈을 절약할 수도 있음을 의미한다.",
+          "prompt": "⟦ORDER:0⟧ or ⟦ORDER:1⟧.",
           "groups": [
             [
-              "is",
-              "ridiculously",
-              "heavy",
-              "the",
-              "cart"
+              "a range of",
+              "enjoy",
+              "offerings",
+              "can either",
+              "this",
+              "for",
+              "a set price",
+              "means",
+              "they"
+            ],
+            [
+              "selecting only",
+              "what",
+              "they",
+              "really need",
+              "by",
+              "money",
+              "save"
             ]
           ],
           "answers": [
-            "the cart is ridiculously heavy"
+            "this means they can either enjoy a range of offerings for a set price",
+            "they save money by selecting only what really need"
           ],
-          "key": "ybm-pj-l2-s8-31",
+          "key": "ybm-l2-s8-31",
           "stage": 8,
           "number": 31
         },
         {
           "kind": "reorder_groups",
-          "source": "그때 정장 차림의 한 남자가 우리 뒤에서 나타난다. 그는 미소를 짓는다. \"도움이 필요한 것 같구나.\"",
-          "prompt": "Then, ⟦ORDER:0⟧. He smiles. \"⟦ORDER:1⟧.\"",
+          "source": "게다가, 구독 서비스는 온라인 플랫폼을 통해 쉽게 접근할 수 있게 되어 소비자들의 편의를 증진시킨다.",
+          "prompt": "Moreover, subscription services ⟦ORDER:0⟧, ⟦ORDER:1⟧.",
           "groups": [
             [
-              "a man",
-              "comes",
-              "behind",
-              "a",
-              "us",
-              "in",
-              "business",
-              "suit",
-              "up"
+              "by",
+              "made",
+              "are",
+              "online",
+              "easily accessible",
+              "platforms"
             ],
             [
-              "looks",
-              "help",
-              "you",
-              "some",
-              "use",
-              "like",
-              "could"
+              "convenience",
+              "enhancing",
+              "consumers'"
             ]
           ],
           "answers": [
-            "a man in a business suit comes up behind us",
-            "looks like you could use some help"
+            "are made easily accessible by online platforms",
+            "enhancing consumers' convenience"
           ],
-          "key": "ybm-pj-l2-s8-32",
+          "key": "ybm-l2-s8-32",
           "stage": 8,
           "number": 32
         },
         {
           "kind": "reorder_groups",
-          "source": "그는 우리가 대답할 때까지 기다리지 않고 카트 손잡이를 잡는다. \"도와주셔서 감사합니다.\" 나는 그에게 말한다.",
-          "prompt": "⟦ORDER:0⟧ ⟦ORDER:1⟧. \"⟦ORDER:2⟧,\" I tell him.",
+          "source": "단지 몇 번의 클릭으로, 소비자들은 서비스나 제품을 받을 수 있다. 만약 그들이 그들의 기기 모델을 변경하기를 원하면, 그렇게 할 수 있다.",
+          "prompt": "With just a few clicks, ⟦ORDER:0⟧. ⟦ORDER:1⟧, ⟦ORDER:2⟧.",
           "groups": [
             [
-              "us",
-              "for",
-              "answer",
+              "services",
+              "receive",
+              "or",
+              "consumers",
+              "products",
+              "can"
+            ],
+            [
               "to",
-              "wait",
-              "doesn't",
-              "he"
+              "change",
+              "they",
+              "if",
+              "wish",
+              "device",
+              "model",
+              "their"
             ],
             [
-              "handle",
-              "grabbing",
-              "the",
-              "cart's",
-              "before"
-            ],
-            [
-              "thank",
-              "helping",
-              "for",
-              "you",
-              "us"
+              "do",
+              "so",
+              "they",
+              "can"
             ]
           ],
           "answers": [
-            "he doesn't wait for us to answer",
-            "before grabbing the cart's handle",
-            "for us thank you helping"
+            "consumers can receive services or products",
+            "if they wish to change their device model",
+            "can they do so"
           ],
-          "key": "ybm-pj-l2-s8-33",
+          "key": "ybm-l2-s8-33",
           "stage": 8,
           "number": 33
         },
         {
           "kind": "reorder_groups",
-          "source": "\"별거 아니야. 우리 모두 서로 도와야지.\" 그는 다시 미소를 짓고 나도 미소로 화답한다.",
-          "prompt": "\"Not a problem. ⟦ORDER:0⟧.\" He smiles again, and I return the smile.",
+          "source": "업그레이드를 원하는 사람들은 누구든지 받을 수 있고 최신 모델을 경험할 수 있다.",
+          "prompt": "⟦ORDER:0⟧ and ⟦ORDER:1⟧.",
           "groups": [
             [
-              "help",
-              "another",
-              "to",
-              "we all",
-              "need",
-              "one"
+              "desires",
+              "get",
+              "whoever",
+              "can",
+              "it",
+              "an upgrade"
+            ],
+            [
+              "models",
+              "latest",
+              "the",
+              "experience"
             ]
           ],
           "answers": [
-            "we all need to help one another"
+            "whoever desires an upgrade can get it",
+            "experience the latest models"
           ],
-          "key": "ybm-pj-l2-s8-34",
+          "key": "ybm-l2-s8-34",
           "stage": 8,
           "number": 34
         },
         {
           "kind": "reorder_groups",
-          "source": "어려운 시기에 사람들의 장점이 드러난다는 것을 알게 되는 것은 좋은 일이다.",
-          "prompt": "⟦ORDER:0⟧ in people.",
+          "source": "온라인 플랫폼들이 구독 경제를 구동한다 스마트폰을 중심으로 한 다양한 디지털 기기의 발전과 함께 소비자들은 많은 것들을 아주 쉽게 할 수 있게 되었다.",
+          "prompt": "Online platforms drive the subscription economy ⟦ORDER:0⟧, ⟦ORDER:1⟧ with great ease.",
           "groups": [
             [
-              "difficult",
-              "can",
-              "that",
-              "the best",
-              "is",
-              "bring",
-              "out",
-              "know",
-              "times",
+              "digital devices",
+              "centered",
+              "various",
+              "smartphones",
+              "the development",
+              "on",
+              "of",
+              "with"
+            ],
+            [
+              "do",
+              "been",
+              "things",
+              "able",
+              "consumers",
+              "numerous",
               "to",
-              "good",
-              "it"
+              "have"
             ]
           ],
           "answers": [
-            "it is good to know that difficult times can bring out the best"
+            "on with the development of various digital devices centered smartphones",
+            "consumers have been able to do numerous things"
           ],
-          "key": "ybm-pj-l2-s8-35",
+          "key": "ybm-l2-s8-35",
           "stage": 8,
           "number": 35
         },
         {
           "kind": "reorder_groups",
-          "source": "나는 호의에는 호의로 보답해야 한다고 결심한다. \"얼음 한 봉지 가져가세요.\" 내가 제안한다.",
-          "prompt": "⟦ORDER:0⟧. \"⟦ORDER:1⟧,\" I suggest.",
+          "source": "과거에는, 사람들이 영화관에 가거나, 그들이 시청하기 원하는 비디오들을 구매할 수 밖에 없었다.",
+          "prompt": "In the past, ⟦ORDER:0⟧ ⟦ORDER:1⟧.",
           "groups": [
             [
-              "favor",
-              "one",
-              "another",
-              "decide",
-              "I",
-              "deserves",
-              "that"
+              "choice",
+              "or",
+              "go",
+              "the theater",
+              "purchase",
+              "to",
+              "but",
+              "the videos",
+              "no",
+              "had",
+              "people",
+              "to"
             ],
             [
-              "a bag",
-              "why",
-              "of",
-              "ice",
-              "you",
-              "for yourself",
-              "don't",
-              "take"
+              "they",
+              "to",
+              "wanted",
+              "watch"
             ]
           ],
           "answers": [
-            "I decide that one favor deserves another",
-            "why don't you take a bag of ice for yourself"
+            "people had no choice but to go to the theater or purchase the videos",
+            "to they wanted watch"
           ],
-          "key": "ybm-pj-l2-s8-36",
+          "key": "ybm-l2-s8-36",
           "stage": 8,
           "number": 36
         },
         {
           "kind": "reorder_groups",
-          "source": "그의 미소가 사라지지 않는다. \"더 좋은 생각이 있어.\" 그가 말한다.",
-          "prompt": "⟦ORDER:0⟧. \"⟦ORDER:1⟧,\" he says.",
+          "source": "오늘날에는, 영화 시청을 원하는 사람들은 누구나 온라인 미디어 구독 플랫폼에 접속해서 그들의 스마트폰에서 또는 다른 디지털 기기에서 엄청난 양의 영화를 즐길 수 있다.",
+          "prompt": "Today, ⟦ORDER:0⟧ and ⟦ORDER:1⟧.",
           "groups": [
             [
-              "does",
-              "fade",
-              "smile",
-              "his",
-              "not"
+              "media",
+              "online",
+              "wants",
+              "a movie",
+              "watch",
+              "whoever",
+              "subscription",
+              "to",
+              "access",
+              "can",
+              "platforms"
             ],
             [
-              "idea",
-              "a",
-              "better",
-              "have",
-              "I"
+              "or",
+              "enjoy",
+              "movies",
+              "devices",
+              "on",
+              "other",
+              "smartphones",
+              "digital",
+              "their",
+              "a vast selection of"
             ]
           ],
           "answers": [
-            "his smile does not fade",
-            "I a have better idea"
+            "to whoever wants watch a movie can access online media subscription platforms",
+            "on or enjoy a vast selection of movies their smartphones other digital devices"
           ],
-          "key": "ybm-pj-l2-s8-37",
+          "key": "ybm-l2-s8-37",
           "stage": 8,
           "number": 37
         },
         {
           "kind": "reorder_groups",
-          "source": "\"너희가 얼음 한 봉지 가져가고 나머지는 내가 가질게.\"",
-          "prompt": "\"⟦ORDER:0⟧, and ⟦ORDER:1⟧.\"",
+          "source": "동시에, 이들 플랫폼들은 기업들이 고객들에게 맞춤형 제품과 서비스를 제공하는 것을 쉽게 만든다.",
+          "prompt": "At the same time, ⟦ORDER:0⟧ ⟦ORDER:1⟧.",
           "groups": [
             [
-              "you",
-              "of",
-              "a bag",
-              "take",
-              "for yourselves",
-              "ice",
-              "why",
-              "don't"
+              "make",
+              "it",
+              "these",
+              "companies",
+              "for",
+              "platforms",
+              "easy"
             ],
             [
-              "rest",
-              "the",
-              "I'll",
-              "keep"
+              "services",
+              "to",
+              "to",
+              "offer",
+              "and",
+              "customers",
+              "products",
+              "customized"
             ]
           ],
           "answers": [
-            "why don't you take a bag of ice for yourselves",
-            "I'll keep the rest"
+            "these platforms make it easy for companies",
+            "to offer customized products and services to customers"
           ],
-          "key": "ybm-pj-l2-s8-38",
+          "key": "ybm-l2-s8-38",
           "stage": 8,
           "number": 38
         },
         {
           "kind": "reorder_groups",
-          "source": "잠시 나는 그가 농담하고 있다고 생각하지만, 곧 그가 진지하다는 것을 깨닫는다. \"네?\"",
-          "prompt": "For a moment ⟦ORDER:0⟧, but then ⟦ORDER:1⟧. \"Excuse me?\"",
+          "source": "인공지능과 빅데이터 알고리즘 기술을 적용하여, 기업들은 고객들의 요구, 기호, 소비 패턴들을 확인한다.",
+          "prompt": "⟦ORDER:0⟧, ⟦ORDER:1⟧",
           "groups": [
             [
-              "he",
-              "is",
-              "joking",
-              "think",
-              "I"
+              "data",
+              "AI",
+              "technology",
+              "applying",
+              "and",
+              "by",
+              "big",
+              "algorithm"
             ],
             [
-              "he",
-              "realize",
-              "serious",
-              "is"
+              "patterns",
+              "tastes,",
+              "identify",
+              "and",
+              "companies",
+              "consumption",
+              "consumers'",
+              "needs,"
             ]
           ],
           "answers": [
-            "I think he is joking",
-            "he is realize serious"
+            "by applying AI and big data algorithm technology",
+            "and companies identify consumers' needs, tastes, consumption patterns"
           ],
-          "key": "ybm-pj-l2-s8-39",
+          "key": "ybm-l2-s8-39",
           "stage": 8,
           "number": 39
         },
         {
           "kind": "reorder_groups",
-          "source": "그는 여전히 웃고 있지만 그의 눈빛이 무섭다.",
-          "prompt": "⟦ORDER:0⟧, but ⟦ORDER:1⟧.",
+          "source": "사람들은 다양한 선택과 맞춤화를 환영하며 이는 결과적으로 그들의 만족을 증진시킨다.",
+          "prompt": "⟦ORDER:0⟧, ⟦ORDER:1⟧",
           "groups": [
             [
-              "is",
-              "still",
-              "smiling",
-              "he"
+              "appreciate",
+              "choices",
+              "having",
+              "people",
+              "diverse",
+              "and",
+              "customization"
             ],
             [
-              "his",
-              "scare",
-              "eyes",
-              "me"
+              "which",
+              "satisfaction",
+              "in turn enhances",
+              "their"
             ]
           ],
           "answers": [
-            "he is still smiling",
-            "his eyes scare me"
+            "people appreciate having diverse choices and customization",
+            "which in turn enhances their satisfaction"
           ],
-          "key": "ybm-pj-l2-s8-40",
+          "key": "ybm-l2-s8-40",
           "stage": 8,
           "number": 40
         },
         {
           "kind": "reorder_groups",
-          "source": "그의 손이 우리 카트 손잡이에 단단히 고정되어 있는 한, 카트가 그의 것이 아니라 우리 것임을 증명할 방법은 없다.",
-          "prompt": "As long as ⟦ORDER:0⟧, ⟦ORDER:1⟧.",
+          "source": "소비자의 구매 기록에 기반한 개인 맞춤화된 의류 스타일 제안이나, 그들의 영화 및 비디오 시청 기록과 부합하는 비디오 추천과 같은 서비스는 그들에게 커다란 만족을 가져다준다.",
+          "prompt": "Services, ⟦ORDER:0⟧ or ⟦ORDER:1⟧, ⟦ORDER:2⟧.",
           "groups": [
             [
-              "are",
-              "the handle",
-              "of",
-              "our",
-              "firmly locked",
-              "hands",
-              "on",
-              "his",
-              "cart"
+              "based on",
+              "such as",
+              "purchase",
+              "clothing",
+              "suggesting",
+              "history",
+              "personalized",
+              "customers'",
+              "styles"
             ],
             [
-              "there",
               "that",
+              "movie",
               "and",
-              "prove",
-              "nothing",
-              "not",
-              "it's",
-              "his",
-              "to",
-              "is",
-              "ours"
+              "video",
+              "viewing",
+              "match",
+              "recommending",
+              "their",
+              "history",
+              "videos"
+            ],
+            [
+              "satisfaction",
+              "them",
+              "bring",
+              "great"
             ]
           ],
           "answers": [
-            "on his hands are firmly locked the handle of our cart",
-            "his and there is nothing to prove that it's ours not"
+            "such as suggesting personalized clothing styles based on customers' purchase history",
+            "history recommending videos that match their movie and video viewing",
+            "bring them great satisfaction"
           ],
-          "key": "ybm-pj-l2-s8-41",
+          "key": "ybm-l2-s8-41",
           "stage": 8,
           "number": 41
         },
         {
           "kind": "reorder_groups",
-          "source": "\"무슨 문제 있나요?\" Basil 삼촌이다. 제시간에 맞춰 도착했다.",
-          "prompt": "\"⟦ORDER:0⟧?\" It is Uncle Basil. ⟦ORDER:1⟧",
+          "source": "구독 경제의 제한점들 비록 구독 경제가 많은 장점을 제공하지만, 또한 고려해야 할 일부 단점들도 있다. 한 가지 우려 사항은 과소비 가능성이다.",
+          "prompt": "Limitations of the subscription economy ⟦ORDER:0⟧, ⟦ORDER:1⟧. ⟦ORDER:2⟧",
           "groups": [
             [
-              "here",
-              "there",
-              "is",
-              "a",
-              "problem"
+              "economy",
+              "offers",
+              "advantages",
+              "although",
+              "many",
+              "the",
+              "subscription"
             ],
             [
-              "has",
-              "just in time",
-              "he",
-              "arrived"
+              "disadvantages",
+              "consider",
+              "to",
+              "are also",
+              "some",
+              "there"
+            ],
+            [
+              "concern",
+              "overconsumption",
+              "the potential",
+              "one",
+              "for",
+              "is"
             ]
           ],
           "answers": [
-            "is there a problem here",
-            "he has arrived just in time"
+            "the subscription economy although offers many advantages",
+            "there are also some disadvantages to consider",
+            "is one concern the potential for overconsumption"
           ],
-          "key": "ybm-pj-l2-s8-42",
+          "key": "ybm-l2-s8-42",
           "stage": 8,
           "number": 42
         },
         {
           "kind": "reorder_groups",
-          "source": "\"전혀요.\" 남자는 씁쓸한 표정으로 얼음을 바라보다가 자리를 뜬다.",
-          "prompt": "\"Not at all.\" ⟦ORDER:0⟧, then leaves.",
+          "source": "구독 모델의 편리성과 접근성은 소비자들이 복수의 서비스를 계약하고 많은 콘텐츠나 제품을 사용하는 것을 쉽게 만든다.",
+          "prompt": "⟦ORDER:0⟧ ⟦ORDER:1⟧",
           "groups": [
             [
-              "the ice",
-              "face",
-              "bitter",
-              "looks",
-              "the man",
-              "at",
-              "with",
-              "a"
+              "for",
+              "of",
+              "services",
+              "multiple",
+              "it",
+              "make",
+              "easy",
+              "the",
+              "accessibility",
+              "up",
+              "consumers",
+              "the convenience",
+              "model",
+              "sign",
+              "for",
+              "to",
+              "subscription",
+              "and"
+            ],
+            [
+              "a lot of",
+              "content",
+              "products",
+              "use",
+              "or",
+              "and"
             ]
           ],
           "answers": [
-            "at a the man looks the ice with bitter face"
+            "the convenience and accessibility of the subscription model make it easy for consumers to sign up for multiple services",
+            "and or use a lot of content products"
           ],
-          "key": "ybm-pj-l2-s8-43",
+          "key": "ybm-l2-s8-43",
           "stage": 8,
           "number": 43
         },
         {
           "kind": "reorder_groups",
-          "source": "*위 내용은 소설 <드라이>(Dry, 2018)의 도입부를 축약한 것이다.",
-          "prompt": "*⟦ORDER:0⟧ Dry ⟦ORDER:1⟧.",
+          "source": "이것은 과도한 소비와 실제로 필요한 것보다 많은 구독 서비스 사용을 야기할 수 있다.",
+          "prompt": "⟦ORDER:0⟧ actually needed.",
           "groups": [
             [
-              "the novel",
-              "the above",
-              "is",
-              "a",
-              "the opening",
-              "of",
-              "version",
-              "of",
-              "shortened"
-            ],
-            [
-              "2018"
+              "this",
+              "using",
+              "than",
+              "services",
+              "consumption",
+              "excessive",
+              "subscription",
+              "result",
+              "in",
+              "can",
+              "and",
+              "more"
             ]
           ],
           "answers": [
-            "the above is a shortened version of the opening of the novel",
-            "2018"
+            "this can result in excessive consumption and using more subscription services than"
           ],
-          "key": "ybm-pj-l2-s8-44",
+          "key": "ybm-l2-s8-44",
           "stage": 8,
           "number": 44
         },
         {
           "kind": "reorder_groups",
-          "source": "이 소설은 캘리포니아의 재앙적인 가뭄 속에서 가족을 위해 힘든 선택을 해야 하는 한 소녀의 이야기이다.",
-          "prompt": "⟦ORDER:0⟧ during a disastrous California drought.",
+          "source": "진정으로 필요한 서비스들만 구독하고 유사한 서비스들을 구독하는 것을 피하는 것이 매우 중요하다.",
+          "prompt": "⟦ORDER:0⟧ and ⟦ORDER:1⟧.",
           "groups": [
             [
-              "for",
-              "family",
-              "her",
+              "that",
+              "to",
+              "is",
               "it",
-              "of",
-              "choices",
-              "tough",
-              "tells",
-              "a girl",
-              "make",
-              "the story",
-              "who",
-              "has to"
+              "are",
+              "to",
+              "truly necessary",
+              "crucial",
+              "subscribe only",
+              "services"
+            ],
+            [
+              "subscribing",
+              "avoid",
+              "to",
+              "similar",
+              "services"
             ]
           ],
           "answers": [
-            "it tells the story of a girl who has to make tough choices for her family"
+            "it is crucial to subscribe only to services that are truly necessary",
+            "to services avoid subscribing similar"
           ],
-          "key": "ybm-pj-l2-s8-45",
+          "key": "ybm-l2-s8-45",
           "stage": 8,
           "number": 45
         },
         {
           "kind": "reorder_groups",
-          "source": "소녀의 원치 않는 모험은 물 공급이 재개되고 생활이 정상으로 돌아오면서 끝난다.",
-          "prompt": "⟦ORDER:0⟧ when ⟦ORDER:1⟧.",
+          "source": "과소비의 우려와 관련된 것으로 구독이 창출할 수 있는 금융 부담이 있다.",
+          "prompt": "⟦ORDER:0⟧ ⟦ORDER:1⟧",
           "groups": [
             [
-              "adventure",
-              "ends",
-              "unwanted",
-              "her"
+              "overconsumption",
+              "the concern",
+              "related",
+              "of",
+              "to"
             ],
             [
-              "and",
+              "that",
+              "create",
+              "the financial burden",
               "is",
-              "supply",
-              "back",
-              "resumes",
-              "water",
-              "life",
-              "normal",
-              "the",
-              "to"
+              "subscriptions",
+              "can"
             ]
           ],
           "answers": [
-            "her unwanted adventure ends",
-            "the water supply resumes and life is back to normal"
+            "related to the concern of overconsumption",
+            "is the financial burden that subscriptions can create"
           ],
-          "key": "ybm-pj-l2-s8-46",
+          "key": "ybm-l2-s8-46",
           "stage": 8,
           "number": 46
         },
         {
           "kind": "reorder_groups",
-          "source": "기후 변화, 인구 증가, 농업용수 과다 사용 등 전 세계적으로 물 부족을 야기하는 요인들이 해결되지 않는다면 이 소설의 이야기가 현실이 될 수도 있다.",
-          "prompt": "Provided that ⟦ORDER:0⟧, including climate change, population growth, and ⟦ORDER:1⟧, ⟦ORDER:2⟧.",
+          "source": "개별 구독 비용은 감당할 수 있어 보일 수 있지만, 복수의 서비스를 구독하는 것은 비용이 빠르게 증가할 수 있다.",
+          "prompt": "⟦ORDER:0⟧, ⟦ORDER:1⟧ quickly.",
           "groups": [
             [
-              "the factors",
-              "contributing",
-              "not",
-              "addressed",
+              "of",
+              "may",
+              "affordable",
+              "while",
+              "subscriptions",
+              "individual",
+              "the cost",
+              "seem"
+            ],
+            [
+              "multiple",
+              "subscribing",
+              "services",
+              "add",
               "to",
-              "shortages",
-              "water",
-              "are",
-              "worldwide"
-            ],
-            [
-              "for",
-              "agriculture",
-              "much",
-              "too",
-              "using",
-              "water"
-            ],
-            [
-              "this",
-              "it",
-              "possible",
-              "become",
-              "that",
-              "story",
-              "a reality",
-              "is",
-              "can"
+              "can",
+              "up"
             ]
           ],
           "answers": [
-            "the factors contributing to water shortages worldwide are not addressed",
-            "water using too much for agriculture",
-            "that it is possible this story can become a reality"
+            "while the cost of individual subscriptions may seem affordable",
+            "subscribing to multiple services can add up"
           ],
-          "key": "ybm-pj-l2-s8-47",
+          "key": "ybm-l2-s8-47",
           "stage": 8,
           "number": 47
+        },
+        {
+          "kind": "reorder_groups",
+          "source": "재정적 부담을 피하기 위해 이들 구독의 비용을 신중하게 고려하는 것이 중요하다.",
+          "prompt": "⟦ORDER:0⟧ ⟦ORDER:1⟧",
+          "groups": [
+            [
+              "the costs",
+              "subscriptions",
+              "important",
+              "carefully consider",
+              "to",
+              "of",
+              "is",
+              "these",
+              "it"
+            ],
+            [
+              "financial",
+              "avoid",
+              "to",
+              "strain"
+            ]
+          ],
+          "answers": [
+            "it is important to carefully consider the costs of these subscriptions",
+            "to avoid financial strain"
+          ],
+          "key": "ybm-l2-s8-48",
+          "stage": 8,
+          "number": 48
+        },
+        {
+          "kind": "reorder_groups",
+          "source": "정기적으로 검토하고 불필요한 구독들을 취소하는 것이 유익할 수 있다.",
+          "prompt": "⟦ORDER:0⟧",
+          "groups": [
+            [
+              "subscriptions",
+              "regularly",
+              "can",
+              "and",
+              "be",
+              "reviewing",
+              "canceling",
+              "beneficial",
+              "unnecessary"
+            ]
+          ],
+          "answers": [
+            "regularly reviewing and canceling unnecessary subscriptions can be beneficial"
+          ],
+          "key": "ybm-l2-s8-49",
+          "stage": 8,
+          "number": 49
+        },
+        {
+          "kind": "reorder_groups",
+          "source": "부가적으로, 구독 경제는 환경 오염에 기여할 수 있다.",
+          "prompt": "Additionally, ⟦ORDER:0⟧.",
+          "groups": [
+            [
+              "environmental",
+              "economy",
+              "to",
+              "can",
+              "the",
+              "contribute",
+              "pollution",
+              "subscription"
+            ]
+          ],
+          "answers": [
+            "the subscription economy can contribute to environmental pollution"
+          ],
+          "key": "ybm-l2-s8-50",
+          "stage": 8,
+          "number": 50
+        },
+        {
+          "kind": "reorder_groups",
+          "source": "포장재에 담긴 제품들을 정기적으로 배달하는 것은 일회용 포장의 사용을 증가시킬 수 있어 이것이 환경을 해친다.",
+          "prompt": "⟦ORDER:0⟧, ⟦ORDER:1⟧",
+          "groups": [
+            [
+              "delivery",
+              "packaging",
+              "the",
+              "in",
+              "of",
+              "the use",
+              "disposable",
+              "increase",
+              "regular",
+              "packaging materials",
+              "of",
+              "products",
+              "can"
+            ],
+            [
+              "which",
+              "harms",
+              "environment",
+              "the"
+            ]
+          ],
+          "answers": [
+            "the regular delivery of products in packaging materials can increase the use of disposable packaging",
+            "the which harms environment"
+          ],
+          "key": "ybm-l2-s8-51",
+          "stage": 8,
+          "number": 51
+        },
+        {
+          "kind": "reorder_groups",
+          "source": "친환경 포장 재료를 사용하고 재사용 가능한 포장을 선택하는 것은 이 문제를 줄이는 데 도움이 될 수 있다.",
+          "prompt": "⟦ORDER:0⟧ ⟦ORDER:1⟧",
+          "groups": [
+            [
+              "reusable",
+              "for",
+              "using",
+              "environmentally friendly",
+              "and",
+              "packaging",
+              "opting",
+              "packaging materials"
+            ],
+            [
+              "can",
+              "help",
+              "reduce",
+              "problem",
+              "this"
+            ]
+          ],
+          "answers": [
+            "using environmentally friendly packaging materials and opting for reusable packaging",
+            "can help reduce this problem"
+          ],
+          "key": "ybm-l2-s8-52",
+          "stage": 8,
+          "number": 52
+        },
+        {
+          "kind": "reorder_groups",
+          "source": "구독 서비스들의 잠재적 제한점들에도 불구하고, 그것은 우리의 삶에 깊숙이 자리 잡고 있으며 더욱더 많은 사업이 구독 경제 모델에 올라타고 있다.",
+          "prompt": "⟦ORDER:0⟧, ⟦ORDER:1⟧ and ⟦ORDER:2⟧.",
+          "groups": [
+            [
+              "limitations",
+              "the",
+              "despite",
+              "services",
+              "potential",
+              "subscription",
+              "of"
+            ],
+            [
+              "have",
+              "become",
+              "our",
+              "deeply embedded",
+              "in",
+              "lives",
+              "they"
+            ],
+            [
+              "are",
+              "model",
+              "the",
+              "subscription",
+              "economy",
+              "more",
+              "and",
+              "more",
+              "businesses",
+              "jumping",
+              "onto"
+            ]
+          ],
+          "answers": [
+            "despite the potential limitations of subscription services",
+            "they have become deeply embedded in our lives",
+            "the subscription and more more businesses are jumping onto economy model"
+          ],
+          "key": "ybm-l2-s8-53",
+          "stage": 8,
+          "number": 53
+        },
+        {
+          "kind": "reorder_groups",
+          "source": "미래에 새로운 영역들에서 소비자들에게 새로운 구독 서비스들이 지속적으로 제공될 것으로 예상된다.",
+          "prompt": "⟦ORDER:0⟧ in new areas in the future.",
+          "groups": [
+            [
+              "to",
+              "new",
+              "continuously provided",
+              "that",
+              "be",
+              "is",
+              "will",
+              "consumers",
+              "it",
+              "services",
+              "subscription",
+              "expected"
+            ]
+          ],
+          "answers": [
+            "it is expected that new subscription services will be continuously provided to consumers"
+          ],
+          "key": "ybm-l2-s8-54",
+          "stage": 8,
+          "number": 54
+        },
+        {
+          "kind": "reorder_groups",
+          "source": "우리는 구독 경제에 대해 보다 깊은 이해를 가지고 정말 필요한 서비스들물 받는 현명한 소비자가 되어야 한다.",
+          "prompt": "⟦ORDER:0⟧ and ⟦ORDER:1⟧.",
+          "groups": [
+            [
+              "of",
+              "deeper",
+              "the",
+              "need",
+              "to",
+              "have",
+              "a",
+              "economy",
+              "we",
+              "understanding",
+              "subscription"
+            ],
+            [
+              "wise",
+              "receive",
+              "who",
+              "consumers",
+              "become",
+              "are",
+              "that",
+              "the services",
+              "really needed"
+            ]
+          ],
+          "answers": [
+            "we need to have a deeper understanding of the subscription economy",
+            "become wise consumers who receive the services that are really needed"
+          ],
+          "key": "ybm-l2-s8-55",
+          "stage": 8,
+          "number": 55
         }
       ]
     },
@@ -4625,1167 +6193,1722 @@ export const YBM_PARKJUNEON_L2_WORKBOOK = {
       "items": [
         {
           "kind": "blank_input",
-          "source": "주방 수도꼭지가 이상한 소리를 낸다. 기침을 한다.",
-          "prompt": "______________ ______________ ______________ ______________ ______________ ______________. It coughs.",
+          "source": "고등학생인 지윤이는 그녀의 스마트폰에서 음악 스트리밍 서비스에 로그인하며 하루를 시작한다.",
+          "prompt": "Jiyun, a high school student, ______________ ______________ ______________ ______________ ______________ ______________ ______________ ______________ ______________ ______________ ______________ on her smartphone.",
           "wordBank": [
-            "tap",
-            "make",
-            "strange"
+            "start",
+            "by",
+            "log",
+            "to"
           ],
           "answers": [
-            "The",
-            "kitchen",
-            "tap",
-            "makes",
-            "strange",
-            "sounds"
+            "starts",
+            "her",
+            "day",
+            "by",
+            "logging",
+            "in",
+            "to",
+            "a",
+            "music",
+            "streaming",
+            "service"
           ],
-          "key": "ybm-pj-l2-s9-01",
+          "key": "ybm-l2-s9-01",
           "stage": 9,
           "number": 1
         },
         {
           "kind": "blank_input",
-          "source": "그것은 침을 한 번 뱉더니 조용해진다.",
-          "prompt": "______________ ______________ once, and then ______________ ______________.",
+          "source": "그녀는 매일 자신이 선호하는 음악을 듣고, 새로운 노래들을 발견하고, 새로운 아티스트들을 탐색하는 것을 즐긴다.",
+          "prompt": "______________ ______________ ______________ ______________ ______________ ______________ ______________, ______________ ______________ ______________, and ______________ ______________ ______________ every day.",
           "wordBank": [
-            "spit",
-            "go"
+            "enjoy",
+            "listen",
+            "favorite",
+            "discover",
+            "explore"
           ],
           "answers": [
-            "It",
-            "spits",
-            "goes",
-            "silent"
+            "She",
+            "enjoys",
+            "listening",
+            "to",
+            "her",
+            "favorite",
+            "music",
+            "discovering",
+            "new",
+            "songs",
+            "exploring",
+            "new",
+            "artists"
           ],
-          "key": "ybm-pj-l2-s9-02",
+          "key": "ybm-l2-s9-02",
           "stage": 9,
           "number": 2
         },
         {
           "kind": "blank_input",
-          "source": "\"엄마,\" 나는 거실을 향해 소리친다. \"물이 안 나와요.\"",
-          "prompt": "\"Mom,\" ______________ ______________ ______________ ______________ ______________ ______________ ______________, \"______________ ______________ ______________ ______________ ______________.\"",
+          "source": "건강한 아침 식사를 위해, 지윤이는 신선한 채소와 과일을 공급하는 구독 서비스로부터 배송을 받는다.",
+          "prompt": "For a healthy breakfast, Jiyun ______________ ______________ ______________ ______________ ______________ ______________ ______________ ______________ ______________ ______________ ______________ ______________ ______________.",
           "wordBank": [
-            "shout",
-            "living room",
-            "come"
+            "receive",
+            "a delivery",
+            "subscription",
+            "that",
+            "provide",
+            "fresh"
           ],
           "answers": [
-            "I",
-            "shout",
-            "out",
-            "into",
-            "the",
-            "living",
-            "room",
-            "water",
-            "is",
-            "not",
-            "coming",
-            "out"
+            "receives",
+            "a",
+            "delivery",
+            "from",
+            "a",
+            "subscription",
+            "service",
+            "that",
+            "provides",
+            "fresh",
+            "vegetables",
+            "and",
+            "fruits"
           ],
-          "key": "ybm-pj-l2-s9-03",
+          "key": "ybm-l2-s9-03",
           "stage": 9,
           "number": 3
         },
         {
           "kind": "blank_input",
-          "source": "\"Alyssa, 조용히 해!\" 엄마가 말한다. 그녀는 TV를 보고 있고, TV에서는 뉴스 앵커가 '물 공급 위기'에 대해 이야기하고 있다.",
-          "prompt": "\"Alyssa, shush!\" Mom says. ______________ ______________ ______________ the TV, ______________ ______________ ______________ ______________ ______________ ______________ ______________ the \"flow crisis.\"",
+          "source": "방과 후에, 지윤이는 그녀가 흥미를 느끼는 것마다 그녀의 지식을 확장하기 위해 비디오 강의 서비스를 활용한다.",
+          "prompt": "After school, Jiyun utilizes ______________ ______________ ______________ ______________ ______________ ______________ ______________ ______________ ______________ ______________ ______________ ______________ ______________.",
           "wordBank": [
-            "watch",
-            "anchor",
-            "talk"
+            "lecture",
+            "expand",
+            "whatever",
+            "find",
+            "interest"
           ],
           "answers": [
-            "She",
-            "is",
-            "watching",
-            "where",
             "a",
-            "news",
-            "anchor",
-            "is",
-            "talking",
-            "about"
+            "video",
+            "lecture",
+            "service",
+            "to",
+            "expand",
+            "her",
+            "knowledge",
+            "in",
+            "whatever",
+            "she",
+            "finds",
+            "interesting"
           ],
-          "key": "ybm-pj-l2-s9-04",
+          "key": "ybm-l2-s9-04",
           "stage": 9,
           "number": 4
         },
         {
           "kind": "blank_input",
-          "source": "사람들이 '가뭄'이라는 단어를 듣는 데 지친 이후로 언론은 가뭄을 이렇게 부르고 있다.",
-          "prompt": "This is ______________ ______________ ______________ ______________ ______________ ______________ ______________ ______________ ever since ______________ ______________ ______________ ______________ ______________ ______________ ______________ \"drought.\"",
+          "source": "예를 들어, 그녀는 학교 공부를 복습하고 그녀가 선택한 연구 분야의 최신 지식에 대해 계속 업데이트하기 위해 다양한 학술 강의들을 시청한다.",
+          "prompt": "For example, ______________ ______________ ______________ ______________ ______________ ______________ ______________ ______________ ______________ and ______________ ______________ ______________ ______________ ______________ ______________ in her chosen field of study.",
           "wordBank": [
-            "what",
-            "the media",
-            "call",
-            "drought",
-            "get",
-            "hear"
+            "watch",
+            "various",
+            "academic",
+            "review",
+            "schoolwork",
+            "stay",
+            "update",
+            "latest"
           ],
           "answers": [
-            "what",
+            "she",
+            "watches",
+            "various",
+            "academic",
+            "lectures",
+            "to",
+            "review",
+            "her",
+            "schoolwork",
+            "stay",
+            "updated",
+            "about",
             "the",
-            "media",
-            "has",
-            "been",
-            "calling",
-            "the",
-            "drought",
-            "people",
-            "got",
-            "tired",
-            "of",
-            "hearing",
-            "the",
-            "word"
+            "latest",
+            "knowledge"
           ],
-          "key": "ybm-pj-l2-s9-05",
+          "key": "ybm-l2-s9-05",
           "stage": 9,
           "number": 5
         },
         {
           "kind": "blank_input",
-          "source": "이제 위기는 새로운 단계로 접어들고 있다. 수도꼭지에서 수돗물이 나오지 않는다.",
-          "prompt": "Now ______________ ______________ ______________ ______________ ______________ ______________ ______________. ______________ ______________ ______________ ______________ ______________ ______________ ______________ ______________ ______________.",
+          "source": "주말에 지윤이와 그녀의 가족은 스트리밍 서비스를 사용하면서 함께 영화들이나 드라마들을 시청하는 좋은 시간을 보낸다.",
+          "prompt": "During weekends, Jiyun and her family ______________ ______________ ______________ ______________ ______________ ______________ ______________ ______________ ______________ ______________ ______________ ______________.",
           "wordBank": [
-            "crisis",
-            "enter",
-            "stage",
-            "we",
-            "have",
-            "run",
-            "out"
+            "spend",
+            "quality",
+            "together",
+            "use"
           ],
           "answers": [
-            "the",
-            "crisis",
-            "is",
-            "entering",
+            "spend",
+            "quality",
+            "time",
+            "together",
+            "watching",
+            "movies",
+            "or",
+            "dramas",
+            "using",
             "a",
-            "new",
-            "stage",
-            "We",
-            "have",
-            "no",
-            "running",
-            "water",
-            "out",
-            "of",
-            "the",
-            "tap"
+            "streaming",
+            "service"
           ],
-          "key": "ybm-pj-l2-s9-06",
+          "key": "ybm-l2-s9-06",
           "stage": 9,
           "number": 6
         },
         {
           "kind": "blank_input",
-          "source": "\"쇼핑몰로 가자!\" Basil 삼촌이 말한다. 동생 Garrett과 나는 삼촌의 트럭에 올라탄다.",
-          "prompt": "______________ ______________ ______________ ______________ ______________.",
+          "source": "구독은 모든 곳에 있다 분명히, 구독 경제는 요즈음 인기 있는 경제 모델이고, 지윤이는 그것에 적극적으로 참여하고 있다.",
+          "prompt": "Subscriptions are everywhere To be sure, the subscription economy ______________ ______________ ______________ ______________ ______________ nowadays, and Jiyun ______________ ______________ ______________ ______________ ______________ ______________.",
           "wordBank": [
-            "jump",
-            "our",
-            "truck \"To the mall!\" says Uncle Basil. My little brother Garret and I"
+            "popular",
+            "economic",
+            "actively",
+            "take"
           ],
           "answers": [
-            "\"To",
-            "the",
-            "mall!\"",
-            "says",
-            "Uncle Basil. My little brother Garrett and I jump in our uncle's truck"
+            "is",
+            "a",
+            "popular",
+            "economic",
+            "model",
+            "is",
+            "actively",
+            "taking",
+            "part",
+            "in",
+            "it"
           ],
-          "key": "ybm-pj-l2-s9-07",
+          "key": "ybm-l2-s9-07",
           "stage": 9,
           "number": 7
         },
         {
           "kind": "blank_input",
-          "source": "주차장에 차를 세우자 많은 사람이 눈에 들어온다. \"너희 둘은 들어가. 안에서 만나자.\"라고 Basil 삼촌이 말한다.",
-          "prompt": "As ______________ ______________ ______________ ______________ ______________ ______________, ______________ ______________ ______________ ______________ ______________. \"You two go in. I'll meet you inside,\" Uncle Basil says.",
+          "source": "구독 기반의 비즈니스 모델들의 개념은 새로운 것이 아니다. 처음에 그것은 우유와 신문 같은 제품들에 한정되었다.",
+          "prompt": "______________ ______________ ______________ ______________ ______________ ______________ ______________ ______________ ______________ ______________ ______________. Initially ______________ ______________ ______________ ______________ ______________ such as milk and newspapers.",
           "wordBank": [
-            "pull",
-            "parking",
-            "see",
-            "crowd"
+            "the concept",
+            "based",
+            "not",
+            "new",
+            "it",
+            "limit",
+            "product"
           ],
           "answers": [
-            "we",
-            "pull",
-            "into",
-            "the",
-            "parking",
-            "lot",
-            "we",
-            "can",
-            "see",
-            "the",
-            "crowd"
+            "The",
+            "concept",
+            "of",
+            "business",
+            "models",
+            "based",
+            "on",
+            "subscriptions",
+            "is",
+            "not",
+            "new",
+            "it",
+            "was",
+            "limited",
+            "to",
+            "products"
           ],
-          "key": "ybm-pj-l2-s9-08",
+          "key": "ybm-l2-s9-08",
           "stage": 9,
           "number": 8
         },
         {
           "kind": "blank_input",
-          "source": "내부 풍경은 최악의 블랙 프라이데이와 비슷하지만, 오늘 사람들이 찾는 것은 텔레비전이나 비디오 게임이 아니다.",
-          "prompt": "Inside it's like Black Friday at its worst—but today ______________ ______________ ______________ ______________ ______________ ______________ ______________ ______________ ______________.",
+          "source": "하지만, 이들 사업 모델은 엔터테인먼트, 기술, 패션, 교육, 그리고 훨씬 더 많은 것들을 포함한, 모든 산업들로 확산되었다.",
+          "prompt": "However, ______________ ______________ ______________ ______________ ______________ ______________ ______________ ______________, including entertainment, technology, fashion, education, and much more.",
           "wordBank": [
-            "it",
-            "televisions",
-            "games",
-            "after"
+            "have",
+            "expand",
+            "all",
+            "industry"
           ],
           "answers": [
-            "it's",
-            "not",
-            "televisions",
-            "and",
-            "video",
-            "games",
-            "people",
-            "are",
-            "after"
+            "these",
+            "business",
+            "models",
+            "have",
+            "expanded",
+            "to",
+            "all",
+            "industries"
           ],
-          "key": "ybm-pj-l2-s9-09",
+          "key": "ybm-l2-s9-09",
           "stage": 9,
           "number": 9
         },
         {
           "kind": "blank_input",
-          "source": "계산대에 줄을 선 카트에 보이는 것은 대부분 물병이다. 생명의 필수품.",
-          "prompt": "______________ ______________ ______________ ______________ ______________ ______________ ______________ ______________ ______________ ______________ ______________ mostly water bottles. ______________ ______________ ______________ ______________",
+          "source": "일회성으로 팔릴 히트 상품을 창출하는 대신에, 기업들은 지금 새 콘텐츠, 보다 개인 맞춤형, 또는 업데이트 접근성 같은 지속적 가치를 제공하는 것을 우선시한다.",
+          "prompt": "Instead of ______________ ______________ ______________ ______________ ______________ ______________ ______________ ______________ once, companies now ______________ ______________ ______________ ______________, such as new content, more personalization, or access to updates.",
           "wordBank": [
-            "what",
-            "see",
-            "carts",
-            "the checkout",
-            "the essentials",
-            "life"
+            "create",
+            "that",
+            "sell",
+            "prioritize",
+            "provide",
+            "continue"
           ],
           "answers": [
-            "What",
-            "I",
-            "see",
-            "in",
-            "the",
-            "carts",
-            "in",
-            "the",
-            "checkout",
-            "line",
-            "are",
-            "The",
-            "essentials",
-            "of",
-            "life."
+            "creating",
+            "a",
+            "hit",
+            "product",
+            "that",
+            "will",
+            "be",
+            "sold",
+            "prioritize",
+            "providing",
+            "continuing",
+            "value"
           ],
-          "key": "ybm-pj-l2-s9-10",
+          "key": "ybm-l2-s9-10",
           "stage": 9,
           "number": 10
         },
         {
           "kind": "blank_input",
-          "source": "줄을 선 사람들의 얼굴에는 조급한 표정이 역력하다.",
-          "prompt": "There is ______________ ______________ ______________ ______________ ______________ ______________ ______________ ______________ ______________ ______________ ______________ ______________.",
+          "source": "고객들은 정기적 구독을 통해 이러한 혜택들에 대해 비용을 지불한다.",
+          "prompt": "Customers ______________ ______________ ______________ ______________ ______________ ______________ ______________ ______________.",
           "wordBank": [
-            "a look",
-            "impatience",
-            "people",
-            "line"
+            "pay",
+            "benefit",
+            "via",
+            "regular"
           ],
           "answers": [
+            "pay",
+            "for",
+            "these",
+            "benefits",
+            "via",
             "a",
-            "look",
-            "of",
-            "impatience",
-            "on",
-            "the",
-            "faces",
-            "of",
-            "the",
-            "people",
-            "in",
-            "line"
+            "regular",
+            "subscription"
           ],
-          "key": "ybm-pj-l2-s9-11",
+          "key": "ybm-l2-s9-11",
           "stage": 9,
           "number": 11
         },
         {
           "kind": "blank_input",
-          "source": "심지어는 얇은 공손함 뒤에 숨은 적대감까지 느껴진다. 그 공손함조차 얇아져 있다.",
-          "prompt": "There is even hostility, ______________ ______________ ______________ ______________ ______________ ______________ ______________. Even ______________ ______________ ______________ ______________ ______________.",
+          "source": "구독 경제는 기업들과 소비자들 모두에게 이점을 가져다준다.",
+          "prompt": "The subscription economy ______________ ______________ ______________ ______________ ______________ ______________ ______________.",
           "wordBank": [
-            "hide",
-            "thin",
-            "layer",
-            "politeness",
-            "that",
-            "stretched"
+            "bring",
+            "advantage",
+            "both",
+            "company"
           ],
           "answers": [
-            "hidden",
-            "by",
-            "a",
-            "thin",
-            "layer",
-            "of",
-            "politeness",
-            "that",
-            "politeness",
-            "is",
-            "stretched",
-            "thin"
+            "brings",
+            "advantages",
+            "for",
+            "both",
+            "companies",
+            "and",
+            "consumers"
           ],
-          "key": "ybm-pj-l2-s9-12",
+          "key": "ybm-l2-s9-12",
           "stage": 9,
           "number": 12
         },
         {
           "kind": "blank_input",
-          "source": "물병을 사러 매장 뒤편에 다다랐을 때 나는 너무 늦었다는 것을 깨닫는다.",
-          "prompt": "As ______________ ______________ ______________ ______________ ______________ ______________ ______________ for water bottles, I realize ______________ ______________ ______________ ______________.",
+          "source": "기업들은 구독 모델을 사용해서 안정적인 수입을 얻고 고객 충성도를 구축할 수 있다.",
+          "prompt": "Companies ______________ ______________ ______________ ______________ ______________ ______________ ______________ ______________ ______________ ______________ ______________ ______________ ______________ ______________.",
           "wordBank": [
-            "approach",
-            "back",
-            "store",
-            "too"
+            "have",
+            "stable",
+            "revenue",
+            "build",
+            "loyalty",
+            "by",
+            "use"
           ],
           "answers": [
-            "I",
-            "approach",
+            "can",
+            "have",
+            "a",
+            "stable",
+            "revenue",
+            "and",
+            "build",
+            "customer",
+            "loyalty",
+            "by",
+            "using",
             "the",
-            "back",
-            "of",
-            "the",
-            "store",
-            "I",
-            "am",
-            "too",
-            "late"
+            "subscription",
+            "model"
           ],
-          "key": "ybm-pj-l2-s9-13",
+          "key": "ybm-l2-s9-13",
           "stage": 9,
           "number": 13
         },
         {
           "kind": "blank_input",
-          "source": "진열대는 이미 비어 있다.",
-          "prompt": "______________ ______________ ______________ ______________ ______________",
+          "source": "소비자의 관점에서, 그들은 더욱 다양한 범위의 선택들과 개인 맞춤형 경험들을 즐길 수 있다.",
+          "prompt": "From the consumers' perspective, ______________ ______________ ______________ ______________ ______________ ______________ ______________ ______________ ______________ ______________ ______________.",
           "wordBank": [
-            "the shelves",
-            "already",
-            "empty"
+            "enjoy",
+            "wide",
+            "range",
+            "choice",
+            "personalize",
+            "experience"
           ],
           "answers": [
-            "The",
-            "shelves",
-            "are",
-            "already",
-            "empty."
+            "they",
+            "can",
+            "enjoy",
+            "a",
+            "wider",
+            "range",
+            "of",
+            "choices",
+            "and",
+            "personalized",
+            "experiences"
           ],
-          "key": "ybm-pj-l2-s9-14",
+          "key": "ybm-l2-s9-14",
           "stage": 9,
           "number": 14
         },
         {
           "kind": "blank_input",
-          "source": "옆 통로로 가서 운을 시험해 본다.",
-          "prompt": "______________ ______________ ______________ ______________ ______________ ______________ ______________ ______________, trying my luck.",
+          "source": "그들은 또한 융통성 있는 구독 계약들을 함으로써 돈을 절약할 수 있다.",
+          "prompt": "They can also ______________ ______________ ______________ ______________ ______________ ______________ ______________.",
           "wordBank": [
-            "manage",
-            "way",
-            "side",
-            "aisle"
+            "save",
+            "by",
+            "have",
+            "flexible",
+            "contract"
           ],
           "answers": [
-            "I",
-            "manage",
-            "my",
-            "way",
-            "to",
-            "the",
-            "side",
-            "aisle"
+            "save",
+            "money",
+            "by",
+            "having",
+            "flexible",
+            "subscription",
+            "contracts"
           ],
-          "key": "ybm-pj-l2-s9-15",
+          "key": "ybm-l2-s9-15",
           "stage": 9,
           "number": 15
         },
         {
           "kind": "blank_input",
-          "source": "가끔 사람들이 원하지 않는 물건을 엉뚱한 선반에 놓는 경우가 있다.",
-          "prompt": "Sometimes ______________ ______________ ______________ ______________ ______________ ______________ ______________ ______________.",
+          "source": "구독 경제의 부상은 두 개의 주요한 동인들과 깊은 연관이 있다: 소비 추세의 변화들과 온라인 플랫폼의 급성장.",
+          "prompt": "______________ ______________ ______________ ______________ ______________ ______________ ______________ ______________ ______________ ______________ ______________ ______________ ______________: changes in consumption trends and the rapid growth of online platforms.",
           "wordBank": [
-            "place",
-            "unwanted",
-            "items",
-            "wrong"
+            "the rise",
+            "closely",
+            "connect",
+            "major",
+            "driver"
           ],
           "answers": [
-            "people",
-            "place",
-            "unwanted",
-            "items",
-            "in",
+            "The",
+            "rise",
+            "of",
             "the",
-            "wrong",
-            "shelves"
+            "subscription",
+            "economy",
+            "is",
+            "closely",
+            "connected",
+            "to",
+            "two",
+            "major",
+            "drivers"
           ],
-          "key": "ybm-pj-l2-s9-16",
+          "key": "ybm-l2-s9-16",
           "stage": 9,
           "number": 16
         },
         {
           "kind": "blank_input",
-          "source": "운이 좋다! 물이 그렇게 귀한 물건이 아니었던 어제 누군가 그곳에 버린 생수 한 상자를 발견한다.",
-          "prompt": "Lucky! ______________ ______________ ______________ ______________ ______________ ______________ ______________ that someone abandoned there maybe yesterday, when ______________ ______________ ______________ ______________ ______________ ______________.",
+          "source": "사람들은 구독을 사랑한다 구독 경제는 요즘 사람들이 어떻게 재화와 서비스를 소비하는지와 상당히 관련되어 있다.",
+          "prompt": "People love the subscriptions ______________ ______________ ______________ ______________ ______________ ______________ ______________ ______________ ______________ ______________ ______________ ______________ ______________ nowadays.",
           "wordBank": [
-            "find",
-            "single",
-            "case",
-            "it",
-            "such",
-            "precious",
-            "commodity"
+            "highly",
+            "relevant",
+            "how",
+            "consume",
+            "goods"
           ],
           "answers": [
-            "I",
-            "find",
-            "a",
-            "single",
-            "case",
-            "of",
-            "water",
-            "it",
-            "wasn't",
-            "such",
-            "a",
-            "precious",
-            "commodity"
+            "The",
+            "subscription",
+            "economy",
+            "is",
+            "highly",
+            "relevant",
+            "to",
+            "how",
+            "people",
+            "consume",
+            "goods",
+            "and",
+            "services"
           ],
-          "key": "ybm-pj-l2-s9-17",
+          "key": "ybm-l2-s9-17",
           "stage": 9,
           "number": 17
         },
         {
           "kind": "blank_input",
-          "source": "손을 뻗어 생수 상자를 집어 들려는 순간, 한 여자가 상자를 가져가는 것을 본다.",
-          "prompt": "I reach for it, ______________ ______________ ______________ ______________ ______________ ______________ at the last second by a woman.",
+          "source": "점점 더 많은 사람이 물건들을 소유하는 것보다 경험들을 우선시한다.",
+          "prompt": "______________ ______________ ______________ ______________ ______________ ______________ ______________ ______________ ______________",
           "wordBank": [
-            "only",
-            "find",
-            "it",
-            "pull"
+            "prioritize",
+            "experience",
+            "over",
+            "own",
+            "thing"
           ],
           "answers": [
-            "only",
-            "to",
-            "find",
-            "it",
-            "pulled",
-            "away"
+            "More",
+            "and",
+            "more",
+            "people",
+            "prioritize",
+            "experiences",
+            "over",
+            "owning",
+            "things."
           ],
-          "key": "ybm-pj-l2-s9-18",
+          "key": "ybm-l2-s9-18",
           "stage": 9,
           "number": 18
         },
         {
           "kind": "blank_input",
-          "source": "그녀는 생수 상자를 카트에 담긴 통조림 위에 마치 왕관처럼 쌓아 놓는다.",
-          "prompt": "______________ ______________ ______________ ______________ ______________ ______________ ______________ ______________ like a crown on top of her canned goods.",
+          "source": "이것이 구독 경제를 그들에게 매력적인 것으로 만드는데 왜냐하면 그것은 소유의 필요 없이 서비스나 콘텐츠에 대한 접근을 제공하기 때문이다.",
+          "prompt": "______________ ______________ ______________ ______________ ______________ ______________ ______________ ______________ because ______________ ______________ ______________ ______________ ______________ ______________ ______________ without ______________ ______________ ______________ ______________.",
           "wordBank": [
-            "stack",
-            "it",
-            "top"
+            "this",
+            "make",
+            "attractive",
+            "offer",
+            "access",
+            "the requirement",
+            "ownership"
           ],
           "answers": [
-            "She",
-            "stacks",
+            "This",
+            "makes",
+            "the",
+            "subscription",
+            "economy",
+            "attractive",
+            "to",
+            "them",
             "it",
-            "on",
-            "top",
+            "offers",
+            "access",
+            "to",
+            "services",
+            "or",
+            "content",
+            "the",
+            "requirement",
             "of",
-            "her",
-            "cart"
+            "ownership"
           ],
-          "key": "ybm-pj-l2-s9-19",
+          "key": "ybm-l2-s9-19",
           "stage": 9,
           "number": 19
         },
         {
           "kind": "blank_input",
-          "source": "\"미안하지만 우리가 먼저 왔어요.\" 그녀가 말한다. 그러자 그녀의 딸이 앞으로 나오는데, 축구팀에서 알고 있는 Hali Hartling이다.",
-          "prompt": "\"I'm sorry, but we were here first,\" she says. And then ______________ ______________ ______________ ______________—a girl ______________ ______________ ______________ ______________—Hali Hartling.",
+          "source": "예를 들어, 음악 스트리밍 서비스를 구독함으로써, 소비자들은 디스크 앨범을 가질 필요가 없이 무한한 음악을 즐길 수 있다.",
+          "prompt": "For example, ______________ ______________ ______________ ______________ ______________ ______________ ______________, consumers ______________ ______________ ______________ ______________ without ______________ ______________ ______________ ______________ disc albums.",
           "wordBank": [
-            "daughter",
-            "forward",
-            "recognize",
-            "from"
+            "enjoy",
+            "limitless",
+            "the need",
+            "for",
+            "have"
           ],
           "answers": [
-            "her",
-            "daughter",
-            "steps",
-            "forward",
-            "I",
-            "recognize",
-            "from",
-            "soccer"
+            "by",
+            "subscribing",
+            "to",
+            "a",
+            "music",
+            "streaming",
+            "service",
+            "can",
+            "enjoy",
+            "limitless",
+            "music",
+            "the",
+            "need",
+            "for",
+            "having"
           ],
-          "key": "ybm-pj-l2-s9-20",
+          "key": "ybm-l2-s9-20",
           "stage": 9,
           "number": 20
         },
         {
           "kind": "blank_input",
-          "source": "그녀의 엄마가 그들의 카트를 끌고 가자 Hali가 내게 몸을 기울인다. \"미안해, Alyssa.\"",
-          "prompt": "As ______________ ______________ ______________ ______________ ______________ ______________, Hali ______________ ______________ ______________ ______________. \"I'm sorry about that, Alyssa.\"",
+          "source": "또 다른 예는 의류 서비스를 구독하는 것으로, 소비자들은 그들의 서랍을 채우지 않고 다양한 의류 스타일을 탐색할 수 있다.",
+          "prompt": "______________ ______________ ______________ ______________ ______________ clothing services, ______________ ______________ ______________ ______________ ______________ ______________ ______________ ______________ ______________ without ______________ ______________ ______________ ______________.",
           "wordBank": [
-            "pulls",
-            "lean",
-            "closer"
+            "where",
+            "explore",
+            "a variety of",
+            "fill",
+            "drawer"
           ],
           "answers": [
-            "her",
-            "mother",
-            "pulls",
-            "their",
-            "cart",
-            "away",
-            "leans",
-            "closer",
+            "Another",
+            "example",
+            "is",
+            "subscribing",
             "to",
-            "me"
+            "where",
+            "consumers",
+            "can",
+            "explore",
+            "a",
+            "variety",
+            "of",
+            "clothing",
+            "styles",
+            "filling",
+            "up",
+            "their",
+            "drawers"
           ],
-          "key": "ybm-pj-l2-s9-21",
+          "key": "ybm-l2-s9-21",
           "stage": 9,
           "number": 21
         },
         {
           "kind": "blank_input",
-          "source": "\"너도 호의를 갚아서 나랑 물 몇 병 나눠도 되겠네.\"",
-          "prompt": "\"Maybe ______________ ______________ ______________ ______________ ______________ and ______________ ______________ ______________ ______________ ______________ ______________.\"",
+          "source": "게다가, 소비자들은 다양성과 맞춤화에 가치를 둔다.",
+          "prompt": "Moreover, ______________ ______________ ______________ ______________ ______________.",
           "wordBank": [
-            "return",
-            "favor",
-            "share",
-            "few"
+            "value",
+            "diversity",
+            "customization"
           ],
           "answers": [
-            "you",
-            "could",
-            "return",
-            "the",
-            "favor",
-            "share",
-            "a",
-            "few",
-            "bottles",
-            "with",
-            "me"
+            "consumers",
+            "value",
+            "diversity",
+            "and",
+            "customization"
           ],
-          "key": "ybm-pj-l2-s9-23",
+          "key": "ybm-l2-s9-22",
+          "stage": 9,
+          "number": 22
+        },
+        {
+          "kind": "blank_input",
+          "source": "구독 경제는 다양한 범위의 구독 선택을 제공하여, 개인들이 그들의 선호들과 관심들에 기초하여 그들의 경험들을 개별화할 수 있도록 해 준다.",
+          "prompt": "The subscription economy ______________ ______________ ______________ ______________ ______________ ______________ ______________, ______________ ______________ ______________ ______________ ______________ ______________ ______________ ______________ ______________ ______________ ______________ ______________ ______________.",
+          "wordBank": [
+            "offer",
+            "diverse",
+            "range",
+            "options",
+            "enable",
+            "individual",
+            "personalize",
+            "based",
+            "preference",
+            "interest"
+          ],
+          "answers": [
+            "offers",
+            "a",
+            "diverse",
+            "range",
+            "of",
+            "subscription",
+            "options",
+            "enabling",
+            "individuals",
+            "to",
+            "personalize",
+            "their",
+            "experiences",
+            "based",
+            "on",
+            "their",
+            "own",
+            "preferences",
+            "and",
+            "interests"
+          ],
+          "key": "ybm-l2-s9-23",
           "stage": 9,
           "number": 23
         },
         {
           "kind": "blank_input",
-          "source": "그녀는 이미 통로를 따라 이동하고 있는 어머니를 돌아보더니 고개를 절레절레 흔들며 내게로 돌아선다.",
-          "prompt": "______________ ______________ ______________ ______________ ______________ ______________, who's already ______________ ______________ ______________ ______________, then ______________ ______________ ______________ ______________ ______________ ______________ ______________.",
+          "source": "구독 경제의 이러한 측면은 젊은 세대가 그들의 고유함을 표현하고, 젊은 세대의 개별적 취향들에 부합하는 가치 있는 콘텐츠와 서비스들을 발견하는 것을 즐김에 따라, 젊은 세대 사이에 더욱 인기가 있다.",
+          "prompt": "This aspect of the subscription economy ______________ ______________ ______________ ______________ ______________ ______________, as ______________ ______________ ______________ ______________ ______________ and ______________ ______________ ______________ ______________ ______________ ______________ ______________ ______________ ______________ ______________ ______________.",
           "wordBank": [
-            "back",
-            "down",
-            "turn",
-            "shake",
-            "head"
+            "popular",
+            "among",
+            "young",
+            "enjoy",
+            "express",
+            "uniqueness",
+            "discover",
+            "valuable",
+            "that",
+            "fit",
+            "taste"
           ],
           "answers": [
-            "She",
-            "looks",
-            "back",
-            "to",
-            "her",
-            "mother",
-            "moving",
-            "down",
-            "the",
-            "aisle",
-            "turns",
-            "back",
-            "to",
-            "me",
-            "shaking",
-            "her",
-            "head"
+            "is",
+            "more",
+            "popular",
+            "among",
+            "younger",
+            "generations",
+            "they",
+            "enjoy",
+            "expressing",
+            "their",
+            "uniqueness",
+            "discovering",
+            "valuable",
+            "content",
+            "and",
+            "services",
+            "that",
+            "fit",
+            "with",
+            "their",
+            "individual",
+            "tastes"
           ],
-          "key": "ybm-pj-l2-s9-24",
+          "key": "ybm-l2-s9-24",
           "stage": 9,
           "number": 24
         },
         {
           "kind": "blank_input",
-          "source": "그러고는 얼굴이 약간 붉어지더니 더 붉어지기 전에 자리를 뜨려고 돌아선다.",
-          "prompt": "And then ______________ ______________ ______________ ______________ ______________ ______________ in the face, and ______________ ______________ ______________ before ______________ ______________ ______________ ______________ ______________.",
+          "source": "주목받고 있는 인기 사례는 화장품 구독 서비스이다.",
+          "prompt": "______________ ______________ ______________ ______________ ______________ ______________ ______________ ______________ ______________ ______________ ______________ ______________",
           "wordBank": [
-            "get",
-            "little",
-            "red",
-            "turn",
-            "leave",
-            "become",
-            "deep",
-            "flush"
+            "popular",
+            "example",
+            "that",
+            "have",
+            "gain",
+            "attention",
+            "the cosmetics"
           ],
           "answers": [
-            "she",
-            "gets",
-            "a",
-            "little",
-            "bit",
-            "red",
-            "turns",
-            "to",
-            "leave",
-            "it",
-            "becomes",
-            "a",
-            "deep",
-            "flush"
+            "A",
+            "popular",
+            "example",
+            "that",
+            "has",
+            "gained",
+            "attention",
+            "is",
+            "the",
+            "cosmetics",
+            "subscription",
+            "service."
           ],
-          "key": "ybm-pj-l2-s9-25",
+          "key": "ybm-l2-s9-25",
           "stage": 9,
           "number": 25
         },
         {
           "kind": "blank_input",
-          "source": "나는 냉동식품 통로에서 Garrett을 발견한다. 그러다 뭔가를 발견한다.",
-          "prompt": "I look for Garrett, whom ______________ ______________ ______________ ______________ ______________ ______________. Then ______________ ______________ ______________.",
+          "source": "그것은 소비자의 현재 피부 상태를 철저하게 분석하고 개개인의 고유한 피부 고민들을 해결하기 위해 만들어진 화장품 제조를 포함한 전문적인 추천들을 제공하는 것이 돋보인다.",
+          "prompt": "It stands out by thoroughly ______________ ______________ ______________ ______________ ______________ and ______________ ______________ ______________, including ______________ ______________ ______________ ______________ ______________ ______________ ______________ ______________ ______________ ______________.",
           "wordBank": [
-            "find",
-            "frozen",
-            "see",
-            "something"
+            "analyze",
+            "current",
+            "conditions",
+            "specialized",
+            "recommendation",
+            "manufacturing",
+            "create",
+            "address",
+            "each",
+            "unique",
+            "concern"
           ],
           "answers": [
-            "I",
-            "find",
-            "in",
-            "the",
-            "frozen",
-            "aisle",
-            "I",
-            "see",
-            "something"
+            "analyzing",
+            "customers'",
+            "current",
+            "skin",
+            "conditions",
+            "providing",
+            "specialized",
+            "recommendations",
+            "manufacturing",
+            "cosmetics",
+            "created",
+            "to",
+            "address",
+            "each",
+            "individual's",
+            "unique",
+            "skin",
+            "concerns"
           ],
-          "key": "ybm-pj-l2-s9-26",
+          "key": "ybm-l2-s9-26",
           "stage": 9,
           "number": 26
         },
         {
           "kind": "blank_input",
-          "source": "냉동 야채와 아이스크림 바로 지나서 얼음이 가득 담긴 상자가 있다.",
-          "prompt": "Just past the frozen vegetables and ice cream, ______________ ______________ ______________ ______________ ______________ ______________ ______________.",
+          "source": "요점을 말하자면, 소비자들은 획일화된 구매 과정 대신에, 그들 개인의 피부 조건을 우선시하는 개별화된 경험을 얻는다.",
+          "prompt": "To come to the point, consumers ______________ ______________ ______________ ______________ ______________ ______________ ______________ ______________ ______________ ______________, rather than ______________ ______________ ______________ ______________.",
           "wordBank": [
-            "there",
-            "a case",
-            "pack"
+            "receive",
+            "personalize",
+            "that",
+            "prioritize",
+            "individual",
+            "uniform",
+            "purchasing"
           ],
           "answers": [
-            "there",
-            "is",
+            "receive",
             "a",
-            "case",
-            "packed",
-            "with",
-            "ice"
+            "personalized",
+            "experience",
+            "that",
+            "prioritizes",
+            "their",
+            "individual",
+            "skin",
+            "conditions",
+            "a",
+            "uniform",
+            "purchasing",
+            "process"
           ],
-          "key": "ybm-pj-l2-s9-27",
+          "key": "ybm-l2-s9-27",
           "stage": 9,
           "number": 27
         },
         {
           "kind": "blank_input",
-          "source": "나는 문을 열고 얼음 봉지를 잡는다. \"뭐 하는 거야? 우린 얼음이 아니라 물이 필요해.\" 동생이 내게 상기시켜 준다.",
-          "prompt": "______________ ______________ ______________ ______________ and ______________ ______________ ______________ ______________. \"______________ ______________ ______________ ______________? ______________ ______________ ______________, not ice,\" he reminds me.",
+          "source": "게다가, 소비자들은 유연성과 편의성을 높이 평가한다.",
+          "prompt": "Furthermore, ______________ ______________ ______________ ______________ ______________.",
           "wordBank": [
-            "open",
-            "reach",
-            "bag",
-            "need"
+            "appreciate",
+            "flexibility",
+            "convenience"
           ],
           "answers": [
-            "I",
-            "open",
-            "the",
-            "door",
-            "reach",
-            "for",
-            "a",
-            "bag",
-            "What",
-            "are",
-            "you",
-            "doing",
-            "We",
-            "need",
-            "water"
+            "consumers",
+            "appreciate",
+            "flexibility",
+            "and",
+            "convenience"
           ],
-          "key": "ybm-pj-l2-s9-28",
+          "key": "ybm-l2-s9-28",
           "stage": 9,
           "number": 28
         },
         {
           "kind": "blank_input",
-          "source": "\"얼음은 물이야. 돕기나 해.\" 내가 말한다. Garrett과 나는 최대한 높이 쌓일 때까지 얼음 봉지를 카트에 담는다.",
-          "prompt": "\"Ice is water. Just help me,\" I tell him. Garrett and I ______________ ______________ ______________ ______________ ______________ ______________ ______________ into our cart, until ______________ ______________ ______________ ______________ ______________ ______________ ______________ ______________ ______________.",
+          "source": "일부 구독 모델에서는, 소비자들이 고정된 비용으로 다양한 제품과 서비스를 경험할 수 있다.",
+          "prompt": "In some subscription models, ______________ ______________ ______________ ______________ ______________ ______________ ______________ ______________ ______________ ______________ ______________ ______________ ______________.",
           "wordBank": [
-            "put",
-            "one",
-            "after",
-            "it",
-            "pile",
-            "as",
-            "high",
-            "get"
+            "experience",
+            "a variety of",
+            "fixed",
+            "cost"
           ],
           "answers": [
-            "put",
-            "one",
-            "bag",
-            "of",
-            "ice",
-            "after",
-            "another",
-            "it",
-            "is",
-            "piled",
-            "as",
-            "high",
-            "as",
-            "it",
+            "consumers",
             "can",
-            "get"
+            "experience",
+            "a",
+            "variety",
+            "of",
+            "products",
+            "or",
+            "services",
+            "for",
+            "a",
+            "fixed",
+            "cost"
           ],
-          "key": "ybm-pj-l2-s9-29",
+          "key": "ybm-l2-s9-29",
           "stage": 9,
           "number": 29
         },
         {
           "kind": "blank_input",
-          "source": "이제 다른 사람들도 눈치를 채고 얼음 상자를 비우기 시작한다.",
-          "prompt": "By now ______________ ______________ ______________ ______________ ______________ and ______________ ______________ ______________ ______________ ______________ ______________.",
+          "source": "다른 모델에서는, 필요할 때 필요한 서비스들이나 제품들만 선택하여 구독 요금을 유연하게 조정할 수 있다.",
+          "prompt": "In other models, they can ______________ ______________ ______________ ______________ ______________ ______________ ______________ ______________ ______________ ______________ ______________ ______________ when needed.",
           "wordBank": [
-            "take",
-            "notice",
-            "begin",
-            "empty",
-            "case"
+            "flexibly",
+            "adjust",
+            "fee",
+            "choose",
+            "only",
+            "necessary"
           ],
           "answers": [
-            "other",
-            "people",
-            "have",
-            "taken",
-            "notice",
-            "begin",
-            "to",
-            "empty",
+            "flexibly",
+            "adjust",
+            "subscription",
+            "fees",
+            "by",
+            "choosing",
+            "only",
             "the",
-            "ice",
-            "case"
+            "necessary",
+            "services",
+            "or",
+            "products"
           ],
-          "key": "ybm-pj-l2-s9-30",
+          "key": "ybm-l2-s9-30",
           "stage": 9,
           "number": 30
         },
         {
           "kind": "blank_input",
-          "source": "이제 카트는 엄청나게 무거워져서 밀기가 거의 불가능할 정도이다.",
-          "prompt": "______________ ______________ ______________ ______________ ______________ now, and almost ______________ ______________ ______________.",
+          "source": "이것은 정해진 가격으로 다양한 제공을 즐길 수도 있고, 그들이 실제 필요한 것만 선택함으로써 돈을 절약할 수도 있음을 의미한다.",
+          "prompt": "This means they can ______________ ______________ ______________ ______________ ______________ ______________ ______________ ______________ ______________ ______________ or ______________ ______________ ______________ ______________ ______________ ______________ ______________ ______________ ______________.",
           "wordBank": [
-            "ridiculously",
-            "impossible",
-            "push"
+            "either",
+            "enjoy",
+            "a range of",
+            "offering",
+            "set",
+            "price",
+            "select",
+            "only",
+            "really",
+            "need"
           ],
           "answers": [
-            "The",
-            "cart",
-            "is",
-            "ridiculously",
-            "heavy",
-            "impossible",
-            "to",
-            "push"
+            "either",
+            "enjoy",
+            "a",
+            "range",
+            "of",
+            "offerings",
+            "for",
+            "a",
+            "set",
+            "price",
+            "save",
+            "money",
+            "by",
+            "selecting",
+            "only",
+            "what",
+            "they",
+            "really",
+            "need"
           ],
-          "key": "ybm-pj-l2-s9-31",
+          "key": "ybm-l2-s9-31",
           "stage": 9,
           "number": 31
         },
         {
           "kind": "blank_input",
-          "source": "그때 정장 차림의 한 남자가 우리 뒤에서 나타난다. 그는 미소를 짓는다. \"도움이 필요한 것 같구나.\"",
-          "prompt": "Then, ______________ ______________ ______________ ______________ ______________ ______________ ______________ ______________ ______________ ______________. He smiles. \"Looks like ______________ ______________ ______________ ______________ ______________.\"",
+          "source": "게다가, 구독 서비스는 온라인 플랫폼을 통해 쉽게 접근할 수 있게 되어 소비자들의 편의를 증진시킨다.",
+          "prompt": "Moreover, subscription services ______________ ______________ ______________ ______________ ______________ ______________ ______________, ______________ ______________ ______________.",
           "wordBank": [
-            "business",
-            "come",
-            "behind",
-            "use",
-            "help"
+            "make",
+            "easily",
+            "accessible",
+            "enhance",
+            "convenience"
           ],
           "answers": [
-            "a",
-            "man",
-            "in",
-            "a",
-            "business",
-            "suit",
-            "comes",
-            "up",
-            "behind",
-            "us",
-            "you",
-            "could",
-            "use",
-            "some",
-            "help"
+            "are",
+            "made",
+            "easily",
+            "accessible",
+            "by",
+            "online",
+            "platforms",
+            "enhancing",
+            "consumers'",
+            "convenience"
           ],
-          "key": "ybm-pj-l2-s9-32",
+          "key": "ybm-l2-s9-32",
           "stage": 9,
           "number": 32
         },
         {
           "kind": "blank_input",
-          "source": "그는 우리가 대답할 때까지 기다리지 않고 카트 손잡이를 잡는다. \"도와주셔서 감사합니다.\" 나는 그에게 말한다.",
-          "prompt": "______________ ______________ ______________ ______________ ______________ ______________ ______________ before ______________ ______________ ______________ ______________. \"______________ ______________ ______________ ______________ ______________,\" I tell him.",
+          "source": "단지 몇 번의 클릭으로, 소비자들은 서비스나 제품을 받을 수 있다. 만약 그들이 그들의 기기 모델을 변경하기를 원하면, 그렇게 할 수 있다.",
+          "prompt": "With just a few clicks, consumers ______________ ______________ ______________ ______________ ______________. If ______________ ______________ ______________ ______________ ______________ ______________ ______________, ______________ ______________ ______________ ______________.",
           "wordBank": [
-            "wait",
-            "answer",
-            "grab",
-            "handle",
-            "thank",
-            "for",
-            "help"
+            "receive",
+            "wish",
+            "change",
+            "device",
+            "do",
+            "so"
           ],
           "answers": [
-            "He",
-            "doesn't",
-            "wait",
-            "for",
-            "us",
+            "can",
+            "receive",
+            "services",
+            "or",
+            "products",
+            "they",
+            "wish",
             "to",
-            "answer",
-            "grabbing",
-            "the",
-            "cart's",
-            "handle",
-            "Thank",
-            "you",
-            "for",
-            "helping",
-            "us"
+            "change",
+            "their",
+            "device",
+            "model",
+            "they",
+            "can",
+            "do",
+            "so"
           ],
-          "key": "ybm-pj-l2-s9-33",
+          "key": "ybm-l2-s9-33",
           "stage": 9,
           "number": 33
         },
         {
           "kind": "blank_input",
-          "source": "\"별거 아니야. 우리 모두 서로 도와야지.\" 그는 다시 미소를 짓고 나도 미소로 화답한다.",
-          "prompt": "\"Not a problem. ______________ ______________ ______________ ______________ ______________ ______________ ______________.\" He smiles again, and ______________ ______________ ______________ ______________.",
+          "source": "업그레이드를 원하는 사람들은 누구든지 받을 수 있고 최신 모델들을 경험할 수 있다.",
+          "prompt": "______________ ______________ ______________ ______________ ______________ ______________ ______________ and ______________ ______________ ______________ ______________.",
           "wordBank": [
-            "all",
-            "need",
-            "another",
-            "return",
-            "smile"
+            "whoever",
+            "desire",
+            "get",
+            "latest"
           ],
           "answers": [
-            "We",
-            "all",
-            "need",
-            "to",
-            "help",
-            "one",
-            "another",
-            "I",
-            "return",
+            "Whoever",
+            "desires",
+            "an",
+            "upgrade",
+            "can",
+            "get",
+            "it",
+            "experience",
             "the",
-            "smile"
+            "latest",
+            "models"
           ],
-          "key": "ybm-pj-l2-s9-34",
+          "key": "ybm-l2-s9-34",
           "stage": 9,
           "number": 34
         },
         {
           "kind": "blank_input",
-          "source": "어려운 시기에 사람들의 장점이 드러난다는 것을 알게 되는 것은 좋은 일이다.",
-          "prompt": "It is good to know that ______________ ______________ ______________ ______________ ______________ ______________ ______________ in people.",
+          "source": "온라인 플랫폼들이 구독 경제를 구동한다 스마트폰을 중심으로 한 다양한 디지털 기기의 발전과 함께 소비자들은 많은 것들을 아주 쉽게 할 수 있게 되었다.",
+          "prompt": "Online platforms drive the subscription economy With ______________ ______________ ______________ ______________ ______________ ______________ ______________ ______________ ______________, consumers ______________ ______________ ______________ ______________ ______________ ______________ ______________ ______________ ______________ ______________.",
           "wordBank": [
-            "difficult",
-            "bring",
-            "best"
+            "the development",
+            "various",
+            "center",
+            "able",
+            "numerous",
+            "thing",
+            "great",
+            "ease"
           ],
           "answers": [
-            "difficult",
-            "times",
-            "can",
-            "bring",
-            "out",
             "the",
-            "best"
+            "development",
+            "of",
+            "various",
+            "digital",
+            "devices",
+            "centered",
+            "on",
+            "smartphones",
+            "have",
+            "been",
+            "able",
+            "to",
+            "do",
+            "numerous",
+            "things",
+            "with",
+            "great",
+            "ease"
           ],
-          "key": "ybm-pj-l2-s9-35",
+          "key": "ybm-l2-s9-35",
           "stage": 9,
           "number": 35
         },
         {
           "kind": "blank_input",
-          "source": "나는 호의에는 호의로 보답해야 한다고 결심한다. \"얼음 한 봉지 가져가세요.\" 내가 제안한다.",
-          "prompt": "I decide that ______________ ______________ ______________ ______________. \"______________ ______________ ______________ ______________ ______________ ______________ ______________ ______________ for yourself,\" I suggest.",
+          "source": "과거에는, 사람들이 영화관에 가거나, 그들이 시청하기 원하는 비디오들을 구매할 수 밖에 없었다.",
+          "prompt": "In the past, ______________ ______________ ______________ ______________ ______________ ______________ ______________ ______________ the theater or ______________ ______________ ______________ ______________ ______________ ______________ ______________.",
           "wordBank": [
-            "one",
-            "favor",
-            "deserves",
-            "why",
-            "take",
-            "bag",
-            "ice"
+            "have",
+            "choice",
+            "but",
+            "purchase",
+            "want",
+            "watch"
           ],
           "answers": [
-            "one",
-            "favor",
-            "deserves",
-            "another",
-            "Why",
-            "don't",
-            "you",
-            "take",
-            "a",
-            "bag",
-            "of",
-            "ice"
+            "people",
+            "had",
+            "no",
+            "choice",
+            "but",
+            "to",
+            "go",
+            "to",
+            "purchase",
+            "the",
+            "videos",
+            "they",
+            "wanted",
+            "to",
+            "watch"
           ],
-          "key": "ybm-pj-l2-s9-36",
+          "key": "ybm-l2-s9-36",
           "stage": 9,
           "number": 36
         },
         {
           "kind": "blank_input",
-          "source": "잠시 나는 그가 농담하고 있다고 생각하지만, 곧 그가 진지하다는 것을 깨닫는다. \"네?\"",
-          "prompt": "For a moment ______________ ______________ ______________ ______________ ______________, but then realize ______________ ______________ ______________. \"Excuse me?\"",
+          "source": "오늘날에는, 영화 시청을 원하는 사람들은 누구나 온라인 미디어 구독 플랫폼에 접속해서 그들의 스마트폰에서 또는 다른 디지털 기기에서 엄청난 양의 영화를 즐길 수 있다.",
+          "prompt": "Today, ______________ ______________ ______________ ______________ ______________ ______________ ______________ ______________ online media subscription platforms and ______________ ______________ ______________ ______________ ______________ ______________ on their smartphones or other digital devices.",
           "wordBank": [
-            "think",
-            "joke",
-            "serious"
+            "whoever",
+            "a movie",
+            "access",
+            "enjoy",
+            "vast",
+            "selection"
           ],
           "answers": [
-            "I",
-            "think",
-            "he",
-            "is",
-            "joking",
-            "he",
-            "is",
-            "serious"
+            "whoever",
+            "wants",
+            "to",
+            "watch",
+            "a",
+            "movie",
+            "can",
+            "access",
+            "enjoy",
+            "a",
+            "vast",
+            "selection",
+            "of",
+            "movies"
           ],
-          "key": "ybm-pj-l2-s9-39",
+          "key": "ybm-l2-s9-37",
+          "stage": 9,
+          "number": 37
+        },
+        {
+          "kind": "blank_input",
+          "source": "동시에, 이들 플랫폼들은 기업들이 고객들에게 맞춤형 제품과 서비스를 제공하는 것을 쉽게 만든다.",
+          "prompt": "At the same time, ______________ ______________ ______________ ______________ ______________ ______________ ______________ ______________ ______________ ______________ ______________ ______________ ______________ to customers.",
+          "wordBank": [
+            "make",
+            "easy",
+            "offer",
+            "customize"
+          ],
+          "answers": [
+            "these",
+            "platforms",
+            "make",
+            "it",
+            "easy",
+            "for",
+            "companies",
+            "to",
+            "offer",
+            "customized",
+            "products",
+            "and",
+            "services"
+          ],
+          "key": "ybm-l2-s9-38",
+          "stage": 9,
+          "number": 38
+        },
+        {
+          "kind": "blank_input",
+          "source": "인공지능과 빅데이터 알고리즘 기술을 적용하여, 기업들은 고객들의 요구들, 기호들, 소비 패턴들을 확인한다.",
+          "prompt": "By ______________ ______________ ______________ ______________ ______________ ______________ ______________, companies ______________ ______________ ______________, ______________, ______________ ______________ ______________.",
+          "wordBank": [
+            "apply",
+            "AI",
+            "algorithm",
+            "identify",
+            "need",
+            "taste",
+            "pattern"
+          ],
+          "answers": [
+            "applying",
+            "AI",
+            "and",
+            "big",
+            "data",
+            "algorithm",
+            "technology",
+            "identify",
+            "consumers'",
+            "needs",
+            "tastes",
+            "and",
+            "consumption",
+            "patterns"
+          ],
+          "key": "ybm-l2-s9-39",
           "stage": 9,
           "number": 39
         },
         {
           "kind": "blank_input",
-          "source": "그는 여전히 웃고 있지만 그의 눈빛이 무섭다.",
-          "prompt": "He is still smiling, but ______________ ______________ ______________ ______________.",
+          "source": "사람들은 다양한 선택과 맞춤화를 환영하며 이는 결과적으로 그들의 만족을 증진시킨다.",
+          "prompt": "______________ ______________ ______________ ______________ ______________ ______________ ______________, ______________ in turn ______________ ______________ ______________.",
           "wordBank": [
-            "eyes",
-            "scare"
+            "appreciate",
+            "have",
+            "diverse",
+            "customization",
+            "enhance",
+            "satisfaction"
           ],
           "answers": [
-            "his",
-            "eyes",
-            "scare",
-            "me"
+            "People",
+            "appreciate",
+            "having",
+            "diverse",
+            "choices",
+            "and",
+            "customization",
+            "which",
+            "enhances",
+            "their",
+            "satisfaction"
           ],
-          "key": "ybm-pj-l2-s9-40",
+          "key": "ybm-l2-s9-40",
           "stage": 9,
           "number": 40
         },
         {
           "kind": "blank_input",
-          "source": "그의 손이 우리 카트 손잡이에 단단히 고정되어 있는 한, 카트가 그의 것이 아니라 우리 것임을 증명할 방법은 없다.",
-          "prompt": "As long as ______________ ______________ ______________ ______________ ______________ ______________ ______________ ______________ of our cart, ______________ ______________ ______________ ______________ ______________ that it's ours and not his.",
+          "source": "소비자의 구매 기록에 기반한 개인 맞춤화된 의류 스타일 제안이나, 그들의 영화 및 비디오 시청 기록과 부합하는 비디오 추천과 같은 서비스는 그들에게 커다란 만족을 가져다준다.",
+          "prompt": "Services, such as ______________ ______________ ______________ ______________ based on customers' purchase history or ______________ ______________ ______________ ______________ their movie and video viewing history, ______________ ______________ ______________ ______________.",
           "wordBank": [
-            "firmly",
-            "lock",
-            "handle",
-            "there",
-            "nothing",
-            "prove"
+            "suggest",
+            "personalized",
+            "recommend",
+            "that",
+            "match",
+            "bring",
+            "great",
+            "satisfaction"
           ],
           "answers": [
-            "his",
-            "hands",
-            "are",
-            "firmly",
-            "locked",
-            "on",
-            "the",
-            "handle",
-            "there",
-            "is",
-            "nothing",
-            "to",
-            "prove"
+            "suggesting",
+            "personalized",
+            "clothing",
+            "styles",
+            "recommending",
+            "videos",
+            "that",
+            "match",
+            "bring",
+            "them",
+            "great",
+            "satisfaction"
           ],
-          "key": "ybm-pj-l2-s9-41",
+          "key": "ybm-l2-s9-41",
           "stage": 9,
           "number": 41
         },
         {
           "kind": "blank_input",
-          "source": "\"전혀요.\" 남자는 씁쓸한 표정으로 얼음을 바라보다가 자리를 뜬다.",
-          "prompt": "\"Not at all.\" ______________ ______________ ______________ ______________ ______________ ______________ ______________ ______________ ______________ ______________, then leaves.",
+          "source": "구독 경제의 제한점들 비록 구독 경제가 많은 장점을 제공하지만, 또한 고려해야 할 일부 단점들도 있다. 한 가지 우려 사항은 과소비 가능성이다.",
+          "prompt": "Limitations of the subscription economy Although ______________ ______________ ______________ ______________ ______________ ______________, there are also ______________ ______________ ______________ ______________. ______________ ______________ ______________ ______________ ______________ ______________ ______________",
           "wordBank": [
-            "look",
-            "with",
-            "bitter",
-            "face"
+            "offer",
+            "many",
+            "advantage",
+            "some",
+            "disadvantage",
+            "consider",
+            "one",
+            "concern",
+            "the potential",
+            "overconsumption"
           ],
           "answers": [
-            "The",
-            "man",
-            "looks",
-            "at",
             "the",
-            "ice",
-            "with",
-            "a",
-            "bitter",
-            "face"
+            "subscription",
+            "economy",
+            "offers",
+            "many",
+            "advantages",
+            "some",
+            "disadvantages",
+            "to",
+            "consider",
+            "One",
+            "concern",
+            "is",
+            "the",
+            "potential",
+            "for",
+            "overconsumption."
           ],
-          "key": "ybm-pj-l2-s9-43",
+          "key": "ybm-l2-s9-42",
+          "stage": 9,
+          "number": 42
+        },
+        {
+          "kind": "blank_input",
+          "source": "구독 모델의 편리성과 접근성은 소비자들이 복수의 서비스들을 계약하고 많은 콘텐츠나 제품들을 사용하는 것을 쉽게 만든다.",
+          "prompt": "The convenience and accessibility of the subscription model ______________ ______________ ______________ ______________ ______________ ______________ ______________ ______________ ______________ ______________ ______________ and ______________ ______________ ______________ ______________ ______________ ______________ ______________.",
+          "wordBank": [
+            "make",
+            "easy",
+            "sign",
+            "for",
+            "multiple",
+            "use",
+            "a lot of",
+            "content"
+          ],
+          "answers": [
+            "make",
+            "it",
+            "easy",
+            "for",
+            "consumers",
+            "to",
+            "sign",
+            "up",
+            "for",
+            "multiple",
+            "services",
+            "use",
+            "a",
+            "lot",
+            "of",
+            "content",
+            "or",
+            "products"
+          ],
+          "key": "ybm-l2-s9-43",
           "stage": 9,
           "number": 43
         },
         {
           "kind": "blank_input",
-          "source": "*위 내용은 소설 <드라이>(Dry, 2018)의 도입부를 축약한 것이다.",
-          "prompt": "*The above is ______________ ______________ ______________ ______________ ______________ ______________ ______________ ______________ ______________ Dry (2018).",
+          "source": "이것은 과도한 소비와 실제로 필요한 것보다 많은 구독 서비스 사용을 야기할 수 있다.",
+          "prompt": "______________ ______________ ______________ ______________ ______________ ______________ ______________ ______________ ______________ ______________ ______________ ______________ actually needed.",
           "wordBank": [
-            "shorten",
-            "version",
-            "opening",
-            "novel"
+            "this",
+            "result",
+            "in",
+            "excessive",
+            "use"
           ],
           "answers": [
-            "a",
-            "shortened",
-            "version",
-            "of",
-            "the",
-            "opening",
-            "of",
-            "the",
-            "novel"
+            "This",
+            "can",
+            "result",
+            "in",
+            "excessive",
+            "consumption",
+            "and",
+            "using",
+            "more",
+            "subscription",
+            "services",
+            "than"
           ],
-          "key": "ybm-pj-l2-s9-44",
+          "key": "ybm-l2-s9-44",
           "stage": 9,
           "number": 44
         },
         {
           "kind": "blank_input",
-          "source": "이 소설은 캘리포니아의 재앙적인 가뭄 속에서 그녀의 가족을 위해 힘든 선택을 해야 하는 한 소녀의 이야기이다.",
-          "prompt": "It tells the story of a girl who ______________ ______________ ______________ ______________ ______________ ______________ ______________ ______________ during a disastrous California drought.",
+          "source": "진정으로 필요한 서비스들만 구독하고 유사한 서비스들을 구독하는 것을 피하는 것이 매우 중요하다.",
+          "prompt": "______________ ______________ ______________ ______________ ______________ ______________ ______________ ______________ ______________ ______________ ______________ ______________ and ______________ ______________ ______________ ______________ ______________.",
           "wordBank": [
-            "have",
-            "make",
-            "tough",
-            "family"
+            "it",
+            "crucial",
+            "subscribe",
+            "only",
+            "that",
+            "truly",
+            "necessary",
+            "avoid",
+            "similar"
           ],
           "answers": [
-            "has",
+            "It",
+            "is",
+            "crucial",
             "to",
-            "make",
-            "tough",
-            "choices",
-            "for",
-            "her",
-            "family"
+            "subscribe",
+            "only",
+            "to",
+            "services",
+            "that",
+            "are",
+            "truly",
+            "necessary",
+            "avoid",
+            "subscribing",
+            "to",
+            "similar",
+            "services"
           ],
-          "key": "ybm-pj-l2-s9-45",
+          "key": "ybm-l2-s9-45",
           "stage": 9,
           "number": 45
         },
         {
           "kind": "blank_input",
-          "source": "그녀의 원치 않는 모험은 물 공급이 재개되고 생활이 정상으로 돌아오면서 끝난다.",
-          "prompt": "______________ ______________ ______________ ______________ when ______________ ______________ ______________ ______________ and ______________ ______________ ______________ ______________ ______________.",
+          "source": "과소비의 우려와 관련된 것으로 구독이 창출할 수 있는 금융 부담이 있다.",
+          "prompt": "Related to ______________ ______________ ______________ ______________ ______________ ______________ ______________ ______________ ______________ ______________ ______________ ______________.",
           "wordBank": [
-            "adventure",
-            "supply",
-            "resume",
-            "life",
-            "back",
-            "normal"
+            "the concern",
+            "financial",
+            "burden",
+            "that",
+            "create"
           ],
           "answers": [
-            "Her",
-            "unwanted",
-            "adventure",
-            "ends",
             "the",
-            "water",
-            "supply",
-            "resumes",
-            "life",
+            "concern",
+            "of",
+            "overconsumption",
             "is",
-            "back",
-            "to",
-            "normal"
+            "the",
+            "financial",
+            "burden",
+            "that",
+            "subscriptions",
+            "can",
+            "create"
           ],
-          "key": "ybm-pj-l2-s9-46",
+          "key": "ybm-l2-s9-46",
           "stage": 9,
           "number": 46
         },
         {
           "kind": "blank_input",
-          "source": "기후 변화, 인구 증가, 농업용수 과다 사용 등 전 세계적으로 물 부족을 야기하는 요인들이 해결되지 않는다면 이 소설의 이야기가 현실이 될 수도 있다.",
-          "prompt": "Provided that ______________ ______________ ______________ ______________ ______________ ______________ ______________ ______________ ______________ ______________, including climate change, population growth, and using too much water for agriculture, it is possible that ______________ ______________ ______________ ______________ ______________ ______________.",
+          "source": "개별 구독 비용은 감당할 수 있어 보일 수 있지만, 복수의 서비스를 구독하는 것은 비용이 빠르게 증가할 수 있다.",
+          "prompt": "While ______________ ______________ ______________ ______________ ______________ ______________ ______________ ______________, ______________ ______________ ______________ ______________ ______________ ______________ ______________ quickly.",
           "wordBank": [
-            "factor",
-            "contribute",
-            "shortages",
-            "worldwide",
-            "address",
-            "become",
-            "a reality"
+            "the cost",
+            "individual",
+            "may",
+            "seem",
+            "affordable",
+            "add",
+            "up"
           ],
           "answers": [
             "the",
-            "factors",
-            "contributing",
+            "cost",
+            "of",
+            "individual",
+            "subscriptions",
+            "may",
+            "seem",
+            "affordable",
+            "subscribing",
             "to",
-            "water",
-            "shortages",
-            "worldwide",
-            "are",
-            "not",
-            "addressed",
-            "this",
-            "story",
+            "multiple",
+            "services",
             "can",
-            "become",
-            "a",
-            "reality"
+            "add",
+            "up"
           ],
-          "key": "ybm-pj-l2-s9-47",
+          "key": "ybm-l2-s9-47",
           "stage": 9,
           "number": 47
+        },
+        {
+          "kind": "blank_input",
+          "source": "재정적 부담을 피하기 위해 이들 구독의 비용을 신중하게 고려하는 것이 중요하다.",
+          "prompt": "______________ ______________ ______________ ______________ ______________ ______________ ______________ ______________ ______________ ______________ ______________ to avoid financial strain.",
+          "wordBank": [
+            "it",
+            "important",
+            "carefully",
+            "consider"
+          ],
+          "answers": [
+            "It",
+            "is",
+            "important",
+            "to",
+            "carefully",
+            "consider",
+            "the",
+            "costs",
+            "of",
+            "these",
+            "subscriptions"
+          ],
+          "key": "ybm-l2-s9-48",
+          "stage": 9,
+          "number": 48
+        },
+        {
+          "kind": "blank_input",
+          "source": "정기적으로 검토하고 불필요한 구독들을 취소하는 것이 유익할 수 있다.",
+          "prompt": "______________ ______________ ______________ ______________ ______________ ______________ ______________ ______________ ______________",
+          "wordBank": [
+            "regularly",
+            "review",
+            "cancel",
+            "unnecessary",
+            "beneficial"
+          ],
+          "answers": [
+            "Regularly",
+            "reviewing",
+            "and",
+            "canceling",
+            "unnecessary",
+            "subscriptions",
+            "can",
+            "be",
+            "beneficial."
+          ],
+          "key": "ybm-l2-s9-49",
+          "stage": 9,
+          "number": 49
+        },
+        {
+          "kind": "blank_input",
+          "source": "부가적으로, 구독 경제는 환경 오염에 기여할 수 있다.",
+          "prompt": "Additionally, ______________ ______________ ______________ ______________ ______________ ______________ ______________ ______________.",
+          "wordBank": [
+            "contribute",
+            "environmental",
+            "pollution"
+          ],
+          "answers": [
+            "the",
+            "subscription",
+            "economy",
+            "can",
+            "contribute",
+            "to",
+            "environmental",
+            "pollution"
+          ],
+          "key": "ybm-l2-s9-50",
+          "stage": 9,
+          "number": 50
+        },
+        {
+          "kind": "blank_input",
+          "source": "포장재에 담긴 제품들을 정기적으로 배달하는 것은 일회용 포장의 사용을 증가시킬 수 있어 이것이 환경을 해친다.",
+          "prompt": "The regular delivery of products in packaging materials ______________ ______________ ______________ ______________ ______________ ______________ ______________, ______________ ______________ ______________ ______________.",
+          "wordBank": [
+            "increase",
+            "the use",
+            "disposable",
+            "packaging",
+            "harm",
+            "the environment"
+          ],
+          "answers": [
+            "can",
+            "increase",
+            "the",
+            "use",
+            "of",
+            "disposable",
+            "packaging",
+            "which",
+            "harms",
+            "the",
+            "environment"
+          ],
+          "key": "ybm-l2-s9-51",
+          "stage": 9,
+          "number": 51
+        },
+        {
+          "kind": "blank_input",
+          "source": "친환경 포장 재료를 사용하고 재사용 가능한 포장을 선택하는 것은 이 문제를 줄이는 데 도움이 될 수 있다.",
+          "prompt": "______________ ______________ ______________ ______________ ______________ and ______________ ______________ ______________ ______________ ______________ ______________ ______________ this problem.",
+          "wordBank": [
+            "environmentally",
+            "friendly",
+            "opt",
+            "reusable",
+            "help",
+            "reduce"
+          ],
+          "answers": [
+            "Using",
+            "environmentally",
+            "friendly",
+            "packaging",
+            "materials",
+            "opting",
+            "for",
+            "reusable",
+            "packaging",
+            "can",
+            "help",
+            "reduce"
+          ],
+          "key": "ybm-l2-s9-52",
+          "stage": 9,
+          "number": 52
+        },
+        {
+          "kind": "blank_input",
+          "source": "구독 서비스들의 잠재적 제한점들에도 불구하고, 그것은 우리의 삶에 깊숙이 자리 잡고 있으며 더욱더 많은 사업이 구독 경제 모델에 올라타고 있다.",
+          "prompt": "Despite ______________ ______________ ______________ ______________ ______________ ______________, ______________ ______________ ______________ ______________ ______________ in our lives and ______________ ______________ ______________ ______________ ______________ ______________ ______________ ______________ ______________ ______________ ______________.",
+          "wordBank": [
+            "potential",
+            "limitation",
+            "become",
+            "deeply",
+            "embed",
+            "jump",
+            "onto"
+          ],
+          "answers": [
+            "the",
+            "potential",
+            "limitations",
+            "of",
+            "subscription",
+            "services",
+            "they",
+            "have",
+            "become",
+            "deeply",
+            "embedded",
+            "more",
+            "and",
+            "more",
+            "businesses",
+            "are",
+            "jumping",
+            "onto",
+            "the",
+            "subscription",
+            "economy",
+            "model"
+          ],
+          "key": "ybm-l2-s9-53",
+          "stage": 9,
+          "number": 53
+        },
+        {
+          "kind": "blank_input",
+          "source": "미래에 새로운 영역들에서 소비자들에게 새로운 구독 서비스들이 지속적으로 제공될 것으로 예상된다.",
+          "prompt": "______________ ______________ ______________ ______________ ______________ ______________ ______________ ______________ ______________ ______________ ______________ ______________ ______________ in new areas in the future.",
+          "wordBank": [
+            "it",
+            "expect",
+            "that",
+            "continuously",
+            "provide"
+          ],
+          "answers": [
+            "It",
+            "is",
+            "expected",
+            "that",
+            "new",
+            "subscription",
+            "services",
+            "will",
+            "be",
+            "continuously",
+            "provided",
+            "to",
+            "consumers"
+          ],
+          "key": "ybm-l2-s9-54",
+          "stage": 9,
+          "number": 54
+        },
+        {
+          "kind": "blank_input",
+          "source": "우리는 구독 경제에 대해 보다 깊은 이해를 가지고 정말 필요한 서비스들을 받는 현명한 소비자가 되어야 한다.",
+          "prompt": "______________ ______________ ______________ ______________ ______________ ______________ ______________ ______________ ______________ ______________ ______________ and ______________ ______________ ______________ ______________ ______________ ______________ ______________ that are really needed.",
+          "wordBank": [
+            "need",
+            "have",
+            "deep",
+            "understanding",
+            "become",
+            "wise",
+            "who",
+            "receive"
+          ],
+          "answers": [
+            "We",
+            "need",
+            "to",
+            "have",
+            "a",
+            "deeper",
+            "understanding",
+            "of",
+            "the",
+            "subscription",
+            "economy",
+            "become",
+            "wise",
+            "consumers",
+            "who",
+            "receive",
+            "the",
+            "services"
+          ],
+          "key": "ybm-l2-s9-55",
+          "stage": 9,
+          "number": 55
         }
       ]
     }

@@ -10,6 +10,7 @@ import { YBM_PARKJUNEON_L1_WORKBOOK } from "./workbook-ybm-l1.mjs";
 import { YBM_PARKJUNEON_L2_WORKBOOK } from "./workbook-ybm-l2.mjs";
 import { validateQuestionSpec } from "./question-spec.mjs";
 import { deterministicGrade, publicInteractionContract } from "./interaction-contract.mjs";
+import { WORKBOOK_TRANSLATION_GRADING_POLICY, workbookTranslationPass } from "./workbook-grading-policy.mjs";
 
 const CORS = { "Access-Control-Allow-Origin": "*", "Access-Control-Allow-Headers": "authorization, apikey, content-type, x-client-info", "Access-Control-Allow-Methods": "POST, OPTIONS" };
 const json = (body: unknown, status = 200) => new Response(JSON.stringify(body), { status, headers: { ...CORS, "Content-Type": "application/json", "Cache-Control": "no-store" } });
@@ -135,6 +136,49 @@ async function callGeminiGrade(question: any, spec: any, responses: string[]) {
   }
   console.error("READY AI grading failed:", lastError);
   throw new ApiError(502, "AI 채점을 잠시 사용할 수 없습니다. 잠시 후 다시 제출해 주세요.");
+}
+
+function workbookTranslationPrompt(item: any, response: string) {
+  return `다음 워크북 번역 답안을 출판사 원문과 출판사 해석에만 근거해 100점 만점으로 평가하세요.
+
+영문 원문: ${clean(item.source, 2_000)}
+출판사 해석: ${clean(item.answers?.[0], 2_000)}
+학생 해석: ${clean(response, 2_000)}
+채점 정책: ${WORKBOOK_TRANSLATION_GRADING_POLICY.version}
+배점: 핵심 의미 60점, 주체·행동·대상·부정·인과 등 핵심 관계 30점, 자연스러운 한국어 10점
+
+원칙:
+- 출판사 해석은 의미의 기준이며 외워야 하는 고정 문자열이 아닙니다.
+- 동의어, 자연스러운 의역, 어순·조사·존댓말 차이는 의미가 같으면 감점하지 않습니다.
+- 정도 부사의 작은 생략은 핵심 의미를 바꾸지 않으면 경미하게만 봅니다. 예: "아주 작은"을 "작은"으로 쓴 경우.
+- critical_errors에는 주체·행동·대상·부정·수치·인과를 뒤집거나 핵심 절을 빠뜨린 중대한 오류만 넣습니다.
+- feedback_lines는 학생이 바로 고칠 수 있는 한국어 문장 1~3개입니다.
+- 정답/오답 boolean은 반환하지 마세요. 통과 여부는 서버가 점수와 critical_errors로 결정합니다.
+
+{"score":0,"critical_errors":[],"feedback_lines":[""],"error_tags":[]}`;
+}
+
+async function callGeminiTranslationGrade(item: any, response: string) {
+  const provider = (Deno.env.get("AI_PROVIDER") ?? "").trim().toLowerCase(), key = Deno.env.get("GEMINI_API_KEY");
+  if (provider !== "gemini" || !key) throw new ApiError(503, "AI 채점이 아직 연결되지 않았습니다.");
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${key}`;
+  const base = { maxOutputTokens: 650, temperature: 0, responseMimeType: "application/json" }, configs = [{ ...base, thinkingConfig: { thinkingBudget: 0 } }, base];
+  let lastError = "";
+  for (const generationConfig of configs) {
+    const responseResult = await fetch(url, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ system_instruction: { parts: [{ text: GEMINI_GRADING_SYSTEM }] }, contents: [{ role: "user", parts: [{ text: workbookTranslationPrompt(item, response) }] }], generationConfig }) });
+    if (responseResult.ok) {
+      const payload = await responseResult.json(), answerText = (payload?.candidates?.[0]?.content?.parts || []).map((part: { text?: string }) => part?.text || "").join("").trim(), parsed = parseJson(answerText);
+      if (!parsed || !Number.isFinite(Number(parsed.score)) || !Array.isArray(parsed.critical_errors) || !Array.isArray(parsed.feedback_lines) || !Array.isArray(parsed.error_tags)) throw new ApiError(502, "AI 번역 채점 결과 형식이 올바르지 않습니다.");
+      const score = Math.max(0, Math.min(100, Math.round(Number(parsed.score))));
+      const criticalErrors = cleanList(parsed.critical_errors, 8, 160), feedbackLines = cleanList(parsed.feedback_lines, 3, 160), errorTags = cleanList(parsed.error_tags, 8, 40);
+      if (!feedbackLines.length) feedbackLines.push(score >= WORKBOOK_TRANSLATION_GRADING_POLICY.passScore && !criticalErrors.length ? "핵심 의미를 잘 전달했습니다." : "핵심 의미와 문장 관계를 다시 확인해 보세요.");
+      return { score, criticalErrors, feedbackLines, errorTags };
+    }
+    lastError = (await responseResult.text()).slice(0, 300);
+    if (responseResult.status !== 400) break;
+  }
+  console.error("READY workbook translation grading failed:", lastError);
+  throw new ApiError(502, "AI 번역 채점을 잠시 사용할 수 없습니다. 잠시 후 다시 제출해 주세요.");
 }
 
 async function studentForSession(session: ReadySession): Promise<Student> {
@@ -743,19 +787,19 @@ async function submitWorkbookAttempt(body: any, session: ReadySession) {
   if (!catalog || !item) throw new ApiError(404, "현재 풀 수 없는 워크북 문제입니다.");
   const responses = cleanList(body.responses, 80, 1_000);
   if (responses.length !== item.answers.length) throw new ApiError(400, "모든 빈칸을 입력해 주세요.");
-  let slotResults = responses.map((response, index) => normalizeWorkbookAnswer(response) === normalizeWorkbookAnswer(item.answers[index])), correct = slotResults.every(Boolean), aiFeedback = "", aiRequestId: string | null = null;
-  if(item.kind==="translation_ai"&&!correct){
+  let slotResults = responses.map((response, index) => normalizeWorkbookAnswer(response) === normalizeWorkbookAnswer(item.answers[index])), correct = slotResults.every(Boolean), aiFeedback = "", aiFeedbackLines: string[] = [], aiScore: number | null = null, gradingPolicy: string | null = null, aiRequestId: string | null = null;
+  if(item.kind==="translation_ai"){
     const today = new Date(); today.setHours(0, 0, 0, 0);
     const used = await db.from("ready_workbook_ai_grading_requests").select("id", { count: "exact", head: true }).eq("student_id", student.id).gte("created_at", today.toISOString());
     if (used.error) throw new ApiError(500, used.error.message);
     if ((used.count || 0) >= AI_GRADING_DAILY_LIMIT) throw new ApiError(429, `오늘 AI 채점 ${AI_GRADING_DAILY_LIMIT}회를 모두 사용했습니다.`);
-    const pseudoQuestion={payload:{accepted_answers:[[item.answers[0]]]}};
-    const pseudoSpec={prompt:"다음 영문을 우리말로 해석하시오.",writingGuide:{taskText:item.source,conditions:[],wordBank:[]},responseSlots:[{label:"해석",wordCount:null}]};
-    const pending = rows<any>(await db.from("ready_workbook_ai_grading_requests").insert({ student_id: student.id, exam_id: examId, passage_id: passageId, workbook_key: catalog.workbookKey, item_key: item.key, response: { responses }, rubric_snapshot: { source: item.source, referenceAnswer: item.answers[0] }, status: "pending" }).select("id").single());
+    const rubricSnapshot = { sourceEnglish: item.source, publisherReferenceTranslation: item.answers[0], graderModel: GEMINI_MODEL, gradingPolicy: WORKBOOK_TRANSLATION_GRADING_POLICY.version, passScore: WORKBOOK_TRANSLATION_GRADING_POLICY.passScore, rubric: WORKBOOK_TRANSLATION_GRADING_POLICY.rubric };
+    const pending = rows<any>(await db.from("ready_workbook_ai_grading_requests").insert({ student_id: student.id, exam_id: examId, passage_id: passageId, workbook_key: catalog.workbookKey, item_key: item.key, response: { responses }, rubric_snapshot: rubricSnapshot, status: "pending" }).select("id").single());
     aiRequestId = pending.id;
     try {
-      const grade=await callGeminiGrade(pseudoQuestion,pseudoSpec,responses);correct=grade.correct;slotResults=[grade.correct];aiFeedback=grade.shortFeedback;
-      const completed = await db.from("ready_workbook_ai_grading_requests").update({ status: "completed", result: { correct: grade.correct, score: grade.score, short_feedback: grade.shortFeedback, error_tags: grade.errorTags }, completed_at: new Date().toISOString() }).eq("id", aiRequestId).eq("status", "pending");
+      const grade=await callGeminiTranslationGrade(item,responses[0]);
+      aiScore=grade.score;gradingPolicy=WORKBOOK_TRANSLATION_GRADING_POLICY.version;correct=workbookTranslationPass(grade.score,grade.criticalErrors);slotResults=[correct];aiFeedbackLines=grade.feedbackLines;aiFeedback=grade.feedbackLines.join(" ");
+      const completed = await db.from("ready_workbook_ai_grading_requests").update({ status: "completed", result: { score: grade.score, correct, critical_errors: grade.criticalErrors, feedback_lines: grade.feedbackLines, error_tags: grade.errorTags, grader_model: GEMINI_MODEL, grading_policy: WORKBOOK_TRANSLATION_GRADING_POLICY.version, pass_score: WORKBOOK_TRANSLATION_GRADING_POLICY.passScore }, completed_at: new Date().toISOString() }).eq("id", aiRequestId).eq("status", "pending");
       if (completed.error) throw new ApiError(500, completed.error.message);
     } catch (error) {
       await db.from("ready_workbook_ai_grading_requests").update({ status: "failed", error_code: error instanceof ApiError ? `http_${error.status}` : "unknown", completed_at: new Date().toISOString() }).eq("id", aiRequestId).eq("status", "pending");
@@ -764,7 +808,7 @@ async function submitWorkbookAttempt(body: any, session: ReadySession) {
   }
   const inserted = rows<any>(await db.from("ready_workbook_attempts").insert({
     student_id: student.id, exam_id: examId, passage_id: passageId, workbook_key: catalog.workbookKey,
-    item_key: item.key, stage: item.stage, response: { responses }, correct,
+    item_key: item.key, stage: item.stage, response: { responses }, correct, ai_grading_request_id: aiRequestId,
   }).select("id,correct,created_at").single());
   if (!correct) {
     const saved = await db.from("ready_workbook_bookmarks").upsert({ student_id: student.id, exam_id: examId, passage_id: passageId, workbook_key: catalog.workbookKey, item_key: item.key, item_type: item.kind, source: "wrong_answer", updated_at: new Date().toISOString() }, { onConflict: "student_id,exam_id,passage_id,workbook_key,item_key", ignoreDuplicates: true });
@@ -775,7 +819,7 @@ async function submitWorkbookAttempt(body: any, session: ReadySession) {
   }
   const bookmark = await db.from("ready_workbook_bookmarks").select("item_key").eq("student_id", student.id).eq("exam_id", examId).eq("passage_id", passageId).eq("workbook_key", catalog.workbookKey).eq("item_key", item.key).maybeSingle();
   if (bookmark.error) throw new ApiError(500, bookmark.error.message);
-  return { attempt: inserted, correct, answers: correct ? [] : item.answers, slotResults, aiFeedback, aiRequestId, bookmarked: !!bookmark.data, reviewCount: (await eligibleReviewQuestionIds(student.id, examId)).length + await workbookReviewCount(student.id, examId) };
+  return { attempt: inserted, correct, answers: correct ? [] : item.answers, slotResults, aiFeedback, aiFeedbackLines, aiScore, gradingPolicy, aiRequestId, bookmarked: !!bookmark.data, reviewCount: (await eligibleReviewQuestionIds(student.id, examId)).length + await workbookReviewCount(student.id, examId) };
 }
 function normalizedWord(value: unknown) { return clean(value, 100).toLowerCase().replace(/[^a-z']/g, "").replace(/^'+|'+$/g, ""); }
 async function studyContext(body: any, session: ReadySession, sentenceRequired = false) { const student = await studentForSession(session), examId = required(body.examId, "Exam", 80), passageId = required(body.passageId, "지문", 80), passage = await studentPassageAccess(examId, passageId, student), sentenceId = clean(body.sentenceId, 80); let sentence:any = null; if (sentenceRequired || sentenceId) { sentence = rows<any>(await db.from("ready_passage_sentences").select("id,text,translation").eq("id", required(sentenceId, "문장", 80)).eq("passage_id", passage.id).single()); } return { student, examId, passage, sentence }; }

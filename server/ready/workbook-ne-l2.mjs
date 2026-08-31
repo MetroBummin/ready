@@ -87,7 +87,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
             "흔적",
             "남기"
           ],
-          "key": "ne-mb-l2-s2-01",
+          "key": "ne-l2-s2-01",
           "stage": 2,
           "number": 1
         },
@@ -99,7 +99,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
             "아주 작",
             "분명할"
           ],
-          "key": "ne-mb-l2-s2-02",
+          "key": "ne-l2-s2-02",
           "stage": 2,
           "number": 2
         },
@@ -112,7 +112,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
             "증거",
             "수집한다"
           ],
-          "key": "ne-mb-l2-s2-03",
+          "key": "ne-l2-s2-03",
           "stage": 2,
           "number": 3
         },
@@ -124,7 +124,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
             "분석하",
             "단서"
           ],
-          "key": "ne-mb-l2-s2-04",
+          "key": "ne-l2-s2-04",
           "stage": 2,
           "number": 4
         },
@@ -135,7 +135,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
           "answers": [
             "저질렀"
           ],
-          "key": "ne-mb-l2-s2-05",
+          "key": "ne-l2-s2-05",
           "stage": 2,
           "number": 5
         },
@@ -146,7 +146,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
           "answers": [
             "과학 수사"
           ],
-          "key": "ne-mb-l2-s2-06",
+          "key": "ne-l2-s2-06",
           "stage": 2,
           "number": 6
         },
@@ -159,7 +159,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
             "덕분에",
             "발전해"
           ],
-          "key": "ne-mb-l2-s2-07",
+          "key": "ne-l2-s2-07",
           "stage": 2,
           "number": 7
         },
@@ -170,7 +170,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
           "answers": [
             "현대"
           ],
-          "key": "ne-mb-l2-s2-08",
+          "key": "ne-l2-s2-08",
           "stage": 2,
           "number": 8
         },
@@ -181,7 +181,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
           "answers": [
             "태어났"
           ],
-          "key": "ne-mb-l2-s2-09",
+          "key": "ne-l2-s2-09",
           "stage": 2,
           "number": 9
         },
@@ -192,7 +192,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
           "answers": [
             "에 흥미를 갖게 되었다"
           ],
-          "key": "ne-mb-l2-s2-10",
+          "key": "ne-l2-s2-10",
           "stage": 2,
           "number": 10
         },
@@ -203,7 +203,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
           "answers": [
             "가는"
           ],
-          "key": "ne-mb-l2-s2-11",
+          "key": "ne-l2-s2-11",
           "stage": 2,
           "number": 11
         },
@@ -214,7 +214,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
           "answers": [
             "수밖에 없었다"
           ],
-          "key": "ne-mb-l2-s2-12",
+          "key": "ne-l2-s2-12",
           "stage": 2,
           "number": 12
         },
@@ -225,7 +225,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
           "answers": [
             "경력"
           ],
-          "key": "ne-mb-l2-s2-13",
+          "key": "ne-l2-s2-13",
           "stage": 2,
           "number": 13
         },
@@ -236,7 +236,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
           "answers": [
             "실제"
           ],
-          "key": "ne-mb-l2-s2-14",
+          "key": "ne-l2-s2-14",
           "stage": 2,
           "number": 14
         },
@@ -248,7 +248,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
             "수사",
             "검시관"
           ],
-          "key": "ne-mb-l2-s2-15",
+          "key": "ne-l2-s2-15",
           "stage": 2,
           "number": 15
         },
@@ -259,7 +259,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
           "answers": [
             "조사하"
           ],
-          "key": "ne-mb-l2-s2-16",
+          "key": "ne-l2-s2-16",
           "stage": 2,
           "number": 16
         },
@@ -271,7 +271,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
             "가르치",
             "열정"
           ],
-          "key": "ne-mb-l2-s2-17",
+          "key": "ne-l2-s2-17",
           "stage": 2,
           "number": 17
         },
@@ -282,7 +282,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
           "answers": [
             "불을 지폈다"
           ],
-          "key": "ne-mb-l2-s2-18",
+          "key": "ne-l2-s2-18",
           "stage": 2,
           "number": 18
         },
@@ -293,7 +293,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
           "answers": [
             "전문가들"
           ],
-          "key": "ne-mb-l2-s2-19",
+          "key": "ne-l2-s2-19",
           "stage": 2,
           "number": 19
         },
@@ -304,7 +304,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
           "answers": [
             "채택될"
           ],
-          "key": "ne-mb-l2-s2-20",
+          "key": "ne-l2-s2-20",
           "stage": 2,
           "number": 20
         },
@@ -315,7 +315,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
           "answers": [
             "게다가"
           ],
-          "key": "ne-mb-l2-s2-21",
+          "key": "ne-l2-s2-21",
           "stage": 2,
           "number": 21
         },
@@ -326,7 +326,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
           "answers": [
             "바치"
           ],
-          "key": "ne-mb-l2-s2-22",
+          "key": "ne-l2-s2-22",
           "stage": 2,
           "number": 22
         },
@@ -339,7 +339,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
             "재산",
             "분야"
           ],
-          "key": "ne-mb-l2-s2-23",
+          "key": "ne-l2-s2-23",
           "stage": 2,
           "number": 23
         },
@@ -350,7 +350,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
           "answers": [
             "문서들"
           ],
-          "key": "ne-mb-l2-s2-24",
+          "key": "ne-l2-s2-24",
           "stage": 2,
           "number": 24
         },
@@ -361,7 +361,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
           "answers": [
             "독립적인"
           ],
-          "key": "ne-mb-l2-s2-25",
+          "key": "ne-l2-s2-25",
           "stage": 2,
           "number": 25
         },
@@ -372,7 +372,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
           "answers": [
             "지지"
           ],
-          "key": "ne-mb-l2-s2-26",
+          "key": "ne-l2-s2-26",
           "stage": 2,
           "number": 26
         },
@@ -384,7 +384,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
             "학과장",
             "주지사"
           ],
-          "key": "ne-mb-l2-s2-27",
+          "key": "ne-l2-s2-27",
           "stage": 2,
           "number": 27
         },
@@ -395,7 +395,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
           "answers": [
             "법의학"
           ],
-          "key": "ne-mb-l2-s2-28",
+          "key": "ne-l2-s2-28",
           "stage": 2,
           "number": 28
         },
@@ -406,7 +406,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
           "answers": [
             "노력"
           ],
-          "key": "ne-mb-l2-s2-29",
+          "key": "ne-l2-s2-29",
           "stage": 2,
           "number": 29
         },
@@ -417,7 +417,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
           "answers": [
             "잠재적인"
           ],
-          "key": "ne-mb-l2-s2-30",
+          "key": "ne-l2-s2-30",
           "stage": 2,
           "number": 30
         },
@@ -430,7 +430,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
             "밟",
             "알아차리"
           ],
-          "key": "ne-mb-l2-s2-31",
+          "key": "ne-l2-s2-31",
           "stage": 2,
           "number": 31
         },
@@ -441,7 +441,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
           "answers": [
             "때문에"
           ],
-          "key": "ne-mb-l2-s2-32",
+          "key": "ne-l2-s2-32",
           "stage": 2,
           "number": 32
         },
@@ -453,7 +453,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
             "관점",
             "관찰하"
           ],
-          "key": "ne-mb-l2-s2-33",
+          "key": "ne-l2-s2-33",
           "stage": 2,
           "number": 33
         },
@@ -464,7 +464,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
           "answers": [
             "를 생각해 냈다"
           ],
-          "key": "ne-mb-l2-s2-34",
+          "key": "ne-l2-s2-34",
           "stage": 2,
           "number": 34
         },
@@ -476,7 +476,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
             "취미",
             "미니어처"
           ],
-          "key": "ne-mb-l2-s2-35",
+          "key": "ne-l2-s2-35",
           "stage": 2,
           "number": 35
         },
@@ -488,7 +488,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
             "자세하",
             "정밀한"
           ],
-          "key": "ne-mb-l2-s2-36",
+          "key": "ne-l2-s2-36",
           "stage": 2,
           "number": 36
         },
@@ -502,7 +502,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
             "세부 사항들",
             "포함했다"
           ],
-          "key": "ne-mb-l2-s2-37",
+          "key": "ne-l2-s2-37",
           "stage": 2,
           "number": 37
         },
@@ -513,7 +513,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
           "answers": [
             "병"
           ],
-          "key": "ne-mb-l2-s2-38",
+          "key": "ne-l2-s2-38",
           "stage": 2,
           "number": 38
         },
@@ -524,7 +524,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
           "answers": [
             "알아차리"
           ],
-          "key": "ne-mb-l2-s2-39",
+          "key": "ne-l2-s2-39",
           "stage": 2,
           "number": 39
         },
@@ -535,7 +535,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
           "answers": [
             "만들어 냈다"
           ],
-          "key": "ne-mb-l2-s2-40",
+          "key": "ne-l2-s2-40",
           "stage": 2,
           "number": 40
         },
@@ -546,7 +546,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
           "answers": [
             "강의"
           ],
-          "key": "ne-mb-l2-s2-41",
+          "key": "ne-l2-s2-41",
           "stage": 2,
           "number": 41
         },
@@ -557,7 +557,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
           "answers": [
             "사건"
           ],
-          "key": "ne-mb-l2-s2-42",
+          "key": "ne-l2-s2-42",
           "stage": 2,
           "number": 42
         },
@@ -571,7 +571,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
             "로부터 일어났",
             "판명하"
           ],
-          "key": "ne-mb-l2-s2-43",
+          "key": "ne-l2-s2-43",
           "stage": 2,
           "number": 43
         },
@@ -582,7 +582,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
           "answers": [
             "파손하"
           ],
-          "key": "ne-mb-l2-s2-44",
+          "key": "ne-l2-s2-44",
           "stage": 2,
           "number": 44
         },
@@ -594,7 +594,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
             "관찰",
             "해결하"
           ],
-          "key": "ne-mb-l2-s2-45",
+          "key": "ne-l2-s2-45",
           "stage": 2,
           "number": 45
         },
@@ -605,7 +605,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
           "answers": [
             "과정"
           ],
-          "key": "ne-mb-l2-s2-46",
+          "key": "ne-l2-s2-46",
           "stage": 2,
           "number": 46
         },
@@ -617,7 +617,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
             "연례",
             "참석하"
           ],
-          "key": "ne-mb-l2-s2-47",
+          "key": "ne-l2-s2-47",
           "stage": 2,
           "number": 47
         },
@@ -629,7 +629,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
             "특수 요원들",
             "군사"
           ],
-          "key": "ne-mb-l2-s2-48",
+          "key": "ne-l2-s2-48",
           "stage": 2,
           "number": 48
         },
@@ -640,7 +640,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
           "answers": [
             "사망했다"
           ],
-          "key": "ne-mb-l2-s2-49",
+          "key": "ne-l2-s2-49",
           "stage": 2,
           "number": 49
         },
@@ -652,7 +652,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
             "고군분투했",
             "상당했"
           ],
-          "key": "ne-mb-l2-s2-50",
+          "key": "ne-l2-s2-50",
           "stage": 2,
           "number": 50
         },
@@ -663,7 +663,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
           "answers": [
             "놀랍"
           ],
-          "key": "ne-mb-l2-s2-51",
+          "key": "ne-l2-s2-51",
           "stage": 2,
           "number": 51
         }
@@ -686,7 +686,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
             "traces",
             "presence"
           ],
-          "key": "ne-mb-l2-s3-01",
+          "key": "ne-l2-s3-01",
           "stage": 3,
           "number": 1
         },
@@ -698,7 +698,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
             "tiny",
             "obvious"
           ],
-          "key": "ne-mb-l2-s3-02",
+          "key": "ne-l2-s3-02",
           "stage": 3,
           "number": 2
         },
@@ -711,7 +711,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
             "collect",
             "evidence"
           ],
-          "key": "ne-mb-l2-s3-03",
+          "key": "ne-l2-s3-03",
           "stage": 3,
           "number": 3
         },
@@ -723,7 +723,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
             "analyze",
             "clues"
           ],
-          "key": "ne-mb-l2-s3-04",
+          "key": "ne-l2-s3-04",
           "stage": 3,
           "number": 4
         },
@@ -734,7 +734,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
           "answers": [
             "committed"
           ],
-          "key": "ne-mb-l2-s3-05",
+          "key": "ne-l2-s3-05",
           "stage": 3,
           "number": 5
         },
@@ -746,7 +746,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
             "forensic",
             "science"
           ],
-          "key": "ne-mb-l2-s3-06",
+          "key": "ne-l2-s3-06",
           "stage": 3,
           "number": 6
         },
@@ -760,7 +760,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
             "to",
             "contributions"
           ],
-          "key": "ne-mb-l2-s3-07",
+          "key": "ne-l2-s3-07",
           "stage": 3,
           "number": 7
         },
@@ -771,7 +771,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
           "answers": [
             "modern"
           ],
-          "key": "ne-mb-l2-s3-08",
+          "key": "ne-l2-s3-08",
           "stage": 3,
           "number": 8
         },
@@ -782,7 +782,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
           "answers": [
             "born"
           ],
-          "key": "ne-mb-l2-s3-09",
+          "key": "ne-l2-s3-09",
           "stage": 3,
           "number": 9
         },
@@ -795,7 +795,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
             "interested",
             "in"
           ],
-          "key": "ne-mb-l2-s3-10",
+          "key": "ne-l2-s3-10",
           "stage": 3,
           "number": 10
         },
@@ -806,7 +806,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
           "answers": [
             "attend"
           ],
-          "key": "ne-mb-l2-s3-11",
+          "key": "ne-l2-s3-11",
           "stage": 3,
           "number": 11
         },
@@ -821,7 +821,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
             "but",
             "to"
           ],
-          "key": "ne-mb-l2-s3-12",
+          "key": "ne-l2-s3-12",
           "stage": 3,
           "number": 12
         },
@@ -832,7 +832,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
           "answers": [
             "career"
           ],
-          "key": "ne-mb-l2-s3-13",
+          "key": "ne-l2-s3-13",
           "stage": 3,
           "number": 13
         },
@@ -843,7 +843,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
           "answers": [
             "real-life"
           ],
-          "key": "ne-mb-l2-s3-14",
+          "key": "ne-l2-s3-14",
           "stage": 3,
           "number": 14
         },
@@ -856,7 +856,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
             "examiner",
             "investigation"
           ],
-          "key": "ne-mb-l2-s3-15",
+          "key": "ne-l2-s3-15",
           "stage": 3,
           "number": 15
         },
@@ -867,7 +867,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
           "answers": [
             "examining"
           ],
-          "key": "ne-mb-l2-s3-16",
+          "key": "ne-l2-s3-16",
           "stage": 3,
           "number": 16
         },
@@ -879,7 +879,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
             "passion",
             "educating"
           ],
-          "key": "ne-mb-l2-s3-17",
+          "key": "ne-l2-s3-17",
           "stage": 3,
           "number": 17
         },
@@ -890,7 +890,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
           "answers": [
             "sparked"
           ],
-          "key": "ne-mb-l2-s3-18",
+          "key": "ne-l2-s3-18",
           "stage": 3,
           "number": 18
         },
@@ -901,7 +901,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
           "answers": [
             "experts"
           ],
-          "key": "ne-mb-l2-s3-19",
+          "key": "ne-l2-s3-19",
           "stage": 3,
           "number": 19
         },
@@ -912,7 +912,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
           "answers": [
             "adopted"
           ],
-          "key": "ne-mb-l2-s3-20",
+          "key": "ne-l2-s3-20",
           "stage": 3,
           "number": 20
         },
@@ -923,7 +923,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
           "answers": [
             "Furthermore"
           ],
-          "key": "ne-mb-l2-s3-21",
+          "key": "ne-l2-s3-21",
           "stage": 3,
           "number": 21
         },
@@ -934,7 +934,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
           "answers": [
             "devote"
           ],
-          "key": "ne-mb-l2-s3-22",
+          "key": "ne-l2-s3-22",
           "stage": 3,
           "number": 22
         },
@@ -947,7 +947,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
             "fortune",
             "branch"
           ],
-          "key": "ne-mb-l2-s3-23",
+          "key": "ne-l2-s3-23",
           "stage": 3,
           "number": 23
         },
@@ -958,7 +958,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
           "answers": [
             "documents"
           ],
-          "key": "ne-mb-l2-s3-24",
+          "key": "ne-l2-s3-24",
           "stage": 3,
           "number": 24
         },
@@ -969,7 +969,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
           "answers": [
             "independent"
           ],
-          "key": "ne-mb-l2-s3-25",
+          "key": "ne-l2-s3-25",
           "stage": 3,
           "number": 25
         },
@@ -980,7 +980,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
           "answers": [
             "support"
           ],
-          "key": "ne-mb-l2-s3-26",
+          "key": "ne-l2-s3-26",
           "stage": 3,
           "number": 26
         },
@@ -995,7 +995,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
             "the",
             "Department"
           ],
-          "key": "ne-mb-l2-s3-27",
+          "key": "ne-l2-s3-27",
           "stage": 3,
           "number": 27
         },
@@ -1007,7 +1007,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
             "legal",
             "medicine"
           ],
-          "key": "ne-mb-l2-s3-28",
+          "key": "ne-l2-s3-28",
           "stage": 3,
           "number": 28
         },
@@ -1018,7 +1018,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
           "answers": [
             "efforts"
           ],
-          "key": "ne-mb-l2-s3-29",
+          "key": "ne-l2-s3-29",
           "stage": 3,
           "number": 29
         },
@@ -1029,7 +1029,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
           "answers": [
             "potential"
           ],
-          "key": "ne-mb-l2-s3-30",
+          "key": "ne-l2-s3-30",
           "stage": 3,
           "number": 30
         },
@@ -1042,7 +1042,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
             "on",
             "realizing"
           ],
-          "key": "ne-mb-l2-s3-31",
+          "key": "ne-l2-s3-31",
           "stage": 3,
           "number": 31
         },
@@ -1054,7 +1054,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
             "Due",
             "to"
           ],
-          "key": "ne-mb-l2-s3-32",
+          "key": "ne-l2-s3-32",
           "stage": 3,
           "number": 32
         },
@@ -1068,7 +1068,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
             "of",
             "view"
           ],
-          "key": "ne-mb-l2-s3-33",
+          "key": "ne-l2-s3-33",
           "stage": 3,
           "number": 33
         },
@@ -1081,7 +1081,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
             "up",
             "with"
           ],
-          "key": "ne-mb-l2-s3-34",
+          "key": "ne-l2-s3-34",
           "stage": 3,
           "number": 34
         },
@@ -1093,7 +1093,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
             "hobby",
             "miniatures"
           ],
-          "key": "ne-mb-l2-s3-35",
+          "key": "ne-l2-s3-35",
           "stage": 3,
           "number": 35
         },
@@ -1105,7 +1105,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
             "detailed",
             "accurate"
           ],
-          "key": "ne-mb-l2-s3-36",
+          "key": "ne-l2-s3-36",
           "stage": 3,
           "number": 36
         },
@@ -1120,7 +1120,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
             "details",
             "stains"
           ],
-          "key": "ne-mb-l2-s3-37",
+          "key": "ne-l2-s3-37",
           "stage": 3,
           "number": 37
         },
@@ -1131,7 +1131,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
           "answers": [
             "jar"
           ],
-          "key": "ne-mb-l2-s3-38",
+          "key": "ne-l2-s3-38",
           "stage": 3,
           "number": 38
         },
@@ -1142,7 +1142,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
           "answers": [
             "notice"
           ],
-          "key": "ne-mb-l2-s3-39",
+          "key": "ne-l2-s3-39",
           "stage": 3,
           "number": 39
         },
@@ -1153,7 +1153,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
           "answers": [
             "created"
           ],
-          "key": "ne-mb-l2-s3-40",
+          "key": "ne-l2-s3-40",
           "stage": 3,
           "number": 40
         },
@@ -1164,7 +1164,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
           "answers": [
             "lecture"
           ],
-          "key": "ne-mb-l2-s3-41",
+          "key": "ne-l2-s3-41",
           "stage": 3,
           "number": 41
         },
@@ -1175,7 +1175,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
           "answers": [
             "case"
           ],
-          "key": "ne-mb-l2-s3-42",
+          "key": "ne-l2-s3-42",
           "stage": 3,
           "number": 42
         },
@@ -1190,7 +1190,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
             "accident",
             "violent"
           ],
-          "key": "ne-mb-l2-s3-43",
+          "key": "ne-l2-s3-43",
           "stage": 3,
           "number": 43
         },
@@ -1201,7 +1201,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
           "answers": [
             "destroying"
           ],
-          "key": "ne-mb-l2-s3-44",
+          "key": "ne-l2-s3-44",
           "stage": 3,
           "number": 44
         },
@@ -1213,7 +1213,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
             "observation",
             "solve"
           ],
-          "key": "ne-mb-l2-s3-45",
+          "key": "ne-l2-s3-45",
           "stage": 3,
           "number": 45
         },
@@ -1224,7 +1224,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
           "answers": [
             "process"
           ],
-          "key": "ne-mb-l2-s3-46",
+          "key": "ne-l2-s3-46",
           "stage": 3,
           "number": 46
         },
@@ -1236,7 +1236,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
             "annual",
             "attended"
           ],
-          "key": "ne-mb-l2-s3-47",
+          "key": "ne-l2-s3-47",
           "stage": 3,
           "number": 47
         },
@@ -1249,7 +1249,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
             "agents",
             "military"
           ],
-          "key": "ne-mb-l2-s3-48",
+          "key": "ne-l2-s3-48",
           "stage": 3,
           "number": 48
         },
@@ -1260,7 +1260,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
           "answers": [
             "died"
           ],
-          "key": "ne-mb-l2-s3-49",
+          "key": "ne-l2-s3-49",
           "stage": 3,
           "number": 49
         },
@@ -1272,7 +1272,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
             "struggled",
             "significant"
           ],
-          "key": "ne-mb-l2-s3-50",
+          "key": "ne-l2-s3-50",
           "stage": 3,
           "number": 50
         },
@@ -1283,7 +1283,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
           "answers": [
             "wonder"
           ],
-          "key": "ne-mb-l2-s3-51",
+          "key": "ne-l2-s3-51",
           "stage": 3,
           "number": 51
         }
@@ -1301,7 +1301,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
           "answers": [
             "범죄자들은 범죄 현장에 그들의 존재 흔적을 남기지 않고 가는 법이 결코 없다."
           ],
-          "key": "ne-mb-l2-s4-01",
+          "key": "ne-l2-s4-01",
           "stage": 4,
           "number": 1
         },
@@ -1312,7 +1312,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
           "answers": [
             "그 흔적들은 머리카락처럼 아주 작거나, 그들의 신발에서 나온 흙처럼 더 분명할지 모른다."
           ],
-          "key": "ne-mb-l2-s4-02",
+          "key": "ne-l2-s4-02",
           "stage": 4,
           "number": 2
         },
@@ -1323,7 +1323,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
           "answers": [
             "그래서 형사들은 모든 가능한 증거를 주의 깊게 수집한다."
           ],
-          "key": "ne-mb-l2-s4-03",
+          "key": "ne-l2-s4-03",
           "stage": 4,
           "number": 3
         },
@@ -1334,7 +1334,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
           "answers": [
             "그러고 나서 과학자들은 모든 것을 분석하고 몇몇 단서를 찾아낸다."
           ],
-          "key": "ne-mb-l2-s4-04",
+          "key": "ne-l2-s4-04",
           "stage": 4,
           "number": 4
         },
@@ -1345,7 +1345,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
           "answers": [
             "그 단서들은 범죄를 저질렀던 사람을 찾는 데 사용된다."
           ],
-          "key": "ne-mb-l2-s4-05",
+          "key": "ne-l2-s4-05",
           "stage": 4,
           "number": 5
         },
@@ -1356,7 +1356,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
           "answers": [
             "이 과정은 과학 수사라고 불린다."
           ],
-          "key": "ne-mb-l2-s4-06",
+          "key": "ne-l2-s4-06",
           "stage": 4,
           "number": 6
         },
@@ -1367,7 +1367,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
           "answers": [
             "이것은 많은 연구자의 기여 덕분에 발전해 왔다."
           ],
-          "key": "ne-mb-l2-s4-07",
+          "key": "ne-l2-s4-07",
           "stage": 4,
           "number": 7
         },
@@ -1378,7 +1378,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
           "answers": [
             "현대 과학 수사의 발전에서 가장 중요한 인물 중 한 명은 Frances Glessner Lee였다."
           ],
-          "key": "ne-mb-l2-s4-08",
+          "key": "ne-l2-s4-08",
           "stage": 4,
           "number": 8
         },
@@ -1389,7 +1389,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
           "answers": [
             "Frances Glessner Lee는 1878년 시카고의 한 부유한 가정에서 태어났다."
           ],
-          "key": "ne-mb-l2-s4-09",
+          "key": "ne-l2-s4-09",
           "stage": 4,
           "number": 9
         },
@@ -1400,7 +1400,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
           "answers": [
             "그녀는 어린 나이에 의학에 흥미를 갖게 되었다."
           ],
-          "key": "ne-mb-l2-s4-10",
+          "key": "ne-l2-s4-10",
           "stage": 4,
           "number": 10
         },
@@ -1411,7 +1411,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
           "answers": [
             "그녀의 꿈은 하버드 의학 대학에 가는 것이었지만, 그 당시에 그 학교는 여자들을 수용하지(입학을 허가하지) 않았다."
           ],
-          "key": "ne-mb-l2-s4-11",
+          "key": "ne-l2-s4-11",
           "stage": 4,
           "number": 11
         },
@@ -1422,7 +1422,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
           "answers": [
             "그녀는 결혼할 수밖에 없었다."
           ],
-          "key": "ne-mb-l2-s4-12",
+          "key": "ne-l2-s4-12",
           "stage": 4,
           "number": 12
         },
@@ -1433,7 +1433,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
           "answers": [
             "그녀는 50대가 되어서야 의학에서 경력을 시작할 수 있었다."
           ],
-          "key": "ne-mb-l2-s4-13",
+          "key": "ne-l2-s4-13",
           "stage": 4,
           "number": 13
         },
@@ -1444,7 +1444,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
           "answers": [
             "Lee는 그녀의 친구 George Burgess Magrath에게서 실제 범죄에 대한 많은 흥미로운 이야기들을 들었다."
           ],
-          "key": "ne-mb-l2-s4-14",
+          "key": "ne-l2-s4-14",
           "stage": 4,
           "number": 14
         },
@@ -1455,7 +1455,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
           "answers": [
             "그는 수사 체계를 바꾸고 싶어 했던 검시관이었다."
           ],
-          "key": "ne-mb-l2-s4-15",
+          "key": "ne-l2-s4-15",
           "stage": 4,
           "number": 15
         },
@@ -1466,7 +1466,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
           "answers": [
             "이것은 그 당시에 의학적 지식이 없는 사람들이 많은 사망 사건을 시신을 조사하지 않은 채로 수사하고 종결했기 때문이었다."
           ],
-          "key": "ne-mb-l2-s4-16",
+          "key": "ne-l2-s4-16",
           "stage": 4,
           "number": 16
         },
@@ -1477,7 +1477,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
           "answers": [
             "그는 또한 법의학 분야에서 의과 학생들을 가르치고자 하는 열정도 있었다."
           ],
-          "key": "ne-mb-l2-s4-17",
+          "key": "ne-l2-s4-17",
           "stage": 4,
           "number": 17
         },
@@ -1488,7 +1488,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
           "answers": [
             "Magrath의 열정이 법의학에 대한 Lee의 흥미에 불을 지폈다."
           ],
-          "key": "ne-mb-l2-s4-18",
+          "key": "ne-l2-s4-18",
           "stage": 4,
           "number": 18
         },
@@ -1499,7 +1499,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
           "answers": [
             "Lee는 책을 읽고 전문가들과 대화함으로써 법의학을 공부하기 시작했다."
           ],
-          "key": "ne-mb-l2-s4-19",
+          "key": "ne-l2-s4-19",
           "stage": 4,
           "number": 19
         },
@@ -1510,7 +1510,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
           "answers": [
             "그녀는 검시관 체계가 전국적으로 더 넓게 채택될 것이라고 믿었다."
           ],
-          "key": "ne-mb-l2-s4-20",
+          "key": "ne-l2-s4-20",
           "stage": 4,
           "number": 20
         },
@@ -1521,7 +1521,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
           "answers": [
             "게다가, 그녀는 더 많은 젊은 의과 학생들이 법의학 분야에서 훈련받는 것을 보고 싶어 했다."
           ],
-          "key": "ne-mb-l2-s4-21",
+          "key": "ne-l2-s4-21",
           "stage": 4,
           "number": 21
         },
@@ -1532,7 +1532,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
           "answers": [
             "그녀는 자신의 여생을 이 분야를 발전시키는 데 바치기로 결심했다."
           ],
-          "key": "ne-mb-l2-s4-22",
+          "key": "ne-l2-s4-22",
           "stage": 4,
           "number": 22
         },
@@ -1543,7 +1543,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
           "answers": [
             "1931년에 그녀는 하버드 대학교를 설득해 그녀의 재산을 새로운 분야의 학문인 법의학(과)을 만드는 데 쓰도록 했다."
           ],
-          "key": "ne-mb-l2-s4-23",
+          "key": "ne-l2-s4-23",
           "stage": 4,
           "number": 23
         },
@@ -1554,7 +1554,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
           "answers": [
             "그녀는 또한 희귀한 책과 문서들을 소장한 도서관을 세우는 것을 도왔다."
           ],
-          "key": "ne-mb-l2-s4-24",
+          "key": "ne-l2-s4-24",
           "stage": 4,
           "number": 24
         },
@@ -1565,7 +1565,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
           "answers": [
             "그녀는 검시관들이 독립적인 힘을 가지도록 법이 바뀌어야 한다고 생각했다."
           ],
-          "key": "ne-mb-l2-s4-25",
+          "key": "ne-l2-s4-25",
           "stage": 4,
           "number": 25
         },
@@ -1576,7 +1576,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
           "answers": [
             "법을 바꾸기 위해서는 대중의 지지가 필요했고, 그녀는 대중에게 현대 검시관 체계를 교육하기 위해 1939년부터 1940년까지 열린 세계 박람회를 이용했다."
           ],
-          "key": "ne-mb-l2-s4-26",
+          "key": "ne-l2-s4-26",
           "stage": 4,
           "number": 26
         },
@@ -1587,7 +1587,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
           "answers": [
             "그녀는 또한 하버드 법의학대 학과장과 함께 주지사를 방문했다."
           ],
-          "key": "ne-mb-l2-s4-27",
+          "key": "ne-l2-s4-27",
           "stage": 4,
           "number": 27
         },
@@ -1598,7 +1598,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
           "answers": [
             "그들은 법의학의 중요성에 관해 이야기를 나누었다."
           ],
-          "key": "ne-mb-l2-s4-28",
+          "key": "ne-l2-s4-28",
           "stage": 4,
           "number": 28
         },
@@ -1609,7 +1609,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
           "answers": [
             "Lee의 노력 덕분에, 하버드의 법의학대는 1940년에 미래의 검시관들을 훈련시키기 시작했다."
           ],
-          "key": "ne-mb-l2-s4-29",
+          "key": "ne-l2-s4-29",
           "stage": 4,
           "number": 29
         },
@@ -1620,7 +1620,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
           "answers": [
             "그러나, 형사들은 잠재적인 증거들에 주의를 하지 않았다."
           ],
-          "key": "ne-mb-l2-s4-30",
+          "key": "ne-l2-s4-30",
           "stage": 4,
           "number": 30
         },
@@ -1631,7 +1631,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
           "answers": [
             "물건들을 만지고 밟으면서, 그들은 알아차리지도 못한 채 자주 단서들을 파손했다."
           ],
-          "key": "ne-mb-l2-s4-31",
+          "key": "ne-l2-s4-31",
           "stage": 4,
           "number": 31
         },
@@ -1642,7 +1642,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
           "answers": [
             "이러한 사실 때문에, 이후에 단서를 분석하는 것이 불가능했다."
           ],
-          "key": "ne-mb-l2-s4-32",
+          "key": "ne-l2-s4-32",
           "stage": 4,
           "number": 32
         },
@@ -1653,7 +1653,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
           "answers": [
             "Lee는 형사들도 범죄 현장을 의학적 관점에서 관찰하는 법을 배워야 한다고 생각했다."
           ],
-          "key": "ne-mb-l2-s4-33",
+          "key": "ne-l2-s4-33",
           "stage": 4,
           "number": 33
         },
@@ -1664,7 +1664,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
           "answers": [
             "형사들을 효율적으로 교육하기 위해, Lee는 창의적인 도구를 생각해 냈다."
           ],
-          "key": "ne-mb-l2-s4-34",
+          "key": "ne-l2-s4-34",
           "stage": 4,
           "number": 34
         },
@@ -1675,7 +1675,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
           "answers": [
             "그녀의 아이디어는 그녀의 취미로부터 왔는데, 미니어처를 만드는 것이다."
           ],
-          "key": "ne-mb-l2-s4-35",
+          "key": "ne-l2-s4-35",
           "stage": 4,
           "number": 35
         },
@@ -1686,7 +1686,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
           "answers": [
             "그녀는 매우 자세하고 정밀한 범죄 현장 미니어처를 만들기 시작했다."
           ],
-          "key": "ne-mb-l2-s4-36",
+          "key": "ne-l2-s4-36",
           "stage": 4,
           "number": 36
         },
@@ -1697,7 +1697,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
           "answers": [
             "실제 범죄 사건에 기반하여, 그것들은 핏자국 같은 세부 사항들을 포함했다."
           ],
-          "key": "ne-mb-l2-s4-37",
+          "key": "ne-l2-s4-37",
           "stage": 4,
           "number": 37
         },
@@ -1708,7 +1708,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
           "answers": [
             "Lee는 작은 램프나 병에 붙은 라벨처럼 가장 작은 세부 사항조차도 놓치지 않았다."
           ],
-          "key": "ne-mb-l2-s4-38",
+          "key": "ne-l2-s4-38",
           "stage": 4,
           "number": 38
         },
@@ -1719,7 +1719,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
           "answers": [
             "그녀는 형사들이 아주 작은 단서들을 알아차리도록 훈련하길 원했다."
           ],
-          "key": "ne-mb-l2-s4-39",
+          "key": "ne-l2-s4-39",
           "stage": 4,
           "number": 39
         },
@@ -1730,7 +1730,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
           "answers": [
             "그녀는 1940년대부터 1950년대 동안 약 스무 개의 미니어처 현장을 만들어 냈다."
           ],
-          "key": "ne-mb-l2-s4-40",
+          "key": "ne-l2-s4-40",
           "stage": 4,
           "number": 40
         },
@@ -1741,7 +1741,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
           "answers": [
             "1945년에, 그녀는 일주일간의 세미나를 열었고 그녀의 범죄 현장 미니어처를 사용하여 첫 번째 강의를 했다."
           ],
-          "key": "ne-mb-l2-s4-41",
+          "key": "ne-l2-s4-41",
           "stage": 4,
           "number": 41
         },
@@ -1752,7 +1752,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
           "answers": [
             "사건 파일을 읽는 동안, 형사들은 미니어처 현장의 세부 사항들을 연구했다."
           ],
-          "key": "ne-mb-l2-s4-42",
+          "key": "ne-l2-s4-42",
           "stage": 4,
           "number": 42
         },
@@ -1763,7 +1763,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
           "answers": [
             "그들은 미니어처 안의 현장이 사고인지 폭력적인 범죄로부터 일어났는지 판명하기 위해 단서들을 찾았다."
           ],
-          "key": "ne-mb-l2-s4-43",
+          "key": "ne-l2-s4-43",
           "stage": 4,
           "number": 43
         },
@@ -1774,7 +1774,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
           "answers": [
             "형사들은 어떤 증거도 파손하지 않고 아주 작은 세부 사항들을 발견하고 현장을 관찰하는 법을 배웠다."
           ],
-          "key": "ne-mb-l2-s4-44",
+          "key": "ne-l2-s4-44",
           "stage": 4,
           "number": 44
         },
@@ -1785,7 +1785,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
           "answers": [
             "자신들의 관찰 능력을 발달시킴으로써, 그들은 범죄 사건을 해결하는 능력을 향상할 수 있었다."
           ],
-          "key": "ne-mb-l2-s4-45",
+          "key": "ne-l2-s4-45",
           "stage": 4,
           "number": 45
         },
@@ -1796,7 +1796,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
           "answers": [
             "Lee의 훈련 과정은 성공적이었다."
           ],
-          "key": "ne-mb-l2-s4-46",
+          "key": "ne-l2-s4-46",
           "stage": 4,
           "number": 46
         },
@@ -1807,7 +1807,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
           "answers": [
             "1949년까지, 연례 세미나에는 미국뿐만 아니라 캐나다에서 온 형사들이 참석하고 있었다."
           ],
-          "key": "ne-mb-l2-s4-47",
+          "key": "ne-l2-s4-47",
           "stage": 4,
           "number": 47
         },
@@ -1818,7 +1818,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
           "answers": [
             "특수 요원들과 군사 간부들 또한 세미나에 참석했다."
           ],
-          "key": "ne-mb-l2-s4-48",
+          "key": "ne-l2-s4-48",
           "stage": 4,
           "number": 48
         },
@@ -1829,7 +1829,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
           "answers": [
             "Lee는 30년이 넘는 경력 생활 후 1962년에 사망했다."
           ],
-          "key": "ne-mb-l2-s4-49",
+          "key": "ne-l2-s4-49",
           "stage": 4,
           "number": 49
         },
@@ -1840,7 +1840,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
           "answers": [
             "비록 그녀가 그 분야에 들어가는 데 고군분투했지만, 과학 수사에 대한 그녀의 기여는 상당했다."
           ],
-          "key": "ne-mb-l2-s4-50",
+          "key": "ne-l2-s4-50",
           "stage": 4,
           "number": 50
         },
@@ -1851,7 +1851,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
           "answers": [
             "그녀가 '과학 수사의 어머니'로 불렸던 것은 놀랍지 않다."
           ],
-          "key": "ne-mb-l2-s4-51",
+          "key": "ne-l2-s4-51",
           "stage": 4,
           "number": 51
         }
@@ -1874,7 +1874,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
             "leave",
             "leaving"
           ],
-          "key": "ne-mb-l2-s5-01",
+          "key": "ne-l2-s5-01",
           "stage": 5,
           "number": 1
         },
@@ -1888,7 +1888,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
           "answers": [
             "be"
           ],
-          "key": "ne-mb-l2-s5-02",
+          "key": "ne-l2-s5-02",
           "stage": 5,
           "number": 2
         },
@@ -1902,7 +1902,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
           "answers": [
             "collect"
           ],
-          "key": "ne-mb-l2-s5-03",
+          "key": "ne-l2-s5-03",
           "stage": 5,
           "number": 3
         },
@@ -1918,7 +1918,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
             "analyze",
             "find"
           ],
-          "key": "ne-mb-l2-s5-04",
+          "key": "ne-l2-s5-04",
           "stage": 5,
           "number": 4
         },
@@ -1932,11 +1932,11 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
             "commit"
           ],
           "answers": [
-            "are",
-            "used to find",
+            "are used",
+            "to find",
             "committed"
           ],
-          "key": "ne-mb-l2-s5-05",
+          "key": "ne-l2-s5-05",
           "stage": 5,
           "number": 5
         },
@@ -1950,7 +1950,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
           "answers": [
             "is called"
           ],
-          "key": "ne-mb-l2-s5-06",
+          "key": "ne-l2-s5-06",
           "stage": 5,
           "number": 6
         },
@@ -1964,7 +1964,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
           "answers": [
             "has evolved"
           ],
-          "key": "ne-mb-l2-s5-07",
+          "key": "ne-l2-s5-07",
           "stage": 5,
           "number": 7
         },
@@ -1978,7 +1978,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
           "answers": [
             "was"
           ],
-          "key": "ne-mb-l2-s5-08",
+          "key": "ne-l2-s5-08",
           "stage": 5,
           "number": 8
         },
@@ -1992,7 +1992,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
           "answers": [
             "was"
           ],
-          "key": "ne-mb-l2-s5-09",
+          "key": "ne-l2-s5-09",
           "stage": 5,
           "number": 9
         },
@@ -2008,7 +2008,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
             "became",
             "interested"
           ],
-          "key": "ne-mb-l2-s5-10",
+          "key": "ne-l2-s5-10",
           "stage": 5,
           "number": 10
         },
@@ -2026,7 +2026,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
             "to attend",
             "did not accept"
           ],
-          "key": "ne-mb-l2-s5-11",
+          "key": "ne-l2-s5-11",
           "stage": 5,
           "number": 11
         },
@@ -2042,7 +2042,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
             "had",
             "to get"
           ],
-          "key": "ne-mb-l2-s5-12",
+          "key": "ne-l2-s5-12",
           "stage": 5,
           "number": 12
         },
@@ -2062,7 +2062,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
             "was",
             "to start"
           ],
-          "key": "ne-mb-l2-s5-13",
+          "key": "ne-l2-s5-13",
           "stage": 5,
           "number": 13
         },
@@ -2078,7 +2078,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
             "heard",
             "interesting"
           ],
-          "key": "ne-mb-l2-s5-14",
+          "key": "ne-l2-s5-14",
           "stage": 5,
           "number": 14
         },
@@ -2096,7 +2096,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
             "wanted",
             "to change"
           ],
-          "key": "ne-mb-l2-s5-15",
+          "key": "ne-l2-s5-15",
           "stage": 5,
           "number": 15
         },
@@ -2116,7 +2116,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
             "closed",
             "examining"
           ],
-          "key": "ne-mb-l2-s5-16",
+          "key": "ne-l2-s5-16",
           "stage": 5,
           "number": 16
         },
@@ -2132,7 +2132,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
             "had",
             "educating"
           ],
-          "key": "ne-mb-l2-s5-17",
+          "key": "ne-l2-s5-17",
           "stage": 5,
           "number": 17
         },
@@ -2146,7 +2146,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
           "answers": [
             "sparked"
           ],
-          "key": "ne-mb-l2-s5-18",
+          "key": "ne-l2-s5-18",
           "stage": 5,
           "number": 18
         },
@@ -2166,7 +2166,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
             "reading",
             "speaking"
           ],
-          "key": "ne-mb-l2-s5-19",
+          "key": "ne-l2-s5-19",
           "stage": 5,
           "number": 19
         },
@@ -2182,7 +2182,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
             "believed",
             "be adopted"
           ],
-          "key": "ne-mb-l2-s5-20",
+          "key": "ne-l2-s5-20",
           "stage": 5,
           "number": 20
         },
@@ -2200,7 +2200,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
             "to see",
             "trained"
           ],
-          "key": "ne-mb-l2-s5-21",
+          "key": "ne-l2-s5-21",
           "stage": 5,
           "number": 21
         },
@@ -2218,7 +2218,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
             "to devote",
             "developing"
           ],
-          "key": "ne-mb-l2-s5-22",
+          "key": "ne-l2-s5-22",
           "stage": 5,
           "number": 22
         },
@@ -2236,7 +2236,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
             "to use",
             "to make"
           ],
-          "key": "ne-mb-l2-s5-23",
+          "key": "ne-l2-s5-23",
           "stage": 5,
           "number": 23
         },
@@ -2252,7 +2252,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
             "helped",
             "set"
           ],
-          "key": "ne-mb-l2-s5-24",
+          "key": "ne-l2-s5-24",
           "stage": 5,
           "number": 24
         },
@@ -2270,7 +2270,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
             "had to be changed",
             "had"
           ],
-          "key": "ne-mb-l2-s5-25",
+          "key": "ne-l2-s5-25",
           "stage": 5,
           "number": 25
         },
@@ -2286,13 +2286,13 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
             "educate"
           ],
           "answers": [
-            "was",
-            "needed to change",
+            "was needed",
+            "to change",
             "used",
             "held",
             "to educate"
           ],
-          "key": "ne-mb-l2-s5-26",
+          "key": "ne-l2-s5-26",
           "stage": 5,
           "number": 26
         },
@@ -2306,7 +2306,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
           "answers": [
             "visited"
           ],
-          "key": "ne-mb-l2-s5-27",
+          "key": "ne-l2-s5-27",
           "stage": 5,
           "number": 27
         },
@@ -2320,7 +2320,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
           "answers": [
             "talked"
           ],
-          "key": "ne-mb-l2-s5-28",
+          "key": "ne-l2-s5-28",
           "stage": 5,
           "number": 28
         },
@@ -2336,7 +2336,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
             "began",
             "to train"
           ],
-          "key": "ne-mb-l2-s5-29",
+          "key": "ne-l2-s5-29",
           "stage": 5,
           "number": 29
         },
@@ -2350,7 +2350,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
           "answers": [
             "were"
           ],
-          "key": "ne-mb-l2-s5-30",
+          "key": "ne-l2-s5-30",
           "stage": 5,
           "number": 30
         },
@@ -2370,7 +2370,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
             "destroyed",
             "realizing"
           ],
-          "key": "ne-mb-l2-s5-31",
+          "key": "ne-l2-s5-31",
           "stage": 5,
           "number": 31
         },
@@ -2386,7 +2386,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
             "analyzing",
             "was"
           ],
-          "key": "ne-mb-l2-s5-32",
+          "key": "ne-l2-s5-32",
           "stage": 5,
           "number": 32
         },
@@ -2404,7 +2404,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
             "had to learn",
             "to observe"
           ],
-          "key": "ne-mb-l2-s5-33",
+          "key": "ne-l2-s5-33",
           "stage": 5,
           "number": 33
         },
@@ -2420,7 +2420,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
             "to educate",
             "came"
           ],
-          "key": "ne-mb-l2-s5-34",
+          "key": "ne-l2-s5-34",
           "stage": 5,
           "number": 34
         },
@@ -2436,7 +2436,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
             "came",
             "creating"
           ],
-          "key": "ne-mb-l2-s5-35",
+          "key": "ne-l2-s5-35",
           "stage": 5,
           "number": 35
         },
@@ -2454,7 +2454,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
             "creating",
             "were"
           ],
-          "key": "ne-mb-l2-s5-36",
+          "key": "ne-l2-s5-36",
           "stage": 5,
           "number": 36
         },
@@ -2470,7 +2470,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
             "Based",
             "included"
           ],
-          "key": "ne-mb-l2-s5-37",
+          "key": "ne-l2-s5-37",
           "stage": 5,
           "number": 37
         },
@@ -2484,7 +2484,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
           "answers": [
             "did not miss"
           ],
-          "key": "ne-mb-l2-s5-38",
+          "key": "ne-l2-s5-38",
           "stage": 5,
           "number": 38
         },
@@ -2502,7 +2502,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
             "to train",
             "to notice"
           ],
-          "key": "ne-mb-l2-s5-39",
+          "key": "ne-l2-s5-39",
           "stage": 5,
           "number": 39
         },
@@ -2516,7 +2516,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
           "answers": [
             "created"
           ],
-          "key": "ne-mb-l2-s5-40",
+          "key": "ne-l2-s5-40",
           "stage": 5,
           "number": 40
         },
@@ -2534,7 +2534,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
             "gave",
             "using"
           ],
-          "key": "ne-mb-l2-s5-41",
+          "key": "ne-l2-s5-41",
           "stage": 5,
           "number": 41
         },
@@ -2550,7 +2550,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
             "reading",
             "studied"
           ],
-          "key": "ne-mb-l2-s5-42",
+          "key": "ne-l2-s5-42",
           "stage": 5,
           "number": 42
         },
@@ -2568,7 +2568,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
             "to determine",
             "resulted"
           ],
-          "key": "ne-mb-l2-s5-43",
+          "key": "ne-l2-s5-43",
           "stage": 5,
           "number": 43
         },
@@ -2588,7 +2588,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
             "to observe",
             "destroying"
           ],
-          "key": "ne-mb-l2-s5-44",
+          "key": "ne-l2-s5-44",
           "stage": 5,
           "number": 44
         },
@@ -2608,7 +2608,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
             "to improve",
             "to solve"
           ],
-          "key": "ne-mb-l2-s5-45",
+          "key": "ne-l2-s5-45",
           "stage": 5,
           "number": 45
         },
@@ -2622,7 +2622,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
           "answers": [
             "was"
           ],
-          "key": "ne-mb-l2-s5-46",
+          "key": "ne-l2-s5-46",
           "stage": 5,
           "number": 46
         },
@@ -2636,7 +2636,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
           "answers": [
             "was being attended"
           ],
-          "key": "ne-mb-l2-s5-47",
+          "key": "ne-l2-s5-47",
           "stage": 5,
           "number": 47
         },
@@ -2650,7 +2650,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
           "answers": [
             "attended"
           ],
-          "key": "ne-mb-l2-s5-48",
+          "key": "ne-l2-s5-48",
           "stage": 5,
           "number": 48
         },
@@ -2664,7 +2664,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
           "answers": [
             "died"
           ],
-          "key": "ne-mb-l2-s5-49",
+          "key": "ne-l2-s5-49",
           "stage": 5,
           "number": 49
         },
@@ -2678,11 +2678,11 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
             "be"
           ],
           "answers": [
-            "had",
-            "struggled to enter",
+            "had struggled",
+            "to enter",
             "were"
           ],
-          "key": "ne-mb-l2-s5-50",
+          "key": "ne-l2-s5-50",
           "stage": 5,
           "number": 50
         },
@@ -2698,7 +2698,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
             "is",
             "was called"
           ],
-          "key": "ne-mb-l2-s5-51",
+          "key": "ne-l2-s5-51",
           "stage": 5,
           "number": 51
         }
@@ -2722,7 +2722,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
           "answers": [
             "leaving"
           ],
-          "key": "ne-mb-l2-s6-01",
+          "key": "ne-l2-s6-01",
           "stage": 6,
           "number": 1
         },
@@ -2739,7 +2739,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
           "answers": [
             "like"
           ],
-          "key": "ne-mb-l2-s6-02",
+          "key": "ne-l2-s6-02",
           "stage": 6,
           "number": 2
         },
@@ -2756,7 +2756,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
           "answers": [
             "carefully collect"
           ],
-          "key": "ne-mb-l2-s6-03",
+          "key": "ne-l2-s6-03",
           "stage": 6,
           "number": 3
         },
@@ -2773,7 +2773,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
           "answers": [
             "find"
           ],
-          "key": "ne-mb-l2-s6-04",
+          "key": "ne-l2-s6-04",
           "stage": 6,
           "number": 4
         },
@@ -2800,7 +2800,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
             "find",
             "who"
           ],
-          "key": "ne-mb-l2-s6-05",
+          "key": "ne-l2-s6-05",
           "stage": 6,
           "number": 5
         },
@@ -2817,7 +2817,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
           "answers": [
             "called"
           ],
-          "key": "ne-mb-l2-s6-06",
+          "key": "ne-l2-s6-06",
           "stage": 6,
           "number": 6
         },
@@ -2834,7 +2834,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
           "answers": [
             "evolved"
           ],
-          "key": "ne-mb-l2-s6-07",
+          "key": "ne-l2-s6-07",
           "stage": 6,
           "number": 7
         },
@@ -2851,7 +2851,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
           "answers": [
             "was"
           ],
-          "key": "ne-mb-l2-s6-08",
+          "key": "ne-l2-s6-08",
           "stage": 6,
           "number": 8
         },
@@ -2868,7 +2868,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
           "answers": [
             "was born"
           ],
-          "key": "ne-mb-l2-s6-09",
+          "key": "ne-l2-s6-09",
           "stage": 6,
           "number": 9
         },
@@ -2885,7 +2885,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
           "answers": [
             "interested"
           ],
-          "key": "ne-mb-l2-s6-10",
+          "key": "ne-l2-s6-10",
           "stage": 6,
           "number": 10
         },
@@ -2902,7 +2902,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
           "answers": [
             "to attend"
           ],
-          "key": "ne-mb-l2-s6-11",
+          "key": "ne-l2-s6-11",
           "stage": 6,
           "number": 11
         },
@@ -2919,7 +2919,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
           "answers": [
             "to get"
           ],
-          "key": "ne-mb-l2-s6-12",
+          "key": "ne-l2-s6-12",
           "stage": 6,
           "number": 12
         },
@@ -2936,7 +2936,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
           "answers": [
             "that"
           ],
-          "key": "ne-mb-l2-s6-13",
+          "key": "ne-l2-s6-13",
           "stage": 6,
           "number": 13
         },
@@ -2953,7 +2953,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
           "answers": [
             "interesting"
           ],
-          "key": "ne-mb-l2-s6-14",
+          "key": "ne-l2-s6-14",
           "stage": 6,
           "number": 14
         },
@@ -2975,7 +2975,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
             "who",
             "to change"
           ],
-          "key": "ne-mb-l2-s6-15",
+          "key": "ne-l2-s6-15",
           "stage": 6,
           "number": 15
         },
@@ -3002,7 +3002,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
             "closed",
             "examining"
           ],
-          "key": "ne-mb-l2-s6-16",
+          "key": "ne-l2-s6-16",
           "stage": 6,
           "number": 16
         },
@@ -3019,7 +3019,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
           "answers": [
             "educating"
           ],
-          "key": "ne-mb-l2-s6-17",
+          "key": "ne-l2-s6-17",
           "stage": 6,
           "number": 17
         },
@@ -3036,7 +3036,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
           "answers": [
             "sparked"
           ],
-          "key": "ne-mb-l2-s6-18",
+          "key": "ne-l2-s6-18",
           "stage": 6,
           "number": 18
         },
@@ -3058,7 +3058,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
             "reading",
             "speaking"
           ],
-          "key": "ne-mb-l2-s6-19",
+          "key": "ne-l2-s6-19",
           "stage": 6,
           "number": 19
         },
@@ -3075,7 +3075,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
           "answers": [
             "that"
           ],
-          "key": "ne-mb-l2-s6-20",
+          "key": "ne-l2-s6-20",
           "stage": 6,
           "number": 20
         },
@@ -3097,7 +3097,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
             "to see",
             "trained"
           ],
-          "key": "ne-mb-l2-s6-21",
+          "key": "ne-l2-s6-21",
           "stage": 6,
           "number": 21
         },
@@ -3119,7 +3119,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
             "to devote",
             "developing"
           ],
-          "key": "ne-mb-l2-s6-22",
+          "key": "ne-l2-s6-22",
           "stage": 6,
           "number": 22
         },
@@ -3141,7 +3141,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
             "to use",
             "make"
           ],
-          "key": "ne-mb-l2-s6-23",
+          "key": "ne-l2-s6-23",
           "stage": 6,
           "number": 23
         },
@@ -3158,7 +3158,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
           "answers": [
             "set"
           ],
-          "key": "ne-mb-l2-s6-24",
+          "key": "ne-l2-s6-24",
           "stage": 6,
           "number": 24
         },
@@ -3175,7 +3175,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
           "answers": [
             "be changed"
           ],
-          "key": "ne-mb-l2-s6-25",
+          "key": "ne-l2-s6-25",
           "stage": 6,
           "number": 25
         },
@@ -3207,7 +3207,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
             "held",
             "educate"
           ],
-          "key": "ne-mb-l2-s6-26",
+          "key": "ne-l2-s6-26",
           "stage": 6,
           "number": 26
         },
@@ -3224,7 +3224,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
           "answers": [
             "also visited"
           ],
-          "key": "ne-mb-l2-s6-27",
+          "key": "ne-l2-s6-27",
           "stage": 6,
           "number": 27
         },
@@ -3241,7 +3241,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
           "answers": [
             "talked"
           ],
-          "key": "ne-mb-l2-s6-28",
+          "key": "ne-l2-s6-28",
           "stage": 6,
           "number": 28
         },
@@ -3258,7 +3258,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
           "answers": [
             "began"
           ],
-          "key": "ne-mb-l2-s6-29",
+          "key": "ne-l2-s6-29",
           "stage": 6,
           "number": 29
         },
@@ -3275,7 +3275,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
           "answers": [
             "were"
           ],
-          "key": "ne-mb-l2-s6-30",
+          "key": "ne-l2-s6-30",
           "stage": 6,
           "number": 30
         },
@@ -3302,7 +3302,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
             "stepping",
             "realizing"
           ],
-          "key": "ne-mb-l2-s6-31",
+          "key": "ne-l2-s6-31",
           "stage": 6,
           "number": 31
         },
@@ -3319,7 +3319,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
           "answers": [
             "analyzing"
           ],
-          "key": "ne-mb-l2-s6-32",
+          "key": "ne-l2-s6-32",
           "stage": 6,
           "number": 32
         },
@@ -3336,7 +3336,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
           "answers": [
             "to observe"
           ],
-          "key": "ne-mb-l2-s6-33",
+          "key": "ne-l2-s6-33",
           "stage": 6,
           "number": 33
         },
@@ -3353,7 +3353,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
           "answers": [
             "to educate"
           ],
-          "key": "ne-mb-l2-s6-34",
+          "key": "ne-l2-s6-34",
           "stage": 6,
           "number": 34
         },
@@ -3370,7 +3370,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
           "answers": [
             "came"
           ],
-          "key": "ne-mb-l2-s6-35",
+          "key": "ne-l2-s6-35",
           "stage": 6,
           "number": 35
         },
@@ -3392,7 +3392,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
             "that",
             "were"
           ],
-          "key": "ne-mb-l2-s6-36",
+          "key": "ne-l2-s6-36",
           "stage": 6,
           "number": 36
         },
@@ -3414,7 +3414,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
             "Based",
             "like"
           ],
-          "key": "ne-mb-l2-s6-37",
+          "key": "ne-l2-s6-37",
           "stage": 6,
           "number": 37
         },
@@ -3436,7 +3436,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
             "did",
             "miss"
           ],
-          "key": "ne-mb-l2-s6-38",
+          "key": "ne-l2-s6-38",
           "stage": 6,
           "number": 38
         },
@@ -3458,7 +3458,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
             "to train",
             "to notice"
           ],
-          "key": "ne-mb-l2-s6-39",
+          "key": "ne-l2-s6-39",
           "stage": 6,
           "number": 39
         },
@@ -3475,7 +3475,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
           "answers": [
             "created"
           ],
-          "key": "ne-mb-l2-s6-40",
+          "key": "ne-l2-s6-40",
           "stage": 6,
           "number": 40
         },
@@ -3497,7 +3497,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
             "gave",
             "using"
           ],
-          "key": "ne-mb-l2-s6-41",
+          "key": "ne-l2-s6-41",
           "stage": 6,
           "number": 41
         },
@@ -3514,7 +3514,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
           "answers": [
             "reading"
           ],
-          "key": "ne-mb-l2-s6-42",
+          "key": "ne-l2-s6-42",
           "stage": 6,
           "number": 42
         },
@@ -3531,7 +3531,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
           "answers": [
             "determine"
           ],
-          "key": "ne-mb-l2-s6-43",
+          "key": "ne-l2-s6-43",
           "stage": 6,
           "number": 43
         },
@@ -3558,7 +3558,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
             "to observe",
             "destroying"
           ],
-          "key": "ne-mb-l2-s6-44",
+          "key": "ne-l2-s6-44",
           "stage": 6,
           "number": 44
         },
@@ -3580,7 +3580,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
             "developing",
             "to solve"
           ],
-          "key": "ne-mb-l2-s6-45",
+          "key": "ne-l2-s6-45",
           "stage": 6,
           "number": 45
         },
@@ -3597,7 +3597,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
           "answers": [
             "was"
           ],
-          "key": "ne-mb-l2-s6-46",
+          "key": "ne-l2-s6-46",
           "stage": 6,
           "number": 46
         },
@@ -3614,7 +3614,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
           "answers": [
             "being attended"
           ],
-          "key": "ne-mb-l2-s6-47",
+          "key": "ne-l2-s6-47",
           "stage": 6,
           "number": 47
         },
@@ -3631,7 +3631,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
           "answers": [
             "also attended"
           ],
-          "key": "ne-mb-l2-s6-48",
+          "key": "ne-l2-s6-48",
           "stage": 6,
           "number": 48
         },
@@ -3648,7 +3648,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
           "answers": [
             "died"
           ],
-          "key": "ne-mb-l2-s6-49",
+          "key": "ne-l2-s6-49",
           "stage": 6,
           "number": 49
         },
@@ -3675,7 +3675,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
             "to enter",
             "were"
           ],
-          "key": "ne-mb-l2-s6-50",
+          "key": "ne-l2-s6-50",
           "stage": 6,
           "number": 50
         },
@@ -3692,7 +3692,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
           "answers": [
             "that"
           ],
-          "key": "ne-mb-l2-s6-51",
+          "key": "ne-l2-s6-51",
           "stage": 6,
           "number": 51
         }
@@ -3704,7 +3704,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
       "instruction": "어색한 표현을 찾아 쓰고 알맞게 고쳐 쓰세요.",
       "items": [
         {
-          "key": "ne-mb-l2-s7-context-01",
+          "key": "ne-l2-s7-context-01",
           "stage": 7,
           "number": 1,
           "kind": "correction_pairs",
@@ -3722,7 +3722,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
           ]
         },
         {
-          "key": "ne-mb-l2-s7-context-02",
+          "key": "ne-l2-s7-context-02",
           "stage": 7,
           "number": 2,
           "kind": "correction_pairs",
@@ -3740,7 +3740,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
           ]
         },
         {
-          "key": "ne-mb-l2-s7-context-03",
+          "key": "ne-l2-s7-context-03",
           "stage": 7,
           "number": 3,
           "kind": "correction_pairs",
@@ -3758,7 +3758,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
           ]
         },
         {
-          "key": "ne-mb-l2-s7-context-04",
+          "key": "ne-l2-s7-context-04",
           "stage": 7,
           "number": 4,
           "kind": "correction_pairs",
@@ -3776,7 +3776,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
           ]
         },
         {
-          "key": "ne-mb-l2-s7-grammar-01",
+          "key": "ne-l2-s7-grammar-01",
           "stage": 7,
           "number": 5,
           "kind": "correction_pairs",
@@ -3794,7 +3794,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
           ]
         },
         {
-          "key": "ne-mb-l2-s7-grammar-02",
+          "key": "ne-l2-s7-grammar-02",
           "stage": 7,
           "number": 6,
           "kind": "correction_pairs",
@@ -3812,7 +3812,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
           ]
         },
         {
-          "key": "ne-mb-l2-s7-grammar-03",
+          "key": "ne-l2-s7-grammar-03",
           "stage": 7,
           "number": 7,
           "kind": "correction_pairs",
@@ -3830,7 +3830,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
           ]
         },
         {
-          "key": "ne-mb-l2-s7-grammar-04",
+          "key": "ne-l2-s7-grammar-04",
           "stage": 7,
           "number": 8,
           "kind": "correction_pairs",
@@ -3878,7 +3878,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
             "criminals never leave a crime scene",
             "without leaving behind traces of their presence"
           ],
-          "key": "ne-mb-l2-s8-01",
+          "key": "ne-l2-s8-01",
           "stage": 8,
           "number": 1
         },
@@ -3898,7 +3898,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
           "answers": [
             "the traces might be tiny"
           ],
-          "key": "ne-mb-l2-s8-02",
+          "key": "ne-l2-s8-02",
           "stage": 8,
           "number": 2
         },
@@ -3919,7 +3919,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
           "answers": [
             "detectives carefully collect all the possible evidence"
           ],
-          "key": "ne-mb-l2-s8-03",
+          "key": "ne-l2-s8-03",
           "stage": 8,
           "number": 3
         },
@@ -3941,7 +3941,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
           "answers": [
             "scientists then analyze everything and find some clues"
           ],
-          "key": "ne-mb-l2-s8-04",
+          "key": "ne-l2-s8-04",
           "stage": 8,
           "number": 4
         },
@@ -3968,7 +3968,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
             "the clues are used to find the person",
             "the who committed crime"
           ],
-          "key": "ne-mb-l2-s8-05",
+          "key": "ne-l2-s8-05",
           "stage": 8,
           "number": 5
         },
@@ -3988,7 +3988,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
           "answers": [
             "this process is called forensic science"
           ],
-          "key": "ne-mb-l2-s8-06",
+          "key": "ne-l2-s8-06",
           "stage": 8,
           "number": 6
         },
@@ -4014,7 +4014,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
             "it has evolved",
             "thanks to the contributions of many researchers"
           ],
-          "key": "ne-mb-l2-s8-07",
+          "key": "ne-l2-s8-07",
           "stage": 8,
           "number": 7
         },
@@ -4039,7 +4039,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
             "one of the most important people",
             "was Frances Glessner Lee"
           ],
-          "key": "ne-mb-l2-s8-08",
+          "key": "ne-l2-s8-08",
           "stage": 8,
           "number": 8
         },
@@ -4061,7 +4061,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
           "answers": [
             "Frances Glessner Lee was born into a rich family"
           ],
-          "key": "ne-mb-l2-s8-09",
+          "key": "ne-l2-s8-09",
           "stage": 8,
           "number": 9
         },
@@ -4081,7 +4081,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
           "answers": [
             "she became interested in medicine"
           ],
-          "key": "ne-mb-l2-s8-10",
+          "key": "ne-l2-s8-10",
           "stage": 8,
           "number": 10
         },
@@ -4109,7 +4109,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
             "her dream was to attend Harvard Medical School",
             "the school did not accept women"
           ],
-          "key": "ne-mb-l2-s8-11",
+          "key": "ne-l2-s8-11",
           "stage": 8,
           "number": 11
         },
@@ -4131,7 +4131,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
           "answers": [
             "she had no choice but to get married"
           ],
-          "key": "ne-mb-l2-s8-12",
+          "key": "ne-l2-s8-12",
           "stage": 8,
           "number": 12
         },
@@ -4165,7 +4165,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
             "it was not until she was in her fifties",
             "was in that Lee able to start a career medicine"
           ],
-          "key": "ne-mb-l2-s8-13",
+          "key": "ne-l2-s8-13",
           "stage": 8,
           "number": 13
         },
@@ -4191,7 +4191,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
           "answers": [
             "Lee heard many interesting stories of real-life crime from her friend"
           ],
-          "key": "ne-mb-l2-s8-14",
+          "key": "ne-l2-s8-14",
           "stage": 8,
           "number": 14
         },
@@ -4216,7 +4216,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
             "he was a medical examiner",
             "who wanted to change the investigation system"
           ],
-          "key": "ne-mb-l2-s8-15",
+          "key": "ne-l2-s8-15",
           "stage": 8,
           "number": 15
         },
@@ -4257,7 +4257,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
             "closed many death cases",
             "without examining the bodies"
           ],
-          "key": "ne-mb-l2-s8-16",
+          "key": "ne-l2-s8-16",
           "stage": 8,
           "number": 16
         },
@@ -4284,7 +4284,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
             "he also had a passion",
             "for educating medical students in legal medicine"
           ],
-          "key": "ne-mb-l2-s8-17",
+          "key": "ne-l2-s8-17",
           "stage": 8,
           "number": 17
         },
@@ -4306,7 +4306,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
           "answers": [
             "Magrath's passion sparked Lee's interest in legal medicine"
           ],
-          "key": "ne-mb-l2-s8-18",
+          "key": "ne-l2-s8-18",
           "stage": 8,
           "number": 18
         },
@@ -4336,7 +4336,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
             "Lee started studying legal medicine",
             "by reading books and speaking with experts"
           ],
-          "key": "ne-mb-l2-s8-19",
+          "key": "ne-l2-s8-19",
           "stage": 8,
           "number": 19
         },
@@ -4358,7 +4358,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
           "answers": [
             "she believed that medical examiner systems would be adopted"
           ],
-          "key": "ne-mb-l2-s8-20",
+          "key": "ne-l2-s8-20",
           "stage": 8,
           "number": 20
         },
@@ -4380,7 +4380,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
           "answers": [
             "more she wanted to see young medical students trained"
           ],
-          "key": "ne-mb-l2-s8-21",
+          "key": "ne-l2-s8-21",
           "stage": 8,
           "number": 21
         },
@@ -4405,7 +4405,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
           "answers": [
             "she decided to devote the rest of her life to developing this field"
           ],
-          "key": "ne-mb-l2-s8-22",
+          "key": "ne-l2-s8-22",
           "stage": 8,
           "number": 22
         },
@@ -4435,7 +4435,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
             "she persuaded Harvard University to use her fortune",
             "a to make new branch of study"
           ],
-          "key": "ne-mb-l2-s8-23",
+          "key": "ne-l2-s8-23",
           "stage": 8,
           "number": 23
         },
@@ -4459,7 +4459,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
           "answers": [
             "she also helped set up a library with rare books and documents"
           ],
-          "key": "ne-mb-l2-s8-24",
+          "key": "ne-l2-s8-24",
           "stage": 8,
           "number": 24
         },
@@ -4486,7 +4486,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
             "laws had to be changed",
             "had so that medical examiners independent power"
           ],
-          "key": "ne-mb-l2-s8-25",
+          "key": "ne-l2-s8-25",
           "stage": 8,
           "number": 25
         },
@@ -4521,7 +4521,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
             "she used the World's Fair held",
             "to educate the public about the modern medical examiner system"
           ],
-          "key": "ne-mb-l2-s8-26",
+          "key": "ne-l2-s8-26",
           "stage": 8,
           "number": 26
         },
@@ -4541,7 +4541,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
           "answers": [
             "she also visited the governor with the chairman"
           ],
-          "key": "ne-mb-l2-s8-27",
+          "key": "ne-l2-s8-27",
           "stage": 8,
           "number": 27
         },
@@ -4561,7 +4561,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
           "answers": [
             "they talked about the importance of legal medicine"
           ],
-          "key": "ne-mb-l2-s8-28",
+          "key": "ne-l2-s8-28",
           "stage": 8,
           "number": 28
         },
@@ -4583,7 +4583,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
           "answers": [
             "the Legal Medicine department at Harvard began to train future medical examiners"
           ],
-          "key": "ne-mb-l2-s8-29",
+          "key": "ne-l2-s8-29",
           "stage": 8,
           "number": 29
         },
@@ -4605,7 +4605,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
           "answers": [
             "detectives were not careful with potential evidence"
           ],
-          "key": "ne-mb-l2-s8-30",
+          "key": "ne-l2-s8-30",
           "stage": 8,
           "number": 30
         },
@@ -4630,7 +4630,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
             "they often destroyed clues",
             "without realizing it"
           ],
-          "key": "ne-mb-l2-s8-31",
+          "key": "ne-l2-s8-31",
           "stage": 8,
           "number": 31
         },
@@ -4649,7 +4649,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
           "answers": [
             "analyzing the clues later was impossible"
           ],
-          "key": "ne-mb-l2-s8-32",
+          "key": "ne-l2-s8-32",
           "stage": 8,
           "number": 32
         },
@@ -4673,7 +4673,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
             "detectives also had to learn",
             "how to observe crime scenes"
           ],
-          "key": "ne-mb-l2-s8-33",
+          "key": "ne-l2-s8-33",
           "stage": 8,
           "number": 33
         },
@@ -4693,7 +4693,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
           "answers": [
             "a Lee came up with creative tool"
           ],
-          "key": "ne-mb-l2-s8-34",
+          "key": "ne-l2-s8-34",
           "stage": 8,
           "number": 34
         },
@@ -4713,7 +4713,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
           "answers": [
             "her idea came from her hobby"
           ],
-          "key": "ne-mb-l2-s8-35",
+          "key": "ne-l2-s8-35",
           "stage": 8,
           "number": 35
         },
@@ -4742,7 +4742,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
             "she started creating miniatures of crime scenes",
             "that were highly detailed and accurate"
           ],
-          "key": "ne-mb-l2-s8-36",
+          "key": "ne-l2-s8-36",
           "stage": 8,
           "number": 36
         },
@@ -4767,7 +4767,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
             "based on real criminal cases",
             "they included details"
           ],
-          "key": "ne-mb-l2-s8-37",
+          "key": "ne-l2-s8-37",
           "stage": 8,
           "number": 37
         },
@@ -4789,7 +4789,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
           "answers": [
             "Lee did not miss even the smallest detail"
           ],
-          "key": "ne-mb-l2-s8-38",
+          "key": "ne-l2-s8-38",
           "stage": 8,
           "number": 38
         },
@@ -4811,7 +4811,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
           "answers": [
             "she wanted to train detectives to notice tiny clues"
           ],
-          "key": "ne-mb-l2-s8-39",
+          "key": "ne-l2-s8-39",
           "stage": 8,
           "number": 39
         },
@@ -4832,7 +4832,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
           "answers": [
             "she created around twenty miniature scenes"
           ],
-          "key": "ne-mb-l2-s8-40",
+          "key": "ne-l2-s8-40",
           "stage": 8,
           "number": 40
         },
@@ -4864,7 +4864,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
             "gave her first lecture",
             "her using miniature crime scenes"
           ],
-          "key": "ne-mb-l2-s8-41",
+          "key": "ne-l2-s8-41",
           "stage": 8,
           "number": 41
         },
@@ -4890,7 +4890,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
             "while reading case files",
             "the detectives studied the details of the miniature scenes"
           ],
-          "key": "ne-mb-l2-s8-42",
+          "key": "ne-l2-s8-42",
           "stage": 8,
           "number": 42
         },
@@ -4921,7 +4921,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
             "they looked for clues",
             "or in if the scene the miniature resulted from an accident a violent crime"
           ],
-          "key": "ne-mb-l2-s8-43",
+          "key": "ne-l2-s8-43",
           "stage": 8,
           "number": 43
         },
@@ -4955,7 +4955,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
             "a to observe scene",
             "without destroying any evidence"
           ],
-          "key": "ne-mb-l2-s8-44",
+          "key": "ne-l2-s8-44",
           "stage": 8,
           "number": 44
         },
@@ -4977,7 +4977,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
           "answers": [
             "they were able to improve their ability to solve crime cases"
           ],
-          "key": "ne-mb-l2-s8-45",
+          "key": "ne-l2-s8-45",
           "stage": 8,
           "number": 45
         },
@@ -4996,7 +4996,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
           "answers": [
             "Lee's training process was successful"
           ],
-          "key": "ne-mb-l2-s8-46",
+          "key": "ne-l2-s8-46",
           "stage": 8,
           "number": 46
         },
@@ -5019,7 +5019,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
           "answers": [
             "by the annual seminar was being attended detectives"
           ],
-          "key": "ne-mb-l2-s8-47",
+          "key": "ne-l2-s8-47",
           "stage": 8,
           "number": 47
         },
@@ -5039,7 +5039,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
           "answers": [
             "special agents and military staff also attended the seminar"
           ],
-          "key": "ne-mb-l2-s8-48",
+          "key": "ne-l2-s8-48",
           "stage": 8,
           "number": 48
         },
@@ -5058,7 +5058,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
           "answers": [
             "Lee died in 1962,"
           ],
-          "key": "ne-mb-l2-s8-49",
+          "key": "ne-l2-s8-49",
           "stage": 8,
           "number": 49
         },
@@ -5087,7 +5087,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
             "although she had struggled to enter the field",
             "to her contributions forensic science were significant"
           ],
-          "key": "ne-mb-l2-s8-50",
+          "key": "ne-l2-s8-50",
           "stage": 8,
           "number": 50
         }
@@ -5127,7 +5127,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
             "their",
             "presence"
           ],
-          "key": "ne-mb-l2-s9-01",
+          "key": "ne-l2-s9-01",
           "stage": 9,
           "number": 1
         },
@@ -5150,7 +5150,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
             "more",
             "obvious"
           ],
-          "key": "ne-mb-l2-s9-02",
+          "key": "ne-l2-s9-02",
           "stage": 9,
           "number": 2
         },
@@ -5175,7 +5175,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
             "possible",
             "evidence"
           ],
-          "key": "ne-mb-l2-s9-03",
+          "key": "ne-l2-s9-03",
           "stage": 9,
           "number": 3
         },
@@ -5198,7 +5198,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
             "some",
             "clues"
           ],
-          "key": "ne-mb-l2-s9-04",
+          "key": "ne-l2-s9-04",
           "stage": 9,
           "number": 4
         },
@@ -5229,7 +5229,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
             "the",
             "crime."
           ],
-          "key": "ne-mb-l2-s9-05",
+          "key": "ne-l2-s9-05",
           "stage": 9,
           "number": 5
         },
@@ -5250,7 +5250,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
             "forensic",
             "science."
           ],
-          "key": "ne-mb-l2-s9-06",
+          "key": "ne-l2-s9-06",
           "stage": 9,
           "number": 6
         },
@@ -5275,7 +5275,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
             "many",
             "researchers"
           ],
-          "key": "ne-mb-l2-s9-07",
+          "key": "ne-l2-s9-07",
           "stage": 9,
           "number": 7
         },
@@ -5299,7 +5299,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
             "Glessner",
             "Lee"
           ],
-          "key": "ne-mb-l2-s9-08",
+          "key": "ne-l2-s9-08",
           "stage": 9,
           "number": 8
         },
@@ -5323,7 +5323,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
             "rich",
             "family"
           ],
-          "key": "ne-mb-l2-s9-09",
+          "key": "ne-l2-s9-09",
           "stage": 9,
           "number": 9
         },
@@ -5343,7 +5343,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
             "in",
             "medicine"
           ],
-          "key": "ne-mb-l2-s9-10",
+          "key": "ne-l2-s9-10",
           "stage": 9,
           "number": 10
         },
@@ -5369,7 +5369,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
             "accept",
             "women"
           ],
-          "key": "ne-mb-l2-s9-11",
+          "key": "ne-l2-s9-11",
           "stage": 9,
           "number": 11
         },
@@ -5393,7 +5393,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
             "get",
             "married."
           ],
-          "key": "ne-mb-l2-s9-12",
+          "key": "ne-l2-s9-12",
           "stage": 9,
           "number": 12
         },
@@ -5427,7 +5427,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
             "a",
             "career"
           ],
-          "key": "ne-mb-l2-s9-13",
+          "key": "ne-l2-s9-13",
           "stage": 9,
           "number": 13
         },
@@ -5453,7 +5453,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
             "real-life",
             "crime"
           ],
-          "key": "ne-mb-l2-s9-14",
+          "key": "ne-l2-s9-14",
           "stage": 9,
           "number": 14
         },
@@ -5484,7 +5484,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
             "investigation",
             "system."
           ],
-          "key": "ne-mb-l2-s9-15",
+          "key": "ne-l2-s9-15",
           "stage": 9,
           "number": 15
         },
@@ -5523,7 +5523,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
             "the",
             "bodies"
           ],
-          "key": "ne-mb-l2-s9-16",
+          "key": "ne-l2-s9-16",
           "stage": 9,
           "number": 16
         },
@@ -5548,7 +5548,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
             "medical",
             "students"
           ],
-          "key": "ne-mb-l2-s9-17",
+          "key": "ne-l2-s9-17",
           "stage": 9,
           "number": 17
         },
@@ -5573,7 +5573,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
             "legal",
             "medicine."
           ],
-          "key": "ne-mb-l2-s9-18",
+          "key": "ne-l2-s9-18",
           "stage": 9,
           "number": 18
         },
@@ -5602,7 +5602,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
             "with",
             "experts"
           ],
-          "key": "ne-mb-l2-s9-19",
+          "key": "ne-l2-s9-19",
           "stage": 9,
           "number": 19
         },
@@ -5629,7 +5629,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
             "more",
             "widely"
           ],
-          "key": "ne-mb-l2-s9-20",
+          "key": "ne-l2-s9-20",
           "stage": 9,
           "number": 20
         },
@@ -5654,7 +5654,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
             "students",
             "trained"
           ],
-          "key": "ne-mb-l2-s9-21",
+          "key": "ne-l2-s9-21",
           "stage": 9,
           "number": 21
         },
@@ -5685,7 +5685,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
             "this",
             "field."
           ],
-          "key": "ne-mb-l2-s9-22",
+          "key": "ne-l2-s9-22",
           "stage": 9,
           "number": 22
         },
@@ -5716,7 +5716,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
             "of",
             "study"
           ],
-          "key": "ne-mb-l2-s9-23",
+          "key": "ne-l2-s9-23",
           "stage": 9,
           "number": 23
         },
@@ -5745,7 +5745,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
             "and",
             "documents"
           ],
-          "key": "ne-mb-l2-s9-24",
+          "key": "ne-l2-s9-24",
           "stage": 9,
           "number": 24
         },
@@ -5778,7 +5778,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
             "independent",
             "power"
           ],
-          "key": "ne-mb-l2-s9-25",
+          "key": "ne-l2-s9-25",
           "stage": 9,
           "number": 25
         },
@@ -5816,7 +5816,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
             "the",
             "public"
           ],
-          "key": "ne-mb-l2-s9-26",
+          "key": "ne-l2-s9-26",
           "stage": 9,
           "number": 26
         },
@@ -5838,7 +5838,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
             "the",
             "chairman"
           ],
-          "key": "ne-mb-l2-s9-27",
+          "key": "ne-l2-s9-27",
           "stage": 9,
           "number": 27
         },
@@ -5863,7 +5863,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
             "legal",
             "medicine."
           ],
-          "key": "ne-mb-l2-s9-28",
+          "key": "ne-l2-s9-28",
           "stage": 9,
           "number": 28
         },
@@ -5885,7 +5885,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
             "medical",
             "examiners"
           ],
-          "key": "ne-mb-l2-s9-29",
+          "key": "ne-l2-s9-29",
           "stage": 9,
           "number": 29
         },
@@ -5908,7 +5908,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
             "potential",
             "evidence"
           ],
-          "key": "ne-mb-l2-s9-30",
+          "key": "ne-l2-s9-30",
           "stage": 9,
           "number": 30
         },
@@ -5932,7 +5932,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
             "realizing",
             "it"
           ],
-          "key": "ne-mb-l2-s9-31",
+          "key": "ne-l2-s9-31",
           "stage": 9,
           "number": 31
         },
@@ -5952,7 +5952,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
             "was",
             "impossible"
           ],
-          "key": "ne-mb-l2-s9-32",
+          "key": "ne-l2-s9-32",
           "stage": 9,
           "number": 32
         },
@@ -5982,7 +5982,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
             "crime",
             "scenes"
           ],
-          "key": "ne-mb-l2-s9-33",
+          "key": "ne-l2-s9-33",
           "stage": 9,
           "number": 33
         },
@@ -6004,7 +6004,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
             "creative",
             "tool"
           ],
-          "key": "ne-mb-l2-s9-34",
+          "key": "ne-l2-s9-34",
           "stage": 9,
           "number": 34
         },
@@ -6024,7 +6024,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
             "her",
             "hobby"
           ],
-          "key": "ne-mb-l2-s9-35",
+          "key": "ne-l2-s9-35",
           "stage": 9,
           "number": 35
         },
@@ -6058,7 +6058,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
             "and",
             "accurate."
           ],
-          "key": "ne-mb-l2-s9-36",
+          "key": "ne-l2-s9-36",
           "stage": 9,
           "number": 36
         },
@@ -6089,7 +6089,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
             "blood",
             "stains."
           ],
-          "key": "ne-mb-l2-s9-37",
+          "key": "ne-l2-s9-37",
           "stage": 9,
           "number": 37
         },
@@ -6113,7 +6113,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
             "smallest",
             "detail"
           ],
-          "key": "ne-mb-l2-s9-38",
+          "key": "ne-l2-s9-38",
           "stage": 9,
           "number": 38
         },
@@ -6140,7 +6140,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
             "tiny",
             "clues."
           ],
-          "key": "ne-mb-l2-s9-39",
+          "key": "ne-l2-s9-39",
           "stage": 9,
           "number": 39
         },
@@ -6163,7 +6163,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
             "miniature",
             "scenes"
           ],
-          "key": "ne-mb-l2-s9-40",
+          "key": "ne-l2-s9-40",
           "stage": 9,
           "number": 40
         },
@@ -6198,7 +6198,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
             "crime",
             "scenes"
           ],
-          "key": "ne-mb-l2-s9-41",
+          "key": "ne-l2-s9-41",
           "stage": 9,
           "number": 41
         },
@@ -6231,7 +6231,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
             "miniature",
             "scenes."
           ],
-          "key": "ne-mb-l2-s9-42",
+          "key": "ne-l2-s9-42",
           "stage": 9,
           "number": 42
         },
@@ -6272,7 +6272,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
             "violent",
             "crime"
           ],
-          "key": "ne-mb-l2-s9-43",
+          "key": "ne-l2-s9-43",
           "stage": 9,
           "number": 43
         },
@@ -6308,7 +6308,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
             "any",
             "evidence"
           ],
-          "key": "ne-mb-l2-s9-44",
+          "key": "ne-l2-s9-44",
           "stage": 9,
           "number": 44
         },
@@ -6337,7 +6337,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
             "crime",
             "cases"
           ],
-          "key": "ne-mb-l2-s9-45",
+          "key": "ne-l2-s9-45",
           "stage": 9,
           "number": 45
         },
@@ -6357,7 +6357,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
             "was",
             "successful."
           ],
-          "key": "ne-mb-l2-s9-46",
+          "key": "ne-l2-s9-46",
           "stage": 9,
           "number": 46
         },
@@ -6381,7 +6381,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
             "by",
             "detectives"
           ],
-          "key": "ne-mb-l2-s9-47",
+          "key": "ne-l2-s9-47",
           "stage": 9,
           "number": 47
         },
@@ -6408,7 +6408,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
             "the",
             "seminar."
           ],
-          "key": "ne-mb-l2-s9-48",
+          "key": "ne-l2-s9-48",
           "stage": 9,
           "number": 48
         },
@@ -6423,7 +6423,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
             "Lee",
             "died"
           ],
-          "key": "ne-mb-l2-s9-49",
+          "key": "ne-l2-s9-49",
           "stage": 9,
           "number": 49
         },
@@ -6458,7 +6458,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
             "were",
             "significant."
           ],
-          "key": "ne-mb-l2-s9-50",
+          "key": "ne-l2-s9-50",
           "stage": 9,
           "number": 50
         },
@@ -6487,7 +6487,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
             "forensic",
             "science"
           ],
-          "key": "ne-mb-l2-s9-51",
+          "key": "ne-l2-s9-51",
           "stage": 9,
           "number": 51
         }
