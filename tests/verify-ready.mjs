@@ -112,7 +112,9 @@ assert.match(app,/marks\[index\]===['"]eliminated['"][\s\S]*filter\(value=>value
 assert.match(app,/combinationChoiceParts[\s\S]*choice-separator/,'Grammar and vocabulary combination choices are not visually separated');
 assert.match(edge,/inferredChoiceParts[\s\S]*row\.length === labels\.length/,'Unambiguous multi-blank choice columns are not preserved');
 assert.match(edge,/inferredMultiSelect[\s\S]*payload\[answerKey\]\.length > 1/,'Multiple-answer questions still depend on a fragile imported flag');
-assert.match(edge,/answerWordCount[\s\S]*wordCount: answerWordCount/,'Written answer fields do not carry verified per-slot word counts');
+const publicQuestionSource=edge.match(/function publicQuestion[\s\S]*?\n\}/)?.[0]||'';
+assert.doesNotMatch(publicQuestionSource,/wordCount\s*:/,'Private answer-derived word counts leak through the student Question API');
+assert.match(edge,/privateSlots[\s\S]*wordCount:[\s\S]*rubric/,'Private word-count validation metadata is missing from AI grading');
 assert.match(edge,/expandedTargetRanges[\s\S]*off\|on\|up\|out/,'Phrasal-verb pointers can still be truncated to the verb token');
 assert.match(app,/hasWorkbook[\s\S]*data-start-workbook/,'The interactive Lesson 1 Workbook is not reachable beside its Passage');
 assert.doesNotMatch(app,/data-open-workbook|window\.open\([^)]*workbook/i,'Workbook still opens a passive PDF instead of an exercise');
@@ -124,6 +126,9 @@ assert.match(app,/data-workbook-choice-group/,'Workbook inline choice interactio
 assert.match(app,/data-workbook-order-remove[\s\S]*data-workbook-order-add/,'Workbook reorder interaction is missing');
 assert.match(edge,/kind: item\.kind[\s\S]*hints:[\s\S]*groups:[\s\S]*pairCount:/,'Workbook public specs omit renderer fields');
 assert.match(app,/explicitPassageHtml[\s\S]*renderSpec\.legacyAdapter[\s\S]*questionPassageHtml/,'Explicit Question specs do not drive whitelist rendering');
+const explicitPassageSource=app.match(/function explicitPassageHtml[^\n]+/)?.[0]||'';
+assert.ok(explicitPassageSource.indexOf('if(annotations.length)')<explicitPassageSource.indexOf("source==='blocks'"),'Block provenance bypasses the validated annotation overlay');
+assert.doesNotMatch(app.match(/function writtenSlotsHtml[^\n]+/)?.[0]||'',/wordCount/,'Answer-derived word counts are exposed as input placeholders');
 assert.match(app,/slotResults[\s\S]*틀린 부분 다시 풀기[\s\S]*event\.key!==['"]Enter['"]/,'Workbook does not identify the exact correction or support keyboard progression');
 assert.match(edge,/slotResults = responses\.map[\s\S]*slotResults\.every\(Boolean\)[\s\S]*slotResults/,'Workbook grading does not report correctness per blank');
 assert.match(workbookMigration,/create table if not exists public\.ready_workbook_attempts[\s\S]*ready_workbook_attempts_are_immutable[\s\S]*before update or delete/,'Workbook attempts must remain append-only');

@@ -614,8 +614,10 @@ function publicQuestion(row: any, passageText = "", studentState: { bookmarked?:
   if (!["multiple_choice", "written_response"].includes(type)) throw new ApiError(500, "지원하지 않는 문제 형식입니다.");
   const acceptedKey = "accepted" + "_answers", answerKey = "ans" + "wer";
   const acceptedSlots = Array.isArray(payload[acceptedKey]) ? payload[acceptedKey] : [];
-  const storedResponseSlots = (Array.isArray(payload.response_slots) ? payload.response_slots : []).slice(0, 12).map((slot: any, index: number) => ({ label: clean(slot?.label, 80) || `답 ${index + 1}`, wordCount: Number(slot?.word_count) || answerWordCount(acceptedSlots[index]) }));
-  const guideSlots = writingGuide?.slotLabels?.map((label: string, index: number) => ({ label, wordCount: answerWordCount(acceptedSlots[index]) })) || [];
+  // Slot counts derived from the private answer key are validation metadata,
+  // never student hints. Explicit word-count conditions remain in writingGuide.
+  const storedResponseSlots = (Array.isArray(payload.response_slots) ? payload.response_slots : []).slice(0, 12).map((slot: any, index: number) => ({ label: clean(slot?.label, 80) || `답 ${index + 1}` }));
+  const guideSlots = writingGuide?.slotLabels?.map((label: string) => ({ label })) || [];
   const responseSlots = storedResponseSlots.length && guideSlots.length !== storedResponseSlots.length ? storedResponseSlots : guideSlots.length ? guideSlots : storedResponseSlots;
   const storedSkill = clean(payload.skill, 40);
   let skill = /요약/.test(clean(payload.prompt, 1_000)) ? "summary" : sourceQuestionNo === 125 ? "vocabulary" : storedSkill;
@@ -767,7 +769,8 @@ async function submitAttempt(body: any, session: ReadySession) {
       const used = await db.from("ready_ai_grading_requests").select("id", { count: "exact", head: true }).eq("student_id", student.id).gte("created_at", today.toISOString());
       if (used.error) throw new ApiError(500, used.error.message);
       if ((used.count || 0) >= AI_GRADING_DAILY_LIMIT) throw new ApiError(429, `오늘 AI 채점 ${AI_GRADING_DAILY_LIMIT}회를 모두 사용했습니다.`);
-      const rubric = { prompt: spec.prompt, taskText: spec.writingGuide?.taskText || "", conditions: spec.writingGuide?.conditions || [], wordBank: spec.writingGuide?.wordBank || [], responseSlots: spec.responseSlots || [], referenceAnswers: answer };
+      const privateSlots = (Array.isArray(question.payload?.response_slots) ? question.payload.response_slots : []).map((slot: any, index: number) => ({ label: clean(slot?.label, 80) || `답 ${index + 1}`, wordCount: Number(slot?.word_count) || answerWordCount(question.payload?.accepted_answers?.[index]) }));
+      const rubric = { prompt: spec.prompt, taskText: spec.writingGuide?.taskText || "", conditions: spec.writingGuide?.conditions || [], wordBank: spec.writingGuide?.wordBank || [], responseSlots: privateSlots, referenceAnswers: answer };
       const pending = rows<any>(await db.from("ready_ai_grading_requests").insert({ student_id: student.id, exam_id: examId, question_id: question.id, response, rubric_snapshot: rubric, status: "pending" }).select("id").single());
       aiRequestId = pending.id;
       try {

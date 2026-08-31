@@ -30,7 +30,8 @@ if(objective.length&&!allowLegacy){
   const finalObjective=bundle?.pipeline_validation?.objective;
   if(!finalObjective||Number(finalObjective.ready)!==objective.length)throw new Error('Final objective validation count does not match the import bundle.');
   if(Number(finalObjective.ready)+Number(finalObjective.dropped)!==Number(finalObjective.source))throw new Error('Final objective validation totals are inconsistent.');
-  if(Number(finalObjective.deterministic_ready)+Number(finalObjective.ai_recovered)!==Number(finalObjective.ready))throw new Error('Objective recovery totals are inconsistent.');
+  const deterministicRetained=Number(finalObjective.deterministic_retained ?? finalObjective.deterministic_ready);
+  if(deterministicRetained+Number(finalObjective.ai_recovered)!==Number(finalObjective.ready))throw new Error('Objective recovery totals are inconsistent.');
   if(Number(finalObjective.ai_attempted)!==Number(finalObjective.source)-Number(finalObjective.deterministic_ready))throw new Error('Objective AI fallback must process deterministic drops only.');
   if(Number(finalObjective.ai_attempted)>0){
     const gate=bundle.ai_objective_fallback;

@@ -1,8 +1,12 @@
-const compact=value=>String(value||'').normalize('NFKC').replace(/\s+/g,' ').trim();
+// Compatibility normalization turns semantic labels such as ⓐ into plain "a".
+// Preserve authored display glyphs; use NFKC only in dedicated comparison code.
+const compact=value=>String(value||'').normalize('NFC').replace(/\s+/g,' ').trim();
 const list=value=>Array.isArray(value)?value:[];
 const BLOCK_KINDS=new Set(['passage','prompt','korean_target','condition','word_bank','choice','summary','answer_template','explanation','annotation_source','stimulus']);
 const LANGUAGES=new Set(['en','ko','mixed','none']);
 const escapeRegExp=value=>String(value||'').replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
+const PLAIN_TAXONOMIES=new Set(['topic','title','main_idea','purpose','emotion','content_true','content_false','unanswerable']);
+const validAnnotationLabel=value=>/^(?:[ⓐ-ⓩ]|\([A-H]\)|[㉠-㉭])$/.test(compact(value));
 
 export const PIPELINE_CONTRACT_VERSION=2;
 export const QUESTION_BLOCK_WHITELISTS=Object.freeze({
@@ -14,7 +18,7 @@ export const QUESTION_BLOCK_WHITELISTS=Object.freeze({
 });
 
 export function sourceContractErrors(payload={},spec={}){
-  const errors=[],contract=payload.pipeline_contract||{},blocks=list(payload.source_blocks),byId=new Map();
+  const errors=[],contract=payload.pipeline_contract||{},blocks=list(payload.source_blocks),byId=new Map(),taxonomy=compact(spec?.taxonomy||payload?.taxonomy);
   if(Number(contract.version)!==PIPELINE_CONTRACT_VERSION)errors.push('pipeline contract version is missing');
   if(!/^[a-f0-9]{64}$/i.test(compact(contract.document_sha256)))errors.push('document provenance hash is missing');
   if(!compact(contract.source_question_identity))errors.push('source question identity is missing');
@@ -53,7 +57,8 @@ export function sourceContractErrors(payload={},spec={}){
   if(/[가-힣]/.test(selectedPassage))errors.push('approved passage contains Korean text');
   if(selectedPassage.length>1800)errors.push('approved passage exceeds the student range budget');
   const hasBlankApparatus=/_{3,}/.test(selectedPassage);
-  if((hasBlankApparatus&&!String(spec?.taxonomy||'').startsWith('blank_'))||/(?:^|\s)→/.test(selectedPassage)||/(?:\(\d+\)\s*)?(?:What|Why|How|Where|When|Who|Which)\b[^?]{0,160}\?/i.test(selectedPassage))errors.push('approved passage contains question apparatus');
+  if((hasBlankApparatus&&!taxonomy.startsWith('blank_'))||/(?:^|\s)→/.test(selectedPassage)||/(?:\(\d+\)\s*)?(?:What|Why|How|Where|When|Who|Which)\b[^?]{0,160}\?/i.test(selectedPassage))errors.push('approved passage contains question apparatus');
+  if(PLAIN_TAXONOMIES.has(taxonomy)&&(/[ⓐ-ⓩ㉠-㉭]/.test(selectedPassage)||/\([A-H]\)\s*(?:\[[^\]]*\/[^\]]*\]|[_＿]{3,})/.test(selectedPassage)))errors.push('plain question contains inactive passage device');
   const passageIds=new Set(list(refs.passage).map(compact));
   const forbidden=['prompt','korean_target','condition','word_bank','summary','answer_template','explanation'];
   for(const role of forbidden)for(const id of list(refs[role]).map(compact))if(passageIds.has(id))errors.push(`${role} source block leaked into approved passage`);
@@ -68,6 +73,7 @@ export function sourceContractErrors(payload={},spec={}){
     const target=compact(annotation?.text);
     if(!target||!selectedPassage.includes(target))errors.push(`annotation ${index+1} is not an exact continuous passage span`);
     const label=compact(annotation?.label),raw=compact(payload._raw_question_text||selectedPassage);
+    if(!validAnnotationLabel(label))errors.push(`annotation ${index+1} has a non-renderable label`);
     if(label&&target){
       const particle='off|on|up|out|in|away|back|over|down|through|around|along';
       const truncated=new RegExp(`${escapeRegExp(label)}\\s*${escapeRegExp(target)}\\s+(${particle})\\b`,'i').exec(raw);

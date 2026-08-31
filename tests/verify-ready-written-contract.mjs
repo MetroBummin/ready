@@ -59,5 +59,10 @@ assert(sourceContractErrors(oversized,oversized.spec).some(item=>item.includes('
 const truncatedPhrase=structuredClone(objective);
 truncatedPhrase.taxonomy='grammar_single_error';truncatedPhrase.spec.renderer='annotated_passage_mcq';truncatedPhrase.target_ranges=[{label:'ⓔ',text:'turned',kind:'target'}];truncatedPhrase._raw_question_text='His location settings were ⓔturned off.';buildObjectiveSourceContract(truncatedPhrase);
 assert(sourceContractErrors(truncatedPhrase,truncatedPhrase.spec).some(item=>item.includes('truncates a marked phrasal span')));
+const inactiveDevice=structuredClone(objective);inactiveDevice.set_text='She believed (A)[that / what] the system worked.';buildObjectiveSourceContract(inactiveDevice);
+assert(sourceContractErrors(inactiveDevice,inactiveDevice.spec).some(item=>item.includes('inactive passage device')));
+const bareLabel=structuredClone(objective);bareLabel.taxonomy='grammar_single_error';bareLabel.spec.renderer='annotated_passage_mcq';bareLabel.set_text='She believed that the system worked.';bareLabel.target_ranges=[{label:'A',text:'that',kind:'target'}];buildObjectiveSourceContract(bareLabel);
+assert.equal(bareLabel.target_ranges[0].label,'(A)');
+assert.equal(sourceContractErrors(bareLabel,bareLabel.spec).some(item=>item.includes('non-renderable label')),false);
 
 console.log('READY written import contract verification passed.');
