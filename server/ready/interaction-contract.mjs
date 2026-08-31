@@ -111,8 +111,10 @@ export function interactionContractErrors(payload={},type='multiple_choice'){
       if(!label)errors.push(`response slot ${index+1} label is missing`);
       if(!['text','textarea'].includes(control))errors.push(`response slot ${index+1} control is invalid`);
       if(!placeholder)errors.push(`response slot ${index+1} placeholder is missing`);
-      const variants=Array.isArray(accepted[index])?accepted[index]:[accepted[index]],counts=new Set(variants.map(wordCount));
-      if(Number(slot?.wordCount)&&(!counts.size||!counts.has(Number(slot.wordCount))))errors.push(`response slot ${index+1} word count does not match publisher answer`);
+      const variants=Array.isArray(accepted[index])?accepted[index]:[accepted[index]],variantCounts=variants.map(wordCount),counts=new Set(variantCounts);
+      if(!variants.length||variantCounts.some(count=>count<1))errors.push(`response slot ${index+1} has no lexical publisher answer`);
+      if(!Number.isInteger(Number(slot?.wordCount))||Number(slot?.wordCount)<1)errors.push(`response slot ${index+1} word count is invalid`);
+      else if(!counts.size||!counts.has(Number(slot.wordCount)))errors.push(`response slot ${index+1} word count does not match publisher answer`);
     });
     const guideKind=text(payload?.writing_guide?.kind).replace(/-/g,'_');
     const expectedLayout=guideKind==='summary'?'summary':guideKind==='arrangement'?'arrangement':guideKind==='multi_correction'?'multi_correction':guideKind==='correction'?'correction':slots.length>1?(list(payload?.writing_guide?.targets).length?'short_answers':'sentence_parts'):'sentence';

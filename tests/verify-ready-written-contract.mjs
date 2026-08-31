@@ -25,6 +25,10 @@ assert(errors({response_slots:[]}).some(item=>item.includes('slot count')));
 assert(errors({response_slots:[{label:'답 1',word_count:1}]}).some(item=>item.includes('word count')));
 assert(errors({conditions:[]}).some(item=>item.includes('conditions missing')));
 
+const emptyPublisherAnswer=structuredClone(base);
+emptyPublisherAnswer.payload.accepted_answers=["'"];
+assert(validateWrittenStructure(emptyPublisherAnswer,{...clean,response_slots:[{label:'답 1',word_count:0}]},canonical).some(item=>item.includes('no lexical publisher answer')));
+
 const overlayBase={type:'written_response',payload:{prompt:'밑줄 친 ⓐ를 고쳐 쓰시오.',_raw_question_text:'The event will ⓐhold tomorrow. (A) 행사는 열릴 것이다.',explanation:'수동태가 필요하다.',accepted_answers:[['be held']]}};
 const overlay={kind:'correction',prompt_text:overlayBase.payload.prompt,passage_mode:'authored_variant',passage_text:'The event will hold tomorrow.',task_text:'',targets:[{label:'ⓐ',text:'hold',canonical_text:'be held'}],conditions:[],word_bank:[],response_slots:[{label:'ⓐ',word_count:2}],summary_text:'',confidence:.99,issues:[]};
 assert.deepEqual(validateWrittenStructure(overlayBase,overlay,'The event will be held tomorrow.'),[]);
@@ -40,6 +44,11 @@ buildStructuredSourceContract({payload:renderPayload,structured:{passage_text:re
 renderPayload.ai_structure={engine:'codex-cli',contract_version:2};
 compileInteractionContract(renderPayload,'written_response');
 assert.equal(validateQuestionSpec(renderPayload,'written_response','available').ready,true);
+const zeroWordSlot=structuredClone(renderPayload);
+zeroWordSlot.accepted_answers=["'"];
+zeroWordSlot.response_slots=[{label:'답',word_count:0}];
+compileInteractionContract(zeroWordSlot,'written_response');
+assert.equal(validateQuestionSpec(zeroWordSlot,'written_response','available').ready,false);
 
 const polluted=structuredClone(renderPayload);
 polluted.source_blocks.find(block=>block.block_kind==='passage').source_text+=' 영작하시오.';

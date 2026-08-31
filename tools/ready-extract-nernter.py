@@ -220,14 +220,20 @@ def normalize_inline_annotations(body: str) -> str:
 
 def accepted_answer_slots(raw: str) -> list:
     value = compact(raw)
-    labelled = list(re.finditer(r"\(([A-C]|\d+)\)\s*", value))
+    # The publisher prints the answer and its explanation in one PDF block.
+    # Bound the machine-readable answer before parsing slot labels so labels
+    # repeated inside the explanation can never become extra response slots.
+    answer_prefix = re.split(r"(?=[가-힣])", value, maxsplit=1)[0].strip()
+    if re.search(r"[.!?]\s+\S", answer_prefix):
+        answer_prefix = re.match(r"^.*?[.!?](?=\s+\S)", answer_prefix).group(0)
+    answer_prefix = re.sub(r"[\s'\"~+]+$", "", answer_prefix).strip()
+    labelled = list(re.finditer(r"\(([A-C]|\d+)\)\s*", answer_prefix))
     if labelled and labelled[0].start() < 20:
         slots = []
         for index, match in enumerate(labelled):
-            end = labelled[index + 1].start() if index + 1 < len(labelled) else len(value)
-            chunk = value[match.end():end]
-            chunk = re.split(r"(?=[가-힣])", chunk, maxsplit=1)[0].strip(" ,;/")
-            alternatives = re.findall(r"(?:또는|or)\s+([A-Za-z][A-Za-z '\-]+)", value[match.end():end])
+            end = labelled[index + 1].start() if index + 1 < len(labelled) else len(answer_prefix)
+            chunk = answer_prefix[match.end():end].strip(" ,;/")
+            alternatives = re.findall(r"(?:또는|or)\s+([A-Za-z][A-Za-z '\-]+)", answer_prefix[match.end():end])
             primary = re.split(r"\s*\((?:또는|or)\b", chunk, maxsplit=1)[0].strip(" ,;/")
             variants = [primary, *[compact(item) for item in alternatives]]
             variants = [item for item in dict.fromkeys(variants) if item]
@@ -237,7 +243,7 @@ def accepted_answer_slots(raw: str) -> list:
     correction = re.findall(r"([①②③④⑤ⓐ-ⓔ])\s*([^,가-힣]{1,80}?)\s*:\s*([^,가-힣]{1,80})(?=,|[가-힣]|$)", value)
     if correction:
         return [compact(f"{ANNOTATION_MARKS.get(label, label)} {fixed}") for label, _wrong, fixed in correction]
-    english = re.split(r"(?=[가-힣])", value, maxsplit=1)[0].strip()
+    english = answer_prefix
     english = re.sub(r"^\[예시답안\]\s*", "", english)
     if english:
         parts = [compact(item) for item in re.split(r"\s*/\s*(?=\(\d+\))", english) if compact(item)]
