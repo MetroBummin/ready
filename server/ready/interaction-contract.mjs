@@ -61,6 +61,7 @@ export function interactionContractErrors(payload={},type='multiple_choice'){
   if(!approved)errors.push('student passage is missing');
   if(!sourceFromSegments&&!segments.some(segment=>segment.kind==='blank'))errors.push('interaction passage renders no source text');
   if(/[가-힣]/.test(sourceFromSegments))errors.push('interaction passage contains Korean text');
+  if(/(?:\([A-H]\)|[ⓐ-ⓩ])\s*\[[^\]]+\/[^\]]+\]/.test(sourceFromSegments))errors.push('interaction passage contains inactive inline-choice apparatus');
 
   if(type==='multiple_choice'){
     if(!['choice_list','choice_matrix','inline_options','position_choice'].includes(text(contract.kind)))errors.push('multiple choice requires a choice interaction');

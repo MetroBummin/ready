@@ -75,6 +75,8 @@ PDF
 
 `passage_id + exam + passage_no + source_question_no + section`이 import identity다. 같은 identity를 다시 import하면 새 Question을 중복 생성하지 않고 기존 row를 갱신한다.
 
+`source.provider`는 `exam4you` 또는 `nernter` 중 하나를 import 시점에 반드시 명시한다. 이 값은 문제의 의미·렌더링·채점에 관여하지 않고 학생 Shorts queue를 만드는 필터 metadata로만 사용한다. 기존 운영 문제는 모두 `exam4you`, 너른터 PDF에서 새로 통과한 문제는 `nernter`다.
+
 학생 풀이와 출제의 최소 단위는 언제나 개별 Question이다. `source.set_id`는 같은 PDF 묶음에서 왔다는 출처 추적값일 뿐, 화면 묶음·풀이 순서·상태 공유의 기준으로 사용하지 않는다. 각 Question은 같은 canonical Passage를 참조할 수 있지만, 학생 화면에는 현재 Question의 `set_text` 또는 최소 장치만 적용한다. 따라서 다른 Question의 빈칸, ⓐ~ⓔ, (A)~(E)가 현재 지문에 섞여서는 안 된다.
 
 ## Validation
@@ -144,6 +146,12 @@ import/debug 전용이며 학생 renderer가 원문 PDF를 다시 읽거나 위�
 prompt·요약·한글 목표문·조건이 passage에 섞였거나, annotation이 `turned off` 같은
 정확한 연속 문자열을 가리키지 않으면 즉시 `DROP`한다. 전체 canonical Passage로
 대체하는 fallback은 금지한다.
+
+포인팅은 문법적 기능을 이루는 고정 표현 전체를 포함해야 한다. 예를 들어 원문이
+`In order to`인데 `In`만 annotation으로 선언되면 span closure 검사에서 `DROP`한다.
+또한 현재 문제의 interaction으로 활성화되지 않은 `(A)[x / y]` 장치가 passage에
+남아 있거나, 내용 일치·불일치 선택지의 핵심 근거 어휘가 승인된 passage 범위에
+전혀 없으면 풀이 범위가 불완전한 것으로 보고 공개하지 않는다.
 
 학생용 원문과 annotation label은 NFC로 보존한다. NFKC는 정답 비교·검색처럼
 호환 문자 차이를 지워야 하는 비공개 비교 경로에서만 사용한다. 원문에 NFKC를

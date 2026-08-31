@@ -16,6 +16,7 @@ const writtenStructurer=read('tools/ready-structure-written-with-codex.mjs');
 const writtenContract=read('tools/ready-written-contract.mjs');
 const sourceContract=read('server/ready/source-contract.mjs');
 const objectiveFallback=read('tools/ready-structure-objective-fallback-with-codex.mjs');
+const pipelineValidator=read('tools/ready-validate-pipeline.mjs');
 const shortsMigration=read('supabase/migrations/20260831113000_ready_shorts_bookmarks_ai_grading.sql');
 
 const operationPattern=/(?:call|readyApi|record)\(['"]([a-z_]+)['"]/g;
@@ -38,7 +39,10 @@ assert.match(writtenStructurer,/codex[\s\S]*--output-schema[\s\S]*confidence>=0\
 assert.match(writtenStructurer,/validateWrittenStructure/,'Written-response structuring bypasses the deterministic contract');
 assert.match(writtenContract,/response_slots\.length!==accepted\.length[\s\S]*word count[\s\S]*continuous student-passage range/,'AI-written specs are not deterministically checked against answers and source text');
 assert.match(sourceContract,/QUESTION_BLOCK_WHITELISTS[\s\S]*block_refs[\s\S]*approved passage contains Korean text/,'Block-first provenance and family whitelist gate is missing');
+assert.match(sourceContract,/FIXED_ANNOTATION_SPANS[\s\S]*truncates the fixed expression/,'Annotation span-closure gate is missing');
+assert.match(sourceContract,/EVIDENCE_TAXONOMIES[\s\S]*no evidence vocabulary/,'Passage evidence-range gate is missing');
 assert.match(objectiveFallback,/import_status==='drop'[\s\S]*callCodex[\s\S]*validateQuestionSpec[\s\S]*status:'drop'/,'Objective deterministic drops do not pass through the one-shot strict AI fallback');
+assert.match(pipelineValidator,/upstreamDrop[\s\S]*upstream extraction or AI structure gate marked the question DROP[\s\S]*continue/,'Final round-trip validation may resurrect an upstream DROP');
 assert.match(shortsMigration,/ready_question_bookmarks[\s\S]*ready_ai_grading_requests[\s\S]*status in \('pending', 'completed', 'failed'\)/,'Shorts bookmark or persisted AI grading storage is missing');
 assert.doesNotMatch(objectiveFallback,/retry|attempt\s*<\s*2/i,'Objective AI fallback must never retry');
 assert.match(inventory,/\| 1 \| 40[\s\S]*\| 2 \| 41[\s\S]*\| 3 \| 24[\s\S]*\| 4 \| 32[\s\S]*\*\*137\*\*/,'18-28 inventory totals are incorrect');
@@ -49,5 +53,8 @@ const migrations=readdirSync(resolve(root,'supabase/migrations')).filter(name=>n
 assert.ok(migrations.includes('20260828150000_ready_question_first.sql'),'Question-first migration is missing');
 assert.doesNotMatch(student+admin,/SUPABASE_SERVICE_ROLE_KEY|READY_ADMIN_PASSWORD|GEMINI_API_KEY/,'A server secret name leaked into frontend code');
 assert.doesNotMatch(student,/reader-token|learning-sheet|data-save-sentence/,'Student frontend still exposes lexical study controls');
+assert.match(student,/student_question_filters[\s\S]*question-source[\s\S]*question-type[\s\S]*student_question_queue/,'Source and multi-select taxonomy queue UI is missing');
+assert.match(edge,/studentQuestionPool[\s\S]*providerSet[\s\S]*taxonomySet[\s\S]*publicQuestion/,'Server-side source and taxonomy filtering is missing');
+assert.match(edge,/configs = \[\{ \.\.\.base, thinkingConfig[\s\S]*response\.status !== 400/,'AI grading lacks the model compatibility fallback used by dictionary calls');
 
 console.log(`READY API contracts verified (${clientOps.size} frontend operations, 137 inventoried questions).`);

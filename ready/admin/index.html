@@ -25,9 +25,9 @@
     <link rel="stylesheet" href="../../styles/fonts.css" />
     <link rel="stylesheet" href="../../styles/tokens.css" />
     <link rel="stylesheet" href="../../styles/base.css" />
-    <link rel="stylesheet" href="../ready.css?v=question-mvp-1" />
+    <link rel="stylesheet" href="../ready.css?v=source-filter-2" />
     <script defer src="../config.js"></script>
-    <script type="module" src="app.js?v=breeze-reader-panel-2"></script>
+    <script type="module" src="app.js?v=source-filter-2"></script>
   </head>
   <body data-ready-mode="admin">
     <div id="app">
@@ -127,6 +127,14 @@
               </select></label
             >
           </div>
+          <form id="question-import-form" class="question-import-form">
+            <label>
+              <span>검증 완료 문제 번들</span>
+              <input name="bundle" type="file" accept="application/json,.json" required />
+            </label>
+            <button class="button quiet" type="submit">READY 문제 가져오기</button>
+            <small>최종 round-trip을 통과한 READY 문항만 가져옵니다.</small>
+          </form>
           <div id="passage-selection"></div>
           <div id="passage-library"></div>
         </section>

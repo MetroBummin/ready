@@ -6,7 +6,11 @@ const BLOCK_KINDS=new Set(['passage','prompt','korean_target','condition','word_
 const LANGUAGES=new Set(['en','ko','mixed','none']);
 const escapeRegExp=value=>String(value||'').replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
 const PLAIN_TAXONOMIES=new Set(['topic','title','main_idea','purpose','emotion','content_true','content_false','unanswerable']);
+const EVIDENCE_TAXONOMIES=new Set(['content_true','content_false','unanswerable']);
+const FIXED_ANNOTATION_SPANS=['in order to','as well as','because of','due to','rather than','such as','according to','not only','but also','so that','even though','in case of','in front of','be able to'];
+const EVIDENCE_STOPWORDS=new Set('a an and are as at be been being but by did do does for from had has have he her hers him his how i in into is it its may might more most not of on only or our she should so than that the their them they this those to was we were what when where which who why will with would'.split(' '));
 const validAnnotationLabel=value=>/^(?:[ⓐ-ⓩ]|\([A-H]\)|[㉠-㉭])$/.test(compact(value));
+const evidenceTokens=value=>(String(value||'').toLowerCase().match(/[a-z]+(?:['’][a-z]+)?/g)||[]).map(token=>token.replace(/[’']/g,"'")).filter(token=>token.length>3&&!EVIDENCE_STOPWORDS.has(token));
 
 export const PIPELINE_CONTRACT_VERSION=2;
 export const QUESTION_BLOCK_WHITELISTS=Object.freeze({
@@ -19,6 +23,7 @@ export const QUESTION_BLOCK_WHITELISTS=Object.freeze({
 
 export function sourceContractErrors(payload={},spec={}){
   const errors=[],contract=payload.pipeline_contract||{},blocks=list(payload.source_blocks),byId=new Map(),taxonomy=compact(spec?.taxonomy||payload?.taxonomy);
+  if(!['exam4you','nernter'].includes(compact(payload?.source?.provider)))errors.push('question source provider is missing or unsupported');
   if(Number(contract.version)!==PIPELINE_CONTRACT_VERSION)errors.push('pipeline contract version is missing');
   if(!/^[a-f0-9]{64}$/i.test(compact(contract.document_sha256)))errors.push('document provenance hash is missing');
   if(!compact(contract.source_question_identity))errors.push('source question identity is missing');
@@ -68,6 +73,10 @@ export function sourceContractErrors(payload={},spec={}){
     if(answers.length<1||answers.some(value=>!Number.isInteger(value)||value<0||value>=choices.length))errors.push('answer key indexes are invalid');
     if(spec.choiceMode==='single'&&answers.length!==1)errors.push('single-choice answer contract does not match answer key');
     if(spec.choiceMode==='multi'&&answers.length<2)errors.push('multi-choice answer contract does not match answer key');
+    if(EVIDENCE_TAXONOMIES.has(taxonomy)){
+      const passageVocabulary=new Set(evidenceTokens(selectedPassage));
+      choices.forEach((choice,index)=>{const tokens=evidenceTokens(choice);if(tokens.length>=3&&!tokens.some(token=>passageVocabulary.has(token)))errors.push(`choice ${index+1} has no evidence vocabulary in the approved passage range`);});
+    }
   }
   for(const [index,annotation] of list(spec?.passage?.annotations).entries()){
     const target=compact(annotation?.text);
@@ -78,6 +87,12 @@ export function sourceContractErrors(payload={},spec={}){
       const particle='off|on|up|out|in|away|back|over|down|through|around|along';
       const truncated=new RegExp(`${escapeRegExp(label)}\\s*${escapeRegExp(target)}\\s+(${particle})\\b`,'i').exec(raw);
       if(truncated&&!new RegExp(`(?:${particle})$`,'i').test(target))errors.push(`annotation ${index+1} truncates a marked phrasal span`);
+      for(const phrase of FIXED_ANNOTATION_SPANS){
+        if(target.toLowerCase()===phrase)continue;
+        if(!phrase.startsWith(`${target.toLowerCase()} `))continue;
+        const incomplete=new RegExp(`${escapeRegExp(label)}\\s*${escapeRegExp(phrase).replace(/\\ /g,'\\s+')}`,'i').test(raw);
+        if(incomplete)errors.push(`annotation ${index+1} truncates the fixed expression ${phrase}`);
+      }
     }
   }
   if(['grammar_single_error','grammar_multi_error','vocabulary_context'].includes(spec?.taxonomy)&&!list(spec?.passage?.annotations).length)errors.push('annotated question has no validated annotation spans');

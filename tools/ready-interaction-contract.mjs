@@ -43,8 +43,13 @@ function inlineDevices(source){
 }
 
 function positionDevices(source,choiceLabels){
-  const allowed=new Set(choiceLabels),devices=[];
-  for(const match of source.matchAll(/\([A-H]\)/g))if(allowed.has(match[0]))devices.push({kind:'position',id:match[0],label:match[0],text:'',start:match.index,end:(match.index||0)+match[0].length});
+  const allowed=new Set(choiceLabels.map(text)),devices=[];
+  const alternatives=[...allowed].filter(Boolean).sort((a,b)=>b.length-a.length).map(escapeRegExp);
+  if(!alternatives.length)return devices;
+  for(const match of source.matchAll(new RegExp(alternatives.join('|'),'g'))){
+    const label=match[0];
+    devices.push({kind:'position',id:label,label,text:'',start:match.index,end:(match.index||0)+label.length});
+  }
   return devices;
 }
 

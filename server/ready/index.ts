@@ -20,7 +20,7 @@ function supabaseAdminKey() {
 }
 const db = createClient(Deno.env.get("SUPABASE_URL") ?? "", supabaseAdminKey(), { auth: { persistSession: false } });
 const adminOps = new Set(["teacher_bootstrap", "delete_impact", "assign_scope_passages", "set_scope_passages", "create_passage", "update_passage", "delete_passage", "create_student", "set_student_pin", "delete_student", "import_questions", "import_explanations"]);
-const studentOps = new Set(["student_bootstrap", "student_passage", "student_questions", "student_review_questions", "set_question_bookmark", "submit_attempt", "student_workbook", "submit_workbook_attempt"]);
+const studentOps = new Set(["student_bootstrap", "student_passage", "student_questions", "student_question_filters", "student_question_queue", "student_review_questions", "set_question_bookmark", "submit_attempt", "student_workbook", "submit_workbook_attempt"]);
 const publicOps = new Set(["list_students", "student_login", "admin_login"]);
 // Match Breeze's free Gemini dictionary defaults. The API key remains a
 // Supabase Edge Function Secret and is never part of any public response.
@@ -113,12 +113,20 @@ async function callGeminiGrade(question: any, spec: any, responses: string[]) {
   const provider = (Deno.env.get("AI_PROVIDER") ?? "").trim().toLowerCase(), key = Deno.env.get("GEMINI_API_KEY");
   if (provider !== "gemini" || !key) throw new ApiError(503, "AI 채점이 아직 연결되지 않았습니다.");
   const url = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${key}`;
-  const generationConfig = { maxOutputTokens: 500, temperature: 0, responseMimeType: "application/json", thinkingConfig: { thinkingBudget: 0 } };
-  const response = await fetch(url, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ system_instruction: { parts: [{ text: GEMINI_GRADING_SYSTEM }] }, contents: [{ role: "user", parts: [{ text: aiGradingPrompt(question, spec, responses) }] }], generationConfig }) });
-  if (!response.ok) { console.error("READY AI grading failed:", (await response.text()).slice(0, 300)); throw new ApiError(502, "AI 채점을 잠시 사용할 수 없습니다. 답안은 저장되었습니다."); }
-  const payload = await response.json(), text = (payload?.candidates?.[0]?.content?.parts || []).map((part: { text?: string }) => part?.text || "").join("").trim(), parsed = parseJson(text);
-  if (!parsed || typeof parsed.correct !== "boolean" || !Number.isFinite(Number(parsed.score))) throw new ApiError(502, "AI 채점 결과를 확인하지 못했습니다. 답안은 저장되었습니다.");
-  return { correct: parsed.correct === true, score: Math.max(0, Math.min(100, Math.round(Number(parsed.score)))), shortFeedback: clean(parsed.short_feedback, 160), errorTags: cleanList(parsed.error_tags, 8, 40) };
+  const base = { maxOutputTokens: 500, temperature: 0, responseMimeType: "application/json" }, configs = [{ ...base, thinkingConfig: { thinkingBudget: 0 } }, base];
+  let lastError = "";
+  for (const generationConfig of configs) {
+    const response = await fetch(url, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ system_instruction: { parts: [{ text: GEMINI_GRADING_SYSTEM }] }, contents: [{ role: "user", parts: [{ text: aiGradingPrompt(question, spec, responses) }] }], generationConfig }) });
+    if (response.ok) {
+      const payload = await response.json(), answerText = (payload?.candidates?.[0]?.content?.parts || []).map((part: { text?: string }) => part?.text || "").join("").trim(), parsed = parseJson(answerText);
+      if (!parsed || typeof parsed.correct !== "boolean" || !Number.isFinite(Number(parsed.score))) throw new ApiError(502, "AI 채점 결과 형식이 올바르지 않습니다.");
+      return { correct: parsed.correct === true, score: Math.max(0, Math.min(100, Math.round(Number(parsed.score)))), shortFeedback: clean(parsed.short_feedback, 160), errorTags: cleanList(parsed.error_tags, 8, 40) };
+    }
+    lastError = (await response.text()).slice(0, 300);
+    if (response.status !== 400) break;
+  }
+  console.error("READY AI grading failed:", lastError);
+  throw new ApiError(502, "AI 채점을 잠시 사용할 수 없습니다. 잠시 후 다시 제출해 주세요.");
 }
 
 async function studentForSession(session: ReadySession): Promise<Student> {
@@ -270,7 +278,7 @@ async function importQuestions(body: any) {
     for (const row of existingRows) {
       const source = row?.payload?.source || {}, identity = [source.exam, source.passage_no, source.source_question_no, source.section].map(value => clean(value, 180)).join("::");
       if (identity.replaceAll("::", "")) byIdentity.set(identity, clean(row.passage_id, 80));
-      if (/NE능률\(민병천\)/.test(clean(source.exam, 180)) && source.passage_no) {
+      if (/민병천|ne\s*능률|공통영어\s*2/i.test(clean(source.exam, 180)) && source.passage_no) {
         const lesson = clean(source.passage_no, 20), ids = byLesson.get(lesson) || new Set<string>();
         if (clean(row.passage_id, 80)) ids.add(clean(row.passage_id, 80));
         byLesson.set(lesson, ids);
@@ -284,6 +292,7 @@ async function importQuestions(body: any) {
     }
   }
   for (const [index, question] of incoming.entries()) {
+    if (!["exam4you", "nernter"].includes(clean(question?.payload?.source?.provider, 30))) throw new ApiError(400, `${index + 1}번 문제의 source provider가 없거나 지원되지 않습니다.`);
     const validation = validateQuestionSpec(question?.payload || {}, clean(question?.type, 40), clean(question?.status, 20) || "draft");
     if (validation.errors.length) throw new ApiError(400, `${index + 1}번 문제의 출제 명세가 불완전합니다: ${validation.errors.join(", ")}`);
     if (validation.spec.importStatus === "ready" && question?.status !== "available") throw new ApiError(400, `${index + 1}번 문제는 ready이므로 available 상태여야 합니다.`);
@@ -435,6 +444,18 @@ function publicSkill(taxonomy: string) {
   if (["topic", "title", "main_idea", "purpose", "emotion", "content_true", "content_false", "unanswerable"].includes(taxonomy)) return "comprehension";
   return taxonomy;
 }
+function publicTaxonomyLabel(taxonomy: string) {
+  const labels: Record<string, string> = {
+    topic: "주제", title: "제목", main_idea: "요지", purpose: "목적", emotion: "심경·분위기",
+    content_true: "내용 일치", content_false: "내용 불일치", unanswerable: "답할 수 없는 질문",
+    grammar_single_error: "어법 단일 오류", grammar_multi_error: "어법 복수 오류", grammar_ab: "어법 A/B",
+    vocabulary_context: "문맥 어휘", blank_word: "빈칸 단어", blank_phrase: "빈칸 구",
+    sentence_insertion: "문장 삽입", irrelevant_sentence: "무관한 문장", paragraph_order: "문단 순서",
+    summary_two_blank: "요약 빈칸", guided_writing: "조건 영작", translation: "영작·해석",
+    arrangement: "순서 배열", correction: "어색한 곳 고치기", summary_completion: "서술형 요약",
+  };
+  return labels[taxonomy] || taxonomy.replaceAll("_", " ");
+}
 function publicQuestion(row: any, passageText = "", studentState: { bookmarked?: boolean; lastResult?: boolean | null } = {}) {
   const payload = row.payload || {}, type = clean(row.type, 40), sourceQuestionNo = Number(payload.source?.source_question_no) || null;
   const specValidation = validateQuestionSpec(payload, type, row.status || "available"), renderSpec = specValidation.spec;
@@ -455,10 +476,48 @@ function publicQuestion(row: any, passageText = "", studentState: { bookmarked?:
     passageText: cleanQuestionText(passageText), interaction: interactionContract.kind, interactionContract,
     stimulus: renderSpec.extras.includes("stimulus") ? clean(payload.stimulus, 10_000) : "", summaryText, inlineGroups, targetRanges,
     bookmarked: studentState.bookmarked === true, lastResult: typeof studentState.lastResult === "boolean" ? studentState.lastResult : null,
-    source: payload.source ? { exam: clean(payload.source.exam, 160), passageNo: Number(payload.source.passage_no) || null, questionNo: sourceQuestionNo, section: clean(payload.source.section, 20), setId: clean(payload.source.set_id, 120) || null } : null,
+    source: payload.source ? { provider: clean(payload.source.provider, 30), exam: clean(payload.source.exam, 160), passageNo: Number(payload.source.passage_no) || null, questionNo: sourceQuestionNo, section: clean(payload.source.section, 20), setId: clean(payload.source.set_id, 120) || null } : null,
   };
 }
 function isReadyQuestion(row: any) { return validateQuestionSpec(row?.payload || {}, clean(row?.type, 40), row?.status || "available").ready; }
+async function studentQuestionPool(student: Student, examId: string) {
+  await studentExamAccess(examId, student);
+  const links = rows<any[]>(await db.from("ready_exam_passages").select("passage_id,position").eq("exam_id", examId).order("position"));
+  const passageIds = links.map(link => link.passage_id);
+  if (!passageIds.length) return [];
+  const passageRows = rows<any[]>(await db.from("ready_passages").select("id,title,source_type,source_label").in("id", passageIds));
+  const sentenceRows = rows<any[]>(await db.from("ready_passage_sentences").select("passage_id,sentence_index,text").in("passage_id", passageIds).order("sentence_index"));
+  const questionRows = rows<any[]>(await db.from("ready_questions").select("id,passage_id,type,payload,status,created_at").in("passage_id", passageIds).in("type", ["multiple_choice", "written_response"]).eq("status", "available"));
+  const attempted = await attemptedQuestionIds(student.id, examId);
+  const bookmarkRows = rows<any[]>(await db.from("ready_question_bookmarks").select("question_id").eq("student_id", student.id).eq("exam_id", examId));
+  const bookmarks = new Set(bookmarkRows.map(item => item.question_id));
+  const passages = new Map(passageRows.map(passage => [passage.id, passage]));
+  const passageText = new Map(passageIds.map(id => [id, sentenceRows.filter(sentence => sentence.passage_id === id).map(sentence => sentence.text).join(" ")]));
+  const linkPosition = new Map(links.map(link => [link.passage_id, Number(link.position) || 0]));
+  return passageIds.flatMap(passageId => normalizeMainTextQuestionRows(questionRows.filter(row => row.passage_id === passageId), passages.get(passageId), passageText.get(passageId) || ""))
+    .filter(row => !attempted.has(row.id) && isReadyQuestion(row) && isMainTextQuestion(row, passages.get(row.passage_id), passageText.get(row.passage_id) || ""))
+    .map(row => ({ row, passageText: passageText.get(row.passage_id) || "", bookmarked: bookmarks.has(row.id), passagePosition: linkPosition.get(row.passage_id) || 0 }))
+    .sort((a, b) => a.passagePosition - b.passagePosition || (Number(a.row.payload?.position) || 0) - (Number(b.row.payload?.position) || 0));
+}
+async function studentQuestionFilters(body: any, session: ReadySession) {
+  const student = await studentForSession(session), examId = required(body.examId, "Exam", 80), pool = await studentQuestionPool(student, examId);
+  const sources = [
+    { id: "exam4you", label: "Exam4you", count: pool.filter(item => item.row.payload?.source?.provider === "exam4you").length },
+    { id: "nernter", label: "너른터", count: pool.filter(item => item.row.payload?.source?.provider === "nernter").length },
+  ];
+  const typeCounts = new Map<string, number>();
+  for (const item of pool) { const taxonomy = clean(item.row.payload?.spec?.taxonomy || item.row.payload?.taxonomy, 60); if (taxonomy) typeCounts.set(taxonomy, (typeCounts.get(taxonomy) || 0) + 1); }
+  const types = [...typeCounts.entries()].map(([id, count]) => ({ id, label: publicTaxonomyLabel(id), count })).sort((a, b) => a.label.localeCompare(b.label, "ko"));
+  return { total: pool.length, sources, types };
+}
+async function studentQuestionQueue(body: any, session: ReadySession) {
+  const student = await studentForSession(session), examId = required(body.examId, "Exam", 80), pool = await studentQuestionPool(student, examId);
+  const providers = cleanList(body.providers, 2, 30), taxonomies = cleanList(body.taxonomies, 60, 60);
+  if (providers.some(provider => !["exam4you", "nernter"].includes(provider))) throw new ApiError(400, "지원하지 않는 문제 출처입니다.");
+  const providerSet = new Set(providers), taxonomySet = new Set(taxonomies);
+  const selected = pool.filter(item => (!providerSet.size || providerSet.has(clean(item.row.payload?.source?.provider, 30))) && (!taxonomySet.size || taxonomySet.has(clean(item.row.payload?.spec?.taxonomy || item.row.payload?.taxonomy, 60))));
+  return { items: selected.map(item => publicQuestion(item.row, item.passageText, { bookmarked: item.bookmarked })) };
+}
 async function studentQuestions(body: any, session: ReadySession) {
   const student = await studentForSession(session), examId = required(body.examId, "Exam", 80);
   const study = await studentPassage(body, session), passageId = study.passage.id;
@@ -700,7 +759,7 @@ async function dispatch(op: string, body: any, session: ReadySession | null) {
     case "list_students": return listStudents(); case "student_login": return studentLogin(body); case "admin_login": return adminLogin(body); case "logout": return revokeSession(session as ReadySession);
     case "teacher_bootstrap": return teacherBootstrap(); case "delete_impact": return deleteImpact(body); case "create_student": return createStudent(body); case "set_student_pin": return setStudentPin(body); case "delete_student": return deleteStudent(body);
     case "assign_scope_passages": return setScopePassages(body, false); case "set_scope_passages": return setScopePassages(body, true); case "create_passage": return createPassage(body); case "update_passage": return updatePassage(body); case "delete_passage": return deletePassage(body); case "import_questions": return importQuestions(body); case "import_explanations": return importExplanations(body);
-    case "student_bootstrap": return studentBootstrap(session as ReadySession); case "student_passage": return studentPassage(body, session as ReadySession); case "student_questions": return studentQuestions(body, session as ReadySession); case "student_review_questions": return studentReviewQuestions(body, session as ReadySession); case "set_question_bookmark": return setQuestionBookmark(body, session as ReadySession); case "submit_attempt": return submitAttempt(body, session as ReadySession); case "student_workbook": return studentWorkbook(body, session as ReadySession); case "submit_workbook_attempt": return submitWorkbookAttempt(body, session as ReadySession);
+    case "student_bootstrap": return studentBootstrap(session as ReadySession); case "student_passage": return studentPassage(body, session as ReadySession); case "student_questions": return studentQuestions(body, session as ReadySession); case "student_question_filters": return studentQuestionFilters(body, session as ReadySession); case "student_question_queue": return studentQuestionQueue(body, session as ReadySession); case "student_review_questions": return studentReviewQuestions(body, session as ReadySession); case "set_question_bookmark": return setQuestionBookmark(body, session as ReadySession); case "submit_attempt": return submitAttempt(body, session as ReadySession); case "student_workbook": return studentWorkbook(body, session as ReadySession); case "submit_workbook_attempt": return submitWorkbookAttempt(body, session as ReadySession);
     default: throw new ApiError(404, "알 수 없는 READY 작업입니다.");
   }
 }

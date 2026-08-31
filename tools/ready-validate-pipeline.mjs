@@ -34,6 +34,12 @@ function actualRenderErrors(payload,type){
 }
 for(const question of selected){
   const payload=question.payload||{};
+  const upstreamDrop=question.status==='draft'||payload.import_status==='drop'||payload?.spec?.importStatus==='drop';
+  if(upstreamDrop){
+    payload.import_status='drop';if(payload.spec)payload.spec.importStatus='drop';question.status='draft';
+    report.push({source:payload.source,type:question.type,status:'drop',round_trip:'drop',errors:['upstream extraction or AI structure gate marked the question DROP']});
+    continue;
+  }
   if(question.type==='multiple_choice')buildObjectiveSourceContract(payload);
   if(question.type==='written_response')payload.response_slots=applyAnswerKeyWordCounts(payload,{response_slots:payload.response_slots}).response_slots;
   const interactionErrors=compileAndValidateInteraction(payload,question.type),renderErrors=interactionErrors.length?[]:actualRenderErrors(payload,question.type);

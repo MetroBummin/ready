@@ -34,7 +34,7 @@ const summaryQuestion={type:'written_response',payload:{prompt:'다음 글의 �
 const summarySpec={kind:'summary',prompt_text:summaryQuestion.payload.prompt,passage_mode:'canonical_excerpt',passage_text:'Source passage.',task_text:'',targets:[],conditions:[],word_bank:[],response_slots:[{label:'A',word_count:1},{label:'B',word_count:2}],summary_text:'',confidence:.99,issues:[]};
 assert(validateWrittenStructure(summaryQuestion,summarySpec,'Source passage.').some(item=>item.includes('summary missing')));
 
-const renderPayload={prompt:'영작하시오.',set_text:'This is the approved source passage.',taxonomy:'guided_writing',writing_guide:{kind:'sentence',title:'영작하시오.',slot_labels:['답'],conditions:[],word_bank:[],task_text:'문장을 쓰시오.',targets:[]},accepted_answers:['answer'],response_slots:[{label:'답',word_count:1}],import_status:'ready',spec:{renderer:'written_input',passage:{source:'blocks',annotations:[]},extras:[],choiceMode:'none',responseMode:'input',gradingMode:'accepted_variants'}};
+const renderPayload={prompt:'영작하시오.',set_text:'This is the approved source passage.',taxonomy:'guided_writing',source:{provider:'exam4you'},writing_guide:{kind:'sentence',title:'영작하시오.',slot_labels:['답'],conditions:[],word_bank:[],task_text:'문장을 쓰시오.',targets:[]},accepted_answers:['answer'],response_slots:[{label:'답',word_count:1}],import_status:'ready',spec:{renderer:'written_input',passage:{source:'blocks',annotations:[]},extras:[],choiceMode:'none',responseMode:'input',gradingMode:'accepted_variants'}};
 assert.equal(validateQuestionSpec(renderPayload,'written_response','available').ready,false);
 buildStructuredSourceContract({payload:renderPayload,structured:{passage_text:renderPayload.set_text,task_text:'문장을 쓰시오.',conditions:[],word_bank:[],summary_text:'',targets:[],response_slots:renderPayload.response_slots},sourceFileHash:'a'.repeat(64)});
 renderPayload.ai_structure={engine:'codex-cli',contract_version:2};
@@ -51,7 +51,7 @@ const missingProvenance=structuredClone(renderPayload);
 delete missingProvenance.pipeline_contract.block_refs.passage;
 assert(sourceContractErrors(missingProvenance,missingProvenance.spec).some(item=>item.includes('passage provenance')));
 
-const objective={prompt:'윗글의 제목으로 알맞은 것은?',set_text:'His location settings were turned off.',taxonomy:'title',choices:['A','B','C','D','E'],answer:[0],multi_select:false,explanation:'해설',import_status:'ready',source:{exam:'시험',section:'1',source_question_no:1,document_sha256:'b'.repeat(64),page:1,bbox:[0,0,100,100]},spec:{renderer:'standard_mcq',passage:{source:'blocks',annotations:[]},extras:[],choiceMode:'single',responseMode:'choice',gradingMode:'exact'}};
+const objective={prompt:'윗글의 제목으로 알맞은 것은?',set_text:'His location settings were turned off.',taxonomy:'title',choices:['A','B','C','D','E'],answer:[0],multi_select:false,explanation:'해설',import_status:'ready',source:{provider:'exam4you',exam:'시험',section:'1',source_question_no:1,document_sha256:'b'.repeat(64),page:1,bbox:[0,0,100,100]},spec:{renderer:'standard_mcq',passage:{source:'blocks',annotations:[]},extras:[],choiceMode:'single',responseMode:'choice',gradingMode:'exact'}};
 buildObjectiveSourceContract(objective);
 compileInteractionContract(objective,'multiple_choice');
 assert.equal(validateQuestionSpec(objective,'multiple_choice','available').ready,true);
@@ -63,6 +63,9 @@ const truncatedPhrase=structuredClone(objective);
 truncatedPhrase.taxonomy='grammar_single_error';truncatedPhrase.spec.renderer='annotated_passage_mcq';truncatedPhrase.target_ranges=[{label:'ⓔ',text:'turned',kind:'target'}];truncatedPhrase._raw_question_text='His location settings were ⓔturned off.';buildObjectiveSourceContract(truncatedPhrase);
 assert.equal(truncatedPhrase.target_ranges[0].label,'ⓔ','Display normalization destroyed a semantic circled label');
 assert(sourceContractErrors(truncatedPhrase,truncatedPhrase.spec).some(item=>item.includes('truncates a marked phrasal span')));
+const truncatedFixed=structuredClone(objective);
+truncatedFixed.taxonomy='grammar_single_error';truncatedFixed.spec.renderer='annotated_passage_mcq';truncatedFixed.set_text='In order to educate detectives, Lee built models.';truncatedFixed.target_ranges=[{label:'ⓓ',text:'In',kind:'target'}];truncatedFixed._raw_question_text='ⓓIn order to educate detectives, Lee built models.';buildObjectiveSourceContract(truncatedFixed);
+assert(sourceContractErrors(truncatedFixed,truncatedFixed.spec).some(item=>item.includes('truncates the fixed expression in order to')));
 const inactiveDevice=structuredClone(objective);inactiveDevice.set_text='She believed (A)[that / what] the system worked.';buildObjectiveSourceContract(inactiveDevice);
 assert(sourceContractErrors(inactiveDevice,inactiveDevice.spec).some(item=>item.includes('inactive passage device')));
 const bareLabel=structuredClone(objective);bareLabel.taxonomy='grammar_single_error';bareLabel.spec.renderer='annotated_passage_mcq';bareLabel.set_text='She believed that the system worked.';bareLabel.target_ranges=[{label:'A',text:'that',kind:'target'}];buildObjectiveSourceContract(bareLabel);

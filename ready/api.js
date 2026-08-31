@@ -1,7 +1,7 @@
 const getConfig = () => window.READY_CONFIG || {};
 const READ_ONLY_OPS = new Set([
   'list_students', 'teacher_bootstrap', 'delete_impact', 'student_bootstrap',
-  'student_passage', 'student_questions', 'student_review_questions',
+  'student_passage', 'student_questions', 'student_question_filters', 'student_question_queue', 'student_review_questions',
   'student_workbook',
 ]);
 

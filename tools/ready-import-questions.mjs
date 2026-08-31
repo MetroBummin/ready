@@ -30,6 +30,7 @@ for(const [index,item] of questions.entries()){
   if(!['multiple_choice','written_response'].includes(item?.type))throw new Error(`Row ${index+1}: unsupported type.`);
   if(!item?.payload?.prompt?.trim())throw new Error(`Row ${index+1}: prompt is required.`);
   if(!source.exam||!Number.isInteger(Number(source.passage_no))||!Number.isInteger(Number(source.source_question_no))||!source.section)throw new Error(`Row ${index+1}: source metadata is incomplete.`);
+  if(!['exam4you','nernter'].includes(source.provider))throw new Error(`Row ${index+1}: source provider is missing or unsupported.`);
   const identity=[item.passage_id||item.passage_key,source.exam,source.passage_no,source.source_question_no,source.section].join(':');
   if(identities.has(identity))throw new Error(`Row ${index+1}: duplicate source identity ${identity}.`);
   identities.add(identity);
