@@ -3752,3 +3752,25 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
     }
   ]
 };
+
+// Stage 4 is derived only from the already publisher-verified stage 2 English
+// source and stage 3 full Korean source. It does not invent translations.
+const neL1Stage2 = NE_MINBYEONGCHEON_L1_WORKBOOK.stages.find(stage => stage.stage === 2);
+const neL1Stage3 = NE_MINBYEONGCHEON_L1_WORKBOOK.stages.find(stage => stage.stage === 3);
+if (neL1Stage2?.items?.length === neL1Stage3?.items?.length) {
+  NE_MINBYEONGCHEON_L1_WORKBOOK.stages.push({
+    stage: 4,
+    title: "4단계 · 해석 연습",
+    instruction: "영문을 자연스러운 우리말로 해석하세요.",
+    items: neL1Stage2.items.map((item, index) => ({
+      key: `ne-mb-l1-s4-${String(index + 1).padStart(2, "0")}`,
+      stage: 4,
+      number: index + 1,
+      kind: "translation_ai",
+      source: item.source,
+      prompt: "우리말 해석을 입력하세요.",
+      answers: [neL1Stage3.items[index].source],
+    })),
+  });
+  NE_MINBYEONGCHEON_L1_WORKBOOK.stages.sort((a, b) => a.stage - b.stage);
+}

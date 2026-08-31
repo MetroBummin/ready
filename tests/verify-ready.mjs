@@ -126,19 +126,28 @@ assert.doesNotMatch(app,/workbookChoiceHtml[^\n]*join\('<i>\/<\/i>'\)/,'Workbook
 assert.match(edge,/publicInteractionContract[\s\S]*deterministicGrade/);
 assert.match(edge,/semantic reference[\s\S]*faithful synonyms and paraphrases/,'AI grading must treat publisher answers as semantic truth, not exact copy');
 assert.match(edge,/같은 원인·사실을 나타내는 자연스러운 동의어와 바꿔쓰기를 정답으로 인정/);
+assert.match(edge,/ready_workbook_ai_grading_requests[\s\S]*status: "pending"[\s\S]*callGeminiGrade/,'Workbook answers must be persisted before AI inference');
+assert.match(app,/data-toggle-workbook-bookmark[\s\S]*data-review-workbook-passage/,'Workbook Review must reopen the original workbook renderer');
 assert.match(runtime,/data-contract-device[\s\S]*choice_matrix/);
 assert.doesNotMatch(css,/question-choice\.eliminated[^}]*text-decoration\s*:\s*line-through/,'Eliminated choices should remain readable');
 assert.match(css,/\.choice-cell[\s\S]*grid-template-columns/,'Choice matrices must have an explicit visual grid');
 
 const baseline=read('supabase/migrations/20260826150000_ready_current_baseline.sql');
 const questionMigration=read('supabase/migrations/20260828150000_ready_question_first.sql');
+const workbookReviewMigration=read('supabase/migrations/20260831233000_ready_workbook_review_ai.sql');
 assert.match(baseline,/ready_attempts_are_immutable[\s\S]*before update or delete/);
 assert.match(questionMigration,/ready_import_question_bundle[\s\S]*jsonb_array_elements/);
+assert.match(workbookReviewMigration,/ready_workbook_bookmarks[\s\S]*ready_workbook_ai_grading_requests/);
 
 const {NE_MINBYEONGCHEON_L1_WORKBOOK}=await import('../server/ready/workbook-ne-l1.mjs');
-assert.equal(NE_MINBYEONGCHEON_L1_WORKBOOK.stages.length,6);
-const workbookItems=NE_MINBYEONGCHEON_L1_WORKBOOK.stages.flatMap(stage=>stage.items);
-assert.equal(workbookItems.length,213);
-assert.equal(new Set(workbookItems.map(item=>item.key)).size,213);
+const {NE_MINBYEONGCHEON_L2_WORKBOOK}=await import('../server/ready/workbook-ne-l2.mjs');
+const {YBM_PARKJUNEON_L1_WORKBOOK}=await import('../server/ready/workbook-ybm-l1.mjs');
+const {YBM_PARKJUNEON_L2_WORKBOOK}=await import('../server/ready/workbook-ybm-l2.mjs');
+const workbooks=[NE_MINBYEONGCHEON_L1_WORKBOOK,NE_MINBYEONGCHEON_L2_WORKBOOK,YBM_PARKJUNEON_L1_WORKBOOK,YBM_PARKJUNEON_L2_WORKBOOK];
+assert.deepEqual(workbooks.map(book=>book.stages.flatMap(stage=>stage.items).length),[254,356,309,292]);
+const workbookItems=workbooks.flatMap(book=>book.stages.flatMap(stage=>stage.items));
+assert.equal(new Set(workbookItems.map(item=>item.key)).size,workbookItems.length);
+for(const item of workbookItems){assert(item.answers.length>0);if(item.kind==='blank_input'||item.kind==='verb_form')assert.equal((item.prompt.match(/_{5,}/g)||[]).length,item.answers.length);if(item.kind==='choice_groups')assert.equal(item.groups.length,item.answers.length);if(item.kind==='translation_ai')assert.equal(item.answers.length,1);}
+for(const book of workbooks.slice(1)){assert.equal(book.source.preserved,true);assert.match(book.source.sha256,/^[a-f0-9]{64}$/);for(const item of book.unpublishedExercises)assert.equal(item.status,'INVALID');}
 
 console.log('READY executable Question contract checks passed');
