@@ -111,6 +111,10 @@ READY_API_URL=... READY_ADMIN_PASSWORD=... \
 단어 수는 같은 PDF의 출판사 정답표에서 결정론적으로 추출하고, AI는 정답을 만들거나
 바꾸지 않는다.
 
+정답에서 역산한 답칸별 단어 수는 validator와 AI 채점기에만 남기는 private metadata다.
+PDF 문제의 조건에 단어 수가 명시된 경우에만 `writing_guide.conditions`로 학생에게
+보여 준다. public Question의 답칸 placeholder로 정답 단어 수를 노출하지 않는다.
+
 ```bash
 npm run structure:written -- \
   --input /absolute/path/to/private-bundle.json \
@@ -140,6 +144,12 @@ import/debug 전용이며 학생 renderer가 원문 PDF를 다시 읽거나 위�
 prompt·요약·한글 목표문·조건이 passage에 섞였거나, annotation이 `turned off` 같은
 정확한 연속 문자열을 가리키지 않으면 즉시 `DROP`한다. 전체 canonical Passage로
 대체하는 fallback은 금지한다.
+
+학생용 원문과 annotation label은 NFC로 보존한다. NFKC는 정답 비교·검색처럼
+호환 문자 차이를 지워야 하는 비공개 비교 경로에서만 사용한다. 원문에 NFKC를
+적용해 `ⓐ`를 `a`로 바꾸는 것은 import 실패다. 일반 내용·주제·제목 문제는 현재
+문제에 활성 annotation이 없으므로 다른 문제의 `ⓐ` 또는 `(A)[x / y]` 장치가 하나라도
+남으면 `DROP`한다.
 
 서술형은 서로 다른 유형을 대표하는 7개 fixture가 최종 렌더 계약까지 모두 통과한
 뒤에만 전체를 한 번 처리한다. AI는 PDF block 경계만 구조화하고 정답은 출판사

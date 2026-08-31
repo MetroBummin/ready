@@ -58,6 +58,7 @@ const oversized=structuredClone(objective);oversized.set_text='A'.repeat(1801);b
 assert(sourceContractErrors(oversized,oversized.spec).some(item=>item.includes('student range budget')));
 const truncatedPhrase=structuredClone(objective);
 truncatedPhrase.taxonomy='grammar_single_error';truncatedPhrase.spec.renderer='annotated_passage_mcq';truncatedPhrase.target_ranges=[{label:'ⓔ',text:'turned',kind:'target'}];truncatedPhrase._raw_question_text='His location settings were ⓔturned off.';buildObjectiveSourceContract(truncatedPhrase);
+assert.equal(truncatedPhrase.target_ranges[0].label,'ⓔ','Display normalization destroyed a semantic circled label');
 assert(sourceContractErrors(truncatedPhrase,truncatedPhrase.spec).some(item=>item.includes('truncates a marked phrasal span')));
 const inactiveDevice=structuredClone(objective);inactiveDevice.set_text='She believed (A)[that / what] the system worked.';buildObjectiveSourceContract(inactiveDevice);
 assert(sourceContractErrors(inactiveDevice,inactiveDevice.spec).some(item=>item.includes('inactive passage device')));
