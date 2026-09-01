@@ -471,6 +471,10 @@ body[data-ready-mode="student"] .question-passage .reading-sentence{display:inli
 .workbook-study-head{display:flex;min-height:62px;align-items:flex-start;justify-content:space-between;gap:var(--ready-space-4);margin-bottom:var(--ready-space-5);padding-bottom:var(--ready-space-3);border-bottom:1px solid var(--ready-hairline)}
 .workbook-study-head .eyebrow{margin:0 0 var(--ready-space-2)}
 .workbook-study-head .workbook-instruction{margin:0}
+.workbook-study-toolbar{position:relative;min-height:42px;align-items:center;margin-top:calc(-1 * var(--ready-space-12));margin-bottom:var(--ready-space-6);padding:0;border:0}
+.workbook-study-toolbar .workbook-state{width:100%;justify-content:flex-end}
+.workbook-study-toolbar .workbook-state>b{position:absolute;left:50%;font-size:14px;transform:translateX(-50%)}
+#student-workbook:not([hidden]){touch-action:pan-y}
 .workbook-tabs{display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:0;margin:0 0 var(--ready-space-4);border:1px solid var(--ready-hairline)}
 .workbook-tabs button{display:grid;min-width:0;gap:var(--ready-space-1);padding:10px 8px;border:0;border-right:1px solid var(--ready-hairline);border-radius:0;color:var(--ready-muted);background:transparent;text-align:left;cursor:pointer}
 .workbook-tabs button.active{color:var(--ready-on-action);background:var(--ready-action);box-shadow:none}
@@ -613,6 +617,7 @@ body[data-ready-mode] #toast.on{opacity:1;transform:translate(-50%,0)}
   .workbook-card{padding:var(--ready-space-4)}
   .workbook-study-head{min-height:60px;margin-bottom:var(--ready-space-5);padding-bottom:var(--ready-space-3)}
   .workbook-study-head .workbook-instruction{font-size:13px}
+  .workbook-study-toolbar{min-height:40px;margin-top:calc(-50px - env(safe-area-inset-top));margin-bottom:var(--ready-space-5);padding:0;border:0}
   .workbook-card.workbook-focus-card{min-height:0;padding:0}
   .workbook-correction-row{grid-template-columns:24px minmax(0,1fr);align-items:start}
   .workbook-correction-row>b{display:none}.workbook-correction-row label{grid-column:2}

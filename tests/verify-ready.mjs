@@ -188,6 +188,12 @@ assert.doesNotMatch(app,/changeWorkbookOrder[^\n]*renderWorkbook\(\)/,'Stage 8 c
 assert.match(read('ready/design.css'),/workbook-order-bank-slot\.used\{visibility:hidden/,'Selected Stage 8 chips must keep their original geometry');
 assert.match(read('ready/design.css'),/workbook-order-built\{[^}]*min-height:68px/,'Stage 8 must keep a compact fixed assembly area');
 assert.doesNotMatch(read('ready/design.css'),/--workbook-order-stable-height/,'Stage 8 must not mirror the full bank height into the assembly area');
+assert.match(app,/function queueWorkbookAutoSubmit\(\)[^\n]*submitWorkbook/,'Choice and reorder tasks must auto-submit only after every slot is complete');
+assert.match(app,/session\.submitting=true[^\n]*session\.submitting=false/,'Workbook submission must reject duplicate automatic requests');
+assert.doesNotMatch(app,/function renderWorkbook\(\)[^\n]*stage\.instruction/,'Focused Workbook must not repeat stage instructions');
+assert.doesNotMatch(app,/function renderWorkbook\(\)[^\n]*data-submit-workbook/,'Focused Workbook must not render a manual grading button');
+assert.match(app,/event\.isComposing\|\|event\.keyCode===229/,'Enter grading must ignore active IME composition');
+assert.match(app,/backGesture=dx<=-64\|\|\(swipe\.fromLeftEdge&&dx>=64\)/,'Workbook previous navigation must support left swipe and the iOS-style edge gesture');
 assert.equal(WORKBOOK_TRANSLATION_GRADING_POLICY.passScore,75);
 assert.equal(workbookTranslationPass(74,[]),false);
 assert.equal(workbookTranslationPass(75,[]),true);
