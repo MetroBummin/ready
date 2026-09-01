@@ -316,9 +316,8 @@ body[data-ready-mode="student"] .question-topline{display:flex;min-height:36px;a
 .question-result-dot.wrong{border-color:var(--ready-error);background:var(--ready-error)}
 .question-bookmark{display:grid;width:34px;height:34px;place-items:center;padding:0;border:1px solid var(--ready-hairline);border-radius:var(--ready-radius-xs);color:var(--ready-muted);background:transparent;cursor:pointer}
 .question-bookmark:hover{border-color:var(--ready-ink);color:var(--ready-ink);transform:none}
-.question-bookmark svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.8}
+.bookmark-star{font-size:23px;line-height:1;transform:translateY(-1px)}
 .question-bookmark.active{border-color:var(--ready-primary);color:var(--ready-primary);background:color-mix(in srgb,var(--ready-primary) 7%,transparent)}
-.question-bookmark.active svg{fill:currentColor}
 body[data-ready-mode="student"] .question-layout .eyebrow{margin-top:var(--ready-space-2)}
 body[data-ready-mode="student"] .reader-shell>.question-prompt{max-width:none;margin:var(--ready-space-4) 0 var(--ready-space-6);font-size:var(--ready-text-title);font-weight:720;line-height:1.4;letter-spacing:-.02em}
 body[data-ready-mode="student"] .question-passage{
@@ -451,6 +450,28 @@ body[data-ready-mode="student"] .question-passage .reading-sentence{display:inli
 .workbook-head{margin-bottom:var(--ready-space-6)}
 .workbook-head h1{margin:var(--ready-space-2) 0;font-size:clamp(26px,4vw,36px);font-weight:720;line-height:1.2}
 .workbook-head>p:last-child{margin:0;color:var(--ready-body);font-size:14px}
+.workbook-stage-picker{width:min(100%,880px);margin:0 auto var(--ready-space-16)}
+.workbook-picker-head{margin-bottom:var(--ready-space-8)}
+.workbook-stage-list{border-top:1px solid var(--ready-hairline)}
+.workbook-stage-list-head{display:flex;min-height:54px;align-items:center;justify-content:space-between;gap:var(--ready-space-4);border-bottom:1px solid var(--ready-hairline)}
+.workbook-stage-list-head h2{margin:0;font-size:16px;font-weight:720}
+.workbook-stage-list-head small{color:var(--ready-muted);font:650 11px/1 var(--ready-font-mono)}
+.workbook-stage-option{display:flex;width:100%;min-height:74px;align-items:center;justify-content:space-between;gap:var(--ready-space-4);padding:var(--ready-space-3) var(--ready-space-4);border:0;border-bottom:1px solid var(--ready-hairline);border-radius:0;color:var(--ready-ink);background:transparent;text-align:left;cursor:pointer}
+.workbook-stage-option:hover{color:var(--ready-primary);background:var(--ready-canvas-quiet);transform:none}
+.workbook-stage-option:focus-visible{outline-offset:-2px}
+.workbook-stage-option:disabled{color:var(--ready-muted);background:var(--ready-canvas-quiet);cursor:not-allowed;opacity:.72}
+.workbook-stage-option.complete{box-shadow:inset 3px 0 var(--ready-success)}
+.workbook-stage-copy{display:grid;min-width:0;gap:4px}
+.workbook-stage-copy strong{font-size:16px;font-weight:720}
+.workbook-stage-copy small{overflow:hidden;color:var(--ready-body);font-size:12px;text-overflow:ellipsis;white-space:nowrap}
+.workbook-stage-state{display:flex;flex:none;align-items:center;gap:var(--ready-space-3);color:var(--ready-muted)}
+.workbook-stage-state small{font:650 11px/1 var(--ready-font-mono);white-space:nowrap}
+.workbook-stage-state b{font-size:19px;font-weight:450}
+.workbook-study-layout{width:min(100%,1120px);margin:0 auto var(--ready-space-16)}
+.workbook-study-head{display:flex;min-height:74px;align-items:flex-start;justify-content:space-between;gap:var(--ready-space-6);margin-bottom:var(--ready-space-6);padding-bottom:var(--ready-space-4);border-bottom:1px solid var(--ready-hairline)}
+.workbook-study-head .eyebrow{margin:0 0 var(--ready-space-2)}
+.workbook-study-head .workbook-instruction{margin:0}
+.workbook-focus-card{min-height:55vh;padding:0;border:0;border-radius:0;background:transparent}
 .workbook-tabs{display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:0;margin:0 0 var(--ready-space-4);border:1px solid var(--ready-hairline)}
 .workbook-tabs button{display:grid;min-width:0;gap:var(--ready-space-1);padding:10px 8px;border:0;border-right:1px solid var(--ready-hairline);border-radius:0;color:var(--ready-muted);background:transparent;text-align:left;cursor:pointer}
 .workbook-tabs button.active{color:var(--ready-on-action);background:var(--ready-action);box-shadow:none}
@@ -466,6 +487,14 @@ body[data-ready-mode] .workbook-blank input{box-sizing:border-box;width:calc(var
 .workbook-blank input:focus::placeholder{color:transparent}
 .workbook-blank.correct input{border-color:var(--ready-success);background:var(--ready-success-soft)}
 .workbook-blank.wrong input{border-color:var(--ready-error);background:var(--ready-error-soft)}
+.workbook-blank input.recall-wrong{border-color:var(--ready-error);color:var(--ready-error);background:var(--ready-error-soft)}
+.workbook-blank input.recall-complete{border-color:var(--ready-success);background:var(--ready-success-soft)}
+.workbook-blank.live-mismatch input{border-color:var(--ready-error);background:var(--ready-error-soft)}
+.workbook-live-copy,.workbook-slot-hint{grid-column:1;color:var(--ready-muted);font-size:11px;font-weight:650;line-height:1.35;text-align:left}
+.workbook-live-copy b{color:var(--ready-error)}
+.workbook-slot-hint{color:var(--ready-primary)}
+.workbook-hint-actions{display:flex;align-items:center;gap:var(--ready-space-3);margin-top:var(--ready-space-4)}
+.workbook-hint-actions small{color:var(--ready-muted);font-size:12px;line-height:1.45}
 .workbook-feedback{display:flex;gap:var(--ready-space-2);margin-top:var(--ready-space-5);padding:var(--ready-space-3) 0;border-top:2px solid currentColor;border-radius:0;font-size:13px;line-height:1.5}
 .workbook-feedback-copy{display:grid;gap:2px}
 .workbook-feedback.correct{color:var(--ready-success);background:transparent}.workbook-feedback.wrong{color:var(--ready-error);background:transparent}
@@ -482,12 +511,13 @@ body[data-ready-mode] .workbook-blank input{box-sizing:border-box;width:calc(var
 body[data-ready-mode] .workbook-correction-row input{min-height:36px;height:36px;padding:4px 7px}
 .workbook-correction-row>span{align-self:center;color:var(--ready-muted);font:750 11px/1 var(--ready-font-mono)}
 .workbook-correction-row.correct{background:var(--ready-success-soft)}.workbook-correction-row.wrong{background:var(--ready-error-soft)}
-.workbook-order-group{display:inline-flex;max-width:100%;gap:var(--ready-space-2);margin:var(--ready-space-2) var(--ready-space-1);padding:var(--ready-space-2);border:1px solid var(--ready-hairline);background:var(--ready-canvas-quiet);vertical-align:middle;flex-direction:column}
+.workbook-order-group{display:inline-flex;max-width:100%;gap:var(--ready-space-4);margin:var(--ready-space-3) var(--ready-space-1);padding:var(--ready-space-4);border:1px solid var(--ready-hairline);background:var(--ready-canvas-quiet);vertical-align:middle;flex-direction:column}
 .workbook-state{display:flex;align-items:center;gap:var(--ready-space-2)}.workbook-state .question-bookmark{width:36px;height:36px}
-.workbook-order-built,.workbook-order-bank{display:flex;min-height:37px;flex-wrap:wrap;gap:var(--ready-space-1);align-items:center}.workbook-order-bank-slot{display:inline-flex}.workbook-order-bank-slot.used{visibility:hidden;pointer-events:none}.workbook-order-bank em{color:var(--ready-muted);font-size:12px;font-style:normal}
+.workbook-order-built,.workbook-order-bank{display:flex;min-height:45px;flex-wrap:wrap;gap:var(--ready-space-2);align-items:center}.workbook-order-bank-slot{display:inline-flex;min-height:41px}.workbook-order-bank-slot.used{visibility:hidden;pointer-events:none}.workbook-order-bank em{color:var(--ready-muted);font-size:13px;font-style:normal}
 .workbook-translation{display:grid;gap:var(--ready-space-2);color:var(--ready-muted);font-size:12px;font-weight:750}.workbook-translation textarea{width:100%;min-height:84px;padding:10px;border:1px solid var(--ready-hairline-strong);color:var(--ready-ink);background:var(--ready-canvas-quiet);font:500 15px/1.55 var(--ready-font-sans);resize:vertical}.workbook-word-bank{display:flex;flex-wrap:wrap;gap:var(--ready-space-1);align-items:center;margin:0 0 var(--ready-space-4)}.workbook-word-bank small{margin-right:var(--ready-space-2);color:var(--ready-muted);font-weight:750}.workbook-word-bank span{padding:5px 8px;border:1px solid var(--ready-hairline);background:var(--ready-canvas-quiet);font-size:13px}
-.workbook-order-built{box-sizing:border-box;width:100%;min-width:220px;min-height:max(37px,var(--workbook-order-stable-height,37px));padding:5px 7px;border-bottom:2px solid var(--ready-ink)}
-.workbook-order-built button,.workbook-order-bank button{padding:6px 9px;border:1px solid var(--ready-hairline);border-radius:var(--ready-radius-xs);color:var(--ready-ink);background:var(--ready-surface);font-size:14px;font-weight:700;cursor:pointer}
+.workbook-order-built{box-sizing:border-box;width:100%;min-width:260px;min-height:max(45px,var(--workbook-order-stable-height,45px));padding:7px 4px 10px;border-bottom:2px solid var(--ready-ink)}
+.workbook-order-built button,.workbook-order-bank button{min-height:41px;padding:8px 12px;border:1px solid var(--ready-hairline-strong);border-radius:var(--ready-radius-xs);color:var(--ready-ink);background:var(--ready-surface);font-size:15px;font-weight:700;cursor:pointer}
+.workbook-order-built button{border-color:var(--ready-action);background:color-mix(in srgb,var(--ready-action) 8%,var(--ready-surface))}
 .review-sections{display:grid;gap:var(--ready-space-6)}.review-group{display:flex;align-items:center;justify-content:space-between;gap:var(--ready-space-6);padding:var(--ready-space-5);border:1px solid var(--ready-hairline);background:var(--ready-surface)}.review-group h2{margin:4px 0 0}.workbook-review-group{display:block}.review-workbook-list{display:grid;margin-top:var(--ready-space-4);border-top:1px solid var(--ready-hairline)}.review-workbook-list button{display:flex;min-height:62px;align-items:center;justify-content:space-between;gap:var(--ready-space-4);padding:var(--ready-space-3) 0;border:0;border-bottom:1px solid var(--ready-hairline);color:var(--ready-ink);background:transparent;text-align:left;cursor:pointer}.review-workbook-list button span{display:grid;gap:3px}.review-workbook-list small{color:var(--ready-muted)}
 
 /* Admin density */
@@ -573,9 +603,15 @@ body[data-ready-mode] #toast.on{opacity:1;transform:translate(-50%,0)}
   .choice-matrix .choice-cell+.choice-cell{padding:var(--ready-space-2) 0 0;border:0;border-top:1px solid var(--ready-hairline)}
   .written-workspace.correction{grid-template-columns:1fr}
   .writing-target,.writing-conditions{grid-template-columns:1fr;gap:var(--ready-space-2)}
+  .workbook-stage-picker{margin-bottom:var(--ready-space-10)}
+  .workbook-picker-head{margin-bottom:var(--ready-space-6)}
+  .workbook-stage-option{min-height:68px;padding-inline:var(--ready-space-3)}
   .workbook-tabs{display:flex;overflow-x:auto}
   .workbook-tabs button{flex:0 0 92px}
   .workbook-card{padding:var(--ready-space-4)}
+  .workbook-study-head{min-height:60px;margin-bottom:var(--ready-space-5);padding-bottom:var(--ready-space-3)}
+  .workbook-study-head .workbook-instruction{font-size:13px}
+  .workbook-focus-card{min-height:calc(100dvh - 220px);padding:0}
   .workbook-correction-row{grid-template-columns:24px minmax(0,1fr);align-items:start}
   .workbook-correction-row>b{display:none}.workbook-correction-row label{grid-column:2}
   .workbook-order-group{display:flex;width:100%;margin:var(--ready-space-2) 0;flex-direction:column}.workbook-order-built{min-width:0}
@@ -595,6 +631,10 @@ body[data-ready-mode] #toast.on{opacity:1;transform:translate(-50%,0)}
   body[data-ready-mode="student"] .start-study{align-items:flex-start}
   body[data-ready-mode="student"] .passage-open small{display:none}
   body[data-ready-mode="student"] .passage-open{padding-inline:0}
+  .workbook-stage-copy small{max-width:58vw}
+  .workbook-study-head{gap:var(--ready-space-3)}
+  .workbook-study-head .workbook-state{align-items:flex-start}
+  .workbook-study-layout .workbook-card blockquote,.workbook-study-layout .workbook-task-passage{margin-inline:calc(-1 * var(--ready-space-4));padding-inline:var(--ready-space-4)}
   body[data-ready-mode="admin"] .filter-toolbar{grid-template-columns:1fr}
   body[data-ready-mode="admin"] .selection-summary{align-items:flex-start;flex-direction:column}
   body[data-ready-mode="admin"] .delete-actions{display:grid;grid-template-columns:1fr 1fr}

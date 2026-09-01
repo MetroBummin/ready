@@ -8,6 +8,8 @@ import { validateQuestionSpec } from '../server/ready/question-spec.mjs';
 import { compileAndValidateInteraction, compileInteractionContract } from '../tools/ready-interaction-contract.mjs';
 import { contractChoiceCopyHtml, contractPassageHtml, contractRenderCounts, contractResponseComplete } from '../ready/interaction-runtime.js';
 import { WORKBOOK_TRANSLATION_GRADING_POLICY, workbookTranslationPass } from '../server/ready/workbook-grading-policy.mjs';
+import { normalizeWorkbookAnswer as normalizeWorkbookAnswerClient, livePrefixState, verifierMatches, workbookRecallCue as workbookRecallCueClient } from '../ready/workbook-assistance.js';
+import { normalizeWorkbookAnswer as normalizeWorkbookAnswerServer, publicWorkbookAssistance, stageNineHint, workbookRecallCue as workbookRecallCueServer } from '../server/ready/workbook-assistance.mjs';
 
 const root=resolve(dirname(fileURLToPath(import.meta.url)),'..');
 const read=path=>readFileSync(resolve(root,path),'utf8');
@@ -21,6 +23,24 @@ assert.match(token,/^[A-Za-z0-9_-]{43}$/);
 assert.equal(bearerToken(`Bearer ${token}`),token);
 assert.equal((await sha256Hex(token)).length,64);
 assert.equal(secureEqual('same-secret','same-secret'),true);
+assert.equal(normalizeWorkbookAnswerClient(' While  scrolling! '),'while scrolling');
+assert.equal(normalizeWorkbookAnswerClient(' While  scrolling! '),normalizeWorkbookAnswerServer(' While  scrolling! '),'Stage 9 live and final grading normalization must stay aligned');
+assert.equal(workbookRecallCueClient('퍼지고 있다','korean_syllable'),'퍼');
+assert.equal(workbookRecallCueServer('퍼지고 있다','korean_syllable'),'퍼');
+assert.equal(workbookRecallCueClient('turned out','english_initial'),'t');
+const recallContract=await publicWorkbookAssistance({stage:2,answers:['퍼지고 있다']},sha256Hex);
+assert.equal(recallContract.mode,'recall_unlock');
+assert.equal(await verifierMatches('퍼',recallContract.slots[0]),true);
+assert.equal(await verifierMatches('파',recallContract.slots[0]),false);
+assert.equal(JSON.stringify(recallContract).includes('퍼지고 있다'),false,'Recall contract must not expose the answer');
+const prefixContract=await publicWorkbookAssistance({stage:9,answers:['While scrolling']},sha256Hex);
+assert.deepEqual(await livePrefixState('While scrol',prefixContract.slots[0]),{valid:true,mismatchIndex:-1,complete:false});
+assert.deepEqual(await livePrefixState('While scrolx',prefixContract.slots[0]),{valid:false,mismatchIndex:11,complete:false});
+assert.equal((await livePrefixState('While scrolling',prefixContract.slots[0])).complete,true);
+assert.equal(JSON.stringify(prefixContract).includes('while scrolling'),false,'Prefix contract must not expose the answer');
+assert.equal(stageNineHint('provocative false stories',1),'provocative');
+assert.equal(stageNineHint('provocative false stories',2),'provocative false stories');
+assert.equal(stageNineHint('provocative',1),'p');
 
 function objective(overrides={}){
   const payload={
@@ -136,11 +156,13 @@ const baseline=read('supabase/migrations/20260826150000_ready_current_baseline.s
 const questionMigration=read('supabase/migrations/20260828150000_ready_question_first.sql');
 const workbookReviewMigration=read('supabase/migrations/20260831233000_ready_workbook_review_ai.sql');
 const workbookGradeLinkMigration=read('supabase/migrations/20260901013000_ready_workbook_ai_grade_link.sql');
+const workbookAssistanceMigration=read('supabase/migrations/20260901030000_ready_workbook_assistance.sql');
 assert.match(baseline,/ready_attempts_are_immutable[\s\S]*before update or delete/);
 assert.match(questionMigration,/ready_import_question_bundle[\s\S]*jsonb_array_elements/);
 assert.match(workbookReviewMigration,/ready_workbook_bookmarks[\s\S]*ready_workbook_ai_grading_requests/);
 assert.match(workbookGradeLinkMigration,/ai_grading_request_id[\s\S]*references public\.ready_workbook_ai_grading_requests/);
 assert.match(workbookGradeLinkMigration,/delete from ready_workbook_attempts[\s\S]*delete from ready_workbook_ai_grading_requests/,'Cascade must delete linked attempts before AI audit rows');
+assert.match(workbookAssistanceMigration,/hint_count[\s\S]*used_full_answer_hint[\s\S]*completed_after_hint/,'Stage 9 assistance must be queryable on append-only attempts');
 
 const {NE_MINBYEONGCHEON_L1_WORKBOOK}=await import('../server/ready/workbook-ne-l1.mjs');
 const {NE_MINBYEONGCHEON_L2_WORKBOOK}=await import('../server/ready/workbook-ne-l2.mjs');
@@ -176,5 +198,16 @@ assert.match(edge,/callGeminiGrade\(question, spec, responses\)[\s\S]*grade\.cor
 assert.match(edge,/rubricSnapshot[\s\S]*publisherReferenceTranslation[\s\S]*gradingPolicy[\s\S]*passScore/);
 assert.match(edge,/ready_workbook_ai_grading_requests[\s\S]*status: "pending"[\s\S]*callGeminiTranslationGrade/,'Workbook translations must be persisted before AI inference');
 assert.match(edge,/ai_grading_request_id: aiRequestId/,'Workbook attempt must link to the AI grading request');
+assert.match(edge,/unlock_workbook_recall[\s\S]*workbook_hint/,'Recall unlock and staged hints must be explicit student operations');
+assert.match(edge,/assistance: workbookAssistanceMode\(item\)/,'Workbook listing must expose only the assistance mode, not every answer verifier');
+assert.match(edge,/async function workbookAssistance[\s\S]*publicWorkbookAssistance/,'Only the current item may lazily request its verifier contract');
+assert.match(app,/ensureWorkbookAssistance[\s\S]*workbook_assistance/,'The client must cache a verifier contract per current item instead of loading the whole workbook');
+assert.match(edge,/usedFullAnswerHint[\s\S]*correct = false/,'A full-answer hint must force the current Stage 9 attempt to wrong');
+assert.match(edge,/형용사절·부사절·주절의 동사/,'Translation feedback must identify the misunderstood sentence unit');
+assert.match(app,/compositionstart[\s\S]*compositionend[\s\S]*handleWorkbookRecallInput/,'Korean recall must wait for IME composition to finish');
+assert.match(app,/flashRecallWrong[\s\S]*220/,'A wrong recall cue must clear after a brief red signal');
+assert.match(app,/data-workbook-live-prefix[\s\S]*workbook-live-copy/,'Stage 9 must show live mismatch feedback without ending the attempt');
+assert.match(app,/hintReceipt[\s\S]*completedAfterHint/,'Stage 9 hint state must survive through final grading');
+assert.match(app,/bookmark-star[\s\S]*★[\s\S]*☆/,'Question and Workbook bookmarks must share star language');
 
 console.log('READY executable Question contract checks passed');

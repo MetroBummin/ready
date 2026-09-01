@@ -11,6 +11,7 @@ import { YBM_PARKJUNEON_L2_WORKBOOK } from "./workbook-ybm-l2.mjs";
 import { validateQuestionSpec } from "./question-spec.mjs";
 import { deterministicGrade, publicInteractionContract } from "./interaction-contract.mjs";
 import { WORKBOOK_TRANSLATION_GRADING_POLICY, workbookTranslationPass } from "./workbook-grading-policy.mjs";
+import { normalizeWorkbookAnswer, publicWorkbookAssistance, stageNineHint, workbookAssistanceMode, workbookRecallCue } from "./workbook-assistance.mjs";
 
 const CORS = { "Access-Control-Allow-Origin": "*", "Access-Control-Allow-Headers": "authorization, apikey, content-type, x-client-info", "Access-Control-Allow-Methods": "POST, OPTIONS" };
 const json = (body: unknown, status = 200) => new Response(JSON.stringify(body), { status, headers: { ...CORS, "Content-Type": "application/json", "Cache-Control": "no-store" } });
@@ -24,7 +25,7 @@ function supabaseAdminKey() {
 }
 const db = createClient(Deno.env.get("SUPABASE_URL") ?? "", supabaseAdminKey(), { auth: { persistSession: false } });
 const adminOps = new Set(["teacher_bootstrap", "delete_impact", "assign_scope_passages", "set_scope_passages", "create_passage", "update_passage", "delete_passage", "create_student", "set_student_pin", "delete_student", "import_questions", "import_explanations"]);
-const studentOps = new Set(["student_bootstrap", "student_passage", "student_questions", "student_question_filters", "student_question_queue", "student_review_questions", "set_question_bookmark", "submit_attempt", "student_workbook", "set_workbook_bookmark", "submit_workbook_attempt"]);
+const studentOps = new Set(["student_bootstrap", "student_passage", "student_questions", "student_question_filters", "student_question_queue", "student_review_questions", "set_question_bookmark", "submit_attempt", "student_workbook", "workbook_assistance", "set_workbook_bookmark", "unlock_workbook_recall", "workbook_hint", "submit_workbook_attempt"]);
 const publicOps = new Set(["list_students", "student_login", "admin_login"]);
 // Match Breeze's free Gemini dictionary defaults. The API key remains a
 // Supabase Edge Function Secret and is never part of any public response.
@@ -153,6 +154,9 @@ function workbookTranslationPrompt(item: any, response: string) {
 - 정도 부사의 작은 생략은 핵심 의미를 바꾸지 않으면 경미하게만 봅니다. 예: "아주 작은"을 "작은"으로 쓴 경우.
 - critical_errors에는 주체·행동·대상·부정·수치·인과를 뒤집거나 핵심 절을 빠뜨린 중대한 오류만 넣습니다.
 - feedback_lines는 학생이 바로 고칠 수 있는 한국어 문장 1~3개입니다.
+- 틀린 부분이 있으면 "의미를 잘 파악하지 못했습니다"처럼 뭉뚱그리지 말고, 형용사절·부사절·주절의 동사·주어/목적어·부정·인과 중 실제로 잘못 해석한 단위를 정확히 지목하세요.
+- 통과 답안도 단순 칭찬만 하지 말고, 정확히 보존된 핵심 절이나 관계를 한 가지 짚으세요.
+- 문법 용어만 나열하지 말고 학생 답안의 어떤 표현을 어떻게 고치면 되는지 짧게 설명하세요.
 - 정답/오답 boolean은 반환하지 마세요. 통과 여부는 서버가 점수와 critical_errors로 결정합니다.
 
 {"score":0,"critical_errors":[],"feedback_lines":[""],"error_tags":[]}`;
@@ -737,11 +741,6 @@ async function workbookReviewItems(studentId: string, examId: string) {
     return [{ passageId: passage.id, passageTitle: passage.title, workbookKey: catalog.workbookKey, workbookTitle: catalog.title, itemKey: item.key, stage: item.stage, number: item.number, kind: item.kind, title: catalog.stages.find((stage: any) => stage.stage === item.stage)?.title || `${item.stage}단계`, bookmarked: true, bookmarkSource: bookmark.source, lastResult: latest.get(`${passage.id}:${item.key}`) ?? null }];
   });
 }
-function normalizeWorkbookAnswer(value: unknown) {
-  return clean(value, 1_000).normalize("NFKC").toLowerCase()
-    .replace(/[“”‘’'".,!?;:()[\]{}]/g, "")
-    .replace(/\s+/g, " ").trim();
-}
 async function studentWorkbook(body: any, session: ReadySession) {
   const student = await studentForSession(session), examId = required(body.examId, "Exam", 80), passageId = required(body.passageId, "지문", 80);
   const passage = await studentPassageAccess(examId, passageId, student), catalog = workbookForPassage(passage);
@@ -763,10 +762,48 @@ async function studentWorkbook(body: any, session: ReadySession) {
       groups: Array.isArray(item.groups) ? item.groups : [],
       wordBank: Array.isArray(item.wordBank) ? item.wordBank : [],
       pairCount: Number(item.pairCount) || 0, subtype: clean(item.subtype, 40),
+      assistance: workbookAssistanceMode(item),
       completed: latest.get(item.key) === true, lastResult: latest.get(item.key) ?? null, bookmarked: bookmarks.has(item.key),
     })),
   }));
   return { workbookKey: catalog.workbookKey, title: catalog.title, passage: { id: passage.id, title: passage.title }, stages };
+}
+
+async function workbookAssistance(body: any, session: ReadySession) {
+  const student = await studentForSession(session), examId = required(body.examId, "Exam", 80), passageId = required(body.passageId, "지문", 80), itemKey = required(body.itemKey, "워크북 문제", 120);
+  const passage = await studentPassageAccess(examId, passageId, student), catalog = workbookForPassage(passage), item = workbookItem(catalog, itemKey);
+  if (!catalog || !item || !workbookAssistanceMode(item)) throw new ApiError(404, "현재 검증 계약이 필요하지 않은 문제입니다.");
+  return { itemKey, assistance: await publicWorkbookAssistance(item, sha256Hex) };
+}
+
+async function unlockWorkbookRecall(body: any, session: ReadySession) {
+  const student = await studentForSession(session), examId = required(body.examId, "Exam", 80), passageId = required(body.passageId, "지문", 80), itemKey = required(body.itemKey, "워크북 문제", 120);
+  const passage = await studentPassageAccess(examId, passageId, student), catalog = workbookForPassage(passage), item = workbookItem(catalog, itemKey), slot = Number(body.slot);
+  if (!catalog || !item || ![2, 3].includes(Number(item.stage)) || !Number.isInteger(slot) || slot < 0 || slot >= item.answers.length) throw new ApiError(404, "현재 해제할 수 없는 빈칸입니다.");
+  const mode = Number(item.stage) === 2 ? "korean_syllable" : "english_initial", cue = workbookRecallCue(body.cue, mode), expected = workbookRecallCue(item.answers[slot], mode);
+  if (!cue || cue !== expected) throw new ApiError(400, "첫 글자를 다시 확인해 주세요.");
+  return { slot, answer: item.answers[slot] };
+}
+
+function hintReceiptSecret() { return `${supabaseAdminKey()}:ready-workbook-hint-v1`; }
+function base64UrlText(value: string) { let binary = ""; for (const byte of new TextEncoder().encode(value)) binary += String.fromCharCode(byte); return btoa(binary).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/g, ""); }
+function decodeBase64UrlText(value: string) { const binary = atob(value.replace(/-/g, "+").replace(/_/g, "/") + "===".slice((value.length + 3) % 4)), bytes = Uint8Array.from(binary, character => character.charCodeAt(0)); return new TextDecoder().decode(bytes); }
+async function signHintReceipt(payload: any) { const encoded = base64UrlText(JSON.stringify(payload)); return `${encoded}.${await sha256Hex(`${hintReceiptSecret()}:${encoded}`)}`; }
+async function verifyHintReceipt(token: unknown, expected: any) {
+  const [encoded, signature] = clean(token, 4_000).split(".");
+  if (!encoded || !signature || !secureEqual(signature, await sha256Hex(`${hintReceiptSecret()}:${encoded}`))) return null;
+  try { const value = JSON.parse(decodeBase64UrlText(encoded)); return value.studentId === expected.studentId && value.examId === expected.examId && value.passageId === expected.passageId && value.itemKey === expected.itemKey ? value : null; } catch { return null; }
+}
+
+async function workbookHint(body: any, session: ReadySession) {
+  const student = await studentForSession(session), examId = required(body.examId, "Exam", 80), passageId = required(body.passageId, "지문", 80), itemKey = required(body.itemKey, "워크북 문제", 120);
+  const passage = await studentPassageAccess(examId, passageId, student), catalog = workbookForPassage(passage), item = workbookItem(catalog, itemKey), slot = Number(body.slot);
+  if (!catalog || !item || Number(item.stage) !== 9 || !Number.isInteger(slot) || slot < 0 || slot >= item.answers.length) throw new ApiError(404, "현재 힌트를 제공할 수 없는 빈칸입니다.");
+  const identity = { studentId: student.id, examId, passageId, itemKey }, prior = body.hintReceipt ? await verifyHintReceipt(body.hintReceipt, identity) : null;
+  if (body.hintReceipt && !prior) throw new ApiError(400, "힌트 상태를 다시 시작해 주세요.");
+  const hintCount = Math.min(2, Number(prior?.hintCount || 0) + 1), usedFullAnswerHint = hintCount >= 2;
+  const hintReceipt = await signHintReceipt({ ...identity, hintCount, usedFullAnswerHint, issuedAt: new Date().toISOString() });
+  return { slot, level: hintCount, fragment: stageNineHint(item.answers[slot], hintCount), hintCount, usedFullAnswerHint, hintReceipt };
 }
 async function setWorkbookBookmark(body: any, session: ReadySession) {
   const student = await studentForSession(session), examId = required(body.examId, "Exam", 80), passageId = required(body.passageId, "지문", 80), itemKey = required(body.itemKey, "워크북 문제", 120), bookmarked = body.bookmarked === true;
@@ -788,6 +825,15 @@ async function submitWorkbookAttempt(body: any, session: ReadySession) {
   const responses = cleanList(body.responses, 80, 1_000);
   if (responses.length !== item.answers.length) throw new ApiError(400, "모든 빈칸을 입력해 주세요.");
   let slotResults = responses.map((response, index) => normalizeWorkbookAnswer(response) === normalizeWorkbookAnswer(item.answers[index])), correct = slotResults.every(Boolean), aiFeedback = "", aiFeedbackLines: string[] = [], aiScore: number | null = null, gradingPolicy: string | null = null, aiRequestId: string | null = null;
+  let hintCount = 0, usedFullAnswerHint = false, completedAfterHint = false;
+  if (Number(item.stage) === 9 && body.hintReceipt) {
+    const hintState = await verifyHintReceipt(body.hintReceipt, { studentId: student.id, examId, passageId, itemKey });
+    if (!hintState) throw new ApiError(400, "힌트 상태를 확인할 수 없습니다. 다시 시도해 주세요.");
+    hintCount = Math.min(2, Math.max(0, Number(hintState.hintCount) || 0));
+    usedFullAnswerHint = hintState.usedFullAnswerHint === true || hintCount >= 2;
+    completedAfterHint = correct && usedFullAnswerHint;
+    if (usedFullAnswerHint) correct = false;
+  }
   if(item.kind==="translation_ai"){
     const today = new Date(); today.setHours(0, 0, 0, 0);
     const used = await db.from("ready_workbook_ai_grading_requests").select("id", { count: "exact", head: true }).eq("student_id", student.id).gte("created_at", today.toISOString());
@@ -809,6 +855,7 @@ async function submitWorkbookAttempt(body: any, session: ReadySession) {
   const inserted = rows<any>(await db.from("ready_workbook_attempts").insert({
     student_id: student.id, exam_id: examId, passage_id: passageId, workbook_key: catalog.workbookKey,
     item_key: item.key, stage: item.stage, response: { responses }, correct, ai_grading_request_id: aiRequestId,
+    hint_count: hintCount, used_full_answer_hint: usedFullAnswerHint, completed_after_hint: completedAfterHint,
   }).select("id,correct,created_at").single());
   if (!correct) {
     const saved = await db.from("ready_workbook_bookmarks").upsert({ student_id: student.id, exam_id: examId, passage_id: passageId, workbook_key: catalog.workbookKey, item_key: item.key, item_type: item.kind, source: "wrong_answer", updated_at: new Date().toISOString() }, { onConflict: "student_id,exam_id,passage_id,workbook_key,item_key", ignoreDuplicates: true });
@@ -819,7 +866,7 @@ async function submitWorkbookAttempt(body: any, session: ReadySession) {
   }
   const bookmark = await db.from("ready_workbook_bookmarks").select("item_key").eq("student_id", student.id).eq("exam_id", examId).eq("passage_id", passageId).eq("workbook_key", catalog.workbookKey).eq("item_key", item.key).maybeSingle();
   if (bookmark.error) throw new ApiError(500, bookmark.error.message);
-  return { attempt: inserted, correct, answers: correct ? [] : item.answers, slotResults, aiFeedback, aiFeedbackLines, aiScore, gradingPolicy, aiRequestId, bookmarked: !!bookmark.data, reviewCount: (await eligibleReviewQuestionIds(student.id, examId)).length + await workbookReviewCount(student.id, examId) };
+  return { attempt: inserted, correct, answers: correct ? [] : item.answers, slotResults, aiFeedback, aiFeedbackLines, aiScore, gradingPolicy, aiRequestId, hintCount, usedFullAnswerHint, completedAfterHint, bookmarked: !!bookmark.data, reviewCount: (await eligibleReviewQuestionIds(student.id, examId)).length + await workbookReviewCount(student.id, examId) };
 }
 function normalizedWord(value: unknown) { return clean(value, 100).toLowerCase().replace(/[^a-z']/g, "").replace(/^'+|'+$/g, ""); }
 async function studyContext(body: any, session: ReadySession, sentenceRequired = false) { const student = await studentForSession(session), examId = required(body.examId, "Exam", 80), passageId = required(body.passageId, "지문", 80), passage = await studentPassageAccess(examId, passageId, student), sentenceId = clean(body.sentenceId, 80); let sentence:any = null; if (sentenceRequired || sentenceId) { sentence = rows<any>(await db.from("ready_passage_sentences").select("id,text,translation").eq("id", required(sentenceId, "문장", 80)).eq("passage_id", passage.id).single()); } return { student, examId, passage, sentence }; }
@@ -873,7 +920,7 @@ async function dispatch(op: string, body: any, session: ReadySession | null) {
     case "list_students": return listStudents(); case "student_login": return studentLogin(body); case "admin_login": return adminLogin(body); case "logout": return revokeSession(session as ReadySession);
     case "teacher_bootstrap": return teacherBootstrap(); case "delete_impact": return deleteImpact(body); case "create_student": return createStudent(body); case "set_student_pin": return setStudentPin(body); case "delete_student": return deleteStudent(body);
     case "assign_scope_passages": return setScopePassages(body, false); case "set_scope_passages": return setScopePassages(body, true); case "create_passage": return createPassage(body); case "update_passage": return updatePassage(body); case "delete_passage": return deletePassage(body); case "import_questions": return importQuestions(body); case "import_explanations": return importExplanations(body);
-    case "student_bootstrap": return studentBootstrap(session as ReadySession); case "student_passage": return studentPassage(body, session as ReadySession); case "student_questions": return studentQuestions(body, session as ReadySession); case "student_question_filters": return studentQuestionFilters(body, session as ReadySession); case "student_question_queue": return studentQuestionQueue(body, session as ReadySession); case "student_review_questions": return studentReviewQuestions(body, session as ReadySession); case "set_question_bookmark": return setQuestionBookmark(body, session as ReadySession); case "submit_attempt": return submitAttempt(body, session as ReadySession); case "student_workbook": return studentWorkbook(body, session as ReadySession); case "set_workbook_bookmark": return setWorkbookBookmark(body, session as ReadySession); case "submit_workbook_attempt": return submitWorkbookAttempt(body, session as ReadySession);
+    case "student_bootstrap": return studentBootstrap(session as ReadySession); case "student_passage": return studentPassage(body, session as ReadySession); case "student_questions": return studentQuestions(body, session as ReadySession); case "student_question_filters": return studentQuestionFilters(body, session as ReadySession); case "student_question_queue": return studentQuestionQueue(body, session as ReadySession); case "student_review_questions": return studentReviewQuestions(body, session as ReadySession); case "set_question_bookmark": return setQuestionBookmark(body, session as ReadySession); case "submit_attempt": return submitAttempt(body, session as ReadySession); case "student_workbook": return studentWorkbook(body, session as ReadySession); case "workbook_assistance": return workbookAssistance(body, session as ReadySession); case "set_workbook_bookmark": return setWorkbookBookmark(body, session as ReadySession); case "unlock_workbook_recall": return unlockWorkbookRecall(body, session as ReadySession); case "workbook_hint": return workbookHint(body, session as ReadySession); case "submit_workbook_attempt": return submitWorkbookAttempt(body, session as ReadySession);
     default: throw new ApiError(404, "알 수 없는 READY 작업입니다.");
   }
 }

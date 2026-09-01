@@ -24,6 +24,7 @@ Workbook에서는 `translation_ai`만 AI 채점이며 빈칸, 동사형, 어법 
 - 서버: `score >= 75`이고 `critical_errors`가 없을 때만 통과시킨다.
 - `rubric_snapshot`에는 원문, 출판사 해석, 모델, 정책 버전, 임계값을 저장한다.
 - `result`에는 점수, 최종 판정, 중대 오류, 피드백, 오류 태그와 적용 정책을 저장한다.
+- 피드백은 일반적인 칭찬/실패 문구 대신 형용사절·부사절·주절 동사·주어/목적어·부정·인과 중 실제로 이해하거나 놓친 문장 단위를 1~3줄로 지목한다.
 - 성공한 attempt의 `ai_grading_request_id`로 당시 평가 결과를 다시 조회할 수 있다.
 
 Question 서술형은 기존 `correct` 기반 semantics를 유지하며 이 점수 정책을 공유하지 않는다.

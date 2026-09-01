@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <title>READY Workbook Flow Harness</title>
+  <link rel="stylesheet" href="../styles/tokens.css">
+  <link rel="stylesheet" href="../styles/base.css">
+  <link rel="stylesheet" href="../design-tokens.css">
+  <link rel="stylesheet" href="../ready/ready.css">
+  <link rel="stylesheet" href="../ready/design.css">
+</head>
+<body data-ready-mode="student">
+<div id="app">
+  <header id="topbar">
+    <button id="logo" class="brand-button"><span class="mark">READY</span><span class="family">Student</span></button>
+    <nav id="student-nav"><button>Home</button><button>Review</button></nav>
+  </header>
+  <main id="harness-main"></main>
+</div>
+<script>
+const stageRows=[
+  ['2단계','우리말 빈칸','18 / 55'],['3단계','영문 빈칸','7 / 55'],['4단계','문장 해석','0 / 55'],
+  ['5단계','동사형','0 / 55'],['6단계','어법 선택','0 / 55'],['7단계','어색한 곳 찾기','1 / 14'],
+  ['8단계','문장 배열','0 / 55'],['9단계','직접 영작','0 / 55']
+];
+const picker=`<div class="workbook-stage-picker"><header class="filter-head workbook-picker-head"><button class="back-link">← Home</button><p class="eyebrow">READY · WORKBOOK</p><h1>영어Ⅱ YBM(박준언) 2과 워크북</h1><p>학습할 단계를 선택하세요. 이어서 풀 단계에는 현재 진도가 표시됩니다.</p></header><section class="workbook-stage-list"><div class="workbook-stage-list-head"><h2>단계 선택</h2><small>8개 단계</small></div>${stageRows.map(([stage,title,count])=>`<button class="workbook-stage-option"><span class="workbook-stage-copy"><strong>${stage}</strong><small>${title}</small></span><span class="workbook-stage-state"><small>${count}</small><b>→</b></span></button>`).join('')}</section></div>`;
+const study=`<button class="study-back"><span>‹</span></button><div class="workbook-study-layout"><header class="workbook-study-head"><div><p class="eyebrow">7단계 · 어색한 곳 찾기</p><p class="workbook-instruction">어색한 표현을 찾아 쓰고 알맞게 고쳐 쓰세요.</p></div><span class="workbook-state"><b>1 / 14</b><button class="question-bookmark"><span class="bookmark-star">☆</span></button></span></header><section class="workbook-card workbook-focus-card"><div class="workbook-task-passage" lang="en">Jiyun, a high school student, starts her day by logging out of a music streaming service on her smartphone. She enjoys listening to her favorite music, discovering new songs, and exploring new artists every day. For a healthy breakfast, Jiyun receives a delivery from a subscription service that provides fresh vegetables and fruits.</div><div class="workbook-correction-list"><div class="workbook-correction-row"><span>1</span><label>어색한 표현<input value="logging out"></label><b>→</b><label>바르게 고치기<input placeholder="직접 입력"></label></div><div class="workbook-correction-row"><span>2</span><label>어색한 표현<input placeholder="직접 입력"></label><b>→</b><label>바르게 고치기<input placeholder="직접 입력"></label></div></div><div class="workbook-actions"><button class="button primary" disabled>채점하기</button></div></section><div class="workbook-nav"><button class="button quiet" disabled>← 이전</button><button class="button quiet">단계 선택</button></div></div>`;
+const isStudy=new URLSearchParams(location.search).get('view')==='study';
+document.body.classList.toggle('study-mode',isStudy);
+document.querySelector('#harness-main').innerHTML=isStudy?study:picker;
+</script>
+</body>
+</html>

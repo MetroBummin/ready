@@ -37,12 +37,17 @@ mixed Check는 현재 학습 범위 밖으로 원본만 보존한다.
 - `student_workbook`: 접근 가능한 Passage의 공개 item과 최신 진도만 반환한다.
 - `submit_workbook_attempt`: 응답을 서버 정규화 후 정답표와 비교하고 append-only 시도를 남긴다.
 - 제출 전 응답에는 정답이 포함되지 않는다.
+- 2·3단계는 첫 음절/글자 salted verifier만 먼저 받고, 성공한 slot만 `unlock_workbook_recall`로 해제한다.
+- 9단계는 현재 문항에 한해 지연 로딩한 salted prefix verifier로 실시간 오류만 표시하고, 힌트는 요청한 slot 조각만 반환한다.
+- 2·3단계의 미세 오타는 Attempt가 아니며, 모든 slot recall 완료 시 한 번만 append한다.
+- 9단계 전체답 힌트는 제출을 막지 않지만 해당 Attempt를 오답으로 기록하고 Review에 남긴다.
 - 해석 AI는 새로운 정답을 만들지 않고 비공개 출판사 해석과 의미만 비교한다.
 - 틀린 제출 뒤에만 해당 빈칸의 정답을 보여 준다.
 - `ready_workbook_attempts`는 원시 기록을 수정하거나 삭제하지 않는다.
 - 오답은 exercise 단위로 Review에 자동 저장되고, 정답 처리되면 자동 오답 상태만 해소한다.
 - 수동 북마크는 정답 여부와 무관하게 사용자가 직접 해제할 때까지 유지한다.
 - Review에서 해당 exercise를 열 때도 원래 Workbook renderer를 그대로 사용한다.
+- Stage 9 Attempt는 `hint_count`, `used_full_answer_hint`, `completed_after_hint`를 함께 보존한다.
 
 일반 추출기는 `tools/ready-extract-workbook-contract.py`다. 카탈로그마다 원본 파일명과
 SHA-256, 단계별 `source / ready / invalid` 수를 남긴다. 7단계도 교재별 예외 없이 같은
