@@ -29,7 +29,7 @@ clearReaderGlossMemory();const cached=await resolveReaderGlossCached(key,()=>{th
 deleteReaderGlossCache(key);const refreshed=await resolveReaderGlossCached(key,request);assert.equal(refreshed.contextGloss,'그들은');assert.equal(calls,2,'Retry must invalidate both memory and local caches');
 const nextRevision=readerGlossCacheKey({passageId:'p',revision:'r2',sentenceId:'s',start:0,end:4,sourceText:'They'});assert.notEqual(key,nextRevision,'Passage revision must invalidate cache keys');
 
-const app=read('ready/app.js'),glossModule=read('ready/reader-inline-gloss.js'),edge=read('server/ready/index.ts'),migration=read('supabase/migrations/20260901154500_ready_reader_word_learning.sql');
+const app=read('ready/app.js'),glossModule=read('ready/reader-inline-gloss.js'),edge=read('server/ready/index.ts'),migration=read('supabase/migrations/20260901154500_ready_reader_word_learning.sql'),css=read('ready/design.css');
 assert.match(app,/READER_INLINE_GLOSS_ENABLED===true[\s\S]*createReaderInlineGloss/,'Reader experiment must be feature-flagged');
 assert.match(app,/if\(!readerGlossEnabled\(\)\)[\s\S]*readerUnits\(\)/,'Feature-off Reader must preserve the plain prose path');
 assert.doesNotMatch(glossModule,/document\.addEventListener|student-questions|student-workbook/,'Gloss events must be owned only by the Reader root');
@@ -45,4 +45,14 @@ assert.match(edge,/lookup_reason:body\.retry\?"retry":"initial"/,'Retry events m
 assert.match(edge,/save_reader_word[\s\S]*saveReaderWord/,'Reader save operation must be dispatched');
 assert.match(migration,/student_id, exam_id, normalized_word/,'Active saved identity must be student + exam + lemma');
 assert.match(migration,/occurrence_key[\s\S]*publisher_translation_snapshot[\s\S]*core_meaning_snapshot/,'Lookup history must retain bilingual occurrence snapshots');
+assert.match(css,/reader-inline-source\.is-pending,[^}]*reader-inline-source\.is-refreshing[^}]*background:var\(--ready-word-block\)[^}]*box-shadow:inset 2px 0 0/,'Reader pending feedback must fill the rectangular token box');
+assert.doesNotMatch(css,/reader-gloss-loading|is-loading[^}]*text-decoration/,'Reader loading must not use an underline animation');
+assert.doesNotMatch(css,/reader-inline-source[^}]*text-decoration:(?!none)/,'Reader source states must not use underlines');
+assert.match(css,/reader-inline-replacement\{[\s\S]*display:inline-flex[\s\S]*background:transparent[\s\S]*box-shadow:none/,'Resolved gloss wrapper must not look like a warning badge');
+assert.match(css,/body\[data-ready-mode\] \.reader-inline-gloss\{[^}]*color:var\(--ready-ink\)[^}]*background:transparent[^}]*box-shadow:none[^}]*font:520 \.92em\/1\.35/,'Korean gloss must read as inline text without button chrome');
+assert.match(css,/reader-word-toggle\{[^}]*width:1\.2em[^}]*font:760 \.62em\/1/,'Save and remove marks must share a fixed visual box');
+assert.match(css,/reader-word-toggle::before\{[^}]*inset:-12px/,'Small save marks must retain a large touch target');
+assert.match(css,/data-memory-level="1"[\s\S]*ready-word-memory-1[\s\S]*data-memory-level="3"[\s\S]*ready-word-memory-3/,'Saved words must expose three distinct memory tints');
+assert.match(css,/reader-word-return var\(--ready-word-return-duration\)/,'English return must use the tokenized dissolve duration');
+assert.match(css,/@media \(prefers-reduced-motion:reduce\)/);
 console.log('READY Reader inline gloss contract verified');
