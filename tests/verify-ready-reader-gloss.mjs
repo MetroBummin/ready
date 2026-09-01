@@ -29,8 +29,11 @@ clearReaderGlossMemory();const cached=await resolveReaderGlossCached(key,()=>{th
 deleteReaderGlossCache(key);const refreshed=await resolveReaderGlossCached(key,request);assert.equal(refreshed.contextGloss,'그들은');assert.equal(calls,2,'Retry must invalidate both memory and local caches');
 const nextRevision=readerGlossCacheKey({passageId:'p',revision:'r2',sentenceId:'s',start:0,end:4,sourceText:'They'});assert.notEqual(key,nextRevision,'Passage revision must invalidate cache keys');
 
-const app=read('ready/app.js'),glossModule=read('ready/reader-inline-gloss.js'),edge=read('server/ready/index.ts'),migration=read('supabase/migrations/20260901154500_ready_reader_word_learning.sql'),css=read('ready/design.css');
+const app=read('ready/app.js'),glossModule=read('ready/reader-inline-gloss.js'),edge=read('server/ready/index.ts'),migration=read('supabase/migrations/20260901154500_ready_reader_word_learning.sql'),css=read('ready/design.css'),pagesBuild=read('tools/build-pages.mjs');
 assert.match(app,/READER_INLINE_GLOSS_ENABLED===true[\s\S]*createReaderInlineGloss/,'Reader experiment must be feature-flagged');
+assert.match(glossModule,/import '\.\.\/modules\/lexical\/core\.js'/,'READY source must import the shared lexical runtime');
+assert.match(pagesBuild,/cp\(resolve\(root, 'modules'\), resolve\(output, 'modules'\)/,'Pages and native bundles must include the shared lexical runtime');
+assert.match(pagesBuild,/\.\/modules\/lexical\/core\.js/,'Bundled Reader imports must stay inside the deployed app base path');
 assert.match(app,/if\(!readerGlossEnabled\(\)\)[\s\S]*readerUnits\(\)/,'Feature-off Reader must preserve the plain prose path');
 assert.doesNotMatch(glossModule,/document\.addEventListener|student-questions|student-workbook/,'Gloss events must be owned only by the Reader root');
 assert.match(edge,/reader_inline_gloss[\s\S]*readerInlineGloss/,'Reader resolver operation is not dispatched');
