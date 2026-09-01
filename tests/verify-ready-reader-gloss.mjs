@@ -30,5 +30,9 @@ assert.doesNotMatch(glossModule,/document\.addEventListener|student-questions|st
 assert.match(edge,/reader_inline_gloss[\s\S]*readerInlineGloss/,'Reader resolver operation is not dispatched');
 assert.match(edge,/sentence\.slice\(start,end\)!==surfaceText/,'Server must reject client range drift');
 assert.match(edge,/confidence>=0\.85[\s\S]*matches\.length===1/,'Phrase expansion must require high confidence and one exact containing span');
+assert.match(glossModule,/accepted:true[\s\S]*redraw\(sentenceId\)[\s\S]*READER_GLOSS_LOADING_DELAY_MS/,'Accepted taps must paint before the delayed network state');
+assert.match(glossModule,/if\(!online\(\)\)[\s\S]*오프라인에서는 단어 뜻을 불러올 수 없어요/,'Offline cache misses must preserve English and show a short local notice');
+assert.match(css,/reader-inline-source\.is-pending[\s\S]*box-shadow:inset/,'Reader pending feedback must fill the rectangular token box');
+assert.doesNotMatch(css,/reader-gloss-loading|is-loading[^}]*text-decoration/,'Reader loading must not use an underline animation');
 assert.match(css,/reader-gloss-dissolve 160ms/);assert.match(css,/@media \(prefers-reduced-motion:reduce\)/);
 console.log('READY Reader inline gloss contract verified');

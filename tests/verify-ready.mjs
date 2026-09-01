@@ -3,13 +3,14 @@ import { readFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { bearerToken, randomSessionToken, secureEqual, sha256Hex, validPin } from '../server/ready/auth-core.mjs';
-import { deterministicGrade, interactionContractErrors, publisherRoundTripErrors } from '../server/ready/interaction-contract.mjs';
+import { deterministicClientContract, deterministicGrade, interactionContractErrors, publisherRoundTripErrors } from '../server/ready/interaction-contract.mjs';
 import { validateQuestionSpec } from '../server/ready/question-spec.mjs';
 import { compileAndValidateInteraction, compileInteractionContract } from '../tools/ready-interaction-contract.mjs';
 import { contractChoiceCopyHtml, contractPassageHtml, contractRenderCounts, contractResponseComplete } from '../ready/interaction-runtime.js';
 import { WORKBOOK_TRANSLATION_GRADING_POLICY, workbookTranslationPass } from '../server/ready/workbook-grading-policy.mjs';
-import { normalizeWorkbookAnswer as normalizeWorkbookAnswerClient, livePrefixState, verifierMatches, workbookRecallCue as workbookRecallCueClient } from '../ready/workbook-assistance.js';
-import { normalizeWorkbookAnswer as normalizeWorkbookAnswerServer, publicWorkbookAssistance, stageNineHint, workbookRecallCue as workbookRecallCueServer } from '../server/ready/workbook-assistance.mjs';
+import { normalizeWorkbookAnswer as normalizeWorkbookAnswerClient, livePrefixState, workbookRecallCue as workbookRecallCueClient } from '../ready/workbook-assistance.js';
+import { normalizeWorkbookAnswer as normalizeWorkbookAnswerServer, publicWorkbookAssistance, stageNineHint, workbookAssistanceMode, workbookRecallCue as workbookRecallCueServer } from '../server/ready/workbook-assistance.mjs';
+import { gradeLocalQuestion, gradeLocalWorkbook, normalizeDeterministicAnswer } from '../ready/deterministic-grading.js';
 
 const root=resolve(dirname(fileURLToPath(import.meta.url)),'..');
 const read=path=>readFileSync(resolve(root,path),'utf8');
@@ -28,11 +29,9 @@ assert.equal(normalizeWorkbookAnswerClient(' While  scrolling! '),normalizeWorkb
 assert.equal(workbookRecallCueClient('퍼지고 있다','korean_syllable'),'퍼');
 assert.equal(workbookRecallCueServer('퍼지고 있다','korean_syllable'),'퍼');
 assert.equal(workbookRecallCueClient('turned out','english_initial'),'t');
-const recallContract=await publicWorkbookAssistance({stage:2,answers:['퍼지고 있다']},sha256Hex);
-assert.equal(recallContract.mode,'recall_unlock');
-assert.equal(await verifierMatches('퍼',recallContract.slots[0]),true);
-assert.equal(await verifierMatches('파',recallContract.slots[0]),false);
-assert.equal(JSON.stringify(recallContract).includes('퍼지고 있다'),false,'Recall contract must not expose the answer');
+assert.equal(normalizeDeterministicAnswer(' While  scrolling! '),'while scrolling');
+assert.deepEqual(workbookAssistanceMode({stage:2}),{mode:'recall_local',recallMode:'korean_syllable'});
+assert.deepEqual(workbookAssistanceMode({stage:3}),{mode:'recall_local',recallMode:'english_initial'});
 const prefixContract=await publicWorkbookAssistance({stage:9,answers:['While scrolling']},sha256Hex);
 assert.deepEqual(await livePrefixState('While scrol',prefixContract.slots[0]),{valid:true,mismatchIndex:-1,complete:false});
 assert.deepEqual(await livePrefixState('While scrolx',prefixContract.slots[0]),{valid:false,mismatchIndex:11,complete:false});
@@ -67,6 +66,9 @@ assert.deepEqual(contractRenderCounts(matrix.spec.interaction),{passageDevices:2
 assert.equal((contractPassageHtml(matrix.spec.interaction,{escape}).match(/data-contract-device=/g)||[]).length,2);
 assert.match(contractChoiceCopyHtml(matrix.spec.interaction,0,escape),/data-choice-column="0"[\s\S]*investigated[\s\S]*data-choice-column="1"[\s\S]*developing/);
 assert.deepEqual(deterministicGrade(matrix,'multiple_choice',{selected:[0]}),{valid:true,correct:true,answer:[0]});
+const matrixClientContract=deterministicClientContract(matrix,'multiple_choice');
+assert.deepEqual(gradeLocalQuestion(matrixClientContract,{selected:[0]}),{valid:true,correct:true,answer:[0],needsServer:false});
+assert.deepEqual(gradeLocalQuestion(matrixClientContract,{selected:[1]}),{valid:true,correct:false,answer:[0],needsServer:false});
 assert.deepEqual(publisherRoundTripErrors(matrix,'multiple_choice'),[]);
 
 const missingCells=objective();
@@ -114,6 +116,11 @@ assert.equal(contractResponseComplete(written.spec.interaction,['first','second'
 assert.equal(contractResponseComplete(written.spec.interaction,['first','']),false);
 assert.deepEqual(publisherRoundTripErrors(written,'written_response'),[]);
 assert.deepEqual(deterministicGrade(written,'written_response',{responses:['The police decided to use social media','to find clues in the picture']}),{valid:true,correct:true,answer:written.accepted_answers});
+const writtenClientContract=deterministicClientContract(written,'written_response');
+assert.equal(gradeLocalQuestion(writtenClientContract,{responses:['The police decided to use social media','to find clues in the picture']}).needsServer,false,'Publisher-exact writing must complete locally');
+assert.equal(gradeLocalQuestion(writtenClientContract,{responses:['A different answer','to find clues in the picture']}).needsServer,true,'Non-exact writing must stay on the AI slow path');
+assert.deepEqual(gradeLocalWorkbook({mode:'deterministic',answers:['퍼지고 있다']},['퍼지고 있다']),{valid:true,correct:true,completedAfterHint:false,answers:[],slotResults:[true],needsServer:false});
+assert.equal(gradeLocalWorkbook({mode:'deterministic',answers:['While scrolling']},['While scrolling'],{usedFullAnswerHint:true}).correct,false,'Full-answer hints must remain wrong in the local fast path');
 
 const passageAnswer=structuredClone(written);
 passageAnswer.prompt='다음 본문을 읽고 영어 질문에 답하시오.';
@@ -208,7 +215,7 @@ assert.match(read('ready/design.css'),/workbook-order-bank-slot\.used\{visibilit
 assert.match(read('ready/design.css'),/workbook-order-built\{[^}]*min-height:68px/,'Stage 8 must keep a compact fixed assembly area');
 assert.doesNotMatch(read('ready/design.css'),/--workbook-order-stable-height/,'Stage 8 must not mirror the full bank height into the assembly area');
 assert.match(app,/function queueWorkbookAutoSubmit\(\)[^\n]*submitWorkbook/,'Choice and reorder tasks must auto-submit only after every slot is complete');
-assert.match(app,/session\.submitting=true[^\n]*session\.submitting=false/,'Workbook submission must reject duplicate automatic requests');
+assert.match(app,/gradeLocalWorkbook[\s\S]{0,700}applyWorkbookOutcome[\s\S]{0,300}renderWorkbook\(\)[\s\S]{0,200}persistWorkbookAttempt/,'Workbook must render a deterministic result before persistence');
 assert.doesNotMatch(app,/function renderWorkbook\(\)[^\n]*stage\.instruction/,'Focused Workbook must not repeat stage instructions');
 assert.doesNotMatch(app,/function renderWorkbook\(\)[^\n]*data-submit-workbook/,'Focused Workbook must not render a manual grading button');
 assert.match(app,/event\.isComposing\|\|event\.keyCode===229/,'Enter grading must ignore active IME composition');
@@ -224,13 +231,12 @@ assert.match(edge,/callGeminiGrade\(question, spec, responses\)[\s\S]*grade\.cor
 assert.match(edge,/rubricSnapshot[\s\S]*publisherReferenceTranslation[\s\S]*gradingPolicy[\s\S]*passScore/);
 assert.match(edge,/ready_workbook_ai_grading_requests[\s\S]*status: "pending"[\s\S]*callGeminiTranslationGrade/,'Workbook translations must be persisted before AI inference');
 assert.match(edge,/ai_grading_request_id: aiRequestId/,'Workbook attempt must link to the AI grading request');
-assert.match(edge,/unlock_workbook_recall[\s\S]*workbook_hint/,'Recall unlock and staged hints must be explicit student operations');
-assert.match(edge,/assistance: workbookAssistanceMode\(item\)/,'Workbook listing must expose only the assistance mode, not every answer verifier');
-assert.match(edge,/async function workbookAssistance[\s\S]*publicWorkbookAssistance/,'Only the current item may lazily request its verifier contract');
-assert.match(app,/ensureWorkbookAssistance[\s\S]*workbook_assistance/,'The client must cache a verifier contract per current item instead of loading the whole workbook');
+assert.match(edge,/grading: item\.kind === "translation_ai" \? \{ mode: "ai" \} : \{ mode: "deterministic", answers: item\.answers \}/,'Deterministic Workbook items must carry their current-item answer contract');
+assert.match(app,/item\.assistance\.mode==='recall_local'/,'Stage 2 and 3 recall must bypass assistance network loading');
+assert.doesNotMatch(app,/readyApi\('unlock_workbook_recall'/,'Stage 2 and 3 must not unlock each slot over the network');
 assert.match(edge,/usedFullAnswerHint[\s\S]*correct = false/,'A full-answer hint must force the current Stage 9 attempt to wrong');
 assert.match(edge,/형용사절·부사절·주절의 동사/,'Translation feedback must identify the misunderstood sentence unit');
-assert.match(app,/compositionstart[\s\S]*compositionend[\s\S]*handleWorkbookRecallInput/,'Korean recall must wait for IME composition to finish');
+assert.match(app,/cue!==expected[^\n]*composing[^\n]*flashRecallWrong/,'IME composition may complete a matching Korean cue immediately but must defer a partial mismatch');
 assert.match(app,/flashRecallWrong[\s\S]*220/,'A wrong recall cue must clear after a brief red signal');
 assert.match(app,/data-workbook-live-prefix[\s\S]*workbook-live-copy/,'Stage 9 must show live mismatch feedback without ending the attempt');
 assert.match(app,/hintReceipt[\s\S]*completedAfterHint/,'Stage 9 hint state must survive through final grading');

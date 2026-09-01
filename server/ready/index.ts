@@ -9,9 +9,9 @@ import { NE_MINBYEONGCHEON_L2_WORKBOOK } from "./workbook-ne-l2.mjs";
 import { YBM_PARKJUNEON_L1_WORKBOOK } from "./workbook-ybm-l1.mjs";
 import { YBM_PARKJUNEON_L2_WORKBOOK } from "./workbook-ybm-l2.mjs";
 import { validateQuestionSpec } from "./question-spec.mjs";
-import { deterministicGrade, publicInteractionContract } from "./interaction-contract.mjs";
+import { deterministicClientContract, deterministicGrade, publicInteractionContract } from "./interaction-contract.mjs";
 import { WORKBOOK_TRANSLATION_GRADING_POLICY, workbookTranslationPass } from "./workbook-grading-policy.mjs";
-import { normalizeWorkbookAnswer, publicWorkbookAssistance, stageNineHint, workbookAssistanceMode, workbookRecallCue } from "./workbook-assistance.mjs";
+import { normalizeWorkbookAnswer, publicWorkbookAssistance, stageNineHint, workbookAssistanceMode } from "./workbook-assistance.mjs";
 
 const CORS = { "Access-Control-Allow-Origin": "*", "Access-Control-Allow-Headers": "authorization, apikey, content-type, x-client-info", "Access-Control-Allow-Methods": "POST, OPTIONS" };
 const json = (body: unknown, status = 200) => new Response(JSON.stringify(body), { status, headers: { ...CORS, "Content-Type": "application/json", "Cache-Control": "no-store" } });
@@ -25,7 +25,7 @@ function supabaseAdminKey() {
 }
 const db = createClient(Deno.env.get("SUPABASE_URL") ?? "", supabaseAdminKey(), { auth: { persistSession: false } });
 const adminOps = new Set(["teacher_bootstrap", "delete_impact", "assign_scope_passages", "set_scope_passages", "create_passage", "update_passage", "delete_passage", "create_student", "set_student_pin", "delete_student", "import_questions", "import_explanations"]);
-const studentOps = new Set(["student_bootstrap", "student_passage", "reader_inline_gloss", "student_questions", "student_question_filters", "student_question_queue", "student_review_questions", "set_question_bookmark", "submit_attempt", "student_workbook", "workbook_assistance", "set_workbook_bookmark", "unlock_workbook_recall", "workbook_hint", "submit_workbook_attempt"]);
+const studentOps = new Set(["student_bootstrap", "student_passage", "reader_inline_gloss", "student_questions", "student_question_filters", "student_question_queue", "student_review_questions", "set_question_bookmark", "submit_attempt", "student_workbook", "workbook_assistance", "set_workbook_bookmark", "workbook_hint", "submit_workbook_attempt"]);
 const publicOps = new Set(["list_students", "student_login", "admin_login"]);
 // Match Breeze's free Gemini dictionary defaults. The API key remains a
 // Supabase Edge Function Secret and is never part of any public response.
@@ -556,6 +556,7 @@ function publicQuestion(row: any, passageText = "", studentState: { bookmarked?:
     id: row.id, type, family: clean(payload.family, 40) || (type === "written_response" ? "written" : "standard"), skill: publicSkill(renderSpec.taxonomy),
     taxonomy: renderSpec.taxonomy, renderer: renderSpec.renderer, renderSpec, importStatus: renderSpec.importStatus,
     prompt: clean(payload.prompt, 1_000), choices, choiceParts, multiSelect: interactionContract.selection === "multi", responseType: type === "written_response" ? "written" : "choice", responseSlots, writingGuide,
+    grading: deterministicClientContract(payload, type), explanation: clean(payload.explanation, 4_000),
     passageText: cleanQuestionText(passageText), interaction: interactionContract.kind, interactionContract,
     stimulus: renderSpec.extras.includes("stimulus") ? clean(payload.stimulus, 10_000) : "", summaryText, inlineGroups, targetRanges,
     bookmarked: studentState.bookmarked === true, lastResult: typeof studentState.lastResult === "boolean" ? studentState.lastResult : null,
@@ -788,6 +789,7 @@ async function studentWorkbook(body: any, session: ReadySession) {
       wordBank: Array.isArray(item.wordBank) ? item.wordBank : [],
       pairCount: Number(item.pairCount) || 0, subtype: clean(item.subtype, 40),
       assistance: workbookAssistanceMode(item),
+      grading: item.kind === "translation_ai" ? { mode: "ai" } : { mode: "deterministic", answers: item.answers },
       completed: latest.get(item.key) === true, lastResult: latest.get(item.key) ?? null, bookmarked: bookmarks.has(item.key),
     })),
   }));
@@ -799,15 +801,6 @@ async function workbookAssistance(body: any, session: ReadySession) {
   const passage = await studentPassageAccess(examId, passageId, student), catalog = workbookForPassage(passage), item = workbookItem(catalog, itemKey);
   if (!catalog || !item || !workbookAssistanceMode(item)) throw new ApiError(404, "현재 검증 계약이 필요하지 않은 문제입니다.");
   return { itemKey, assistance: await publicWorkbookAssistance(item, sha256Hex) };
-}
-
-async function unlockWorkbookRecall(body: any, session: ReadySession) {
-  const student = await studentForSession(session), examId = required(body.examId, "Exam", 80), passageId = required(body.passageId, "지문", 80), itemKey = required(body.itemKey, "워크북 문제", 120);
-  const passage = await studentPassageAccess(examId, passageId, student), catalog = workbookForPassage(passage), item = workbookItem(catalog, itemKey), slot = Number(body.slot);
-  if (!catalog || !item || ![2, 3].includes(Number(item.stage)) || !Number.isInteger(slot) || slot < 0 || slot >= item.answers.length) throw new ApiError(404, "현재 해제할 수 없는 빈칸입니다.");
-  const mode = Number(item.stage) === 2 ? "korean_syllable" : "english_initial", cue = workbookRecallCue(body.cue, mode), expected = workbookRecallCue(item.answers[slot], mode);
-  if (!cue || cue !== expected) throw new ApiError(400, "첫 글자를 다시 확인해 주세요.");
-  return { slot, answer: item.answers[slot] };
 }
 
 function hintReceiptSecret() { return `${supabaseAdminKey()}:ready-workbook-hint-v1`; }
@@ -956,7 +949,7 @@ async function dispatch(op: string, body: any, session: ReadySession | null) {
     case "list_students": return listStudents(); case "student_login": return studentLogin(body); case "admin_login": return adminLogin(body); case "logout": return revokeSession(session as ReadySession);
     case "teacher_bootstrap": return teacherBootstrap(); case "delete_impact": return deleteImpact(body); case "create_student": return createStudent(body); case "set_student_pin": return setStudentPin(body); case "delete_student": return deleteStudent(body);
     case "assign_scope_passages": return setScopePassages(body, false); case "set_scope_passages": return setScopePassages(body, true); case "create_passage": return createPassage(body); case "update_passage": return updatePassage(body); case "delete_passage": return deletePassage(body); case "import_questions": return importQuestions(body); case "import_explanations": return importExplanations(body);
-    case "student_bootstrap": return studentBootstrap(session as ReadySession); case "student_passage": return studentPassage(body, session as ReadySession); case "reader_inline_gloss": return readerInlineGloss(body, session as ReadySession); case "student_questions": return studentQuestions(body, session as ReadySession); case "student_question_filters": return studentQuestionFilters(body, session as ReadySession); case "student_question_queue": return studentQuestionQueue(body, session as ReadySession); case "student_review_questions": return studentReviewQuestions(body, session as ReadySession); case "set_question_bookmark": return setQuestionBookmark(body, session as ReadySession); case "submit_attempt": return submitAttempt(body, session as ReadySession); case "student_workbook": return studentWorkbook(body, session as ReadySession); case "workbook_assistance": return workbookAssistance(body, session as ReadySession); case "set_workbook_bookmark": return setWorkbookBookmark(body, session as ReadySession); case "unlock_workbook_recall": return unlockWorkbookRecall(body, session as ReadySession); case "workbook_hint": return workbookHint(body, session as ReadySession); case "submit_workbook_attempt": return submitWorkbookAttempt(body, session as ReadySession);
+    case "student_bootstrap": return studentBootstrap(session as ReadySession); case "student_passage": return studentPassage(body, session as ReadySession); case "reader_inline_gloss": return readerInlineGloss(body, session as ReadySession); case "student_questions": return studentQuestions(body, session as ReadySession); case "student_question_filters": return studentQuestionFilters(body, session as ReadySession); case "student_question_queue": return studentQuestionQueue(body, session as ReadySession); case "student_review_questions": return studentReviewQuestions(body, session as ReadySession); case "set_question_bookmark": return setQuestionBookmark(body, session as ReadySession); case "submit_attempt": return submitAttempt(body, session as ReadySession); case "student_workbook": return studentWorkbook(body, session as ReadySession); case "workbook_assistance": return workbookAssistance(body, session as ReadySession); case "set_workbook_bookmark": return setWorkbookBookmark(body, session as ReadySession); case "workbook_hint": return workbookHint(body, session as ReadySession); case "submit_workbook_attempt": return submitWorkbookAttempt(body, session as ReadySession);
     default: throw new ApiError(404, "알 수 없는 READY 작업입니다.");
   }
 }

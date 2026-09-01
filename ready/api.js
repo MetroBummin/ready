@@ -2,7 +2,7 @@ const getConfig = () => window.READY_CONFIG || {};
 const READ_ONLY_OPS = new Set([
   'list_students', 'teacher_bootstrap', 'delete_impact', 'student_bootstrap',
   'student_passage', 'reader_inline_gloss', 'student_questions', 'student_question_filters', 'student_question_queue', 'student_review_questions',
-  'student_workbook', 'workbook_assistance', 'unlock_workbook_recall', 'workbook_hint',
+  'student_workbook', 'workbook_assistance', 'workbook_hint',
 ]);
 
 export async function readyApi(op, data = {}, token = '', { signal } = {}) {

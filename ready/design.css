@@ -308,16 +308,17 @@ body[data-ready-mode="student"] .reading-passage{margin:0;color:var(--ready-body
 .reader-inline-sentence{display:inline}
 .reader-inline-source{display:inline;margin:0;padding:0;border:0;border-radius:0;color:inherit;background:transparent;font:inherit;letter-spacing:inherit;line-height:inherit;text-align:inherit;cursor:pointer;text-decoration:underline;text-decoration-color:transparent;text-decoration-thickness:1px;text-underline-offset:.18em}
 .reader-inline-source:hover,.reader-inline-source:focus-visible{color:var(--ready-ink);text-decoration-color:color-mix(in srgb,var(--ready-primary) 55%,transparent);outline:0}
-.reader-inline-source.is-loading{animation:reader-gloss-loading .8s ease-in-out infinite alternate;text-decoration-color:var(--ready-muted);text-decoration-style:dotted}
+.reader-inline-source.is-pending{color:var(--ready-ink);background:color-mix(in srgb,var(--ready-primary) 15%,var(--ready-surface));box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--ready-primary) 34%,var(--ready-hairline));text-decoration-color:transparent}
+.reader-inline-source.is-loading{background:color-mix(in srgb,var(--ready-primary) 20%,var(--ready-surface))}
 .reader-inline-source.is-error{text-decoration-color:var(--ready-error);text-decoration-style:wavy}
+.reader-inline-notice{position:fixed;z-index:30;right:max(16px,env(safe-area-inset-right));bottom:max(18px,calc(env(safe-area-inset-bottom) + 12px));max-width:min(360px,calc(100vw - 32px));margin:0;padding:10px 12px;border:1px solid var(--ready-hairline);border-radius:0;color:var(--ready-body);background:var(--ready-surface);box-shadow:var(--shadow-sheet);font-size:12px;line-height:1.45}
 .reader-inline-replacement{display:inline;color:var(--ready-primary);font-weight:720;white-space:normal}
 .reader-inline-gloss{display:inline}
 .reader-inline-reset{display:inline-grid;width:30px;height:30px;place-items:center;margin:-5px -3px -5px 1px;padding:0;border:0;border-radius:50%;color:var(--ready-muted);background:transparent;font:700 15px/1 var(--ready-font-sans);vertical-align:baseline;cursor:pointer}
 .reader-inline-reset:hover,.reader-inline-reset:focus-visible{color:var(--ready-primary);background:color-mix(in srgb,var(--ready-primary) 9%,transparent);outline:1px solid color-mix(in srgb,var(--ready-primary) 45%,transparent)}
 .reader-inline-dissolve{animation:reader-gloss-dissolve 160ms ease-out both}
 @keyframes reader-gloss-dissolve{from{opacity:.3;filter:blur(1.5px);transform:translateY(1px)}to{opacity:1;filter:blur(0);transform:translateY(0)}}
-@keyframes reader-gloss-loading{from{text-decoration-color:transparent}to{text-decoration-color:var(--ready-muted)}}
-@media (prefers-reduced-motion:reduce){.reader-inline-source.is-loading{animation:none;text-decoration-color:var(--ready-muted)}.reader-inline-dissolve{animation-name:reader-gloss-fade;animation-duration:160ms}.reader-inline-dissolve.reduced-motion{animation-name:reader-gloss-fade}@keyframes reader-gloss-fade{from{opacity:.45}to{opacity:1}}}
+@media (prefers-reduced-motion:reduce){.reader-inline-dissolve{animation-name:reader-gloss-fade;animation-duration:160ms}.reader-inline-dissolve.reduced-motion{animation-name:reader-gloss-fade}@keyframes reader-gloss-fade{from{opacity:.45}to{opacity:1}}}
 
 /* Question renderer: keep contract-shaped DOM, restyle rows and states. */
 body[data-ready-mode="student"] .question-layout{width:min(100%,880px);margin:0 auto}
@@ -416,6 +417,7 @@ body[data-ready-mode="student"] .question-passage .reading-sentence{display:inli
 .feedback-actions button{padding:7px 10px;border:1px solid currentColor;border-radius:var(--ready-radius-xs);color:inherit;background:transparent;font-size:12px;font-weight:700;cursor:pointer}
 .explanation-reveal,.answer-reveal{margin:var(--ready-space-2) 0 0;padding:var(--ready-space-3) 0;border-top:1px solid var(--ready-hairline);border-radius:0;color:var(--ready-body);background:transparent;font-size:13px;line-height:1.6;white-space:pre-wrap}
 .ai-grade-feedback{display:flex;align-items:flex-start;gap:var(--ready-space-2);margin:var(--ready-space-2) 0 0;padding:var(--ready-space-3) 0;border-top:1px solid var(--ready-hairline);border-radius:0;color:var(--ready-body);background:transparent;font-size:12px;line-height:1.55}
+.local-ai-status{display:grid;width:100%;gap:3px;margin-top:var(--ready-space-3);padding:var(--ready-space-3) 0;border-top:1px solid var(--ready-hairline);color:var(--ready-body);font-size:12px;line-height:1.5;text-align:left}.local-ai-status strong{color:var(--ready-ink)}.local-ai-status.error strong{color:var(--ready-error)}
 .shorts-cue{display:flex;align-items:center;justify-content:center;gap:var(--ready-space-2);margin:var(--ready-space-6) 0 var(--ready-space-12);color:var(--ready-muted);font:650 11px/1 var(--ready-font-mono)}
 
 /* Written contract layouts */

@@ -11,8 +11,8 @@ export function workbookRecallCue(value, mode) {
 }
 
 export function workbookAssistanceMode(item) {
-  if (Number(item.stage) === 2) return { mode: 'recall_unlock', recallMode: 'korean_syllable' };
-  if (Number(item.stage) === 3) return { mode: 'recall_unlock', recallMode: 'english_initial' };
+  if (Number(item.stage) === 2) return { mode: 'recall_local', recallMode: 'korean_syllable' };
+  if (Number(item.stage) === 3) return { mode: 'recall_local', recallMode: 'english_initial' };
   if (Number(item.stage) === 9) return { mode: 'prefix_typing' };
   return null;
 }

@@ -36,9 +36,10 @@ mixed Check는 현재 학습 범위 밖으로 원본만 보존한다.
 
 - `student_workbook`: 접근 가능한 Passage의 공개 item과 최신 진도만 반환한다.
 - `submit_workbook_attempt`: 응답을 서버 정규화 후 정답표와 비교하고 append-only 시도를 남긴다.
-- 제출 전 응답에는 정답이 포함되지 않는다.
-- 2·3단계는 첫 음절/글자 salted verifier만 먼저 받고, 성공한 slot만 `unlock_workbook_recall`로 해제한다.
+- 현재 학습 중인 deterministic item은 즉시 피드백을 위해 정답 계약을 함께 받는다. 화면에는 제출 전 표시하지 않는다.
+- 2·3단계는 현재 item의 정답을 메모리에서 사용해 첫 음절/글자가 맞는 즉시 전체 slot을 완성한다. slot별 네트워크 해제는 runtime fast path에서 사용하지 않는다.
 - 9단계는 현재 문항에 한해 지연 로딩한 salted prefix verifier로 실시간 오류만 표시하고, 힌트는 요청한 slot 조각만 반환한다.
+- deterministic 결과는 먼저 기기에서 표시하고 Attempt 저장과 Review/progress 동기화는 뒤에서 수행한다. 서버는 같은 규칙으로 다시 검증한다.
 - 2·3단계의 미세 오타는 Attempt가 아니며, 모든 slot recall 완료 시 한 번만 append한다.
 - 9단계 전체답 힌트는 제출을 막지 않지만 해당 Attempt를 오답으로 기록하고 Review에 남긴다.
 - 해석 AI는 새로운 정답을 만들지 않고 비공개 출판사 해석과 의미만 비교한다.

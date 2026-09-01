@@ -1,7 +1,8 @@
+import {normalizeDeterministicAnswer as normalize} from '../../ready/deterministic-grading.js';
+
 const text=value=>typeof value==='string'?value.trim():'';
 const list=value=>Array.isArray(value)?value:[];
 const wordCount=value=>(String(value||'').match(/[A-Za-z]+(?:['’][A-Za-z]+)?|\d+(?:,\d{3})*(?:\.\d+)?/g)||[]).length;
-const normalize=value=>text(value).normalize('NFKC').toLowerCase().replace(/[“”‘’'".,!?;:()[\]{}]/g,'').replace(/\s+/g,' ').trim();
 const INTERACTION_KINDS=new Set(['choice_list','choice_matrix','inline_options','position_choice','written_response']);
 const SEGMENT_KINDS=new Set(['text','annotation','blank','inline_options','inline_options_display','position']);
 const WRITTEN_LAYOUTS=new Set(['sentence','sentence_cloze','sentence_parts','short_answers','arrangement','correction','multi_correction','summary']);
@@ -192,6 +193,17 @@ function inlineExpected(contract,payload){
     return false;
   }
   return visit(0,[])?selected:[];
+}
+
+export function deterministicClientContract(payload={},type='multiple_choice'){
+  const contract=payload?.spec?.interaction||{};
+  if(type==='multiple_choice')return {
+    mode:'deterministic',kind:contract.kind==='inline_options'?'inline_options':'choice',selection:text(contract.selection)||'single',
+    answer:contract.kind==='inline_options'?inlineExpected(contract,payload):list(payload.answer).map(Number),
+  };
+  return {
+    mode:'deterministic_then_ai',kind:'written',acceptedAnswers:list(payload.accepted_answers),acceptedResponseSets:list(payload.accepted_response_sets),
+  };
 }
 
 export function deterministicGrade(payload={},type='multiple_choice',submission={}){

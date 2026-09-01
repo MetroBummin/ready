@@ -19,7 +19,7 @@ renderer는 taxonomy 이름이나 한국어 발문을 보고 화면을 추측하
 3. 학생 runtime에는 word lookup, sentence translation, SavedWord, SavedSentence, lexical highlight를 연결하지 않는다. 기존 DB 데이터와 서버 함수는 삭제하지 않는다.
 4. `ready_passages`와 `ready_passage_sentences`가 canonical source다. Question이 canonical을 수정하거나 덮어쓰면 안 된다.
 5. `ready_attempts`는 append-only다. 별도 WrongAnswer 테이블을 만들지 않는다.
-6. 정답은 제출 전 public Question payload에 포함하지 않는다.
+6. 학생에게 배정된 현재 practice 묶음은 즉시 deterministic 피드백을 위해 정답·해설 계약을 함께 받을 수 있다. UI는 제출 전 이를 표시하지 않고, 서버는 Attempt 저장 시 독립적으로 다시 채점한다.
 
 ## 두 response contract
 
