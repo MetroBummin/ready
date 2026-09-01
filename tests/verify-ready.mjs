@@ -169,18 +169,37 @@ const {NE_MINBYEONGCHEON_L2_WORKBOOK}=await import('../server/ready/workbook-ne-
 const {YBM_PARKJUNEON_L1_WORKBOOK}=await import('../server/ready/workbook-ybm-l1.mjs');
 const {YBM_PARKJUNEON_L2_WORKBOOK}=await import('../server/ready/workbook-ybm-l2.mjs');
 const workbooks=[NE_MINBYEONGCHEON_L1_WORKBOOK,NE_MINBYEONGCHEON_L2_WORKBOOK,YBM_PARKJUNEON_L1_WORKBOOK,YBM_PARKJUNEON_L2_WORKBOOK];
-assert.deepEqual(workbooks.map(book=>book.stages.flatMap(stage=>stage.items).length),[295,364,327,394]);
+assert.deepEqual(workbooks.map(book=>book.stages.flatMap(stage=>stage.items).length),[295,364,329,394]);
 for(const book of workbooks)assert.deepEqual(book.stages.map(stage=>stage.stage),[2,3,4,5,6,7,8,9],`${book.workbookKey} must expose every requested workbook stage`);
 const workbookItems=workbooks.flatMap(book=>book.stages.flatMap(stage=>stage.items));
 assert.equal(new Set(workbookItems.map(item=>item.key)).size,workbookItems.length);
 for(const item of workbookItems){assert(item.answers.length>0);if(item.kind==='blank_input'||item.kind==='verb_form')assert.equal((item.prompt.match(/_{5,}/g)||[]).length,item.answers.length);if(item.kind==='verb_form')assert.equal(item.hints.length,item.answers.length);if(item.kind==='choice_groups')assert.equal(item.groups.length,item.answers.length);if(item.kind==='correction_pairs')assert.equal(item.pairCount*2,item.answers.length);if(item.kind==='translation_ai')assert.equal(item.answers.length,1);}
 for(const book of workbooks){assert.equal(book.source.preserved,true);assert.match(book.source.sha256,/^[a-f0-9]{64}$/);for(const item of book.unpublishedExercises)assert.equal(item.status,'INVALID');}
 for(const book of workbooks)assert(book.stages.find(stage=>stage.stage===2).items.every(item=>item.kind==='blank_input'),'Stage 2 must remain deterministic blank input');
+const normalizeWorkbookSentence=value=>String(value||'').replace(/[’‘]/g,"'").replace(/[“”]/g,'"').replace(/\s+([,.;:!?])/g,'$1').replace(/([.!?])(["'])/g,'$2$1').replace(/\b(i|you|we|they)'re\b/gi,'$1 are').replace(/\b(i)'m\b/gi,'$1 am').replace(/\b(i|you|we|they)'ve\b/gi,'$1 have').replace(/\b(i|you|he|she|it|we|they)'ll\b/gi,'$1 will').replace(/\b(he|she|it|that|there|what|who)'s\b/gi,'$1 is').replace(/\s+/g,' ').trim().toLowerCase();
+for(const book of workbooks){
+  const canonicalSources=[...book.stages.find(stage=>stage.stage===2).items.map(item=>item.source),...book.unpublishedExercises.filter(item=>item.stage===2).map(item=>item.source)];
+  const canonicalCorpus=normalizeWorkbookSentence(canonicalSources.join(' '));
+  for(const item of book.stages.find(stage=>stage.stage===8).items){
+    let answerIndex=0;
+    const reconstructed=item.prompt.replace(/⟦ORDER:\d+⟧/g,()=>item.answers[answerIndex++]);
+    assert.equal(answerIndex,item.groups.length,`${item.key} must serialize every reorder group`);
+    assert(canonicalCorpus.includes(normalizeWorkbookSentence(reconstructed)),`${item.key} must round-trip to the publisher corpus`);
+  }
+}
+const repeatedOrderToken=YBM_PARKJUNEON_L2_WORKBOOK.stages.find(stage=>stage.stage===8).items[0];
+assert.equal(repeatedOrderToken.answers[0],'starts her day by logging in to a music streaming service on her smartphone','Stage 8 must resolve repeated common chips inside the explicit ORDER span');
 const adjacentStage5=NE_MINBYEONGCHEON_L2_WORKBOOK.stages.find(stage=>stage.stage===5).items.find(item=>item.prompt.includes('The clues'));
 assert.deepEqual(adjacentStage5.answers,['are used','to find','committed'],'Stage 5 must preserve publisher slash-separated slot boundaries');
+const adjacentStage8=NE_MINBYEONGCHEON_L2_WORKBOOK.stages.find(stage=>stage.stage===8).items.find(item=>item.source.includes('범죄를 저질렀던 사람'));
+assert.equal(adjacentStage8.groups.length,1,'Whitespace-only Stage 8 PDF splits must remain one sentence interaction');
+assert.deepEqual(adjacentStage8.answers,['the clues are used to find the person who committed the crime'],'Merged Stage 8 groups must preserve the publisher sentence');
 const importer=read('tools/ready-extract-workbook-contract.py');
 assert.match(importer,/stage5_answer_items[\s\S]*value\.split\("\/"\)/,'Stage 5 answers must come from publisher Answer Key separators');
 assert.match(importer,/fill_frame\(frame, answers\)[\s\S]*canonical_corpus/,'Stage 5 publisher slots must round-trip to the canonical corpus');
+assert.match(importer,/reorder_contract\(prompt, groups, reorder_corpus\)/,'Stage 8 answers must be recovered from fixed prompt boundaries against the publisher corpus');
+assert.match(importer,/merge_adjacent_reorder_groups\(prompt, groups\)/,'Stage 8 must merge whitespace-only PDF presentation splits');
+assert.match(importer,/reorder answers do not round-trip to canonical sentence/,'Stage 8 importer must fail closed when its reconstructed sentence drifts');
 assert.match(app,/placeholder="\$\{esc\(hint\|\|'\'\)\}"/,'Stage 5 base verbs must be input placeholders, not exposed labels');
 assert.match(app,/workbook-order-bank-slot \$\{chosenSet\.has\(chipIndex\)\?'used'/,'Stage 8 must preserve every bank slot after selection');
 assert.match(app,/changeWorkbookOrder[\s\S]*refreshWorkbookOrderGroup\(group\)/,'Stage 8 chip changes must locally refresh only their group');

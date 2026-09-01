@@ -304,6 +304,20 @@ body[data-ready-mode="student"] .reader-lede{margin:0 0 var(--ready-space-8);col
 body[data-ready-mode="student"] .reader-prose{display:grid;gap:var(--ready-space-6);padding:0 0 var(--ready-space-12);color:var(--ready-body)}
 body[data-ready-mode="student"] .reader-prose p,
 body[data-ready-mode="student"] .reading-passage{margin:0;color:var(--ready-body);font-size:var(--ready-text-question);line-height:var(--ready-leading-question);letter-spacing:0}
+.sr-only{position:absolute!important;width:1px!important;height:1px!important;padding:0!important;margin:-1px!important;overflow:hidden!important;clip:rect(0,0,0,0)!important;white-space:nowrap!important;border:0!important}
+.reader-inline-sentence{display:inline}
+.reader-inline-source{display:inline;margin:0;padding:0;border:0;border-radius:0;color:inherit;background:transparent;font:inherit;letter-spacing:inherit;line-height:inherit;text-align:inherit;cursor:pointer;text-decoration:underline;text-decoration-color:transparent;text-decoration-thickness:1px;text-underline-offset:.18em}
+.reader-inline-source:hover,.reader-inline-source:focus-visible{color:var(--ready-ink);text-decoration-color:color-mix(in srgb,var(--ready-primary) 55%,transparent);outline:0}
+.reader-inline-source.is-loading{animation:reader-gloss-loading .8s ease-in-out infinite alternate;text-decoration-color:var(--ready-muted);text-decoration-style:dotted}
+.reader-inline-source.is-error{text-decoration-color:var(--ready-error);text-decoration-style:wavy}
+.reader-inline-replacement{display:inline;color:var(--ready-primary);font-weight:720;white-space:normal}
+.reader-inline-gloss{display:inline}
+.reader-inline-reset{display:inline-grid;width:30px;height:30px;place-items:center;margin:-5px -3px -5px 1px;padding:0;border:0;border-radius:50%;color:var(--ready-muted);background:transparent;font:700 15px/1 var(--ready-font-sans);vertical-align:baseline;cursor:pointer}
+.reader-inline-reset:hover,.reader-inline-reset:focus-visible{color:var(--ready-primary);background:color-mix(in srgb,var(--ready-primary) 9%,transparent);outline:1px solid color-mix(in srgb,var(--ready-primary) 45%,transparent)}
+.reader-inline-dissolve{animation:reader-gloss-dissolve 160ms ease-out both}
+@keyframes reader-gloss-dissolve{from{opacity:.3;filter:blur(1.5px);transform:translateY(1px)}to{opacity:1;filter:blur(0);transform:translateY(0)}}
+@keyframes reader-gloss-loading{from{text-decoration-color:transparent}to{text-decoration-color:var(--ready-muted)}}
+@media (prefers-reduced-motion:reduce){.reader-inline-source.is-loading{animation:none;text-decoration-color:var(--ready-muted)}.reader-inline-dissolve{animation-name:reader-gloss-fade;animation-duration:160ms}.reader-inline-dissolve.reduced-motion{animation-name:reader-gloss-fade}@keyframes reader-gloss-fade{from{opacity:.45}to{opacity:1}}}
 
 /* Question renderer: keep contract-shaped DOM, restyle rows and states. */
 body[data-ready-mode="student"] .question-layout{width:min(100%,880px);margin:0 auto}

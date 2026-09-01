@@ -37,6 +37,7 @@ def norm(value: str) -> str:
 def canonical_form(value: str) -> str:
     """Normalize only typography that publisher text extraction can vary."""
     value = re.sub(r"\s+([,.;:!?])", r"\1", norm(value).lower())
+    value = re.sub(r"([.!?])([\"'])", r"\2\1", value)
     value = re.sub(r"\b(i|you|we|they)'re\b", r"\1 are", value)
     value = re.sub(r"\b(i)'m\b", r"\1 am", value)
     value = re.sub(r"\b(i|you|we|they)'ve\b", r"\1 have", value)
@@ -204,15 +205,108 @@ def writing_frame(prompt: str, canonical: str) -> tuple[str, list[str]]:
     return norm(f"{static} {tail}"), bank
 
 
-def ordered_group(group: list[str], canonical: str) -> str:
-    occupied, positions = [], []
-    for chip in sorted(group, key=len, reverse=True):
-        candidates = [match.start() for match in re.finditer(re.escape(chip), canonical, flags=re.I)]
-        start = next((value for value in candidates if not any(value < end and value + len(chip) > begin for begin, end in occupied)), None)
-        if start is None:
-            raise ValueError(f"reorder chip {chip!r} not in canonical")
-        occupied.append((start, start + len(chip))); positions.append((start, chip))
-    return " ".join(chip for _start, chip in sorted(positions))
+def reorder_answers(prompt: str, groups: list[list[str]], canonical: str) -> list[str]:
+    """Solve all ORDER groups jointly against the publisher sentence.
+
+    Adjacent groups make a regex capture boundary ambiguous, so the solver
+    consumes fixed prompt text and every chip in one left-to-right proof.  A
+    common chip can therefore never be borrowed from text outside its group.
+    """
+    prompt, canonical_source = norm(prompt), norm(canonical)
+    prompt = re.sub(r"([.!?])([\"'])", r"\2\1", prompt)
+    canonical = re.sub(r"([.!?])([\"'])", r"\2\1", canonical_source)
+    parts = re.split(r"\([^()]*\)", prompt)
+    if len(parts) - 1 != len(groups):
+        raise ValueError("reorder groups and prompt slots differ")
+    chips = [[norm(chip) for chip in group] for group in groups]
+    solutions: set[tuple[str, ...]] = set()
+
+    def fixed_end(position: int, value: str) -> int | None:
+        pattern = re.escape(value).replace(r"\ ", r"\s+")
+        match = re.compile(pattern, flags=re.I).match(canonical, position)
+        return match.end() if match else None
+
+    def consume_group(group_index: int, position: int, remaining: tuple[int, ...], sequence: tuple[str, ...], answers: tuple[str, ...]) -> None:
+        if not remaining:
+            consume_frame(group_index + 1, position, answers + (" ".join(sequence),))
+            return
+        if len(solutions) > 1:
+            return
+        if sequence:
+            while position < len(canonical) and canonical[position].isspace():
+                position += 1
+        for index in sorted(remaining, key=lambda value: len(chips[group_index][value]), reverse=True):
+            chip = chips[group_index][index]
+            end = position + len(chip)
+            if canonical[position:end].casefold() != chip.casefold():
+                continue
+            if end < len(canonical) and canonical[end].isalnum() and chip[-1:].isalnum():
+                continue
+            consume_group(group_index, end, tuple(value for value in remaining if value != index), sequence + (chip,), answers)
+
+    def consume_frame(group_index: int, position: int, answers: tuple[str, ...]) -> None:
+        position = fixed_end(position, parts[group_index])
+        if position is None:
+            return
+        if group_index == len(groups):
+            if position == len(canonical):
+                solutions.add(answers)
+            return
+        consume_group(group_index, position, tuple(range(len(chips[group_index]))), (), answers)
+
+    consume_frame(0, 0, ())
+    if len(solutions) != 1:
+        raise ValueError(f"reorder frame has {len(solutions)} exact publisher reconstructions")
+    answers = list(next(iter(solutions)))
+    reconstructed = parts[0]
+    for answer, tail in zip(answers, parts[1:]):
+        reconstructed += answer + tail
+    if canonical_form(reconstructed) != canonical_form(canonical_source):
+        raise ValueError("reorder answers do not round-trip to canonical sentence")
+    return answers
+
+
+def complete_reorder_frame(prompt: str, canonical: str) -> str:
+    """Restore terminal punctuation omitted by the PDF's chip-bank text layer."""
+    prompt, canonical = norm(prompt), norm(canonical)
+    terminal = re.search(r"([.!?]+)$", canonical)
+    final_options = [norm(value) for value in re.findall(r"\(([^()]*)\)", prompt)[-1].split("/")] if re.findall(r"\(([^()]*)\)", prompt) else []
+    punctuation_is_a_chip = bool(terminal and terminal.group(1) in final_options)
+    if terminal and not punctuation_is_a_chip and not re.search(r"[.!?]+$", prompt):
+        prompt += terminal.group(1)
+    return prompt
+
+
+def merge_adjacent_reorder_groups(prompt: str, groups: list[list[str]]) -> tuple[str, list[list[str]]]:
+    """A whitespace-only PDF split is presentation, not a second exercise slot."""
+    marker_index = iter(range(len(groups)))
+    marked = re.sub(r"\([^()]+\)", lambda _match: f"⟦ORDER:{next(marker_index)}⟧", norm(prompt))
+    groups = [list(group) for group in groups]
+    adjacent = re.compile(r"⟦ORDER:(\d+)⟧\s+⟦ORDER:(\d+)⟧")
+    while match := adjacent.search(marked):
+        left, right = map(int, match.groups())
+        if right != left + 1:
+            raise ValueError("adjacent reorder markers are not sequential")
+        groups[left].extend(groups[right]); del groups[right]
+        marked = marked[:match.start()] + f"⟦ORDER:{left}⟧" + marked[match.end():]
+        marked = re.sub(r"⟦ORDER:(\d+)⟧", lambda item: f"⟦ORDER:{int(item.group(1)) - (int(item.group(1)) > right)}⟧", marked)
+    rebuilt = re.sub(r"⟦ORDER:(\d+)⟧", lambda item: f"({' / '.join(groups[int(item.group(1))])})", marked)
+    return rebuilt, groups
+
+
+def reorder_contract(prompt: str, groups: list[list[str]], candidates: list[str]) -> tuple[str, list[str]]:
+    """Select the unique publisher sentence that the whole ORDER frame rebuilds."""
+    solutions: dict[tuple[str, tuple[str, ...]], tuple[str, list[str]]] = {}
+    for canonical in dict.fromkeys(norm(value) for value in candidates):
+        candidate_prompt = complete_reorder_frame(prompt, canonical)
+        try:
+            answers = reorder_answers(candidate_prompt, groups, canonical)
+        except ValueError:
+            continue
+        solutions[(canonical_form(canonical), tuple(answer.casefold() for answer in answers))] = (candidate_prompt, answers)
+    if len(solutions) != 1:
+        raise ValueError(f"reorder exercise has {len(solutions)} publisher-corpus round trips")
+    return next(iter(solutions.values()))
 
 
 def stage7_prompt_items(reader: PdfReader) -> list[tuple[str, int, str]]:
@@ -287,6 +381,9 @@ def compile_catalog(pdf: Path, key: str, title: str, prefix: str) -> tuple[dict,
     korean = [source for source, _prompt in raw[3]]
     corpus = norm(" ".join(english))
     canonical_corpus = canonical_form(corpus)
+    reorder_corpus = list(english)
+    for value in english:
+        reorder_corpus.extend(part for part in re.split(r"(?<=[.!?])\s+(?=[A-Z])", norm(value)) if part)
     stage5_answers = stage5_answer_items(reader, len(raw[5]))
     unpublished = []
     stages, statuses = [], {str(stage): {"source": len(items), "ready": 0, "invalid": 0} for stage, items in raw.items()}
@@ -321,7 +418,8 @@ def compile_catalog(pdf: Path, key: str, title: str, prefix: str) -> tuple[dict,
                     answers = choice_answers(prompt, groups, corpus)
                 elif stage == 8:
                     groups = [[norm(option) for option in value.split("/")] for value in re.findall(r"\(([^()]*)\)", prompt)]
-                    answers = [ordered_group(group, english[index]) for group in groups]
+                    prompt, groups = merge_adjacent_reorder_groups(prompt, groups)
+                    prompt, answers = reorder_contract(prompt, groups, reorder_corpus)
                     counter = iter(range(len(groups))); marked_prompt = re.sub(r"\([^()]+\)", lambda _m: f"⟦ORDER:{next(counter)}⟧", prompt)
                     item = {"kind": "reorder_groups", "source": source, "prompt": norm(marked_prompt), "groups": groups, "answers": answers}
                 elif stage == 9:

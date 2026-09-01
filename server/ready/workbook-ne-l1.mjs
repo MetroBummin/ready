@@ -3184,24 +3184,21 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
         {
           "kind": "reorder_groups",
           "source": "Rene Compean이라는 실종된 등산객이 화요일 Angeles National Forest(앤젤레스 국유림)에서 구조팀에 의해 안전한 상태로 발견되었습니다.",
-          "prompt": "⟦ORDER:0⟧ ⟦ORDER:1⟧ on Tuesday by a rescue team in Angeles National Forest.",
+          "prompt": "⟦ORDER:0⟧ on Tuesday by a rescue team in Angeles National Forest.",
           "groups": [
             [
               "hiker",
               "a",
               "named",
               "missing",
-              "Rene Compean"
-            ],
-            [
+              "Rene Compean",
               "safe",
               "found",
               "was"
             ]
           ],
           "answers": [
-            "a missing hiker named Rene Compean",
-            "was found safe"
+            "a missing hiker named Rene Compean was found safe"
           ],
           "key": "ne-l1-s8-01",
           "stage": 8,
@@ -3210,7 +3207,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
         {
           "kind": "reorder_groups",
           "source": "그의 생명을 구하는 데 한 장의 사진이 중요한 역할을 한 것으로 밝혀졌습니다.",
-          "prompt": "⟦ORDER:0⟧ ⟦ORDER:1⟧",
+          "prompt": "⟦ORDER:0⟧.",
           "groups": [
             [
               "key",
@@ -3220,9 +3217,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
               "role",
               "played",
               "that",
-              "a photo"
-            ],
-            [
+              "a photo",
               "saving",
               "life",
               "his",
@@ -3230,8 +3225,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
             ]
           ],
           "answers": [
-            "it turns out that a photo played a key role",
-            "in saving his life"
+            "it turns out that a photo played a key role in saving his life"
           ],
           "key": "ne-l1-s8-02",
           "stage": 8,
@@ -3301,14 +3295,12 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
         {
           "kind": "reorder_groups",
           "source": "Compean은 이 지역을 잘 알던 숙련된 등산객으로, 4월 12일 홀로 등산에 나섰습니다.",
-          "prompt": "Compean, ⟦ORDER:0⟧ ⟦ORDER:1⟧, ⟦ORDER:2⟧ on April 12.",
+          "prompt": "Compean, ⟦ORDER:0⟧, ⟦ORDER:1⟧ on April 12.",
           "groups": [
             [
               "hiker",
               "experienced",
-              "an"
-            ],
-            [
+              "an",
               "the area well",
               "knew",
               "who"
@@ -3322,9 +3314,8 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
             ]
           ],
           "answers": [
-            "an experienced hiker",
-            "who knew the area well",
-            "a hike went on alone"
+            "an experienced hiker who knew the area well",
+            "went on a hike alone"
           ],
           "key": "ne-l1-s8-06",
           "stage": 8,
@@ -3358,7 +3349,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
           ],
           "answers": [
             "a recent forest fire had destroyed some signs",
-            "a which caused him to take wrong turn and get lost"
+            "which caused him to take a wrong turn and get lost"
           ],
           "key": "ne-l1-s8-07",
           "stage": 8,
@@ -3367,7 +3358,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
         {
           "kind": "reorder_groups",
           "source": "그는 도움을 청하기 위해 소리를 지르기도 하고 심지어 비행기나 헬리콥터가 지나갈 경우를 대비하여 땅에 SOS를 쓰기도 했습니다.",
-          "prompt": "⟦ORDER:0⟧ and ⟦ORDER:1⟧ ⟦ORDER:2⟧.",
+          "prompt": "⟦ORDER:0⟧ and ⟦ORDER:1⟧.",
           "groups": [
             [
               "tried",
@@ -3380,9 +3371,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
               "on",
               "even wrote",
               "the ground",
-              "SOS"
-            ],
-            [
+              "SOS",
               "or",
               "passed by",
               "helicopter",
@@ -3392,8 +3381,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
           ],
           "answers": [
             "he tried shouting for help",
-            "even wrote SOS on the ground",
-            "or in case a plane helicopter passed by"
+            "even wrote SOS on the ground in case a plane or helicopter passed by"
           ],
           "key": "ne-l1-s8-08",
           "stage": 8,
@@ -3525,7 +3513,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
           ],
           "answers": [
             "he climbed up to a higher spot",
-            "a found weak signal"
+            "found a weak signal"
           ],
           "key": "ne-l1-s8-13",
           "stage": 8,
@@ -3534,7 +3522,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
         {
           "kind": "reorder_groups",
           "source": "그는 그의 마지막 (남은) 배터리를 그의 친구에게 문자 메시지를 보내기 위해 사용했습니다.",
-          "prompt": "⟦ORDER:0⟧ ⟦ORDER:1⟧",
+          "prompt": "⟦ORDER:0⟧.",
           "groups": [
             [
               "of",
@@ -3542,9 +3530,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
               "he",
               "battery",
               "his",
-              "the last"
-            ],
-            [
+              "the last",
               "friend",
               "to",
               "his",
@@ -3553,8 +3539,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
             ]
           ],
           "answers": [
-            "he used the last of his battery",
-            "his to send a text message to friend"
+            "he used the last of his battery to send a text message to his friend"
           ],
           "key": "ne-l1-s8-14",
           "stage": 8,
@@ -3576,7 +3561,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
             ]
           ],
           "answers": [
-            "he that was lost and needed help"
+            "that he was lost and needed help"
           ],
           "key": "ne-l1-s8-15",
           "stage": 8,
@@ -3585,22 +3570,19 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
         {
           "kind": "reorder_groups",
           "source": "그는 또한 그의 주변 환경을 보여 주기 위해 사진 한 장을 보냈습니다.",
-          "prompt": "⟦ORDER:0⟧ ⟦ORDER:1⟧",
+          "prompt": "⟦ORDER:0⟧.",
           "groups": [
             [
               "a picture",
               "also sent",
-              "he"
-            ],
-            [
+              "he",
               "surroundings",
               "his",
               "to show"
             ]
           ],
           "answers": [
-            "he also sent a picture",
-            "to show his surroundings"
+            "he also sent a picture to show his surroundings"
           ],
           "key": "ne-l1-s8-16",
           "stage": 8,
@@ -3609,7 +3591,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
         {
           "kind": "reorder_groups",
           "source": "Compean의 친구는 그 메시지와 사진을 지역 경찰에게 공유했습니다.",
-          "prompt": "⟦ORDER:0⟧",
+          "prompt": "⟦ORDER:0⟧.",
           "groups": [
             [
               "the message",
@@ -3632,7 +3614,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
         {
           "kind": "reorder_groups",
           "source": "지역 경찰이 실종된 등산객에 대해 보고받았을 때, 그들은 즉시 구조팀을 보냈습니다.",
-          "prompt": "⟦ORDER:0⟧, ⟦ORDER:1⟧",
+          "prompt": "⟦ORDER:0⟧, ⟦ORDER:1⟧.",
           "groups": [
             [
               "the",
@@ -3660,7 +3642,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
         {
           "kind": "reorder_groups",
           "source": "밤샘 수색에도 불구하고, 그들은 여전히 Compean이 어디에 있는지 아무 짐작도 하지 못했습니다.",
-          "prompt": "⟦ORDER:0⟧, ⟦ORDER:1⟧ ⟦ORDER:2⟧",
+          "prompt": "⟦ORDER:0⟧, ⟦ORDER:1⟧.",
           "groups": [
             [
               "the night",
@@ -3673,9 +3655,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
               "they",
               "still didn't",
               "idea",
-              "have"
-            ],
-            [
+              "have",
               "Compean",
               "where",
               "was"
@@ -3683,8 +3663,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
           ],
           "answers": [
             "despite searching through the night",
-            "they still didn't have any idea",
-            "where Compean was"
+            "they still didn't have any idea where Compean was"
           ],
           "key": "ne-l1-s8-19",
           "stage": 8,
@@ -3733,15 +3712,13 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
         {
           "kind": "reorder_groups",
           "source": "그러나, 그 사진은 경찰에게 크게 도움이 되지 못했는데 왜냐하면 약한 신호로 인해 화질이 나빴고, 그의 위치 설정도 꺼져 있었기 때문이었습니다.",
-          "prompt": "However, ⟦ORDER:0⟧ ⟦ORDER:1⟧ due to the weak signal, and ⟦ORDER:2⟧.",
+          "prompt": "However, ⟦ORDER:0⟧ due to the weak signal, and ⟦ORDER:1⟧.",
           "groups": [
             [
               "help",
               "didn't",
               "the police much",
-              "the picture"
-            ],
-            [
+              "the picture",
               "was",
               "because",
               "poor",
@@ -3756,8 +3733,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
             ]
           ],
           "answers": [
-            "the picture didn't help the police much",
-            "because the quality was poor",
+            "the picture didn't help the police much because the quality was poor",
             "his location settings were turned off"
           ],
           "key": "ne-l1-s8-22",
@@ -3795,15 +3771,13 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
         {
           "kind": "reorder_groups",
           "source": "그래서 그들은 누군가 사진 속에서 단서를 찾을 수 있는지 알아보기 위해 소셜 미디어를 사용하기로 결정했습니다.",
-          "prompt": "So ⟦ORDER:0⟧ ⟦ORDER:1⟧ in the picture.",
+          "prompt": "So ⟦ORDER:0⟧ in the picture.",
           "groups": [
             [
               "to use",
               "they",
               "social media",
-              "decided"
-            ],
-            [
+              "decided",
               "anyone",
               "to find out",
               "could",
@@ -3813,8 +3787,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
             ]
           ],
           "answers": [
-            "they decided to use social media",
-            "to find out if anyone could find clues"
+            "they decided to use social media to find out if anyone could find clues"
           ],
           "key": "ne-l1-s8-24",
           "stage": 8,
@@ -3849,15 +3822,13 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
         {
           "kind": "reorder_groups",
           "source": "경찰에 의해 공유된 그 사진은 Ben Kuo라는 이름의 한 캘리포니아 사람에게 목격되었습니다.",
-          "prompt": "⟦ORDER:0⟧ ⟦ORDER:1⟧ named Ben Kuo.",
+          "prompt": "⟦ORDER:0⟧ named Ben Kuo.",
           "groups": [
             [
               "by",
               "the picture",
               "shared",
-              "the police"
-            ],
-            [
+              "the police",
               "seen",
               "by",
               "was",
@@ -3865,8 +3836,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
             ]
           ],
           "answers": [
-            "the picture shared by the police",
-            "by was seen a Californian"
+            "the picture shared by the police was seen by a Californian"
           ],
           "key": "ne-l1-s8-26",
           "stage": 8,
@@ -3875,7 +3845,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
         {
           "kind": "reorder_groups",
           "source": "그의 취미 중 하나는 산불을 추적하기 위해 위성 이미지를 조사하고 사람들에게 잠재적 위험에 대해 알리는 것입니다.",
-          "prompt": "⟦ORDER:0⟧ ⟦ORDER:1⟧ and ⟦ORDER:2⟧.",
+          "prompt": "⟦ORDER:0⟧ and ⟦ORDER:1⟧.",
           "groups": [
             [
               "his",
@@ -3884,9 +3854,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
               "examining",
               "hobbies",
               "satellite images",
-              "one"
-            ],
-            [
+              "one",
               "fires",
               "forest",
               "to track"
@@ -3900,9 +3868,8 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
             ]
           ],
           "answers": [
-            "one of his hobbies is examining satellite images",
-            "to track forest fires",
-            "of informing people potential dangers"
+            "one of his hobbies is examining satellite images to track forest fires",
+            "informing people of potential dangers"
           ],
           "key": "ne-l1-s8-27",
           "stage": 8,
@@ -3911,14 +3878,12 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
         {
           "kind": "reorder_groups",
           "source": "그는 또한 어디서 사진이 찍혔는지와 영화가 어디서 촬영되었는지를 알아내는 것을 즐겼습니다.",
-          "prompt": "⟦ORDER:0⟧ ⟦ORDER:1⟧ and ⟦ORDER:2⟧.",
+          "prompt": "⟦ORDER:0⟧ and ⟦ORDER:1⟧.",
           "groups": [
             [
               "determining",
               "also enjoys",
-              "he"
-            ],
-            [
+              "he",
               "were",
               "pictures",
               "where",
@@ -3932,9 +3897,8 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
             ]
           ],
           "answers": [
-            "he also enjoys determining",
-            "where pictures were taken",
-            "where were movies filmed"
+            "he also enjoys determining where pictures were taken",
+            "where movies were filmed"
           ],
           "key": "ne-l1-s8-28",
           "stage": 8,
@@ -3943,7 +3907,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
         {
           "kind": "reorder_groups",
           "source": "그가 Compean의 사진을 보았을 때, 그는 바로 흥미를 느꼈습니다.",
-          "prompt": "⟦ORDER:0⟧, ⟦ORDER:1⟧",
+          "prompt": "⟦ORDER:0⟧, ⟦ORDER:1⟧.",
           "groups": [
             [
               "saw",
@@ -3990,7 +3954,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
           ],
           "answers": [
             "when Kuo saw the black ash",
-            "a it reminded him of recent forest fire"
+            "it reminded him of a recent forest fire"
           ],
           "key": "ne-l1-s8-30",
           "stage": 8,
@@ -3999,7 +3963,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
         {
           "kind": "reorder_groups",
           "source": "이것은 그가 Compean의 거의 정확한 위치를 추론하도록 도와주었습니다.",
-          "prompt": "⟦ORDER:0⟧",
+          "prompt": "⟦ORDER:0⟧.",
           "groups": [
             [
               "helped",
@@ -4021,16 +3985,14 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
         {
           "kind": "reorder_groups",
           "source": "Kuo는 이 지역이 매우 익숙했는데 왜냐하면 그가 이전에 그 화재를 추적했었고 위성 이미지에서 그 지역의 특징을 확인했었기 때문입니다.",
-          "prompt": "⟦ORDER:0⟧ ⟦ORDER:1⟧ before and ⟦ORDER:2⟧ in satellite images.",
+          "prompt": "⟦ORDER:0⟧ before and ⟦ORDER:1⟧ in satellite images.",
           "groups": [
             [
               "was",
               "familiar with",
               "very",
               "the area",
-              "Kuo"
-            ],
-            [
+              "Kuo",
               "he",
               "the fire",
               "because",
@@ -4044,9 +4006,8 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
             ]
           ],
           "answers": [
-            "Kuo was very familiar with the area",
-            "he because had tracked the fire",
-            "the area had checked the features of"
+            "Kuo was very familiar with the area because he had tracked the fire",
+            "had checked the features of the area"
           ],
           "key": "ne-l1-s8-32",
           "stage": 8,
@@ -4072,7 +4033,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
             ]
           ],
           "answers": [
-            "the Kuo guessed that it must be south side of the mountain"
+            "Kuo guessed that it must be the south side of the mountain"
           ],
           "key": "ne-l1-s8-33",
           "stage": 8,
@@ -4120,7 +4081,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
             ]
           ],
           "answers": [
-            "in Kuo compared the view Compean's picture with more satellite images"
+            "Kuo compared the view in Compean's picture with more satellite images"
           ],
           "key": "ne-l1-s8-35",
           "stage": 8,
@@ -4209,7 +4170,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
         {
           "kind": "reorder_groups",
           "source": "그는 나중에 Kuo에게 영상 통화로 감사를 전했습니다.",
-          "prompt": "⟦ORDER:0⟧",
+          "prompt": "⟦ORDER:0⟧.",
           "groups": [
             [
               "a video call",
@@ -4229,20 +4190,16 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
         {
           "kind": "reorder_groups",
           "source": "이제 지역 경찰은 혼자 등산하는 등산객들에게 자신들의 계획된 경로를 다른 사람들에게 알리고 언제나 종이 지도를 가져오라고 상기시키고 있습니다.",
-          "prompt": "⟦ORDER:0⟧ ⟦ORDER:1⟧ ⟦ORDER:2⟧ and ⟦ORDER:3⟧.",
+          "prompt": "⟦ORDER:0⟧ and ⟦ORDER:1⟧.",
           "groups": [
             [
               "now reminding",
               "are",
               "hikers",
-              "the local police"
-            ],
-            [
+              "the local police",
               "alone",
               "who",
-              "hike"
-            ],
-            [
+              "hike",
               "their",
               "to inform",
               "of",
@@ -4257,9 +4214,7 @@ export const NE_MINBYEONGCHEON_L1_WORKBOOK = {
             ]
           ],
           "answers": [
-            "the local police are now reminding hikers",
-            "hike who alone",
-            "to inform others of their planned route",
+            "the local police are now reminding hikers who hike alone to inform others of their planned route",
             "to always bring a paper map"
           ],
           "key": "ne-l1-s8-40",

@@ -67,7 +67,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
       "number": 51,
       "source": "그녀가 '과학 수사의 어머니'로 불렸던 것은 놀랍지 않다.",
       "prompt": "(wonder / is / the \"mother of forensic science\" / no / was / that / it / she / called)",
-      "reason": "reorder chip 'the \"mother of forensic science\"' not in canonical"
+      "reason": "reorder exercise has 0 publisher-corpus round trips"
     }
   ],
   "stages": [
@@ -3857,15 +3857,13 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
         {
           "kind": "reorder_groups",
           "source": "범죄자들은 범죄 현장에 그들의 존재 흔적을 남기지 않고 가는 법이 결코 없다.",
-          "prompt": "⟦ORDER:0⟧ ⟦ORDER:1⟧",
+          "prompt": "⟦ORDER:0⟧.",
           "groups": [
             [
               "a crime scene",
               "never",
               "criminals",
-              "leave"
-            ],
-            [
+              "leave",
               "presence",
               "leaving behind",
               "of",
@@ -3875,8 +3873,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
             ]
           ],
           "answers": [
-            "criminals never leave a crime scene",
-            "without leaving behind traces of their presence"
+            "criminals never leave a crime scene without leaving behind traces of their presence"
           ],
           "key": "ne-l2-s8-01",
           "stage": 8,
@@ -3926,7 +3923,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
         {
           "kind": "reorder_groups",
           "source": "그러고 나서 과학자들은 모든 것을 분석하고 몇몇 단서를 찾아낸다.",
-          "prompt": "⟦ORDER:0⟧",
+          "prompt": "⟦ORDER:0⟧.",
           "groups": [
             [
               "clues",
@@ -3948,16 +3945,14 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
         {
           "kind": "reorder_groups",
           "source": "그 단서들은 범죄를 저질렀던 사람을 찾는 데 사용된다.",
-          "prompt": "⟦ORDER:0⟧ ⟦ORDER:1⟧",
+          "prompt": "⟦ORDER:0⟧.",
           "groups": [
             [
               "to find",
               "the clues",
               "used",
               "the person",
-              "are"
-            ],
-            [
+              "are",
               "crime",
               "the",
               "committed",
@@ -3965,8 +3960,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
             ]
           ],
           "answers": [
-            "the clues are used to find the person",
-            "the who committed crime"
+            "the clues are used to find the person who committed the crime"
           ],
           "key": "ne-l2-s8-05",
           "stage": 8,
@@ -3975,7 +3969,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
         {
           "kind": "reorder_groups",
           "source": "이 과정은 과학 수사라고 불린다.",
-          "prompt": "⟦ORDER:0⟧",
+          "prompt": "⟦ORDER:0⟧.",
           "groups": [
             [
               "is",
@@ -3995,14 +3989,12 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
         {
           "kind": "reorder_groups",
           "source": "이것은 많은 연구자의 기여 덕분에 발전해 왔다.",
-          "prompt": "⟦ORDER:0⟧ ⟦ORDER:1⟧",
+          "prompt": "⟦ORDER:0⟧.",
           "groups": [
             [
               "evolved",
               "has",
-              "it"
-            ],
-            [
+              "it",
               "researchers",
               "the contributions",
               "of",
@@ -4011,8 +4003,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
             ]
           ],
           "answers": [
-            "it has evolved",
-            "thanks to the contributions of many researchers"
+            "it has evolved thanks to the contributions of many researchers"
           ],
           "key": "ne-l2-s8-07",
           "stage": 8,
@@ -4116,7 +4107,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
         {
           "kind": "reorder_groups",
           "source": "그녀는 결혼할 수밖에 없었다.",
-          "prompt": "⟦ORDER:0⟧",
+          "prompt": "⟦ORDER:0⟧.",
           "groups": [
             [
               "but",
@@ -4138,7 +4129,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
         {
           "kind": "reorder_groups",
           "source": "그녀는 50대가 되어서야 의학에서 경력을 시작할 수 있었다.",
-          "prompt": "⟦ORDER:0⟧ ⟦ORDER:1⟧",
+          "prompt": "⟦ORDER:0⟧.",
           "groups": [
             [
               "her",
@@ -4148,9 +4139,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
               "fifties",
               "in",
               "she",
-              "not until"
-            ],
-            [
+              "not until",
               "was",
               "that",
               "able",
@@ -4162,8 +4151,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
             ]
           ],
           "answers": [
-            "it was not until she was in her fifties",
-            "was in that Lee able to start a career medicine"
+            "it was not until she was in her fifties that Lee was able to start a career in medicine"
           ],
           "key": "ne-l2-s8-13",
           "stage": 8,
@@ -4198,14 +4186,12 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
         {
           "kind": "reorder_groups",
           "source": "그는 수사 체계를 바꾸고 싶어 했던 검시관이었다.",
-          "prompt": "⟦ORDER:0⟧ ⟦ORDER:1⟧",
+          "prompt": "⟦ORDER:0⟧.",
           "groups": [
             [
               "a medical examiner",
               "was",
-              "he"
-            ],
-            [
+              "he",
               "wanted",
               "the investigation system",
               "to change",
@@ -4213,8 +4199,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
             ]
           ],
           "answers": [
-            "he was a medical examiner",
-            "who wanted to change the investigation system"
+            "he was a medical examiner who wanted to change the investigation system"
           ],
           "key": "ne-l2-s8-15",
           "stage": 8,
@@ -4223,7 +4208,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
         {
           "kind": "reorder_groups",
           "source": "이것은 그 당시에 의학적 지식이 없는 사람들이 많은 사망 사건을 시신을 조사하지 않은 채로 수사하고 종결했기 때문이었다.",
-          "prompt": "⟦ORDER:0⟧, at that time, ⟦ORDER:1⟧ and ⟦ORDER:2⟧ ⟦ORDER:3⟧.",
+          "prompt": "⟦ORDER:0⟧, at that time, ⟦ORDER:1⟧ and ⟦ORDER:2⟧.",
           "groups": [
             [
               "because",
@@ -4242,9 +4227,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
               "cases",
               "death",
               "many",
-              "closed"
-            ],
-            [
+              "closed",
               "examining",
               "without",
               "bodies",
@@ -4254,8 +4237,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
           "answers": [
             "this was because",
             "people with no medical knowledge investigated",
-            "closed many death cases",
-            "without examining the bodies"
+            "closed many death cases without examining the bodies"
           ],
           "key": "ne-l2-s8-16",
           "stage": 8,
@@ -4264,15 +4246,13 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
         {
           "kind": "reorder_groups",
           "source": "그는 또한 법의학 분야에서 의과 학생들을 가르치고자 하는 열정도 있었다.",
-          "prompt": "⟦ORDER:0⟧ ⟦ORDER:1⟧",
+          "prompt": "⟦ORDER:0⟧.",
           "groups": [
             [
               "had",
               "also",
               "a passion",
-              "he"
-            ],
-            [
+              "he",
               "medical students",
               "for",
               "legal medicine",
@@ -4281,8 +4261,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
             ]
           ],
           "answers": [
-            "he also had a passion",
-            "for educating medical students in legal medicine"
+            "he also had a passion for educating medical students in legal medicine"
           ],
           "key": "ne-l2-s8-17",
           "stage": 8,
@@ -4291,7 +4270,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
         {
           "kind": "reorder_groups",
           "source": "Magrath의 열정이 법의학에 대한 Lee의 흥미에 불을 지폈다.",
-          "prompt": "⟦ORDER:0⟧",
+          "prompt": "⟦ORDER:0⟧.",
           "groups": [
             [
               "Lee's",
@@ -4313,16 +4292,14 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
         {
           "kind": "reorder_groups",
           "source": "Lee는 책을 읽고 전문가들과 대화함으로써 법의학을 공부하기 시작했다.",
-          "prompt": "⟦ORDER:0⟧ ⟦ORDER:1⟧",
+          "prompt": "⟦ORDER:0⟧.",
           "groups": [
             [
               "legal",
               "started",
               "medicine",
               "Lee",
-              "studying"
-            ],
-            [
+              "studying",
               "experts",
               "by",
               "speaking",
@@ -4333,8 +4310,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
             ]
           ],
           "answers": [
-            "Lee started studying legal medicine",
-            "by reading books and speaking with experts"
+            "Lee started studying legal medicine by reading books and speaking with experts"
           ],
           "key": "ne-l2-s8-19",
           "stage": 8,
@@ -4378,7 +4354,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
             ]
           ],
           "answers": [
-            "more she wanted to see young medical students trained"
+            "she wanted to see more young medical students trained"
           ],
           "key": "ne-l2-s8-21",
           "stage": 8,
@@ -4387,7 +4363,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
         {
           "kind": "reorder_groups",
           "source": "그녀는 자신의 여생을 이 분야를 발전시키는 데 바치기로 결심했다.",
-          "prompt": "⟦ORDER:0⟧",
+          "prompt": "⟦ORDER:0⟧.",
           "groups": [
             [
               "the rest of",
@@ -4412,7 +4388,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
         {
           "kind": "reorder_groups",
           "source": "1931년에 그녀는 하버드 대학교를 설득해 그녀의 재산을 새로운 분야의 학문인 법의학(과)을 만드는 데 쓰도록 했다.",
-          "prompt": "In 1931, ⟦ORDER:0⟧ ⟦ORDER:1⟧: legal medicine.",
+          "prompt": "In 1931, ⟦ORDER:0⟧: legal medicine.",
           "groups": [
             [
               "Harvard University",
@@ -4420,9 +4396,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
               "persuaded",
               "to use",
               "her",
-              "she"
-            ],
-            [
+              "she",
               "branch",
               "new",
               "of",
@@ -4432,8 +4406,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
             ]
           ],
           "answers": [
-            "she persuaded Harvard University to use her fortune",
-            "a to make new branch of study"
+            "she persuaded Harvard University to use her fortune to make a new branch of study"
           ],
           "key": "ne-l2-s8-23",
           "stage": 8,
@@ -4442,7 +4415,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
         {
           "kind": "reorder_groups",
           "source": "그녀는 또한 희귀한 책과 문서들을 소장한 도서관을 세우는 것을 도왔다.",
-          "prompt": "⟦ORDER:0⟧",
+          "prompt": "⟦ORDER:0⟧.",
           "groups": [
             [
               "with",
@@ -4466,15 +4439,13 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
         {
           "kind": "reorder_groups",
           "source": "그녀는 검시관들이 독립적인 힘을 가지도록 법이 바뀌어야 한다고 생각했다.",
-          "prompt": "She thought ⟦ORDER:0⟧ ⟦ORDER:1⟧.",
+          "prompt": "She thought ⟦ORDER:0⟧.",
           "groups": [
             [
               "changed",
               "laws",
               "be",
-              "had to"
-            ],
-            [
+              "had to",
               "independent",
               "had",
               "medical examiners",
@@ -4483,8 +4454,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
             ]
           ],
           "answers": [
-            "laws had to be changed",
-            "had so that medical examiners independent power"
+            "laws had to be changed so that medical examiners had independent power"
           ],
           "key": "ne-l2-s8-25",
           "stage": 8,
@@ -4548,7 +4518,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
         {
           "kind": "reorder_groups",
           "source": "그들은 법의학의 중요성에 관해 이야기를 나누었다.",
-          "prompt": "⟦ORDER:0⟧",
+          "prompt": "⟦ORDER:0⟧.",
           "groups": [
             [
               "legal medicine",
@@ -4612,23 +4582,20 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
         {
           "kind": "reorder_groups",
           "source": "물건들을 만지고 밟으면서, 그들은 알아차리지도 못한 채 자주 단서들을 파손했다.",
-          "prompt": "By touching and stepping on things, ⟦ORDER:0⟧ ⟦ORDER:1⟧.",
+          "prompt": "By touching and stepping on things, ⟦ORDER:0⟧.",
           "groups": [
             [
               "clues",
               "destroyed",
               "often",
-              "they"
-            ],
-            [
+              "they",
               "it",
               "realizing",
               "without"
             ]
           ],
           "answers": [
-            "they often destroyed clues",
-            "without realizing it"
+            "they often destroyed clues without realizing it"
           ],
           "key": "ne-l2-s8-31",
           "stage": 8,
@@ -4656,22 +4623,19 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
         {
           "kind": "reorder_groups",
           "source": "Lee는 형사들도 범죄 현장을 의학적 관점에서 관찰하는 법을 배워야 한다고 생각했다.",
-          "prompt": "Lee thought ⟦ORDER:0⟧ ⟦ORDER:1⟧ from a medical point of view.",
+          "prompt": "Lee thought ⟦ORDER:0⟧ from a medical point of view.",
           "groups": [
             [
               "learn",
               "also had to",
-              "detectives"
-            ],
-            [
+              "detectives",
               "crime scenes",
               "to observe",
               "how"
             ]
           ],
           "answers": [
-            "detectives also had to learn",
-            "how to observe crime scenes"
+            "detectives also had to learn how to observe crime scenes"
           ],
           "key": "ne-l2-s8-33",
           "stage": 8,
@@ -4691,7 +4655,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
             ]
           ],
           "answers": [
-            "a Lee came up with creative tool"
+            "Lee came up with a creative tool"
           ],
           "key": "ne-l2-s8-34",
           "stage": 8,
@@ -4720,7 +4684,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
         {
           "kind": "reorder_groups",
           "source": "그녀는 매우 자세하고 정밀한 범죄 현장 미니어처를 만들기 시작했다.",
-          "prompt": "⟦ORDER:0⟧ ⟦ORDER:1⟧",
+          "prompt": "⟦ORDER:0⟧.",
           "groups": [
             [
               "miniatures",
@@ -4728,9 +4692,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
               "crime scenes",
               "started",
               "of",
-              "she"
-            ],
-            [
+              "she",
               "and",
               "highly detailed",
               "accurate",
@@ -4739,8 +4701,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
             ]
           ],
           "answers": [
-            "she started creating miniatures of crime scenes",
-            "that were highly detailed and accurate"
+            "she started creating miniatures of crime scenes that were highly detailed and accurate"
           ],
           "key": "ne-l2-s8-36",
           "stage": 8,
@@ -4796,7 +4757,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
         {
           "kind": "reorder_groups",
           "source": "그녀는 형사들이 아주 작은 단서들을 알아차리도록 훈련하길 원했다.",
-          "prompt": "⟦ORDER:0⟧",
+          "prompt": "⟦ORDER:0⟧.",
           "groups": [
             [
               "wanted",
@@ -4839,7 +4800,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
         {
           "kind": "reorder_groups",
           "source": "1945년에, 그녀는 일주일간의 세미나를 열었고 그녀의 범죄 현장 미니어처를 사용하여 첫 번째 강의를 했다.",
-          "prompt": "In 1945, ⟦ORDER:0⟧ and ⟦ORDER:1⟧ ⟦ORDER:2⟧.",
+          "prompt": "In 1945, ⟦ORDER:0⟧ and ⟦ORDER:1⟧.",
           "groups": [
             [
               "week-long",
@@ -4851,9 +4812,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
             [
               "lecture",
               "her first",
-              "gave"
-            ],
-            [
+              "gave",
               "miniature crime scenes",
               "her",
               "using"
@@ -4861,8 +4820,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
           ],
           "answers": [
             "she held a week-long seminar",
-            "gave her first lecture",
-            "her using miniature crime scenes"
+            "gave her first lecture using her miniature crime scenes"
           ],
           "key": "ne-l2-s8-41",
           "stage": 8,
@@ -4871,7 +4829,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
         {
           "kind": "reorder_groups",
           "source": "사건 파일을 읽는 동안, 형사들은 미니어처 현장의 세부 사항들을 연구했다.",
-          "prompt": "⟦ORDER:0⟧, ⟦ORDER:1⟧",
+          "prompt": "⟦ORDER:0⟧, ⟦ORDER:1⟧.",
           "groups": [
             [
               "case files",
@@ -4919,7 +4877,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
           ],
           "answers": [
             "they looked for clues",
-            "or in if the scene the miniature resulted from an accident a violent crime"
+            "if the scene in the miniature resulted from an accident or a violent crime"
           ],
           "key": "ne-l2-s8-43",
           "stage": 8,
@@ -4928,7 +4886,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
         {
           "kind": "reorder_groups",
           "source": "형사들은 어떤 증거도 파손하지 않고 아주 작은 세부 사항들을 발견하고 현장을 관찰하는 법을 배웠다.",
-          "prompt": "⟦ORDER:0⟧ and ⟦ORDER:1⟧ ⟦ORDER:2⟧.",
+          "prompt": "⟦ORDER:0⟧ and ⟦ORDER:1⟧.",
           "groups": [
             [
               "learned",
@@ -4941,9 +4899,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
               "scene",
               "a",
               "to",
-              "observe"
-            ],
-            [
+              "observe",
               "evidence",
               "destroying",
               "without",
@@ -4952,8 +4908,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
           ],
           "answers": [
             "the detectives learned to notice tiny details",
-            "a to observe scene",
-            "without destroying any evidence"
+            "to observe a scene without destroying any evidence"
           ],
           "key": "ne-l2-s8-44",
           "stage": 8,
@@ -4984,7 +4939,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
         {
           "kind": "reorder_groups",
           "source": "Lee의 훈련 과정은 성공적이었다.",
-          "prompt": "⟦ORDER:0⟧",
+          "prompt": "⟦ORDER:0⟧.",
           "groups": [
             [
               "was",
@@ -5017,7 +4972,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
             ]
           ],
           "answers": [
-            "by the annual seminar was being attended detectives"
+            "the annual seminar was being attended by detectives"
           ],
           "key": "ne-l2-s8-47",
           "stage": 8,
@@ -5026,7 +4981,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
         {
           "kind": "reorder_groups",
           "source": "특수 요원들과 군사 간부들 또한 세미나에 참석했다.",
-          "prompt": "⟦ORDER:0⟧",
+          "prompt": "⟦ORDER:0⟧.",
           "groups": [
             [
               "the seminar",
@@ -5065,7 +5020,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
         {
           "kind": "reorder_groups",
           "source": "비록 그녀가 그 분야에 들어가는 데 고군분투했지만, 과학 수사에 대한 그녀의 기여는 상당했다.",
-          "prompt": "⟦ORDER:0⟧, ⟦ORDER:1⟧",
+          "prompt": "⟦ORDER:0⟧, ⟦ORDER:1⟧.",
           "groups": [
             [
               "she",
@@ -5085,7 +5040,7 @@ export const NE_MINBYEONGCHEON_L2_WORKBOOK = {
           ],
           "answers": [
             "although she had struggled to enter the field",
-            "to her contributions forensic science were significant"
+            "her contributions to forensic science were significant"
           ],
           "key": "ne-l2-s8-50",
           "stage": 8,

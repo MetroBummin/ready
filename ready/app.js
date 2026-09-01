@@ -2,13 +2,14 @@ import { readyApi } from './api.js';
 import { contractChoiceCopyHtml, contractPassageHtml, contractResponseComplete, contractResponseControlHtml } from './interaction-runtime.js';
 import { createShortsWheelGesture, normalizeWheelDelta } from './shorts-navigation.js';
 import { livePrefixState, verifierMatches, workbookRecallCue } from './workbook-assistance.js';
+import { createReaderInlineGloss, readerSentenceMarkup } from './reader-inline-gloss.js';
 
 const $=selector=>document.querySelector(selector);
 const esc=value=>String(value??'').replace(/[&<>'"]/g,char=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[char]));
 const SESSION_KEY='ready-student-session';
 const CACHE_INDEX='ready-passage-cache-v2:';
 const state={token:'',student:null,selectedStudent:null,scope:null,passages:[],passage:null,sentences:[],questionSession:null,questionFilters:null,workbookSession:null,reviewData:null,reviewCount:0};
-let busyCount=0,toastTimer;
+let busyCount=0,toastTimer,readerGlossController=null;
 
 function busy(on,label='잠시만요…'){busyCount=Math.max(0,busyCount+(on?1:-1));$('#busy').hidden=!busyCount;$('#busy span:last-child').textContent=label;}
 function toast(message,ms=1900){const node=$('#toast');node.textContent=message;node.classList.add('on');clearTimeout(toastTimer);toastTimer=setTimeout(()=>node.classList.remove('on'),ms);}
@@ -17,7 +18,7 @@ async function call(op,data={},token=state.token,label='잠시만요…'){busy(t
 function record(op,data={}){readyApi(op,data,state.token).catch(()=>{});}
 function clearSession(){localStorage.removeItem(SESSION_KEY);Object.assign(state,{token:'',student:null,scope:null,passages:[],passage:null,sentences:[],questionSession:null,questionFilters:null,workbookSession:null,reviewData:null,reviewCount:0});}
 async function safely(job,{auth=true}={}){try{return await job();}catch(error){if(auth&&error.status===401){clearSession();await chooseStudent();}toast(error.message||'요청을 처리하지 못했습니다.',3600);return null;}}
-function show(...ids){['student-home','pin-login','student-sets','student-review','student-reader','student-questions','student-workbook','student-library'].forEach(id=>$('#'+id).hidden=!ids.includes(id));document.body.classList.toggle('study-mode',ids.includes('student-reader')||ids.includes('student-questions')||ids.includes('student-workbook'));}
+function show(...ids){if(!ids.includes('student-reader')&&readerGlossController){readerGlossController.destroy();readerGlossController=null;}['student-home','pin-login','student-sets','student-review','student-reader','student-questions','student-workbook','student-library'].forEach(id=>$('#'+id).hidden=!ids.includes(id));document.body.classList.toggle('study-mode',ids.includes('student-reader')||ids.includes('student-questions')||ids.includes('student-workbook'));}
 function updateStudentNav(){const nav=$('#student-nav');nav.hidden=!state.token;$('#logout').hidden=!state.token;const review=nav.querySelector('[data-student-route="review"]');if(review)review.innerHTML=`Review${state.reviewCount?` <span>${state.reviewCount}</span>`:''}`;}
 
 async function chooseStudent(){const data=await safely(()=>call('list_students',{},'','학생 목록을 불러오는 중…'),{auth:false});if(!data)return;state.selectedStudent=null;show('student-home');updateStudentNav();$('#student-list').innerHTML=data.students.length?data.students.map(student=>`<button class="student-button" type="button" data-student-id="${student.id}" data-student-name="${esc(student.name)}">${esc(student.name)}</button>`).join(''):'<div class="empty">등록된 학생이 없습니다.</div>';}
@@ -99,7 +100,15 @@ function cleanDisplayText(value){return String(value||'').replace(/^\s*(?:[�
 function plainPassage(){return state.sentences.map(sentence=>esc(cleanDisplayText(sentence.text))).filter(Boolean).join(' ');}
 function readerUnits(){const text=state.sentences.map(sentence=>cleanDisplayText(sentence.text)).filter(Boolean).join(' ');if(!text)return [];try{return [...new Intl.Segmenter('en',{granularity:'sentence'}).segment(text)].map(item=>item.segment.trim()).filter(Boolean);}catch{return text.split(/(?<=[.!?])\s+(?=[A-Z“"'])/).filter(Boolean);}}
 function readerParagraphs(units){const paragraphs=[];let current=[];for(const unit of units){const length=current.join(' ').length;if(current.length&&length+unit.length>430){paragraphs.push(current.join(' '));current=[];}current.push(unit);}if(current.length)paragraphs.push(current.join(' '));return paragraphs;}
-function renderReader(){const units=readerUnits(),lead=units.shift()||'',paragraphs=readerParagraphs(units);show('student-reader');$('#student-reader').innerHTML=`<button class="study-back" type="button" data-exit-study aria-label="학습 목록으로"><span aria-hidden="true">‹</span></button><div class="reader-shell reader-document"><p class="eyebrow">TEXTBOOK · READER</p><h1>${esc(state.passage.title)}</h1>${lead?`<p class="reader-lede">${esc(lead)}</p>`:''}<article class="reader-prose">${paragraphs.length?paragraphs.map(paragraph=>`<p>${esc(paragraph)}</p>`).join(''):`<p>${plainPassage()}</p>`}</article></div>`;}
+function readerGlossEnabled(){return window.READY_CONFIG?.READER_INLINE_GLOSS_ENABLED===true;}
+function readerGlossParagraphs(sentences){const paragraphs=[];let current=[];for(const sentence of sentences){const length=current.reduce((sum,item)=>sum+item.text.length+1,0);if(current.length&&length+sentence.text.length>430){paragraphs.push(current);current=[];}current.push(sentence);}if(current.length)paragraphs.push(current);return paragraphs;}
+function readerGlossSentenceHtml(sentence){return `<span class="reader-inline-sentence" data-reader-sentence-id="${esc(sentence.id)}">${readerSentenceMarkup(sentence)}</span>`;}
+function renderReader(){
+  readerGlossController?.destroy();readerGlossController=null;
+  if(!readerGlossEnabled()){const units=readerUnits(),lead=units.shift()||'',paragraphs=readerParagraphs(units);show('student-reader');$('#student-reader').innerHTML=`<button class="study-back" type="button" data-exit-study aria-label="학습 목록으로"><span aria-hidden="true">‹</span></button><div class="reader-shell reader-document"><p class="eyebrow">TEXTBOOK · READER</p><h1>${esc(state.passage.title)}</h1>${lead?`<p class="reader-lede">${esc(lead)}</p>`:''}<article class="reader-prose">${paragraphs.length?paragraphs.map(paragraph=>`<p>${esc(paragraph)}</p>`).join(''):`<p>${plainPassage()}</p>`}</article></div>`;return;}
+  const sentences=state.sentences.map(sentence=>({id:sentence.id,text:String(sentence.text||'').trim()})).filter(sentence=>sentence.text),lead=sentences.shift(),paragraphs=readerGlossParagraphs(sentences),root=$('#student-reader');show('student-reader');root.dataset.readerPassageId=state.passage.id;root.innerHTML=`<button class="study-back" type="button" data-exit-study aria-label="학습 목록으로"><span aria-hidden="true">‹</span></button><div class="reader-shell reader-document"><p class="eyebrow">TEXTBOOK · READER</p><h1>${esc(state.passage.title)}</h1>${lead?`<p class="reader-lede">${readerGlossSentenceHtml(lead)}</p>`:''}<article class="reader-prose">${paragraphs.length?paragraphs.map(paragraph=>`<p>${paragraph.map(readerGlossSentenceHtml).join(' ')}</p>`).join(''):'<p></p>'}</article><span class="sr-only" data-reader-gloss-live aria-live="polite"></span></div>`;
+  readerGlossController=createReaderInlineGloss({root,passage:state.passage,sentences:[...(lead?[lead]:[]),...sentences],request:data=>readyApi('reader_inline_gloss',{examId:state.scope.id,...data},state.token)});
+}
 function cacheIndexKey(passageId){return `${CACHE_INDEX}${state.student?.id}:${passageId}`;}
 function cachedPassage(passageId){try{const pointer=JSON.parse(localStorage.getItem(cacheIndexKey(passageId))||'null');return pointer?.key?JSON.parse(localStorage.getItem(pointer.key)||'null'):null;}catch{return null;}}
 function cachePassage(data){try{const revision=[data.passage.id,data.passage.updated_at||'current'].join(':'),key=`ready-passage-cache-v2:${state.student.id}:${revision}`;localStorage.setItem(key,JSON.stringify(data));localStorage.setItem(cacheIndexKey(data.passage.id),JSON.stringify({key,revision}));}catch{/* disposable acceleration only */}}

@@ -40,8 +40,8 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
       },
       "8": {
         "source": 47,
-        "ready": 45,
-        "invalid": 2
+        "ready": 47,
+        "invalid": 0
       },
       "9": {
         "source": 47,
@@ -58,7 +58,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
       "1": "outside_requested_range",
       "10": "outside_requested_range"
     },
-    "ready": 327
+    "ready": 329
   },
   "unpublishedExercises": [
     {
@@ -83,22 +83,6 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
       "number": 47,
       "source": "Anyone can be the next person producing or spreading fake news!",
       "prompt": "",
-      "reason": "list index out of range"
-    },
-    {
-      "status": "INVALID",
-      "stage": 8,
-      "number": 28,
-      "source": "이 과정에서 사람들은 '확증 편향'의 함정에 쉽게 빠진다.",
-      "prompt": "In this process, (easily fall / into the trap / \"confirmation bias\" / people / of).",
-      "reason": "reorder chip '\"confirmation bias\"' not in canonical"
-    },
-    {
-      "status": "INVALID",
-      "stage": 8,
-      "number": 47,
-      "source": "누구나 가짜 뉴스를 생산하거나 퍼뜨리는 다음의 사람이 될 수 있다!",
-      "prompt": "(the next person / producing / be / can / fake news / or spreading / ! / anyone)",
       "reason": "list index out of range"
     },
     {
@@ -4253,7 +4237,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
           ],
           "answers": [
             "a reporter standing next to the undamaged Heundeulbawi said",
-            "damaged Today's Internet stories of the Heundeulbawi being were fake"
+            "Today's Internet stories of the Heundeulbawi being damaged were fake"
           ],
           "key": "ybm-l1-s8-03",
           "stage": 8,
@@ -4331,7 +4315,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
           ],
           "answers": [
             "the news that a famous athlete had died became the number one issue",
-            "be it turned out to fake"
+            "it turned out to be fake"
           ],
           "key": "ybm-l1-s8-06",
           "stage": 8,
@@ -4413,7 +4397,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
           ],
           "answers": [
             "criticized those who had made and spread fake news",
-            "it had and hurt the athlete confused people"
+            "it had hurt the athlete and confused people"
           ],
           "key": "ybm-l1-s8-09",
           "stage": 8,
@@ -4455,7 +4439,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
             ]
           ],
           "answers": [
-            "of fake news becoming an accidental distributor like Gina is not unusual"
+            "becoming an accidental distributor of fake news like Gina is not unusual"
           ],
           "key": "ybm-l1-s8-11",
           "stage": 8,
@@ -4589,7 +4573,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
           ],
           "answers": [
             "an earthquake measuring 6.5 struck Ambon",
-            "in thousands of residents did not return to their homes and were still shelters"
+            "thousands of residents did not return to their homes and were still in shelters"
           ],
           "key": "ybm-l1-s8-16",
           "stage": 8,
@@ -4654,8 +4638,8 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
           ],
           "answers": [
             "one of those messages said",
-            "me it's up to you if you want to believe or not",
-            "to Ambon is going sink"
+            "it's up to you if you want to believe me or not",
+            "Ambon is going to sink"
           ],
           "key": "ybm-l1-s8-18",
           "stage": 8,
@@ -4664,7 +4648,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
         {
           "kind": "reorder_groups",
           "source": "많은 이재민들이 여진에 대한 불안감에 휩싸여 있었기 때문에 정부는 이 정보가 가짜라고 발표해야 했다.",
-          "prompt": "⟦ORDER:0⟧",
+          "prompt": "⟦ORDER:0⟧.",
           "groups": [
             [
               "that",
@@ -4737,7 +4721,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
         {
           "kind": "reorder_groups",
           "source": "이러한 현상에 대한 한 가지 설명은 사람들이 새롭고 자극적인 것을 좋아한다는 것이다.",
-          "prompt": "⟦ORDER:0⟧",
+          "prompt": "⟦ORDER:0⟧.",
           "groups": [
             [
               "people",
@@ -4786,8 +4770,8 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
           ],
           "answers": [
             "information is astonishing",
-            "is not only feel that it surprising",
-            "to they also want share the stimulating news"
+            "not only feel that it is surprising",
+            "they also want to share the stimulating news"
           ],
           "key": "ybm-l1-s8-23",
           "stage": 8,
@@ -4821,7 +4805,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
           ],
           "answers": [
             "passing it to others on social media",
-            "to they can gain attention because are the first post previously unknown"
+            "can gain attention because they are the first to post previously unknown"
           ],
           "key": "ybm-l1-s8-24",
           "stage": 8,
@@ -4875,7 +4859,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
           ],
           "answers": [
             "more likely for them to believe new information without any proof",
-            "it critically examining"
+            "critically examining it"
           ],
           "key": "ybm-l1-s8-26",
           "stage": 8,
@@ -4912,6 +4896,26 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
         },
         {
           "kind": "reorder_groups",
+          "source": "이 과정에서 사람들은 '확증 편향'의 함정에 쉽게 빠진다.",
+          "prompt": "In this process, ⟦ORDER:0⟧.",
+          "groups": [
+            [
+              "easily fall",
+              "into the trap",
+              "\"confirmation bias\"",
+              "people",
+              "of"
+            ]
+          ],
+          "answers": [
+            "people easily fall into the trap of \"confirmation bias\""
+          ],
+          "key": "ybm-l1-s8-28",
+          "stage": 8,
+          "number": 28
+        },
+        {
+          "kind": "reorder_groups",
           "source": "즉, 그들은 자신의 신념을 확인시켜주는 뉴스만 선별적으로 받아들이고 이를 뒷받침하지 않는 뉴스는 무시한다.",
           "prompt": "That is, ⟦ORDER:0⟧ and ⟦ORDER:1⟧.",
           "groups": [
@@ -4934,8 +4938,8 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
             ]
           ],
           "answers": [
-            "that they selectively accept news in a way only confirms their beliefs",
-            "that news ignore doesn't support them"
+            "they selectively accept news in a way that only confirms their beliefs",
+            "ignore news that doesn't support them"
           ],
           "key": "ybm-l1-s8-29",
           "stage": 8,
@@ -4971,8 +4975,8 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
             ]
           ],
           "answers": [
-            "in a tend to blindly believe any news describing their favored candidates positive way",
-            "news candidates unconsciously believing that reports something negative about other"
+            "tend to blindly believe any news describing their favored candidates in a positive way",
+            "unconsciously believing news that reports something negative about other candidates"
           ],
           "key": "ybm-l1-s8-30",
           "stage": 8,
@@ -4998,7 +5002,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
             ]
           ],
           "answers": [
-            "fake news how can you make sure that does not mislead you"
+            "how can you make sure that fake news does not mislead you"
           ],
           "key": "ybm-l1-s8-31",
           "stage": 8,
@@ -5096,7 +5100,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
         {
           "kind": "reorder_groups",
           "source": "뉴스를 판단하기 위해 비판적인 사고 기술을 연습해라.",
-          "prompt": "⟦ORDER:0⟧",
+          "prompt": "⟦ORDER:0⟧.",
           "groups": [
             [
               "critical thinking skills",
@@ -5116,7 +5120,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
         {
           "kind": "reorder_groups",
           "source": "당신은 당신이 읽은 내용에 대해 질문하고, 분석하고, 평가해야 한다.",
-          "prompt": "⟦ORDER:0⟧",
+          "prompt": "⟦ORDER:0⟧.",
           "groups": [
             [
               "read",
@@ -5157,7 +5161,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
         {
           "kind": "reorder_groups",
           "source": "자신의 신념이 당신의 판단에 영향을 미칠 수 있는지를 고려해라.",
-          "prompt": "⟦ORDER:0⟧",
+          "prompt": "⟦ORDER:0⟧.",
           "groups": [
             [
               "could",
@@ -5203,7 +5207,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
           ],
           "answers": [
             "ask yourself if you are only reading articles that suit your opinion",
-            "articles that your opinion look for oppose"
+            "look for articles that oppose your opinion"
           ],
           "key": "ybm-l1-s8-40",
           "stage": 8,
@@ -5252,7 +5256,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
           ],
           "answers": [
             "you should examine who wrote the news story",
-            "the news story what the intent was behind writing"
+            "what the intent was behind writing the news story"
           ],
           "key": "ybm-l1-s8-42",
           "stage": 8,
@@ -5280,7 +5284,7 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
           ],
           "answers": [
             "need to check whether the news story is from a reliable media source",
-            "is the evidence valid"
+            "the evidence is valid"
           ],
           "key": "ybm-l1-s8-43",
           "stage": 8,
@@ -5362,6 +5366,29 @@ export const YBM_PARKJUNEON_L1_WORKBOOK = {
           "key": "ybm-l1-s8-46",
           "stage": 8,
           "number": 46
+        },
+        {
+          "kind": "reorder_groups",
+          "source": "누구나 가짜 뉴스를 생산하거나 퍼뜨리는 다음의 사람이 될 수 있다!",
+          "prompt": "⟦ORDER:0⟧",
+          "groups": [
+            [
+              "the next person",
+              "producing",
+              "be",
+              "can",
+              "fake news",
+              "or spreading",
+              "!",
+              "anyone"
+            ]
+          ],
+          "answers": [
+            "anyone can be the next person producing or spreading fake news !"
+          ],
+          "key": "ybm-l1-s8-47",
+          "stage": 8,
+          "number": 47
         }
       ]
     },

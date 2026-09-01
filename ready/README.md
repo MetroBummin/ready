@@ -48,9 +48,10 @@ runtime입니다. PDF는 원본과 정답의 근거로만 사용합니다. 현�
 - 구조화된 `sentenceRows` 항목 하나는 `PassageSentence` 한 개입니다.
 - 각 항목은 영어 `text`와 한국어 `translation`을 가지며 서버가 다시 분리하거나 번역하지 않습니다.
 - Passage와 모든 문장/해석은 `ready_create_passage_with_sentences` 한 transaction으로 저장합니다.
-- Reader와 Question passage는 연속된 plain prose입니다. 학생 runtime의 word lookup, 문장 해석,
-  SavedWord/SavedSentence, lexical highlight 연결은 비활성화되어 있습니다. 기존 운영 데이터와
-  관련 테이블은 삭제하지 않습니다.
+- Reader와 Question passage는 연속된 plain prose입니다. `READER_INLINE_GLOSS_ENABLED` 실험이
+  켜진 경우에만 Reader의 영어 단어를 문맥상 짧은 한국어 뜻으로 직접 치환할 수 있습니다.
+  Question/Workbook에는 lookup 이벤트가 연결되지 않으며 문장 해석, SavedWord/SavedSentence,
+  lexical highlight UI는 계속 비활성입니다. 기존 운영 데이터와 관련 테이블은 삭제하지 않습니다.
 - 학교/학년별 현재 시험범위와 Passage 연결은 `ready_set_current_scope_passages` 한 transaction으로 저장합니다.
 - Passage 소속의 Source of Truth는 `ready_exam_passages`입니다.
 - `ready_exams`는 기록 분리를 위한 내부 구현이며 학생과 관리자에게 생성·선택 개념을 노출하지 않습니다.
@@ -80,7 +81,8 @@ npm run ready:test
 - 학생 PIN은 PostgreSQL bcrypt hash만 저장합니다.
 - 관리자 비밀번호는 로그인 시 한 번만 보내고 이후 opaque admin session을 사용합니다.
 - API key, 관리자 비밀번호, service-role key는 frontend나 Git에 넣지 않습니다.
-- 기존 lexical 데이터와 비활성 서버 함수는 보존하지만 학생 operation dispatcher에는 연결하지 않습니다.
+- 기존 lexical 데이터와 비활성 서버 함수는 보존합니다. Reader inline gloss만 별도 학생 operation으로
+  연결하며 SavedWord/문장 번역 operation은 연결하지 않습니다.
 - Question import용 관리자 비밀번호와 서버 key는 client·git·로그에 넣지 않습니다.
 
 ## 배포

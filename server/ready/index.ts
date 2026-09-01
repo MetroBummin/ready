@@ -25,7 +25,7 @@ function supabaseAdminKey() {
 }
 const db = createClient(Deno.env.get("SUPABASE_URL") ?? "", supabaseAdminKey(), { auth: { persistSession: false } });
 const adminOps = new Set(["teacher_bootstrap", "delete_impact", "assign_scope_passages", "set_scope_passages", "create_passage", "update_passage", "delete_passage", "create_student", "set_student_pin", "delete_student", "import_questions", "import_explanations"]);
-const studentOps = new Set(["student_bootstrap", "student_passage", "student_questions", "student_question_filters", "student_question_queue", "student_review_questions", "set_question_bookmark", "submit_attempt", "student_workbook", "workbook_assistance", "set_workbook_bookmark", "unlock_workbook_recall", "workbook_hint", "submit_workbook_attempt"]);
+const studentOps = new Set(["student_bootstrap", "student_passage", "reader_inline_gloss", "student_questions", "student_question_filters", "student_question_queue", "student_review_questions", "set_question_bookmark", "submit_attempt", "student_workbook", "workbook_assistance", "set_workbook_bookmark", "unlock_workbook_recall", "workbook_hint", "submit_workbook_attempt"]);
 const publicOps = new Set(["list_students", "student_login", "admin_login"]);
 // Match Breeze's free Gemini dictionary defaults. The API key remains a
 // Supabase Edge Function Secret and is never part of any public response.
@@ -89,6 +89,31 @@ async function callGeminiLook(word: string, clicked: string, sentence: string) {
   }
   console.error("READY Gemini lookup failed:", lastError);
   throw new ApiError(502, "Gemini 단어 사전을 잠시 사용할 수 없습니다.");
+}
+
+function geminiInlineGlossPrompt(clicked: string, sentence: string) {
+  return `영어 문장에서 클릭한 단어의 문맥상 뜻을 짧은 한국어로 치환하려고 합니다.
+
+문장: ${sentence}
+클릭한 표면형: ${clicked}
+
+- gloss: 이 문맥에서만 자연스러운 짧은 한국어 뜻. 설명문 금지
+- lemma: 영어 표제어
+- phrase: 클릭 단어를 포함하며 문장에 글자 그대로 연속해서 존재하는 확실한 구동사/숙어만. 아니면 빈 문자열
+- confidence: 0부터 1. 문맥 뜻 자체가 불확실하면 0.65 미만
+
+{"gloss":"","lemma":"","phrase":"","confidence":0}`;
+}
+async function callGeminiInlineGloss(clicked: string, sentence: string) {
+  const provider=(Deno.env.get("AI_PROVIDER")??"").trim().toLowerCase(),key=Deno.env.get("GEMINI_API_KEY");
+  if(provider!=="gemini"||!key)throw new ApiError(503,"Gemini 문맥 뜻풀이가 아직 연결되지 않았습니다.");
+  const url=`https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${key}`,base={maxOutputTokens:180,temperature:0.1,responseMimeType:"application/json"};let lastError="";
+  for(const generationConfig of [{...base,thinkingConfig:{thinkingBudget:0}},base]){
+    const response=await fetch(url,{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({system_instruction:{parts:[{text:GEMINI_SYSTEM}]},contents:[{role:"user",parts:[{text:geminiInlineGlossPrompt(clicked,sentence)}]}],generationConfig})});
+    if(response.ok){const payload=await response.json(),text=(payload?.candidates?.[0]?.content?.parts||[]).map((part:{text?:string})=>part?.text||"").join("").trim(),parsed=parseJson(text);if(parsed)return parsed;throw new ApiError(502,"Gemini 문맥 뜻풀이를 읽지 못했습니다.");}
+    lastError=(await response.text()).slice(0,300);if(response.status!==400)break;
+  }
+  console.error("READY Gemini inline gloss failed:",lastError);throw new ApiError(502,"Gemini 문맥 뜻풀이를 잠시 사용할 수 없습니다.");
 }
 
 function aiGradingPrompt(question: any, spec: any, responses: string[]) {
@@ -905,6 +930,17 @@ async function wordLookup(body: any, session: ReadySession) {
     remaining: Math.max(0, AI_DAILY_LIMIT - (used.count || 0) - 1),
   };
 }
+async function readerInlineGloss(body:any,session:ReadySession){
+  const context=await studyContext(body,session,true),sentence=String(context.sentence.text||""),start=Number(body.start),end=Number(body.end),surfaceText=required(body.sourceText,"선택 단어",100),requestedRevision=clean(body.passageRevision,100);
+  if(!Number.isInteger(start)||!Number.isInteger(end)||start<0||end<=start||end>sentence.length||sentence.slice(start,end)!==surfaceText)throw new ApiError(400,"선택한 단어 범위가 현재 문장과 맞지 않습니다.");
+  if(requestedRevision&&requestedRevision!==clean(context.passage.updated_at,100))throw new ApiError(409,"지문이 수정되었습니다. 다시 열어 주세요.");
+  if(!/^[A-Za-z]+(?:[’'][A-Za-z]+)*$/.test(surfaceText))throw new ApiError(400,"영어 단어만 뜻을 볼 수 있습니다.");
+  const today=new Date();today.setHours(0,0,0,0);const used=await db.from("ready_word_lookup_events").select("id",{count:"exact",head:true}).eq("student_id",context.student.id).gte("created_at",today.toISOString());if(used.error)throw new ApiError(500,used.error.message);if((used.count||0)>=AI_DAILY_LIMIT)throw new ApiError(429,`오늘 Gemini 문맥 뜻풀이 ${AI_DAILY_LIMIT}회를 모두 사용했습니다.`);
+  const ai=await callGeminiInlineGloss(surfaceText,sentence),confidence=Math.max(0,Math.min(1,Number(ai.confidence)||0)),gloss=clean(ai.gloss,30),root=clean(ai.lemma,100)||lemma(surfaceText),phrase=clean(ai.phrase,100);let resolvedStart=start,resolvedEnd=end,kind="word";
+  if(phrase&&confidence>=0.85){const folded=sentence.toLocaleLowerCase(),needle=phrase.toLocaleLowerCase(),matches=[];let offset=0;while((offset=folded.indexOf(needle,offset))>=0){const phraseEnd=offset+phrase.length;if(offset<=start&&phraseEnd>=end)matches.push({start:offset,end:phraseEnd});offset+=Math.max(1,needle.length);}if(matches.length===1){resolvedStart=matches[0].start;resolvedEnd=matches[0].end;kind="phrase";}}
+  const resolved=confidence>=0.65&&!!gloss,sourceText=sentence.slice(resolvedStart,resolvedEnd);const event=await db.from("ready_word_lookup_events").insert({student_id:context.student.id,exam_id:context.examId,passage_id:context.passage.id,sentence_id:context.sentence.id,surface_word:surfaceText,normalized_word:lemma(surfaceText),source_text_snapshot:resolved?sourceText:surfaceText,start_offset:resolved?resolvedStart:start,end_offset:resolved?resolvedEnd:end,gloss_snapshot:resolved?gloss:null,lemma_snapshot:root,lookup_kind:resolved?kind:"word",confidence,passage_revision:context.passage.updated_at});if(event.error)throw new ApiError(500,event.error.message);
+  return resolved?{resolved:true,sentenceId:context.sentence.id,start:resolvedStart,end:resolvedEnd,sourceText,gloss,lemma:root,kind,confidence}:{resolved:false,sentenceId:context.sentence.id,start,end,sourceText:surfaceText,confidence};
+}
 function meaningKey(value: string) { return clean(value, 500).toLowerCase().replace(/\s+/g, " "); }
 async function saveWord(body:any,session:ReadySession){const context=await studyContext(body,session),word=required(body.word,"단어",100),normalized=normalizedWord(body.normalizedWord||word),root=lemma(normalized),meaning=required(body.meaning,"선택한 뜻",500);if(!root)throw new ApiError(400,"영어 단어만 저장할 수 있습니다.");const known=await db.from("ready_word_states").select("known").eq("student_id",context.student.id).eq("passage_id",context.passage.id).eq("normalized_word",root).maybeSingle();if(known.error)throw new ApiError(500,known.error.message);if(known.data?.known)throw new ApiError(409,"아는 단어로 표시했습니다. 다시 학습하기를 누른 뒤 저장할 수 있습니다.");const saved=await db.from("ready_saved_words").upsert({student_id:context.student.id,passage_id:context.passage.id,sentence_id:context.sentence?.id||null,word,normalized_word:root,meaning_snapshot:meaning,meaning_key:meaningKey(meaning)},{onConflict:"student_id,passage_id,normalized_word,meaning_key",ignoreDuplicates:true}).select("id,meaning_snapshot").maybeSingle();if(saved.error)throw new ApiError(500,saved.error.message);return {saved:true,normalizedWord:root,meaning};}
 async function setWordKnown(body:any,session:ReadySession,known:boolean){const context=await studyContext(body,session),root=lemma(normalizedWord(required(body.normalizedWord||body.word,"단어",100)));if(!root)throw new ApiError(400,"영어 단어만 처리할 수 있습니다.");const result=await db.rpc("ready_set_word_known",{p_student_id:context.student.id,p_passage_id:context.passage.id,p_normalized_word:root,p_known:known});if(result.error)throw new ApiError(500,result.error.message);return {known,normalizedWord:root};}
@@ -920,7 +956,7 @@ async function dispatch(op: string, body: any, session: ReadySession | null) {
     case "list_students": return listStudents(); case "student_login": return studentLogin(body); case "admin_login": return adminLogin(body); case "logout": return revokeSession(session as ReadySession);
     case "teacher_bootstrap": return teacherBootstrap(); case "delete_impact": return deleteImpact(body); case "create_student": return createStudent(body); case "set_student_pin": return setStudentPin(body); case "delete_student": return deleteStudent(body);
     case "assign_scope_passages": return setScopePassages(body, false); case "set_scope_passages": return setScopePassages(body, true); case "create_passage": return createPassage(body); case "update_passage": return updatePassage(body); case "delete_passage": return deletePassage(body); case "import_questions": return importQuestions(body); case "import_explanations": return importExplanations(body);
-    case "student_bootstrap": return studentBootstrap(session as ReadySession); case "student_passage": return studentPassage(body, session as ReadySession); case "student_questions": return studentQuestions(body, session as ReadySession); case "student_question_filters": return studentQuestionFilters(body, session as ReadySession); case "student_question_queue": return studentQuestionQueue(body, session as ReadySession); case "student_review_questions": return studentReviewQuestions(body, session as ReadySession); case "set_question_bookmark": return setQuestionBookmark(body, session as ReadySession); case "submit_attempt": return submitAttempt(body, session as ReadySession); case "student_workbook": return studentWorkbook(body, session as ReadySession); case "workbook_assistance": return workbookAssistance(body, session as ReadySession); case "set_workbook_bookmark": return setWorkbookBookmark(body, session as ReadySession); case "unlock_workbook_recall": return unlockWorkbookRecall(body, session as ReadySession); case "workbook_hint": return workbookHint(body, session as ReadySession); case "submit_workbook_attempt": return submitWorkbookAttempt(body, session as ReadySession);
+    case "student_bootstrap": return studentBootstrap(session as ReadySession); case "student_passage": return studentPassage(body, session as ReadySession); case "reader_inline_gloss": return readerInlineGloss(body, session as ReadySession); case "student_questions": return studentQuestions(body, session as ReadySession); case "student_question_filters": return studentQuestionFilters(body, session as ReadySession); case "student_question_queue": return studentQuestionQueue(body, session as ReadySession); case "student_review_questions": return studentReviewQuestions(body, session as ReadySession); case "set_question_bookmark": return setQuestionBookmark(body, session as ReadySession); case "submit_attempt": return submitAttempt(body, session as ReadySession); case "student_workbook": return studentWorkbook(body, session as ReadySession); case "workbook_assistance": return workbookAssistance(body, session as ReadySession); case "set_workbook_bookmark": return setWorkbookBookmark(body, session as ReadySession); case "unlock_workbook_recall": return unlockWorkbookRecall(body, session as ReadySession); case "workbook_hint": return workbookHint(body, session as ReadySession); case "submit_workbook_attempt": return submitWorkbookAttempt(body, session as ReadySession);
     default: throw new ApiError(404, "알 수 없는 READY 작업입니다.");
   }
 }

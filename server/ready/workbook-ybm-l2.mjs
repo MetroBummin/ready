@@ -4405,7 +4405,7 @@ export const YBM_PARKJUNEON_L2_WORKBOOK = {
             ]
           ],
           "answers": [
-            "a starts her day by logging in to music streaming service on her smartphone"
+            "starts her day by logging in to a music streaming service on her smartphone"
           ],
           "key": "ybm-l2-s8-01",
           "stage": 8,
@@ -4446,16 +4446,14 @@ export const YBM_PARKJUNEON_L2_WORKBOOK = {
         {
           "kind": "reorder_groups",
           "source": "건강한 아침 식사를 위해, 지윤이는 신선한 채소와 과일을 공급하는 구독 서비스로부터 배송을 받는다.",
-          "prompt": "For a healthy breakfast, ⟦ORDER:0⟧ ⟦ORDER:1⟧.",
+          "prompt": "For a healthy breakfast, ⟦ORDER:0⟧.",
           "groups": [
             [
               "receives",
               "from",
               "a subscription service",
               "jiyun",
-              "a delivery"
-            ],
-            [
+              "a delivery",
               "and",
               "that",
               "fruits",
@@ -4465,8 +4463,7 @@ export const YBM_PARKJUNEON_L2_WORKBOOK = {
             ]
           ],
           "answers": [
-            "jiyun receives a delivery from a subscription service",
-            "that provides fresh vegetables and fruits"
+            "jiyun receives a delivery from a subscription service that provides fresh vegetables and fruits"
           ],
           "key": "ybm-l2-s8-03",
           "stage": 8,
@@ -4475,15 +4472,13 @@ export const YBM_PARKJUNEON_L2_WORKBOOK = {
         {
           "kind": "reorder_groups",
           "source": "방과 후에, 지윤이는 그녀가 흥미를 느끼는 것마다 그녀의 지식을 확장하기 위해 비디오 강의 서비스를 활용한다.",
-          "prompt": "After school, ⟦ORDER:0⟧ ⟦ORDER:1⟧.",
+          "prompt": "After school, ⟦ORDER:0⟧.",
           "groups": [
             [
               "utilizes",
               "a video lecture",
               "service",
-              "jiyun"
-            ],
-            [
+              "jiyun",
               "in",
               "interesting",
               "knowledge",
@@ -4496,8 +4491,7 @@ export const YBM_PARKJUNEON_L2_WORKBOOK = {
             ]
           ],
           "answers": [
-            "jiyun utilizes a video lecture service",
-            "to expand her knowledge in whatever she finds interesting"
+            "jiyun utilizes a video lecture service to expand her knowledge in whatever she finds interesting"
           ],
           "key": "ybm-l2-s8-04",
           "stage": 8,
@@ -4506,16 +4500,14 @@ export const YBM_PARKJUNEON_L2_WORKBOOK = {
         {
           "kind": "reorder_groups",
           "source": "예를 들어, 그녀는 학교 공부를 복습하고 그녀가 선택한 연구 분야의 최신 지식에 대해 계속 업데이트하기 위해 다양한 학술 강의를 시청한다.",
-          "prompt": "For example, ⟦ORDER:0⟧ ⟦ORDER:1⟧.",
+          "prompt": "For example, ⟦ORDER:0⟧.",
           "groups": [
             [
               "academic",
               "lectures",
               "watches",
               "she",
-              "various"
-            ],
-            [
+              "various",
               "in",
               "to",
               "review",
@@ -4536,8 +4528,7 @@ export const YBM_PARKJUNEON_L2_WORKBOOK = {
             ]
           ],
           "answers": [
-            "she watches various academic lectures",
-            "to review her schoolwork and stay updated about the latest knowledge in her chosen field of study"
+            "she watches various academic lectures to review her schoolwork and stay updated about the latest knowledge in her chosen field of study"
           ],
           "key": "ybm-l2-s8-05",
           "stage": 8,
@@ -4546,7 +4537,7 @@ export const YBM_PARKJUNEON_L2_WORKBOOK = {
         {
           "kind": "reorder_groups",
           "source": "주말에 지윤이와 그녀의 가족은 스트리밍 서비스를 사용하면서 함께 영화나 드라마를 시청하는 좋은 시간을 보낸다.",
-          "prompt": "During weekends, Jiyun and her family ⟦ORDER:0⟧ ⟦ORDER:1⟧.",
+          "prompt": "During weekends, Jiyun and her family ⟦ORDER:0⟧.",
           "groups": [
             [
               "together",
@@ -4556,9 +4547,7 @@ export const YBM_PARKJUNEON_L2_WORKBOOK = {
               "movies",
               "time",
               "or",
-              "quality"
-            ],
-            [
+              "quality",
               "streaming",
               "a",
               "using",
@@ -4566,8 +4555,7 @@ export const YBM_PARKJUNEON_L2_WORKBOOK = {
             ]
           ],
           "answers": [
-            "spend quality time together watching movies or dramas",
-            "a using streaming service"
+            "spend quality time together watching movies or dramas using a streaming service"
           ],
           "key": "ybm-l2-s8-06",
           "stage": 8,
@@ -4596,7 +4584,7 @@ export const YBM_PARKJUNEON_L2_WORKBOOK = {
             ]
           ],
           "answers": [
-            "a the subscription economy is popular economic model",
+            "the subscription economy is a popular economic model",
             "is actively taking part in it"
           ],
           "key": "ybm-l2-s8-07",
@@ -4668,7 +4656,7 @@ export const YBM_PARKJUNEON_L2_WORKBOOK = {
           ],
           "answers": [
             "these business models have expanded to all industries",
-            "and including entertainment, technology, fashion, education, much more"
+            "including entertainment, technology, fashion, education, and much more"
           ],
           "key": "ybm-l2-s8-09",
           "stage": 8,
@@ -4711,7 +4699,7 @@ export const YBM_PARKJUNEON_L2_WORKBOOK = {
           "answers": [
             "instead of creating a hit product that will be sold",
             "companies now prioritize providing continuing value",
-            "or such as new content, more personalization, access to updates"
+            "such as new content, more personalization, or access to updates"
           ],
           "key": "ybm-l2-s8-10",
           "stage": 8,
@@ -4720,7 +4708,7 @@ export const YBM_PARKJUNEON_L2_WORKBOOK = {
         {
           "kind": "reorder_groups",
           "source": "고객들은 정기적 구독을 통해 이러한 혜택들에 대해 비용을 지불한다.",
-          "prompt": "⟦ORDER:0⟧",
+          "prompt": "⟦ORDER:0⟧.",
           "groups": [
             [
               "subscription",
@@ -4744,7 +4732,7 @@ export const YBM_PARKJUNEON_L2_WORKBOOK = {
         {
           "kind": "reorder_groups",
           "source": "구독 경제는 기업과 소비자 모두에게 이점을 가져다준다.",
-          "prompt": "⟦ORDER:0⟧",
+          "prompt": "⟦ORDER:0⟧.",
           "groups": [
             [
               "the",
@@ -4769,15 +4757,13 @@ export const YBM_PARKJUNEON_L2_WORKBOOK = {
         {
           "kind": "reorder_groups",
           "source": "기업들은 구독 모델을 사용해서 안정적인 수입을 얻고 고객 충성도를 구축할 수 있다.",
-          "prompt": "⟦ORDER:0⟧ ⟦ORDER:1⟧",
+          "prompt": "⟦ORDER:0⟧.",
           "groups": [
             [
               "can",
               "a stable revenue",
               "companies",
-              "have"
-            ],
-            [
+              "have",
               "build",
               "by",
               "using",
@@ -4788,8 +4774,7 @@ export const YBM_PARKJUNEON_L2_WORKBOOK = {
             ]
           ],
           "answers": [
-            "companies can have a stable revenue",
-            "and build customer loyalty by using the subscription model"
+            "companies can have a stable revenue and build customer loyalty by using the subscription model"
           ],
           "key": "ybm-l2-s8-13",
           "stage": 8,
@@ -4880,7 +4865,7 @@ export const YBM_PARKJUNEON_L2_WORKBOOK = {
           "answers": [
             "the rise of the subscription economy is closely connected to two major drivers",
             "changes in consumption trends",
-            "the of rapid growth online platforms"
+            "the rapid growth of online platforms"
           ],
           "key": "ybm-l2-s8-16",
           "stage": 8,
@@ -4889,7 +4874,7 @@ export const YBM_PARKJUNEON_L2_WORKBOOK = {
         {
           "kind": "reorder_groups",
           "source": "사람들은 구독을 사랑한다 구독 경제는 요즘 사람들이 어떻게 재화와 서비스를 소비하는지와 상당히 관련되어 있다.",
-          "prompt": "People love the subscriptions ⟦ORDER:0⟧ ⟦ORDER:1⟧ nowadays.",
+          "prompt": "People love the subscriptions ⟦ORDER:0⟧ nowadays.",
           "groups": [
             [
               "the",
@@ -4897,9 +4882,7 @@ export const YBM_PARKJUNEON_L2_WORKBOOK = {
               "to",
               "relevant",
               "is highly",
-              "subscription"
-            ],
-            [
+              "subscription",
               "consume",
               "services",
               "goods",
@@ -4909,8 +4892,7 @@ export const YBM_PARKJUNEON_L2_WORKBOOK = {
             ]
           ],
           "answers": [
-            "the subscription economy is highly relevant to",
-            "people how consume goods and services"
+            "the subscription economy is highly relevant to how people consume goods and services"
           ],
           "key": "ybm-l2-s8-17",
           "stage": 8,
@@ -4919,7 +4901,7 @@ export const YBM_PARKJUNEON_L2_WORKBOOK = {
         {
           "kind": "reorder_groups",
           "source": "점점 더 많은 사람이 물건을 소유하는 것보다 경험을 우선시한다.",
-          "prompt": "⟦ORDER:0⟧",
+          "prompt": "⟦ORDER:0⟧.",
           "groups": [
             [
               "experiences",
@@ -4943,7 +4925,7 @@ export const YBM_PARKJUNEON_L2_WORKBOOK = {
         {
           "kind": "reorder_groups",
           "source": "이것이 구독 경제를 그들에게 매력적인 것으로 만드는데 왜냐하면 그것은 소유의 필요 없이 서비스나 콘텐츠에 대한 접근을 제공하기 때문이다.",
-          "prompt": "⟦ORDER:0⟧ ⟦ORDER:1⟧",
+          "prompt": "⟦ORDER:0⟧.",
           "groups": [
             [
               "attractive",
@@ -4953,9 +4935,7 @@ export const YBM_PARKJUNEON_L2_WORKBOOK = {
               "subscription",
               "to",
               "the",
-              "economy"
-            ],
-            [
+              "economy",
               "content",
               "it",
               "of",
@@ -4971,8 +4951,7 @@ export const YBM_PARKJUNEON_L2_WORKBOOK = {
             ]
           ],
           "answers": [
-            "this makes the subscription economy attractive to them",
-            "to because it offers access services or content without the requirement of ownership"
+            "this makes the subscription economy attractive to them because it offers access to services or content without the requirement of ownership"
           ],
           "key": "ybm-l2-s8-19",
           "stage": 8,
@@ -5006,8 +4985,8 @@ export const YBM_PARKJUNEON_L2_WORKBOOK = {
             ]
           ],
           "answers": [
-            "a by subscribing to music streaming service",
-            "for music can enjoy limitless without the need having disc albums"
+            "by subscribing to a music streaming service",
+            "can enjoy limitless music without the need for having disc albums"
           ],
           "key": "ybm-l2-s8-20",
           "stage": 8,
@@ -5016,7 +4995,7 @@ export const YBM_PARKJUNEON_L2_WORKBOOK = {
         {
           "kind": "reorder_groups",
           "source": "또 다른 예는 의류 서비스를 구독하는 것으로, 소비자들은 그들의 서랍을 채우지 않고 다양한 의류 스타일을 탐색할 수 있다.",
-          "prompt": "⟦ORDER:0⟧, ⟦ORDER:1⟧",
+          "prompt": "⟦ORDER:0⟧, ⟦ORDER:1⟧.",
           "groups": [
             [
               "subscribing",
@@ -5044,7 +5023,7 @@ export const YBM_PARKJUNEON_L2_WORKBOOK = {
           ],
           "answers": [
             "another example is subscribing to clothing services",
-            "clothing where consumers can explore a variety of styles without filling up their drawers"
+            "where consumers can explore a variety of clothing styles without filling up their drawers"
           ],
           "key": "ybm-l2-s8-21",
           "stage": 8,
@@ -5073,7 +5052,7 @@ export const YBM_PARKJUNEON_L2_WORKBOOK = {
         {
           "kind": "reorder_groups",
           "source": "구독 경제는 다양한 범위의 구독 선택을 제공하여, 개인들이 그들의 선호와 관심에 기초하여 그들의 경험들을 개별화할 수 있도록 해 준다.",
-          "prompt": "The subscription economy ⟦ORDER:0⟧, ⟦ORDER:1⟧ ⟦ORDER:2⟧.",
+          "prompt": "The subscription economy ⟦ORDER:0⟧, ⟦ORDER:1⟧.",
           "groups": [
             [
               "offers",
@@ -5090,9 +5069,7 @@ export const YBM_PARKJUNEON_L2_WORKBOOK = {
               "experiences",
               "their",
               "enabling",
-              "to"
-            ],
-            [
+              "to",
               "based on",
               "their",
               "interests",
@@ -5102,9 +5079,8 @@ export const YBM_PARKJUNEON_L2_WORKBOOK = {
             ]
           ],
           "answers": [
-            "subscription offers a diverse range of options",
-            "enabling individuals to personalize their experiences",
-            "their based on own preferences and interests"
+            "offers a diverse range of subscription options",
+            "enabling individuals to personalize their experiences based on their own preferences and interests"
           ],
           "key": "ybm-l2-s8-23",
           "stage": 8,
@@ -5113,7 +5089,7 @@ export const YBM_PARKJUNEON_L2_WORKBOOK = {
         {
           "kind": "reorder_groups",
           "source": "구독 경제의 이러한 측면은 젊은 세대가 그들의 고유함을 표현하고, 젊은 세대의 개별적 취향에 부합하는 가치 있는 콘텐츠와 서비스들을 발견하는 것을 즐김에 따라, 젊은 세대 사이에 더욱 인기가 있다.",
-          "prompt": "⟦ORDER:0⟧ among younger generations, ⟦ORDER:1⟧ ⟦ORDER:2⟧.",
+          "prompt": "⟦ORDER:0⟧ among younger generations, ⟦ORDER:1⟧.",
           "groups": [
             [
               "aspect",
@@ -5138,9 +5114,7 @@ export const YBM_PARKJUNEON_L2_WORKBOOK = {
               "their",
               "enjoy",
               "as",
-              "uniqueness"
-            ],
-            [
+              "uniqueness",
               "individual",
               "fit",
               "with",
@@ -5151,8 +5125,7 @@ export const YBM_PARKJUNEON_L2_WORKBOOK = {
           ],
           "answers": [
             "this aspect of the subscription economy is more popular",
-            "as they enjoy expressing their uniqueness and discovering valuable content and services",
-            "their that fit with individual tastes"
+            "as they enjoy expressing their uniqueness and discovering valuable content and services that fit with their individual tastes"
           ],
           "key": "ybm-l2-s8-24",
           "stage": 8,
@@ -5161,7 +5134,7 @@ export const YBM_PARKJUNEON_L2_WORKBOOK = {
         {
           "kind": "reorder_groups",
           "source": "주목받고 있는 인기 사례는 화장품 구독 서비스이다.",
-          "prompt": "⟦ORDER:0⟧",
+          "prompt": "⟦ORDER:0⟧.",
           "groups": [
             [
               "a",
@@ -5220,7 +5193,7 @@ export const YBM_PARKJUNEON_L2_WORKBOOK = {
           ],
           "answers": [
             "stands out by thoroughly analyzing customers' current skin conditions and providing specialized recommendations",
-            "to skin including manufacturing cosmetics created address each individual's unique concerns"
+            "including manufacturing cosmetics created to address each individual's unique skin concerns"
           ],
           "key": "ybm-l2-s8-26",
           "stage": 8,
@@ -5229,7 +5202,7 @@ export const YBM_PARKJUNEON_L2_WORKBOOK = {
         {
           "kind": "reorder_groups",
           "source": "요점을 말하자면, 소비자들은 획일화된 구매 과정 대신에, 그들 개인의 피부 조건을 우선시하는 개별화된 경험을 얻는다.",
-          "prompt": "⟦ORDER:0⟧, ⟦ORDER:1⟧ ⟦ORDER:2⟧, ⟦ORDER:3⟧",
+          "prompt": "⟦ORDER:0⟧, ⟦ORDER:1⟧, ⟦ORDER:2⟧.",
           "groups": [
             [
               "to",
@@ -5243,9 +5216,7 @@ export const YBM_PARKJUNEON_L2_WORKBOOK = {
               "experience",
               "a",
               "consumers",
-              "receive"
-            ],
-            [
+              "receive",
               "that",
               "conditions",
               "individual",
@@ -5264,9 +5235,8 @@ export const YBM_PARKJUNEON_L2_WORKBOOK = {
           ],
           "answers": [
             "to come to the point",
-            "consumers receive a personalized experience",
-            "that prioritizes their individual skin conditions",
-            "a rather than uniform purchasing process"
+            "consumers receive a personalized experience that prioritizes their individual skin conditions",
+            "rather than a uniform purchasing process"
           ],
           "key": "ybm-l2-s8-27",
           "stage": 8,
@@ -5323,16 +5293,14 @@ export const YBM_PARKJUNEON_L2_WORKBOOK = {
         {
           "kind": "reorder_groups",
           "source": "다른 모델에서는, 필요할 때 필요한 서비스나 제품만 선택하여 구독 요금을 유연하게 조정할 수 있다.",
-          "prompt": "In other models, ⟦ORDER:0⟧ ⟦ORDER:1⟧ when needed.",
+          "prompt": "In other models, ⟦ORDER:0⟧ when needed.",
           "groups": [
             [
               "they",
               "can",
               "fees",
               "subscription",
-              "flexibly adjust"
-            ],
-            [
+              "flexibly adjust",
               "choosing only",
               "the",
               "by",
@@ -5343,8 +5311,7 @@ export const YBM_PARKJUNEON_L2_WORKBOOK = {
             ]
           ],
           "answers": [
-            "they can flexibly adjust subscription fees",
-            "the by choosing only necessary services or products"
+            "they can flexibly adjust subscription fees by choosing only the necessary services or products"
           ],
           "key": "ybm-l2-s8-30",
           "stage": 8,
@@ -5378,7 +5345,7 @@ export const YBM_PARKJUNEON_L2_WORKBOOK = {
           ],
           "answers": [
             "this means they can either enjoy a range of offerings for a set price",
-            "they save money by selecting only what really need"
+            "save money by selecting only what they really need"
           ],
           "key": "ybm-l2-s8-31",
           "stage": 8,
@@ -5444,7 +5411,7 @@ export const YBM_PARKJUNEON_L2_WORKBOOK = {
           "answers": [
             "consumers can receive services or products",
             "if they wish to change their device model",
-            "can they do so"
+            "they can do so"
           ],
           "key": "ybm-l2-s8-33",
           "stage": 8,
@@ -5505,7 +5472,7 @@ export const YBM_PARKJUNEON_L2_WORKBOOK = {
             ]
           ],
           "answers": [
-            "on with the development of various digital devices centered smartphones",
+            "with the development of various digital devices centered on smartphones",
             "consumers have been able to do numerous things"
           ],
           "key": "ybm-l2-s8-35",
@@ -5515,7 +5482,7 @@ export const YBM_PARKJUNEON_L2_WORKBOOK = {
         {
           "kind": "reorder_groups",
           "source": "과거에는, 사람들이 영화관에 가거나, 그들이 시청하기 원하는 비디오들을 구매할 수 밖에 없었다.",
-          "prompt": "In the past, ⟦ORDER:0⟧ ⟦ORDER:1⟧.",
+          "prompt": "In the past, ⟦ORDER:0⟧.",
           "groups": [
             [
               "choice",
@@ -5529,9 +5496,7 @@ export const YBM_PARKJUNEON_L2_WORKBOOK = {
               "no",
               "had",
               "people",
-              "to"
-            ],
-            [
+              "to",
               "they",
               "to",
               "wanted",
@@ -5539,8 +5504,7 @@ export const YBM_PARKJUNEON_L2_WORKBOOK = {
             ]
           ],
           "answers": [
-            "people had no choice but to go to the theater or purchase the videos",
-            "to they wanted watch"
+            "people had no choice but to go to the theater or purchase the videos they wanted to watch"
           ],
           "key": "ybm-l2-s8-36",
           "stage": 8,
@@ -5578,8 +5542,8 @@ export const YBM_PARKJUNEON_L2_WORKBOOK = {
             ]
           ],
           "answers": [
-            "to whoever wants watch a movie can access online media subscription platforms",
-            "on or enjoy a vast selection of movies their smartphones other digital devices"
+            "whoever wants to watch a movie can access online media subscription platforms",
+            "enjoy a vast selection of movies on their smartphones or other digital devices"
           ],
           "key": "ybm-l2-s8-37",
           "stage": 8,
@@ -5588,7 +5552,7 @@ export const YBM_PARKJUNEON_L2_WORKBOOK = {
         {
           "kind": "reorder_groups",
           "source": "동시에, 이들 플랫폼들은 기업들이 고객들에게 맞춤형 제품과 서비스를 제공하는 것을 쉽게 만든다.",
-          "prompt": "At the same time, ⟦ORDER:0⟧ ⟦ORDER:1⟧.",
+          "prompt": "At the same time, ⟦ORDER:0⟧.",
           "groups": [
             [
               "make",
@@ -5597,9 +5561,7 @@ export const YBM_PARKJUNEON_L2_WORKBOOK = {
               "companies",
               "for",
               "platforms",
-              "easy"
-            ],
-            [
+              "easy",
               "services",
               "to",
               "to",
@@ -5611,8 +5573,7 @@ export const YBM_PARKJUNEON_L2_WORKBOOK = {
             ]
           ],
           "answers": [
-            "these platforms make it easy for companies",
-            "to offer customized products and services to customers"
+            "these platforms make it easy for companies to offer customized products and services to customers"
           ],
           "key": "ybm-l2-s8-38",
           "stage": 8,
@@ -5621,7 +5582,7 @@ export const YBM_PARKJUNEON_L2_WORKBOOK = {
         {
           "kind": "reorder_groups",
           "source": "인공지능과 빅데이터 알고리즘 기술을 적용하여, 기업들은 고객들의 요구, 기호, 소비 패턴들을 확인한다.",
-          "prompt": "⟦ORDER:0⟧, ⟦ORDER:1⟧",
+          "prompt": "⟦ORDER:0⟧, ⟦ORDER:1⟧.",
           "groups": [
             [
               "data",
@@ -5646,7 +5607,7 @@ export const YBM_PARKJUNEON_L2_WORKBOOK = {
           ],
           "answers": [
             "by applying AI and big data algorithm technology",
-            "and companies identify consumers' needs, tastes, consumption patterns"
+            "companies identify consumers' needs, tastes, and consumption patterns"
           ],
           "key": "ybm-l2-s8-39",
           "stage": 8,
@@ -5655,7 +5616,7 @@ export const YBM_PARKJUNEON_L2_WORKBOOK = {
         {
           "kind": "reorder_groups",
           "source": "사람들은 다양한 선택과 맞춤화를 환영하며 이는 결과적으로 그들의 만족을 증진시킨다.",
-          "prompt": "⟦ORDER:0⟧, ⟦ORDER:1⟧",
+          "prompt": "⟦ORDER:0⟧, ⟦ORDER:1⟧.",
           "groups": [
             [
               "appreciate",
@@ -5718,7 +5679,7 @@ export const YBM_PARKJUNEON_L2_WORKBOOK = {
           ],
           "answers": [
             "such as suggesting personalized clothing styles based on customers' purchase history",
-            "history recommending videos that match their movie and video viewing",
+            "recommending videos that match their movie and video viewing history",
             "bring them great satisfaction"
           ],
           "key": "ybm-l2-s8-41",
@@ -5728,7 +5689,7 @@ export const YBM_PARKJUNEON_L2_WORKBOOK = {
         {
           "kind": "reorder_groups",
           "source": "구독 경제의 제한점들 비록 구독 경제가 많은 장점을 제공하지만, 또한 고려해야 할 일부 단점들도 있다. 한 가지 우려 사항은 과소비 가능성이다.",
-          "prompt": "Limitations of the subscription economy ⟦ORDER:0⟧, ⟦ORDER:1⟧. ⟦ORDER:2⟧",
+          "prompt": "Limitations of the subscription economy ⟦ORDER:0⟧, ⟦ORDER:1⟧. ⟦ORDER:2⟧.",
           "groups": [
             [
               "economy",
@@ -5757,9 +5718,9 @@ export const YBM_PARKJUNEON_L2_WORKBOOK = {
             ]
           ],
           "answers": [
-            "the subscription economy although offers many advantages",
+            "although the subscription economy offers many advantages",
             "there are also some disadvantages to consider",
-            "is one concern the potential for overconsumption"
+            "one concern is the potential for overconsumption"
           ],
           "key": "ybm-l2-s8-42",
           "stage": 8,
@@ -5768,7 +5729,7 @@ export const YBM_PARKJUNEON_L2_WORKBOOK = {
         {
           "kind": "reorder_groups",
           "source": "구독 모델의 편리성과 접근성은 소비자들이 복수의 서비스를 계약하고 많은 콘텐츠나 제품을 사용하는 것을 쉽게 만든다.",
-          "prompt": "⟦ORDER:0⟧ ⟦ORDER:1⟧",
+          "prompt": "⟦ORDER:0⟧.",
           "groups": [
             [
               "for",
@@ -5788,9 +5749,7 @@ export const YBM_PARKJUNEON_L2_WORKBOOK = {
               "for",
               "to",
               "subscription",
-              "and"
-            ],
-            [
+              "and",
               "a lot of",
               "content",
               "products",
@@ -5800,8 +5759,7 @@ export const YBM_PARKJUNEON_L2_WORKBOOK = {
             ]
           ],
           "answers": [
-            "the convenience and accessibility of the subscription model make it easy for consumers to sign up for multiple services",
-            "and or use a lot of content products"
+            "the convenience and accessibility of the subscription model make it easy for consumers to sign up for multiple services and use a lot of content or products"
           ],
           "key": "ybm-l2-s8-43",
           "stage": 8,
@@ -5861,7 +5819,7 @@ export const YBM_PARKJUNEON_L2_WORKBOOK = {
           ],
           "answers": [
             "it is crucial to subscribe only to services that are truly necessary",
-            "to services avoid subscribing similar"
+            "avoid subscribing to similar services"
           ],
           "key": "ybm-l2-s8-45",
           "stage": 8,
@@ -5870,16 +5828,14 @@ export const YBM_PARKJUNEON_L2_WORKBOOK = {
         {
           "kind": "reorder_groups",
           "source": "과소비의 우려와 관련된 것으로 구독이 창출할 수 있는 금융 부담이 있다.",
-          "prompt": "⟦ORDER:0⟧ ⟦ORDER:1⟧",
+          "prompt": "⟦ORDER:0⟧.",
           "groups": [
             [
               "overconsumption",
               "the concern",
               "related",
               "of",
-              "to"
-            ],
-            [
+              "to",
               "that",
               "create",
               "the financial burden",
@@ -5889,8 +5845,7 @@ export const YBM_PARKJUNEON_L2_WORKBOOK = {
             ]
           ],
           "answers": [
-            "related to the concern of overconsumption",
-            "is the financial burden that subscriptions can create"
+            "related to the concern of overconsumption is the financial burden that subscriptions can create"
           ],
           "key": "ybm-l2-s8-46",
           "stage": 8,
@@ -5932,7 +5887,7 @@ export const YBM_PARKJUNEON_L2_WORKBOOK = {
         {
           "kind": "reorder_groups",
           "source": "재정적 부담을 피하기 위해 이들 구독의 비용을 신중하게 고려하는 것이 중요하다.",
-          "prompt": "⟦ORDER:0⟧ ⟦ORDER:1⟧",
+          "prompt": "⟦ORDER:0⟧.",
           "groups": [
             [
               "the costs",
@@ -5943,9 +5898,7 @@ export const YBM_PARKJUNEON_L2_WORKBOOK = {
               "of",
               "is",
               "these",
-              "it"
-            ],
-            [
+              "it",
               "financial",
               "avoid",
               "to",
@@ -5953,8 +5906,7 @@ export const YBM_PARKJUNEON_L2_WORKBOOK = {
             ]
           ],
           "answers": [
-            "it is important to carefully consider the costs of these subscriptions",
-            "to avoid financial strain"
+            "it is important to carefully consider the costs of these subscriptions to avoid financial strain"
           ],
           "key": "ybm-l2-s8-48",
           "stage": 8,
@@ -5963,7 +5915,7 @@ export const YBM_PARKJUNEON_L2_WORKBOOK = {
         {
           "kind": "reorder_groups",
           "source": "정기적으로 검토하고 불필요한 구독들을 취소하는 것이 유익할 수 있다.",
-          "prompt": "⟦ORDER:0⟧",
+          "prompt": "⟦ORDER:0⟧.",
           "groups": [
             [
               "subscriptions",
@@ -6010,7 +5962,7 @@ export const YBM_PARKJUNEON_L2_WORKBOOK = {
         {
           "kind": "reorder_groups",
           "source": "포장재에 담긴 제품들을 정기적으로 배달하는 것은 일회용 포장의 사용을 증가시킬 수 있어 이것이 환경을 해친다.",
-          "prompt": "⟦ORDER:0⟧, ⟦ORDER:1⟧",
+          "prompt": "⟦ORDER:0⟧, ⟦ORDER:1⟧.",
           "groups": [
             [
               "delivery",
@@ -6036,7 +5988,7 @@ export const YBM_PARKJUNEON_L2_WORKBOOK = {
           ],
           "answers": [
             "the regular delivery of products in packaging materials can increase the use of disposable packaging",
-            "the which harms environment"
+            "which harms the environment"
           ],
           "key": "ybm-l2-s8-51",
           "stage": 8,
@@ -6045,7 +5997,7 @@ export const YBM_PARKJUNEON_L2_WORKBOOK = {
         {
           "kind": "reorder_groups",
           "source": "친환경 포장 재료를 사용하고 재사용 가능한 포장을 선택하는 것은 이 문제를 줄이는 데 도움이 될 수 있다.",
-          "prompt": "⟦ORDER:0⟧ ⟦ORDER:1⟧",
+          "prompt": "⟦ORDER:0⟧.",
           "groups": [
             [
               "reusable",
@@ -6055,9 +6007,7 @@ export const YBM_PARKJUNEON_L2_WORKBOOK = {
               "and",
               "packaging",
               "opting",
-              "packaging materials"
-            ],
-            [
+              "packaging materials",
               "can",
               "help",
               "reduce",
@@ -6066,8 +6016,7 @@ export const YBM_PARKJUNEON_L2_WORKBOOK = {
             ]
           ],
           "answers": [
-            "using environmentally friendly packaging materials and opting for reusable packaging",
-            "can help reduce this problem"
+            "using environmentally friendly packaging materials and opting for reusable packaging can help reduce this problem"
           ],
           "key": "ybm-l2-s8-52",
           "stage": 8,
@@ -6113,7 +6062,7 @@ export const YBM_PARKJUNEON_L2_WORKBOOK = {
           "answers": [
             "despite the potential limitations of subscription services",
             "they have become deeply embedded in our lives",
-            "the subscription and more more businesses are jumping onto economy model"
+            "more and more businesses are jumping onto the subscription economy model"
           ],
           "key": "ybm-l2-s8-53",
           "stage": 8,
