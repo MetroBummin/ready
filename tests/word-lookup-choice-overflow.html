@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>READY Question Word Lookup Overflow</title>
+  <link rel="stylesheet" href="../ready/design.css">
+  <style>
+    body{margin:0}.fixture{width:100%;max-width:390px;margin:0 auto;padding:16px}.fixture h1{font-size:18px}
+  </style>
+</head>
+<body data-ready-mode="student">
+  <main class="fixture">
+    <h1>Question 선택지 Word Lookup · 390px</h1>
+    <section class="question-answer-area" aria-label="Word Lookup overflow fixtures">
+      <div class="question-choice"><span class="question-choice-mark">①</span><span class="question-choice-copy">A <span class="reader-inline-sentence"><span class="reader-inline-replacement"><button class="reader-inline-gloss">정기적으로 구독하여 이용하다</button><button class="reader-word-toggle">✓</button></span></span> plan.</span></div>
+      <div class="question-choice"><span class="question-choice-mark">②</span><span class="question-choice-copy">This is an intentionally long choice that already wraps onto multiple lines before <span class="reader-inline-sentence"><span class="reader-inline-replacement"><button class="reader-inline-gloss">새롭고 중요한 사실을 우연히 발견하다</button><button class="reader-word-toggle">✓</button></span></span> appears.</span></div>
+      <div class="question-choice"><span class="question-choice-mark">③</span><span class="question-choice-copy"><span class="reader-inline-sentence"><span class="reader-inline-replacement"><button class="reader-inline-gloss">구독하다</button><button class="reader-word-toggle">−</button></span></span> and <span class="reader-inline-sentence"><span class="reader-inline-replacement"><button class="reader-inline-gloss">발견하다</button><button class="reader-word-toggle">✓</button></span></span> every day.</span></div>
+      <div class="question-choice"><span class="question-choice-mark">④</span><span class="question-choice-copy">Students <span class="reader-inline-sentence"><span class="reader-inline-replacement"><button class="reader-inline-gloss">적극적으로 참여하다</button><button class="reader-word-toggle">✓</button></span></span> the project.</span></div>
+      <div class="question-choice correct"><span class="question-choice-mark">⑤</span><span class="question-choice-copy">Saved same meaning <span class="reader-inline-sentence"><span class="reader-inline-replacement" data-word-saved="true"><button class="reader-inline-gloss">구독하다</button><button class="reader-word-toggle">−</button></span></span>.</span></div>
+      <div class="question-choice wrong"><span class="question-choice-mark">⑥</span><span class="question-choice-copy">Saved different meaning <span class="reader-inline-sentence"><span class="reader-inline-replacement" data-word-saved="true"><button class="reader-inline-gloss">가입하다</button><button class="reader-word-toggle">✓</button></span></span>.</span></div>
+      <div class="question-choice"><span class="question-choice-mark">⑦</span><span class="question-choice-copy" id="auto-return">Auto return <span class="reader-inline-sentence"><span class="reader-inline-replacement"><button class="reader-inline-gloss">구독하다</button><button class="reader-word-toggle">−</button></span></span>.</span></div>
+    </section>
+    <section id="fast-path-root" data-reader-passage-id="fixture-passage">
+      <h2>Saved meaning local fast path</h2>
+      <p><span class="reader-inline-sentence" data-reader-sentence-id="fast-sentence"></span></p>
+      <p class="reader-inline-notice" data-reader-gloss-notice hidden></p>
+      <span data-reader-gloss-live></span>
+    </section>
+    <output id="metrics"></output>
+  </main>
+  <script>
+    function measure(){const choices=[...document.querySelectorAll('.question-choice')],overflow=choices.map(node=>Math.max(0,node.scrollWidth-node.clientWidth));document.querySelector('#metrics').value=JSON.stringify({viewport:document.documentElement.clientWidth,bodyOverflow:Math.max(0,document.documentElement.scrollWidth-document.documentElement.clientWidth),choiceOverflow:overflow,maxChoiceOverflow:Math.max(...overflow)});}
+    measure();addEventListener('resize',measure);setTimeout(()=>{document.querySelector('#auto-return').innerHTML='Auto return <span class="reader-inline-sentence"><button class="reader-inline-source">subscribing</button></span>.';document.body.dataset.autoReturned='true';measure();},10_000);
+  </script>
+  <script type="module">
+    import {createReaderInlineGloss,readerSentenceMarkup} from '../ready/reader-inline-gloss.js?v=local-saved-fast-path-2';
+    const root=document.querySelector('#fast-path-root'),sentence={id:'fast-sentence',text:'She enjoys subscribing to the service.'},saved={id:'saved-subscribe',lemma:'subscribe',meaning:'구독하다',memoryLevel:2};
+    root.querySelector('[data-reader-sentence-id]').innerHTML=readerSentenceMarkup(sentence,[],[],new Map([[saved.lemma,saved]]));
+    document.body.dataset.lookupRequests='0';
+    createReaderInlineGloss({root,passage:{id:'fixture-passage',updated_at:'fixture-v1'},sentences:[sentence],savedWords:[saved],request:async()=>{document.body.dataset.lookupRequests=String(Number(document.body.dataset.lookupRequests)+1);throw new Error('Saved fast path must not request');},saveWord:async()=>({saved:true}),removeWord:async()=>({saved:false})});
+  </script>
+</body>
+</html>

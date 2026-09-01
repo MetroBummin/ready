@@ -430,6 +430,10 @@ body[data-ready-mode="student"] .question-passage .reading-sentence{display:inli
 .question-choice.wrong{color:var(--ready-error);background:var(--ready-error-soft);box-shadow:inset 3px 0 var(--ready-error)}
 .question-choice-mark{color:inherit;font-size:15px;font-weight:750;line-height:1.5}
 .question-choice-copy{min-width:0;color:inherit;font-size:15px;font-weight:500;line-height:1.58;overflow-wrap:anywhere}
+.question-choice-copy .reader-inline-sentence{min-width:0;max-width:100%}
+.question-choice-copy .reader-inline-replacement{min-width:0;max-width:100%;flex-wrap:wrap;overflow-wrap:anywhere}
+.question-choice-copy .reader-inline-gloss{max-width:100%}
+.question-choice-copy .reader-word-toggle{min-height:1.58em}
 .question-choice.selected .question-choice-copy,
 .question-choice.correct .question-choice-copy,
 .question-choice.wrong .question-choice-copy{font-weight:650}

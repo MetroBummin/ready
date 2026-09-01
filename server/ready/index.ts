@@ -26,7 +26,7 @@ function supabaseAdminKey() {
 }
 const db = createClient(Deno.env.get("SUPABASE_URL") ?? "", supabaseAdminKey(), { auth: { persistSession: false } });
 const adminOps = new Set(["teacher_bootstrap", "delete_impact", "assign_scope_passages", "set_scope_passages", "create_passage", "update_passage", "delete_passage", "create_student", "set_student_pin", "delete_student", "import_questions", "import_explanations"]);
-const studentOps = new Set(["student_bootstrap", "student_passage", "reader_inline_gloss", "save_reader_word", "remove_reader_word", "update_reader_word_meanings", "student_questions", "student_question_filters", "student_question_queue", "student_review_questions", "set_question_bookmark", "submit_attempt", "student_workbook", "workbook_assistance", "set_workbook_bookmark", "workbook_hint", "submit_workbook_attempt"]);
+const studentOps = new Set(["student_bootstrap", "student_passage", "word_lookup_meaning", "save_reader_word", "remove_reader_word", "update_reader_word_meaning", "student_questions", "student_question_filters", "student_question_queue", "student_review_questions", "set_question_bookmark", "submit_attempt", "student_workbook", "workbook_assistance", "set_workbook_bookmark", "workbook_hint", "submit_workbook_attempt"]);
 const publicOps = new Set(["list_students", "student_login", "admin_login"]);
 // Match Breeze's free Gemini dictionary defaults. The API key remains a
 // Supabase Edge Function Secret and is never part of any public response.
@@ -45,73 +45,51 @@ function rows<T>(result: { data: T | null; error: { message: string } | null }):
 function cleanList(value: unknown, count: number, max: number) { return (Array.isArray(value) ? value : []).map(item => clean(item, max)).filter(Boolean).slice(0, count); }
 function parseJson(raw: string) { try { return JSON.parse(raw); } catch { /* Gemini occasionally adds a wrapper despite JSON mode. */ } const found = raw.match(/\{[\s\S]*\}/); if (!found) return null; try { return JSON.parse(found[0]); } catch { return null; } }
 
-function geminiLookPrompt(word: string, clicked: string, sentence: string) {
-  const form = clicked && clicked.toLowerCase() !== word.toLowerCase() ? `단어: ${word} (문장에서는 "${clicked}")` : `단어: ${word}`;
-  return `${form}
-문장: ${sentence || "(문장 없음 — 일반적인 뜻으로 답하세요)"}
-
-이 문장에서 이 단어가 어떤 뜻으로 쓰였는지 판단하세요.
-
-- lemma: 사전 표제어(원형). 고유명사나 약어면 그대로
-- pos: 명사|동사|형용사|부사|전치사|기타 중 하나
-- ko: 이 문장에서의 뜻. 한국어 8자 내외의 짧은 사전식 뜻
-- note: 이 문장에서 어떻게 쓰였는지 한국어 한 문장으로 설명
-- phrase: 클릭한 단어를 포함한 아주 확실한 고정 표현 하나만. 없으면 빈 문자열
-- alts: 지금 문맥의 뜻과 겹치지 않는 흔한 다른 한국어 뜻을 최대 3개
-
-{"lemma":"","pos":"","ko":"","note":"","phrase":"","alts":[""]}`;
-}
-
-async function callGeminiLook(word: string, clicked: string, sentence: string) {
-  const provider = (Deno.env.get("AI_PROVIDER") ?? "").trim().toLowerCase();
-  const key = Deno.env.get("GEMINI_API_KEY");
-  if (provider !== "gemini" || !key) throw new ApiError(503, "Gemini 사전이 아직 연결되지 않았습니다.");
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${key}`;
-  // Breeze intentionally requests JSON mode without responseSchema: Gemini's
-  // OpenAPI-schema subset differs between models, while this prompt is stable.
-  const base = { maxOutputTokens: 450, temperature: 0.2, responseMimeType: "application/json" };
-  let lastError = "";
-  // This is the same compatibility fallback Breeze uses for Gemini models
-  // that do not yet accept thinkingConfig.
-  for (const generationConfig of [{ ...base, thinkingConfig: { thinkingBudget: 0 } }, base]) {
-    const response = await fetch(url, {
-      method: "POST", headers: { "content-type": "application/json" },
-      body: JSON.stringify({ system_instruction: { parts: [{ text: GEMINI_SYSTEM }] }, contents: [{ role: "user", parts: [{ text: geminiLookPrompt(word, clicked, sentence) }] }], generationConfig }),
-    });
-    if (response.ok) {
-      const payload = await response.json();
-      const text = (payload?.candidates?.[0]?.content?.parts || []).map((part: { text?: string }) => part?.text || "").join("").trim();
-      const parsed = parseJson(text);
-      if (parsed && clean(parsed.ko, 60)) return parsed;
-      throw new ApiError(502, "Gemini가 단어 뜻을 읽지 못했습니다.");
-    }
-    lastError = (await response.text()).slice(0, 300);
-    if (response.status !== 400) break;
-  }
-  console.error("READY Gemini lookup failed:", lastError);
-  throw new ApiError(502, "Gemini 단어 사전을 잠시 사용할 수 없습니다.");
-}
-
-type ReaderGlossPromptContext = { clicked:string; lemma:string; sentence:string; translation:string; existingCoreMeaning:string; previousGloss:string; retry:boolean; previous?:{sentence:string;translation:string}|null; next?:{sentence:string;translation:string}|null };
+type ReaderGlossPromptContext = { clicked:string; lemma:string; sentence:string; translation:string; savedMeaning:string; previousMeaning:string; retry:boolean };
 function geminiInlineGlossPrompt(context: ReaderGlossPromptContext) {
-  const surrounding=context.retry?`이전 문장: ${context.previous?.sentence||"(없음)"}\n이전 출판사 해석: ${context.previous?.translation||"(없음)"}\n다음 문장: ${context.next?.sentence||"(없음)"}\n다음 출판사 해석: ${context.next?.translation||"(없음)"}`:"";
-  return `영어 Reader에서 클릭한 표현을 한국어로 직접 치환하려고 합니다.
+  return `한국 중고등학생이 영어 단어 또는 하나의 고정 표현을 기억하도록 돕는 사전형 뜻을 만드세요.
 
 클릭한 표면형: ${context.clicked}
 Breeze lexical core lemma: ${context.lemma}
 현재 영어 문장: ${context.sentence}
 현재 출판사 한국어 문장: ${context.translation||"(없음)"}
-저장된 대표 뜻: ${context.existingCoreMeaning||"(없음)"}
-${surrounding}
-${context.retry?`이전 context_gloss: ${context.previousGloss}\n학생이 이전 뜻을 다시 요청했습니다. 더 넓은 문맥으로 자연스러운 치환을 찾되, 기존 뜻이 가장 정확하면 그대로 유지하세요.`:"첫 요청입니다. 출판사 한국어 문장을 이 문장의 의미 기준으로 사용하세요."}
+현재 저장된 뜻: ${context.savedMeaning||"(없음)"}
+${context.retry?`직전 후보 뜻: ${context.previousMeaning||"(없음)"}\n학생이 표시된 뜻을 다시 눌렀습니다. 현재 문맥에서 가능한 다른 짧은 사전형 뜻이 있으면 제시하고, 직전 뜻이 가장 정확하면 그대로 유지하세요.`:"첫 조회입니다."}
 
-- lemma: 클릭한 단어의 영어 사전 표제어. 제공된 Breeze lemma가 타당하면 그대로 사용
-- core_meaning: lemma 자체를 기억할 때 쓸 짧은 한국어 사전형 대표 뜻
-- source_span: clicked token을 포함하며 현재 영어 문장에 글자 그대로 한 번 존재하는 최소 연속 영어 span. 문법상 필요하면 전치사·목적어까지 포함하되 문장 전체는 피함
-- context_gloss: source_span을 현재 문장에서 바로 치환할 수 있는 짧고 자연스러운 한국어 표현. 설명문 금지
-- confidence: 0부터 1. 문맥 뜻이나 source_span이 불확실하면 0.65 미만
+핵심 원칙:
+- 이것은 문장 번역 기능이 아닙니다. 학생이 클릭한 단어 또는 실제 고정 표현 자체를 기억할 수 있는 짧은 한국어 뜻 하나만 반환합니다.
+- 현재 문장과 출판사 한국어는 품사와 다의어의 sense를 결정하는 참고 자료일 뿐입니다. 주어, 목적어, 일반 수식어를 meaning에 붙이지 마세요.
+- source_span은 기본적으로 clicked token 하나입니다.
+- 구동사, 숙어, 고정 결합처럼 전체가 하나의 lexical expression일 때만 kind를 phrase로 하고 source_span을 최소 범위로 확장합니다.
+- 일반적인 verb + object, adjective + noun, verb + ordinary modifier는 phrase가 아닙니다.
+${context.retry?`- 현재 저장된 뜻은 빠른 첫 표시를 위한 weak hint일 뿐이며 현재 문맥의 정답으로 간주하지 마세요.
+- 현재 영어 문장과 출판사 한국어를 우선하여 sense를 독립적으로 다시 판단하세요.
+- 저장된 뜻이 현재 문맥에도 적합하면 그대로 반환하고, 다른 sense이면 더 적절한 짧은 사전형 뜻을 반환하세요.`:""}
 
-{"lemma":"","core_meaning":"","source_span":"","context_gloss":"","confidence":0}`;
+명확한 예시:
+discovering new songs / clicked: discovering
+GOOD {"lemma":"discover","meaning":"발견하다","source_span":"discovering","kind":"word","confidence":0.97}
+BAD meaning: "새로운 노래를 발견하다"
+
+by subscribing to the service / clicked: subscribing
+GOOD {"lemma":"subscribe","meaning":"구독하다","source_span":"subscribing","kind":"word","confidence":0.97}
+BAD meaning: "서비스를 구독함으로써"
+
+carefully collect all the evidence / clicked: collect
+GOOD {"lemma":"collect","meaning":"수집하다","source_span":"collect","kind":"word","confidence":0.97}
+BAD meaning: "모든 증거를 주의 깊게 수집하다"
+
+take part in the project / clicked: part
+GOOD {"lemma":"part","meaning":"참여하다","source_span":"take part in","kind":"phrase","confidence":0.96}
+
+필드:
+- lemma: 제공된 Breeze lemma를 우선 사용합니다.
+- meaning: 2~18자 내외의 기억하기 좋은 한국어 사전형 뜻 하나. 설명문 금지.
+- source_span: 현재 영어 문장에 글자 그대로 한 번 존재하고 clicked token을 포함하는 최소 span.
+- kind: word 또는 phrase.
+- confidence: 0부터 1. sense나 span이 불확실하면 0.65 미만.
+
+{"lemma":"","meaning":"","source_span":"","kind":"word","confidence":0}`;
 }
 async function callGeminiInlineGloss(context: ReaderGlossPromptContext) {
   const provider=(Deno.env.get("AI_PROVIDER")??"").trim().toLowerCase(),key=Deno.env.get("GEMINI_API_KEY");
@@ -466,17 +444,17 @@ async function scopePassages(examId: string, studentId: string) {
 async function studentBootstrap(session: ReadySession) {
   const student = await studentForSession(session), scope = rows<any>(await db.from("ready_exams").select("id,school,grade").eq("school", student.school).eq("grade", student.grade).eq("is_current", true).maybeSingle());
   const passages = scope ? await scopePassages(scope.id, student.id) : [];
-  let reviewCount=0;if(scope){const [wordCount,sentenceCount]=await Promise.all([db.from("ready_saved_words").select("id",{count:"exact",head:true}).eq("student_id",student.id).eq("exam_id",scope.id),db.from("ready_saved_sentences").select("id",{count:"exact",head:true}).eq("student_id",student.id).eq("exam_id",scope.id)]);if(wordCount.error)throw new ApiError(500,wordCount.error.message);if(sentenceCount.error)throw new ApiError(500,sentenceCount.error.message);reviewCount=(await eligibleReviewQuestionIds(student.id,scope.id)).length+await workbookReviewCount(student.id,scope.id)+(wordCount.count||0)+(sentenceCount.count||0);}
-  return { student: { id: student.id, school: student.school, grade: student.grade }, scope, passages, reviewCount };
+  let reviewCount=0,savedWords:any[]=[];if(scope){const [wordRows,sentenceCount]=await Promise.all([db.from("ready_saved_words").select("id,normalized_word,meaning_snapshot,memory_level").eq("student_id",student.id).eq("exam_id",scope.id).order("created_at"),db.from("ready_saved_sentences").select("id",{count:"exact",head:true}).eq("student_id",student.id).eq("exam_id",scope.id)]);if(wordRows.error)throw new ApiError(500,wordRows.error.message);if(sentenceCount.error)throw new ApiError(500,sentenceCount.error.message);savedWords=rows<any[]>(wordRows).map(item=>({id:item.id,lemma:item.normalized_word,meaning:item.meaning_snapshot,memoryLevel:Number(item.memory_level)||1}));reviewCount=(await eligibleReviewQuestionIds(student.id,scope.id)).length+await workbookReviewCount(student.id,scope.id)+savedWords.length+(sentenceCount.count||0);}
+  return { student: { id: student.id, school: student.school, grade: student.grade }, scope, passages, savedWords, reviewCount };
 }
 async function studentPassageAccess(examId: string, passageId: string, student: Student) { await studentExamAccess(examId, student); const linked = await db.from("ready_exam_passages").select("passage_id").eq("exam_id", examId).eq("passage_id", passageId).maybeSingle(); if (linked.error) throw new ApiError(500, linked.error.message); if (!linked.data) throw new ApiError(404, "현재 시험범위에 없는 지문입니다."); return rows<any>(await db.from("ready_passages").select("id,title,source_type,source_label,updated_at").eq("id", passageId).single()); }
 async function studentPassage(body: any, session: ReadySession) {
   const student=await studentForSession(session),examId=required(body.examId,"Exam",80),passageId=required(body.passageId,"지문",80),passage=await studentPassageAccess(examId,passageId,student);
   const [sentences,savedWords]=await Promise.all([
     db.from("ready_passage_sentences").select("id,sentence_index,text,translation").eq("passage_id",passageId).order("sentence_index"),
-    db.from("ready_saved_words").select("id,normalized_word,meaning_snapshot,core_meanings,memory_level").eq("student_id",student.id).eq("exam_id",examId).order("created_at"),
+    db.from("ready_saved_words").select("id,normalized_word,meaning_snapshot,memory_level").eq("student_id",student.id).eq("exam_id",examId).order("created_at"),
   ]);
-  return {passage,sentences:rows<any[]>(sentences),savedWords:rows<any[]>(savedWords).map(item=>({id:item.id,lemma:item.normalized_word,coreMeaning:item.meaning_snapshot,coreMeanings:Array.isArray(item.core_meanings)?item.core_meanings:[],memoryLevel:Number(item.memory_level)||1}))};
+  return {passage,sentences:rows<any[]>(sentences),savedWords:rows<any[]>(savedWords).map(item=>({id:item.id,lemma:item.normalized_word,meaning:item.meaning_snapshot,memoryLevel:Number(item.memory_level)||1}))};
 }
 function answerIndexes(value: unknown, choiceCount: number) {
   if (!Array.isArray(value)) throw new ApiError(500, "문제 정답 형식이 올바르지 않습니다.");
@@ -568,7 +546,7 @@ function publicQuestion(row: any, passageText = "", studentState: { bookmarked?:
   const targetRanges = interactionContract.passage.segments.filter((segment: any) => segment.kind === "annotation").map((segment: any) => ({ label: segment.label, text: segment.text, canonicalText: segment.text }));
   const summaryText = renderSpec.extras.includes("summary") ? clean(payload.summary_text, 10_000) : "";
   return {
-    id: row.id, type, family: clean(payload.family, 40) || (type === "written_response" ? "written" : "standard"), skill: publicSkill(renderSpec.taxonomy),
+    id: row.id, passageId: row.passage_id, type, family: clean(payload.family, 40) || (type === "written_response" ? "written" : "standard"), skill: publicSkill(renderSpec.taxonomy),
     taxonomy: renderSpec.taxonomy, renderer: renderSpec.renderer, renderSpec, importStatus: renderSpec.importStatus,
     prompt: clean(payload.prompt, 1_000), choices, choiceParts, multiSelect: interactionContract.selection === "multi", responseType: type === "written_response" ? "written" : "choice", responseSlots, writingGuide,
     grading: deterministicClientContract(payload, type), explanation: clean(payload.explanation, 4_000),
@@ -615,12 +593,13 @@ async function studentQuestionQueue(body: any, session: ReadySession) {
   if (providers.some(provider => !["exam4you", "nernter"].includes(provider))) throw new ApiError(400, "지원하지 않는 문제 출처입니다.");
   const providerSet = new Set(providers), taxonomySet = new Set(taxonomies);
   const selected = pool.filter(item => (!providerSet.size || providerSet.has(clean(item.row.payload?.source?.provider, 30))) && (!taxonomySet.size || taxonomySet.has(clean(item.row.payload?.spec?.taxonomy || item.row.payload?.taxonomy, 60))));
-  return { items: selected.map(item => publicQuestion(item.row, item.passageText, { bookmarked: item.bookmarked })) };
+  const savedWords=rows<any[]>(await db.from("ready_saved_words").select("id,normalized_word,meaning_snapshot,memory_level").eq("student_id",student.id).eq("exam_id",examId).order("created_at")).map(item=>({id:item.id,lemma:item.normalized_word,meaning:item.meaning_snapshot,memoryLevel:Number(item.memory_level)||1}));
+  return { items: selected.map(item => publicQuestion(item.row, item.passageText, { bookmarked: item.bookmarked })), savedWords };
 }
 async function studentQuestions(body: any, session: ReadySession) {
   const student = await studentForSession(session), examId = required(body.examId, "Exam", 80);
   const study = await studentPassage(body, session), passageId = study.passage.id;
-  const questionRows = rows<any[]>(await db.from("ready_questions").select("id,type,payload,status,created_at").eq("passage_id", passageId).in("type", ["multiple_choice", "written_response"]).eq("status", "available").order("created_at"));
+  const questionRows = rows<any[]>(await db.from("ready_questions").select("id,passage_id,type,payload,status,created_at").eq("passage_id", passageId).in("type", ["multiple_choice", "written_response"]).eq("status", "available").order("created_at"));
   questionRows.sort((a, b) => (Number(a.payload?.position) || 0) - (Number(b.payload?.position) || 0));
   const passageText = study.sentences.map((sentence: any) => sentence.text).join(" ");
   const attempted = await attemptedQuestionIds(student.id, examId);
@@ -668,9 +647,9 @@ async function latestAttemptResults(studentId: string, examId: string) {
   return latest;
 }
 async function wordReviewItems(studentId:string,examId:string){
-  const savedResult=await db.from("ready_saved_words").select("id,passage_id,word,normalized_word,meaning_snapshot,core_meanings,memory_level,created_at").eq("student_id",studentId).eq("exam_id",examId).order("created_at",{ascending:false});if(savedResult.error)throw new ApiError(500,savedResult.error.message);const saved=rows<any[]>(savedResult);if(!saved.length)return [];
-  const lemmas=[...new Set(saved.map(item=>item.normalized_word))],eventsResult=await db.from("ready_word_lookup_events").select("id,passage_id,sentence_id,surface_word,normalized_word,source_text_snapshot,english_sentence_snapshot,publisher_translation_snapshot,gloss_snapshot,occurrence_key,created_at").eq("student_id",studentId).eq("exam_id",examId).eq("resolved",true).in("normalized_word",lemmas).order("created_at",{ascending:false});if(eventsResult.error)throw new ApiError(500,eventsResult.error.message);const events=rows<any[]>(eventsResult),passageIds=[...new Set([...saved.map(item=>item.passage_id),...events.map(item=>item.passage_id)].filter(Boolean))],passageResult=passageIds.length?await db.from("ready_passages").select("id,title,source_label").in("id",passageIds):{data:[],error:null};if(passageResult.error)throw new ApiError(500,passageResult.error.message);const passageById=new Map((passageResult.data||[]).map(item=>[item.id,item]));
-  return saved.map(item=>{const seen=new Set<string>(),contexts=[];for(const event of events){if(event.normalized_word!==item.normalized_word||!event.occurrence_key||seen.has(event.occurrence_key))continue;seen.add(event.occurrence_key);contexts.push({occurrenceKey:event.occurrence_key,surface:event.surface_word,sourceSpan:event.source_text_snapshot,englishSentence:event.english_sentence_snapshot,publisherTranslation:event.publisher_translation_snapshot,contextGloss:event.gloss_snapshot,passageTitle:passageById.get(event.passage_id)?.title||"",sourceLabel:passageById.get(event.passage_id)?.source_label||"",createdAt:event.created_at});}const meanings=(Array.isArray(item.core_meanings)?item.core_meanings:[item.meaning_snapshot]).map((value:unknown)=>clean(value,60)).filter(Boolean);return {id:item.id,word:item.word,lemma:item.normalized_word,coreMeaning:item.meaning_snapshot,coreMeanings:meanings,memoryLevel:Number(item.memory_level)||1,createdAt:item.created_at,contexts};});
+  const savedResult=await db.from("ready_saved_words").select("id,passage_id,word,normalized_word,meaning_snapshot,memory_level,created_at").eq("student_id",studentId).eq("exam_id",examId).order("created_at",{ascending:false});if(savedResult.error)throw new ApiError(500,savedResult.error.message);const saved=rows<any[]>(savedResult);if(!saved.length)return [];
+  const lemmas=[...new Set(saved.map(item=>item.normalized_word))],eventsResult=await db.from("ready_word_lookup_events").select("id,passage_id,sentence_id,surface_word,normalized_word,source_text_snapshot,english_sentence_snapshot,publisher_translation_snapshot,meaning_snapshot,source_kind,source_key,occurrence_key,created_at").eq("student_id",studentId).eq("exam_id",examId).eq("resolved",true).in("normalized_word",lemmas).order("created_at",{ascending:false});if(eventsResult.error)throw new ApiError(500,eventsResult.error.message);const events=rows<any[]>(eventsResult),passageIds=[...new Set([...saved.map(item=>item.passage_id),...events.map(item=>item.passage_id)].filter(Boolean))],passageResult=passageIds.length?await db.from("ready_passages").select("id,title,source_label").in("id",passageIds):{data:[],error:null};if(passageResult.error)throw new ApiError(500,passageResult.error.message);const passageById=new Map((passageResult.data||[]).map(item=>[item.id,item]));
+  return saved.map(item=>{const seen=new Set<string>(),examples=[];for(const event of events){if(event.normalized_word!==item.normalized_word||!event.occurrence_key||seen.has(event.occurrence_key))continue;seen.add(event.occurrence_key);examples.push({occurrenceKey:event.occurrence_key,surface:event.surface_word,sourceSpan:event.source_text_snapshot,englishSentence:event.english_sentence_snapshot,publisherTranslation:event.publisher_translation_snapshot,meaning:event.meaning_snapshot,sourceKind:event.source_kind||"reader",sourceKey:event.source_key||"",passageTitle:passageById.get(event.passage_id)?.title||"",sourceLabel:passageById.get(event.passage_id)?.source_label||"",createdAt:event.created_at});}return {id:item.id,word:item.word,lemma:item.normalized_word,meaning:item.meaning_snapshot,memoryLevel:Number(item.memory_level)||1,exampleCount:examples.length,createdAt:item.created_at,examples};});
 }
 async function studentReviewQuestions(body: any, session: ReadySession) {
   const student = await studentForSession(session), examId = required(body.examId, "Exam", 80);
@@ -815,7 +794,8 @@ async function studentWorkbook(body: any, session: ReadySession) {
       completed: latest.get(item.key) === true, lastResult: latest.get(item.key) ?? null, bookmarked: bookmarks.has(item.key),
     })),
   }));
-  return { workbookKey: catalog.workbookKey, title: catalog.title, passage: { id: passage.id, title: passage.title }, stages };
+  const savedWords=rows<any[]>(await db.from("ready_saved_words").select("id,normalized_word,meaning_snapshot,memory_level").eq("student_id",student.id).eq("exam_id",examId).order("created_at")).map(item=>({id:item.id,lemma:item.normalized_word,meaning:item.meaning_snapshot,memoryLevel:Number(item.memory_level)||1}));
+  return { workbookKey: catalog.workbookKey, title: catalog.title, passage: { id: passage.id, title: passage.title, updated_at: passage.updated_at }, savedWords, stages };
 }
 
 async function workbookAssistance(body: any, session: ReadySession) {
@@ -912,60 +892,68 @@ async function submitWorkbookAttempt(body: any, session: ReadySession) {
 }
 function normalizedWord(value: unknown) { return clean(value, 100).toLowerCase().replace(/[^a-z']/g, "").replace(/^'+|'+$/g, ""); }
 async function studyContext(body: any, session: ReadySession, sentenceRequired = false) { const student = await studentForSession(session), examId = required(body.examId, "Exam", 80), passageId = required(body.passageId, "지문", 80), passage = await studentPassageAccess(examId, passageId, student), sentenceId = clean(body.sentenceId, 80); let sentence:any = null; if (sentenceRequired || sentenceId) { sentence = rows<any>(await db.from("ready_passage_sentences").select("id,sentence_index,text,translation").eq("id", required(sentenceId, "문장", 80)).eq("passage_id", passage.id).single()); } return { student, examId, passage, sentence }; }
-async function wordLookup(body: any, session: ReadySession) {
-  const context = await studyContext(body, session), surfaceWord = required(body.word, "단어", 100), normalized = normalizedWord(surfaceWord), root = lemma(normalized);
-  if (!normalized) throw new ApiError(400, "영어 단어만 조회할 수 있습니다.");
-  const [knownState, savedSenses] = await Promise.all([
-    db.from("ready_word_states").select("known").eq("student_id", context.student.id).eq("passage_id", context.passage.id).eq("normalized_word", root).maybeSingle(),
-    db.from("ready_saved_words").select("meaning_snapshot").eq("student_id", context.student.id).eq("passage_id", context.passage.id).eq("normalized_word", root).order("created_at"),
-  ]);
-  if (knownState.error) throw new ApiError(500, knownState.error.message);
-  if (savedSenses.error) throw new ApiError(500, savedSenses.error.message);
-  const known = knownState.data?.known === true;
-  const existingMeanings = rows<any[]>(savedSenses).map(item => clean(item.meaning_snapshot, 500)).filter(Boolean);
-  const today = new Date(); today.setHours(0, 0, 0, 0);
-  const used = await db.from("ready_word_lookup_events").select("id", { count: "exact", head: true }).eq("student_id", context.student.id).gte("created_at", today.toISOString());
-  if (used.error) throw new ApiError(500, used.error.message);
-  if ((used.count || 0) >= AI_DAILY_LIMIT) throw new ApiError(429, `오늘 Gemini 단어 사전 ${AI_DAILY_LIMIT}회를 모두 사용했습니다.`);
-  const event = await db.from("ready_word_lookup_events").insert({ student_id: context.student.id, exam_id: context.examId, passage_id: context.passage.id, sentence_id: context.sentence?.id || null, surface_word: surfaceWord, normalized_word: root });
-  if (event.error) throw new ApiError(500, event.error.message);
-  // Do not use the legacy lemma-only cache here: the same lemma can mean
-  // different things in two sentences. Breeze caches by lemma + context.
-  const result = await callGeminiLook(root, surfaceWord, context.sentence?.text || "");
-  const meaning = clean(result.ko, 60), alts = cleanList(result.alts, 3, 40).filter(item => item !== meaning);
-  if (!known && meaning) {
-    const automaticSave = await db.from("ready_saved_words").upsert({
-      student_id: context.student.id, passage_id: context.passage.id, sentence_id: context.sentence?.id || null,
-      word: surfaceWord, normalized_word: root, meaning_snapshot: meaning, meaning_key: meaningKey(meaning),
-    }, { onConflict: "student_id,passage_id,normalized_word,meaning_key", ignoreDuplicates: true });
-    if (automaticSave.error) throw new ApiError(500, automaticSave.error.message);
+async function wordLookupContext(body:any,session:ReadySession){
+  const surfaceKind=clean(body.surfaceKind,20)||"reader";
+  if(surfaceKind==="reader"){
+    const context=await studyContext(body,session,true);
+    return {...context,surfaceKind,surfaceKey:clean(body.surfaceKey,160)||`sentence:${context.sentence.id}`,sentence:{...context.sentence,id:clean(body.sentenceId,160)}};
   }
-  return {
-    word: surfaceWord, normalizedWord: root, meaning, meanings: [meaning, ...alts],
-    pos: clean(result.pos, 12), note: clean(result.note, 300), phrase: clean(result.phrase, 80),
-    provider: "gemini", cached: false, known, savedMeanings: known ? existingMeanings : [...new Set([...existingMeanings, meaning])].filter(Boolean),
-    remaining: Math.max(0, AI_DAILY_LIMIT - (used.count || 0) - 1),
-  };
+  const student=await studentForSession(session),examId=required(body.examId,"Exam",80),passageId=required(body.passageId,"지문",80),passage=await studentPassageAccess(examId,passageId,student),surfaceKey=required(body.surfaceKey,"조회 위치",160);
+  if(surfaceKind==="question"){
+    const questionId=required(body.questionId,"문제",80),question=rows<any>(await db.from("ready_questions").select("id,passage_id,type,payload,status").eq("id",questionId).eq("passage_id",passageId).eq("status","available").maybeSingle());
+    if(!question||!isReadyQuestion(question))throw new ApiError(404,"현재 단어를 조회할 수 없는 문제입니다.");
+    const attempted=await db.from("ready_attempts").select("id").eq("student_id",student.id).eq("exam_id",examId).eq("question_id",questionId).limit(1).maybeSingle();if(attempted.error)throw new ApiError(500,attempted.error.message);if(!attempted.data)throw new ApiError(403,"문제를 제출한 뒤 단어 뜻을 볼 수 있습니다.");
+    const sentenceRows=rows<any[]>(await db.from("ready_passage_sentences").select("id,sentence_index,text,translation").eq("passage_id",passageId).order("sentence_index")),spec=publicQuestion(question,sentenceRows.map(item=>item.text).join(" ")),segments=spec.interactionContract?.passage?.segments||[];let text="";
+    if(surfaceKey==="prompt")text=spec.prompt;
+    else if(surfaceKey.startsWith("passage:")){const index=Number(surfaceKey.split(":")[1]),segment=segments[index];if(segment&&["text","annotation"].includes(segment.kind))text=clean(segment.text,10_000);}
+    else if(surfaceKey.startsWith("choice:")){const [,rowText,cellText]=surfaceKey.split(":"),row=Number(rowText),cell=Number(cellText);text=clean(spec.interactionContract?.choices?.rows?.[row]?.cells?.[cell],2_000);}
+    if(!text)throw new ApiError(404,"이 문제 영역에서는 단어 뜻을 볼 수 없습니다.");
+    const publisher=sentenceRows.find(item=>item.text.includes(text)||text.includes(item.text));
+    return {student,examId,passage,surfaceKind,surfaceKey,sentence:{id:clean(body.sentenceId,160),text,translation:clean(publisher?.translation,2_000),sentence_index:publisher?.sentence_index??null,dbSentenceId:publisher?.id||null},questionId};
+  }
+  if(surfaceKind==="workbook"){
+    const itemKey=required(body.workbookItemKey,"워크북 문제",120),catalog=workbookForPassage(passage),item=workbookItem(catalog,itemKey);if(!catalog||!item)throw new ApiError(404,"현재 단어를 조회할 수 없는 워크북 문제입니다.");
+    const attempted=await db.from("ready_workbook_attempts").select("id").eq("student_id",student.id).eq("exam_id",examId).eq("passage_id",passageId).eq("workbook_key",catalog.workbookKey).eq("item_key",itemKey).limit(1).maybeSingle();if(attempted.error)throw new ApiError(500,attempted.error.message);if(!attempted.data)throw new ApiError(403,"워크북을 제출한 뒤 단어 뜻을 볼 수 있습니다.");
+    let text="";if(surfaceKey==="source")text=clean(item.source,10_000);else if(surfaceKey.startsWith("prompt")){const canonical=clean(item.prompt,10_000),partIndex=Number(surfaceKey.split(":")[1]),parts=canonical.split(/_{5,}|⟦(?:CHOICE|ORDER):\d+⟧/);text=Number.isInteger(partIndex)&&parts[partIndex]!==undefined?parts[partIndex]:canonical;}if(!text||!/[A-Za-z]/.test(text))throw new ApiError(404,"이 워크북 영역에서는 단어 뜻을 볼 수 없습니다.");
+    const translation=/[가-힣]/.test(clean(item.source,10_000))?clean(item.source,2_000):(item.kind==="translation_ai"?clean(item.answers?.[0],2_000):"");
+    return {student,examId,passage,surfaceKind,surfaceKey,sentence:{id:clean(body.sentenceId,160),text,translation,sentence_index:null,dbSentenceId:null},workbookItemKey:itemKey};
+  }
+  throw new ApiError(400,"지원하지 않는 단어 조회 화면입니다.");
+}
+async function progressSavedWordMemory(saved:any,context:any,root:string,occurrenceKey:string,resolved:boolean,retry:boolean){
+  if(!saved||!resolved||retry||occurrenceKey===saved.origin_occurrence_key)return saved;
+  const history=await db.from("ready_word_lookup_events").select("occurrence_key").eq("student_id",context.student.id).eq("exam_id",context.examId).eq("normalized_word",root).eq("resolved",true).eq("lookup_reason","initial").gte("created_at",saved.created_at);
+  if(history.error)throw new ApiError(500,history.error.message);
+  const distinct=new Set((history.data||[]).map(item=>item.occurrence_key).filter(key=>key&&key!==saved.origin_occurrence_key)),memoryLevel=Math.min(3,1+distinct.size);
+  if(memoryLevel===Number(saved.memory_level))return saved;
+  const updated=await db.from("ready_saved_words").update({memory_level:memoryLevel,updated_at:new Date().toISOString()}).eq("id",saved.id).select("id,meaning_snapshot,memory_level,origin_occurrence_key,created_at").single();
+  if(updated.error)throw new ApiError(500,updated.error.message);
+  return rows<any>(updated);
 }
 async function readerInlineGloss(body:any,session:ReadySession){
-  const context=await studyContext(body,session,true),sentence=String(context.sentence.text||""),start=Number(body.start),end=Number(body.end),surfaceText=required(body.sourceText,"선택 단어",100),requestedRevision=clean(body.passageRevision,100);
+  const context=await wordLookupContext(body,session),sentence=String(context.sentence.text||""),start=Number(body.start),end=Number(body.end),surfaceText=required(body.sourceText,"선택 단어",100),requestedRevision=clean(body.passageRevision,100);
   if(!Number.isInteger(start)||!Number.isInteger(end)||start<0||end<=start||end>sentence.length||sentence.slice(start,end)!==surfaceText)throw new ApiError(400,"선택한 단어 범위가 현재 문장과 맞지 않습니다.");
-  if(requestedRevision&&requestedRevision!==clean(context.passage.updated_at,100))throw new ApiError(409,"지문이 수정되었습니다. 다시 열어 주세요.");
+  if(context.surfaceKind==="reader"&&requestedRevision&&requestedRevision!==clean(context.passage.updated_at,100))throw new ApiError(409,"지문이 수정되었습니다. 다시 열어 주세요.");
   if(!/^[A-Za-z]+(?:[’'][A-Za-z]+)*$/.test(surfaceText))throw new ApiError(400,"영어 단어만 뜻을 볼 수 있습니다.");
   const today=new Date();today.setHours(0,0,0,0);const used=await db.from("ready_word_lookup_events").select("id",{count:"exact",head:true}).eq("student_id",context.student.id).gte("created_at",today.toISOString());if(used.error)throw new ApiError(500,used.error.message);if((used.count||0)>=AI_DAILY_LIMIT)throw new ApiError(429,`오늘 Gemini 문맥 뜻풀이 ${AI_DAILY_LIMIT}회를 모두 사용했습니다.`);
-  const root=lemma(surfaceText),savedResult=await db.from("ready_saved_words").select("id,meaning_snapshot,core_meanings,memory_level,origin_occurrence_key,created_at").eq("student_id",context.student.id).eq("exam_id",context.examId).eq("normalized_word",root).maybeSingle();if(savedResult.error)throw new ApiError(500,savedResult.error.message);let saved:any=savedResult.data;
-  let previous:any=null,next:any=null;if(body.retry){const neighbors=await db.from("ready_passage_sentences").select("sentence_index,text,translation").eq("passage_id",context.passage.id).in("sentence_index",[Math.max(0,Number(context.sentence.sentence_index)-1),Number(context.sentence.sentence_index)+1]);if(neighbors.error)throw new ApiError(500,neighbors.error.message);previous=neighbors.data?.find(item=>item.sentence_index===Number(context.sentence.sentence_index)-1)||null;next=neighbors.data?.find(item=>item.sentence_index===Number(context.sentence.sentence_index)+1)||null;}
-  const promptContext:ReaderGlossPromptContext={clicked:surfaceText,lemma:root,sentence,translation:clean(context.sentence.translation,2_000),existingCoreMeaning:clean(saved?.meaning_snapshot,60),previousGloss:body.retry?clean(body.previousGloss,60):"",retry:body.retry===true,previous,next};
-  const ai=await callGeminiInlineGloss(promptContext),confidence=Math.max(0,Math.min(1,Number(ai.confidence)||0)),coreMeaning=clean(ai.core_meaning,60),contextGloss=clean(ai.context_gloss,80),sourceSpan=clean(ai.source_span,180);let resolvedStart=start,resolvedEnd=end,kind="word",spanValidated=false;
-  if(sourceSpan){const folded=sentence.toLocaleLowerCase(),needle=sourceSpan.toLocaleLowerCase(),matches=[];let offset=0;while((offset=folded.indexOf(needle,offset))>=0){const spanEnd=offset+sourceSpan.length;if(offset<=start&&spanEnd>=end)matches.push({start:offset,end:spanEnd});offset+=Math.max(1,needle.length);}if(matches.length===1){spanValidated=true;resolvedStart=matches[0].start;resolvedEnd=matches[0].end;kind=resolvedStart===start&&resolvedEnd===end?"word":"phrase";}}
-  const resolved=confidence>=0.65&&spanValidated&&!!contextGloss&&!!coreMeaning,sourceText=sentence.slice(resolvedStart,resolvedEnd),occurrenceKey=[context.passage.id,context.sentence.id,start,end,clean(context.passage.updated_at,100)||"current"].join(":"),eventResult=await db.from("ready_word_lookup_events").insert({student_id:context.student.id,exam_id:context.examId,passage_id:context.passage.id,sentence_id:context.sentence.id,surface_word:surfaceText,normalized_word:root,source_text_snapshot:resolved?sourceText:surfaceText,start_offset:resolved?resolvedStart:start,end_offset:resolved?resolvedEnd:end,gloss_snapshot:resolved?contextGloss:null,lemma_snapshot:root,lookup_kind:resolved?kind:"word",confidence,passage_revision:context.passage.updated_at,occurrence_key:occurrenceKey,english_sentence_snapshot:sentence,publisher_translation_snapshot:clean(context.sentence.translation,2_000),core_meaning_snapshot:resolved?coreMeaning:null,lookup_reason:body.retry?"retry":"initial",resolved}).select("id").single();if(eventResult.error)throw new ApiError(500,eventResult.error.message);const event=rows<any>(eventResult);
-  if(saved&&resolved&&!body.retry&&occurrenceKey!==saved.origin_occurrence_key){const history=await db.from("ready_word_lookup_events").select("occurrence_key").eq("student_id",context.student.id).eq("exam_id",context.examId).eq("normalized_word",root).eq("resolved",true).eq("lookup_reason","initial").gte("created_at",saved.created_at);if(history.error)throw new ApiError(500,history.error.message);const distinct=new Set((history.data||[]).map(item=>item.occurrence_key).filter(key=>key&&key!==saved.origin_occurrence_key)),memoryLevel=Math.min(3,1+distinct.size);if(memoryLevel!==Number(saved.memory_level)){const updated=await db.from("ready_saved_words").update({memory_level:memoryLevel,updated_at:new Date().toISOString()}).eq("id",saved.id).select("id,meaning_snapshot,core_meanings,memory_level,origin_occurrence_key,created_at").single();if(updated.error)throw new ApiError(500,updated.error.message);saved=rows<any>(updated);}}
-  return resolved?{resolved:true,eventId:event.id,sentenceId:context.sentence.id,start:resolvedStart,end:resolvedEnd,sourceText,contextGloss,gloss:contextGloss,coreMeaning,lemma:root,kind,confidence,occurrenceKey,saved:!!saved,savedWordId:saved?.id||null,memoryLevel:saved?Number(saved.memory_level)||1:0}:{resolved:false,eventId:event.id,sentenceId:context.sentence.id,start,end,sourceText:surfaceText,lemma:root,confidence,saved:!!saved,savedWordId:saved?.id||null,memoryLevel:saved?Number(saved.memory_level)||1:0};
+  const root=lemma(surfaceText),savedResult=await db.from("ready_saved_words").select("id,meaning_snapshot,memory_level,origin_occurrence_key,created_at").eq("student_id",context.student.id).eq("exam_id",context.examId).eq("normalized_word",root).maybeSingle();if(savedResult.error)throw new ApiError(500,savedResult.error.message);let saved:any=savedResult.data,occurrenceKey=[context.surfaceKind,context.passage.id,context.surfaceKey,context.sentence.id,start,end,clean(context.passage.updated_at,100)||"current"].join(":");
+  if(saved&&!body.retry){
+    const meaning=clean(saved.meaning_snapshot,60),fastEvent=await db.from("ready_word_lookup_events").insert({student_id:context.student.id,exam_id:context.examId,passage_id:context.passage.id,sentence_id:context.sentence.dbSentenceId||((context.surfaceKind==="reader")?context.sentence.id:null),surface_word:surfaceText,normalized_word:root,source_text_snapshot:surfaceText,start_offset:start,end_offset:end,meaning_snapshot:meaning,lemma_snapshot:root,lookup_kind:"word",confidence:1,passage_revision:context.passage.updated_at,occurrence_key:occurrenceKey,english_sentence_snapshot:sentence,publisher_translation_snapshot:clean(context.sentence.translation,2_000),lookup_reason:"initial",resolved:true,source_kind:context.surfaceKind,source_key:context.surfaceKey}).select("id").single();
+    if(fastEvent.error)throw new ApiError(500,fastEvent.error.message);
+    saved=await progressSavedWordMemory(saved,context,root,occurrenceKey,true,false);
+    return {resolved:true,eventId:fastEvent.data.id,sentenceId:context.sentence.id,start,end,sourceText:surfaceText,meaning,lemma:root,kind:"word",confidence:1,occurrenceKey,saved:true,savedWordId:saved.id,savedMeaning:meaning,memoryLevel:Number(saved.memory_level)||1,fastPath:true};
+  }
+  const promptContext:ReaderGlossPromptContext={clicked:surfaceText,lemma:root,sentence,translation:clean(context.sentence.translation,2_000),savedMeaning:clean(saved?.meaning_snapshot,60),previousMeaning:body.retry?clean(body.previousMeaning,60):"",retry:body.retry===true};
+  const ai=await callGeminiInlineGloss(promptContext),confidence=Math.max(0,Math.min(1,Number(ai.confidence)||0)),meaning=clean(ai.meaning,60),sourceSpan=clean(ai.source_span,180),requestedKind=clean(ai.kind,12);let resolvedStart=start,resolvedEnd=end,kind:"word"|"phrase"="word",spanValidated=false;
+  if(sourceSpan){const folded=sentence.toLocaleLowerCase(),needle=sourceSpan.toLocaleLowerCase(),matches=[];let offset=0;while((offset=folded.indexOf(needle,offset))>=0){const spanEnd=offset+sourceSpan.length;if(offset<=start&&spanEnd>=end)matches.push({start:offset,end:spanEnd});offset+=Math.max(1,needle.length);}if(matches.length===1){resolvedStart=matches[0].start;resolvedEnd=matches[0].end;const expanded=resolvedStart!==start||resolvedEnd!==end,tokenCount=(sourceSpan.match(/[A-Za-z]+(?:[’'][A-Za-z]+)*/g)||[]).length;spanValidated=expanded?requestedKind==="phrase"&&tokenCount>=2&&tokenCount<=5&&!/[.!?;:]/.test(sourceSpan):requestedKind==="word";kind=expanded?"phrase":"word";}}
+  const resolved=confidence>=0.65&&spanValidated&&!!meaning,sourceText=sentence.slice(resolvedStart,resolvedEnd),eventResult=await db.from("ready_word_lookup_events").insert({student_id:context.student.id,exam_id:context.examId,passage_id:context.passage.id,sentence_id:context.sentence.dbSentenceId||((context.surfaceKind==="reader")?context.sentence.id:null),surface_word:surfaceText,normalized_word:root,source_text_snapshot:resolved?sourceText:surfaceText,start_offset:resolved?resolvedStart:start,end_offset:resolved?resolvedEnd:end,meaning_snapshot:resolved?meaning:null,lemma_snapshot:root,lookup_kind:resolved?kind:"word",confidence,passage_revision:context.passage.updated_at,occurrence_key:occurrenceKey,english_sentence_snapshot:sentence,publisher_translation_snapshot:clean(context.sentence.translation,2_000),lookup_reason:body.retry?"retry":"initial",resolved,source_kind:context.surfaceKind,source_key:context.surfaceKey}).select("id").single();if(eventResult.error)throw new ApiError(500,eventResult.error.message);const event=rows<any>(eventResult);
+  saved=await progressSavedWordMemory(saved,context,root,occurrenceKey,resolved,body.retry===true);
+  return resolved?{resolved:true,eventId:event.id,sentenceId:context.sentence.id,start:resolvedStart,end:resolvedEnd,sourceText,meaning,lemma:root,kind,confidence,occurrenceKey,saved:!!saved,savedWordId:saved?.id||null,savedMeaning:clean(saved?.meaning_snapshot,60),memoryLevel:saved?Number(saved.memory_level)||1:0}:{resolved:false,eventId:event.id,sentenceId:context.sentence.id,start,end,sourceText:surfaceText,lemma:root,confidence,saved:!!saved,savedWordId:saved?.id||null,savedMeaning:clean(saved?.meaning_snapshot,60),memoryLevel:saved?Number(saved.memory_level)||1:0};
 }
 function meaningKey(value: string) { return clean(value, 500).toLowerCase().replace(/\s+/g, " "); }
-async function saveReaderWord(body:any,session:ReadySession){const student=await studentForSession(session),examId=required(body.examId,"Exam",80),eventId=required(body.eventId,"조회 기록",80);await studentExamAccess(examId,student);const eventResult=await db.from("ready_word_lookup_events").select("id,exam_id,passage_id,sentence_id,surface_word,normalized_word,core_meaning_snapshot,occurrence_key,resolved").eq("id",eventId).eq("student_id",student.id).eq("exam_id",examId).maybeSingle();if(eventResult.error)throw new ApiError(500,eventResult.error.message);const event:any=eventResult.data;if(!event?.resolved||!event.core_meaning_snapshot)throw new ApiError(400,"확인된 단어 뜻만 저장할 수 있습니다.");const existing=await db.from("ready_saved_words").select("id,normalized_word,meaning_snapshot,core_meanings,memory_level").eq("student_id",student.id).eq("exam_id",examId).eq("normalized_word",event.normalized_word).maybeSingle();if(existing.error)throw new ApiError(500,existing.error.message);if(existing.data)return {saved:true,savedWordId:existing.data.id,lemma:existing.data.normalized_word,coreMeaning:existing.data.meaning_snapshot,coreMeanings:existing.data.core_meanings,memoryLevel:Number(existing.data.memory_level)||1};const meaning=clean(event.core_meaning_snapshot,60),inserted=await db.from("ready_saved_words").insert({student_id:student.id,exam_id:examId,passage_id:event.passage_id,sentence_id:event.sentence_id,word:event.surface_word,normalized_word:event.normalized_word,meaning_snapshot:meaning,meaning_key:meaningKey(meaning),core_meanings:[meaning],memory_level:1,origin_occurrence_key:event.occurrence_key}).select("id,normalized_word,meaning_snapshot,core_meanings,memory_level").single();if(inserted.error){if((inserted.error as any).code==="23505"){const raced=await db.from("ready_saved_words").select("id,normalized_word,meaning_snapshot,core_meanings,memory_level").eq("student_id",student.id).eq("exam_id",examId).eq("normalized_word",event.normalized_word).single();if(raced.error)throw new ApiError(500,raced.error.message);const row:any=raced.data;return {saved:true,savedWordId:row.id,lemma:row.normalized_word,coreMeaning:row.meaning_snapshot,coreMeanings:row.core_meanings,memoryLevel:Number(row.memory_level)||1};}throw new ApiError(500,inserted.error.message);}const row:any=inserted.data;return {saved:true,savedWordId:row.id,lemma:row.normalized_word,coreMeaning:row.meaning_snapshot,coreMeanings:row.core_meanings,memoryLevel:Number(row.memory_level)||1};}
+async function saveReaderWord(body:any,session:ReadySession){const student=await studentForSession(session),examId=required(body.examId,"Exam",80),eventId=required(body.eventId,"조회 기록",80);await studentExamAccess(examId,student);const eventResult=await db.from("ready_word_lookup_events").select("id,passage_id,sentence_id,surface_word,normalized_word,meaning_snapshot,occurrence_key,resolved").eq("id",eventId).eq("student_id",student.id).eq("exam_id",examId).maybeSingle();if(eventResult.error)throw new ApiError(500,eventResult.error.message);const event:any=eventResult.data;if(!event?.resolved||!event.meaning_snapshot)throw new ApiError(400,"확인된 단어 뜻만 저장할 수 있습니다.");const meaning=clean(event.meaning_snapshot,60),existing=await db.from("ready_saved_words").select("id,normalized_word,meaning_snapshot,memory_level,origin_occurrence_key").eq("student_id",student.id).eq("exam_id",examId).eq("normalized_word",event.normalized_word).maybeSingle();if(existing.error)throw new ApiError(500,existing.error.message);if(existing.data){const replaced=meaningKey(existing.data.meaning_snapshot)!==meaningKey(meaning),updated=await db.from("ready_saved_words").update({meaning_snapshot:meaning,meaning_key:meaningKey(meaning),word:event.surface_word,passage_id:event.passage_id,sentence_id:event.sentence_id,updated_at:new Date().toISOString()}).eq("id",existing.data.id).select("id,normalized_word,meaning_snapshot,memory_level").single();if(updated.error)throw new ApiError(500,updated.error.message);return {saved:true,replaced,savedWordId:updated.data.id,lemma:updated.data.normalized_word,meaning:updated.data.meaning_snapshot,memoryLevel:Number(updated.data.memory_level)||1};}const inserted=await db.from("ready_saved_words").insert({student_id:student.id,exam_id:examId,passage_id:event.passage_id,sentence_id:event.sentence_id,word:event.surface_word,normalized_word:event.normalized_word,meaning_snapshot:meaning,meaning_key:meaningKey(meaning),memory_level:1,origin_occurrence_key:event.occurrence_key}).select("id,normalized_word,meaning_snapshot,memory_level").single();if(inserted.error)throw new ApiError(500,inserted.error.message);return {saved:true,replaced:false,savedWordId:inserted.data.id,lemma:inserted.data.normalized_word,meaning:inserted.data.meaning_snapshot,memoryLevel:Number(inserted.data.memory_level)||1};}
 async function removeReaderWord(body:any,session:ReadySession){const student=await studentForSession(session),examId=required(body.examId,"Exam",80),root=lemma(normalizedWord(required(body.lemma,"단어",100)));await studentExamAccess(examId,student);const removed=await db.from("ready_saved_words").delete().eq("student_id",student.id).eq("exam_id",examId).eq("normalized_word",root).select("id");if(removed.error)throw new ApiError(500,removed.error.message);return {saved:false,lemma:root,memoryLevel:0,removed:(removed.data||[]).length};}
-async function updateReaderWordMeanings(body:any,session:ReadySession){const student=await studentForSession(session),examId=required(body.examId,"Exam",80),savedWordId=required(body.savedWordId,"저장 단어",80),action=clean(body.action,12),meaning=required(body.meaning,"대표 뜻",60);await studentExamAccess(examId,student);const current=await db.from("ready_saved_words").select("id,meaning_snapshot,core_meanings").eq("id",savedWordId).eq("student_id",student.id).eq("exam_id",examId).maybeSingle();if(current.error)throw new ApiError(500,current.error.message);if(!current.data)throw new ApiError(404,"저장 단어를 찾지 못했습니다.");let meanings=(Array.isArray(current.data.core_meanings)?current.data.core_meanings:[current.data.meaning_snapshot]).map(item=>clean(item,60)).filter(Boolean);if(action==="add")meanings=[...new Set([...meanings,meaning])].slice(0,8);else if(action==="remove")meanings=meanings.filter(item=>meaningKey(item)!==meaningKey(meaning));else throw new ApiError(400,"대표 뜻 변경 방식을 확인해 주세요.");if(!meanings.length)throw new ApiError(400,"대표 뜻은 하나 이상 남겨 주세요.");const updated=await db.from("ready_saved_words").update({meaning_snapshot:meanings[0],meaning_key:meaningKey(meanings[0]),core_meanings:meanings,updated_at:new Date().toISOString()}).eq("id",savedWordId).eq("student_id",student.id).select("id,meaning_snapshot,core_meanings").single();if(updated.error)throw new ApiError(500,updated.error.message);return {savedWordId,coreMeaning:updated.data.meaning_snapshot,coreMeanings:updated.data.core_meanings};}
+async function updateReaderWordMeaning(body:any,session:ReadySession){const student=await studentForSession(session),examId=required(body.examId,"Exam",80),savedWordId=required(body.savedWordId,"저장 단어",80),meaning=required(body.meaning,"저장 뜻",60);await studentExamAccess(examId,student);const updated=await db.from("ready_saved_words").update({meaning_snapshot:meaning,meaning_key:meaningKey(meaning),updated_at:new Date().toISOString()}).eq("id",savedWordId).eq("student_id",student.id).eq("exam_id",examId).select("id,normalized_word,meaning_snapshot,memory_level").maybeSingle();if(updated.error)throw new ApiError(500,updated.error.message);if(!updated.data)throw new ApiError(404,"저장 단어를 찾지 못했습니다.");return {savedWordId:updated.data.id,lemma:updated.data.normalized_word,meaning:updated.data.meaning_snapshot,memoryLevel:Number(updated.data.memory_level)||1};}
 async function saveWord(body:any,session:ReadySession){const context=await studyContext(body,session),word=required(body.word,"단어",100),normalized=normalizedWord(body.normalizedWord||word),root=lemma(normalized),meaning=required(body.meaning,"선택한 뜻",500);if(!root)throw new ApiError(400,"영어 단어만 저장할 수 있습니다.");const known=await db.from("ready_word_states").select("known").eq("student_id",context.student.id).eq("passage_id",context.passage.id).eq("normalized_word",root).maybeSingle();if(known.error)throw new ApiError(500,known.error.message);if(known.data?.known)throw new ApiError(409,"아는 단어로 표시했습니다. 다시 학습하기를 누른 뒤 저장할 수 있습니다.");const saved=await db.from("ready_saved_words").upsert({student_id:context.student.id,passage_id:context.passage.id,sentence_id:context.sentence?.id||null,word,normalized_word:root,meaning_snapshot:meaning,meaning_key:meaningKey(meaning)},{onConflict:"student_id,passage_id,normalized_word,meaning_key",ignoreDuplicates:true}).select("id,meaning_snapshot").maybeSingle();if(saved.error)throw new ApiError(500,saved.error.message);return {saved:true,normalizedWord:root,meaning};}
 async function setWordKnown(body:any,session:ReadySession,known:boolean){const context=await studyContext(body,session),root=lemma(normalizedWord(required(body.normalizedWord||body.word,"단어",100)));if(!root)throw new ApiError(400,"영어 단어만 처리할 수 있습니다.");const result=await db.rpc("ready_set_word_known",{p_student_id:context.student.id,p_passage_id:context.passage.id,p_normalized_word:root,p_known:known});if(result.error)throw new ApiError(500,result.error.message);return {known,normalizedWord:root};}
 async function deleteSavedWord(body:any,session:ReadySession){const student=await studentForSession(session),savedWordId=required(body.savedWordId,"저장 단어",80),result=await db.from("ready_saved_words").delete().eq("id",savedWordId).eq("student_id",student.id).select("id,normalized_word").maybeSingle();if(result.error)throw new ApiError(500,result.error.message);if(!result.data)throw new ApiError(404,"저장 단어를 찾지 못했습니다.");return {deleted:result.data.id,normalizedWord:result.data.normalized_word};}
@@ -980,7 +968,7 @@ async function dispatch(op: string, body: any, session: ReadySession | null) {
     case "list_students": return listStudents(); case "student_login": return studentLogin(body); case "admin_login": return adminLogin(body); case "logout": return revokeSession(session as ReadySession);
     case "teacher_bootstrap": return teacherBootstrap(); case "delete_impact": return deleteImpact(body); case "create_student": return createStudent(body); case "set_student_pin": return setStudentPin(body); case "delete_student": return deleteStudent(body);
     case "assign_scope_passages": return setScopePassages(body, false); case "set_scope_passages": return setScopePassages(body, true); case "create_passage": return createPassage(body); case "update_passage": return updatePassage(body); case "delete_passage": return deletePassage(body); case "import_questions": return importQuestions(body); case "import_explanations": return importExplanations(body);
-    case "student_bootstrap": return studentBootstrap(session as ReadySession); case "student_passage": return studentPassage(body, session as ReadySession); case "reader_inline_gloss": return readerInlineGloss(body, session as ReadySession); case "save_reader_word": return saveReaderWord(body, session as ReadySession); case "remove_reader_word": return removeReaderWord(body, session as ReadySession); case "update_reader_word_meanings": return updateReaderWordMeanings(body, session as ReadySession); case "student_questions": return studentQuestions(body, session as ReadySession); case "student_question_filters": return studentQuestionFilters(body, session as ReadySession); case "student_question_queue": return studentQuestionQueue(body, session as ReadySession); case "student_review_questions": return studentReviewQuestions(body, session as ReadySession); case "set_question_bookmark": return setQuestionBookmark(body, session as ReadySession); case "submit_attempt": return submitAttempt(body, session as ReadySession); case "student_workbook": return studentWorkbook(body, session as ReadySession); case "workbook_assistance": return workbookAssistance(body, session as ReadySession); case "set_workbook_bookmark": return setWorkbookBookmark(body, session as ReadySession); case "workbook_hint": return workbookHint(body, session as ReadySession); case "submit_workbook_attempt": return submitWorkbookAttempt(body, session as ReadySession);
+    case "student_bootstrap": return studentBootstrap(session as ReadySession); case "student_passage": return studentPassage(body, session as ReadySession); case "word_lookup_meaning": return readerInlineGloss(body, session as ReadySession); case "save_reader_word": return saveReaderWord(body, session as ReadySession); case "remove_reader_word": return removeReaderWord(body, session as ReadySession); case "update_reader_word_meaning": return updateReaderWordMeaning(body, session as ReadySession); case "student_questions": return studentQuestions(body, session as ReadySession); case "student_question_filters": return studentQuestionFilters(body, session as ReadySession); case "student_question_queue": return studentQuestionQueue(body, session as ReadySession); case "student_review_questions": return studentReviewQuestions(body, session as ReadySession); case "set_question_bookmark": return setQuestionBookmark(body, session as ReadySession); case "submit_attempt": return submitAttempt(body, session as ReadySession); case "student_workbook": return studentWorkbook(body, session as ReadySession); case "workbook_assistance": return workbookAssistance(body, session as ReadySession); case "set_workbook_bookmark": return setWorkbookBookmark(body, session as ReadySession); case "workbook_hint": return workbookHint(body, session as ReadySession); case "submit_workbook_attempt": return submitWorkbookAttempt(body, session as ReadySession);
     default: throw new ApiError(404, "알 수 없는 READY 작업입니다.");
   }
 }
