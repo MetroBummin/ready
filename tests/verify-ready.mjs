@@ -186,7 +186,8 @@ assert.match(app,/workbook-order-bank-slot \$\{chosenSet\.has\(chipIndex\)\?'use
 assert.match(app,/changeWorkbookOrder[\s\S]*refreshWorkbookOrderGroup\(group\)/,'Stage 8 chip changes must locally refresh only their group');
 assert.doesNotMatch(app,/changeWorkbookOrder[^\n]*renderWorkbook\(\)/,'Stage 8 chip changes must not rerender the full Workbook');
 assert.match(read('ready/design.css'),/workbook-order-bank-slot\.used\{visibility:hidden/,'Selected Stage 8 chips must keep their original geometry');
-assert.match(read('ready/design.css'),/--workbook-order-stable-height/,'Stage 8 built area must reserve the measured bank height');
+assert.match(read('ready/design.css'),/workbook-order-built\{[^}]*min-height:68px/,'Stage 8 must keep a compact fixed assembly area');
+assert.doesNotMatch(read('ready/design.css'),/--workbook-order-stable-height/,'Stage 8 must not mirror the full bank height into the assembly area');
 assert.equal(WORKBOOK_TRANSLATION_GRADING_POLICY.passScore,75);
 assert.equal(workbookTranslationPass(74,[]),false);
 assert.equal(workbookTranslationPass(75,[]),true);
