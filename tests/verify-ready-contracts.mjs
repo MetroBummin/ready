@@ -55,6 +55,8 @@ assert.doesNotMatch(student+admin,/SUPABASE_SERVICE_ROLE_KEY|READY_ADMIN_PASSWOR
 assert.doesNotMatch(student,/reader-token|learning-sheet|data-save-sentence/,'Student frontend still exposes lexical study controls');
 assert.match(student,/student_question_filters[\s\S]*question-source[\s\S]*question-type[\s\S]*student_question_queue/,'Source and multi-select taxonomy queue UI is missing');
 assert.match(edge,/studentQuestionPool[\s\S]*providerSet[\s\S]*taxonomySet[\s\S]*publicQuestion/,'Server-side source and taxonomy filtering is missing');
+assert.match(edge,/has_workbook:\s*!!workbookForPassage\(passage\)/,'Student bootstrap must expose workbook availability from the server catalog');
+assert.match(student,/function hasWorkbook\(passage\)\{return passage\?\.has_workbook===true;\}/,'Student home must use the server workbook flag instead of a textbook allowlist');
 assert.match(edge,/configs = \[\{ \.\.\.base, thinkingConfig[\s\S]*response\.status !== 400/,'AI grading lacks the model compatibility fallback used by dictionary calls');
 
 console.log(`READY API contracts verified (${clientOps.size} frontend operations, 137 inventoried questions).`);

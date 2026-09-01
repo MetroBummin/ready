@@ -457,7 +457,10 @@ async function scopePassages(examId: string, studentId: string) {
     const passage = byId.get(question.passage_id);
     if (!attempted.has(question.id) && isReadyQuestion(question) && isMainTextQuestion(question, passage, passageText.get(question.passage_id) || "")) questionCounts.set(question.passage_id, (questionCounts.get(question.passage_id) || 0) + 1);
   });
-  const passages = links.map(link => ({ ...byId.get(link.passage_id), position: link.position, question_count: questionCounts.get(link.passage_id) || 0 })).filter(item => item.id);
+  const passages = links.map(link => {
+    const passage = byId.get(link.passage_id);
+    return passage ? { ...passage, position: link.position, question_count: questionCounts.get(link.passage_id) || 0, has_workbook: !!workbookForPassage(passage) } : null;
+  }).filter(Boolean);
   return passages;
 }
 async function studentBootstrap(session: ReadySession) {
