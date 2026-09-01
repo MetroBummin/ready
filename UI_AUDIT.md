@@ -115,3 +115,17 @@ Completed on `codex/ui-redesign` after merging `main` at `1e67d49`:
 - Restyled Student chooser/PIN/Home/source filter, the existing Question renderer, choice matrix, written/AI feedback states, Review's shared renderer, Workbook, Admin login/forms/tables/scope screens, sheets, loading, empty, and error states.
 - Preserved `ready/app.js`, `ready/admin/app.js`, `ready/interaction-runtime.js`, importer, grader, API, migrations, and all Contract hooks relative to the merged `main`.
 - Added `tests/ui-harness.html` to visually exercise production selectors without creating a production route or bypassing authentication.
+
+## Word Learning visual extension — 2026-09-01
+
+Design-only selectors are defined for the feature branch's semantic hooks:
+`.reader-inline-source`, `.reader-inline-replacement`, `.reader-inline-gloss`,
+`.reader-inline-save-toggle`, `.is-pending`, `.is-refreshing`, `.is-returning`,
+`[data-word-saved]`, and `[data-memory-level]`. The current pre-feature markup
+still contains a retry icon; this branch does not change its JavaScript or API.
+
+The dense Reader case, long contextual gloss reflow, fixed-width save/remove
+control, three saved-memory tints, return dissolve, four-part Review navigation,
+collapsed word row, expanded context history, mobile, dark, and large-text states
+are captured in `word-learning-preview.html`. Production Question and Workbook
+lookup behavior remains out of scope.

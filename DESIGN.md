@@ -285,7 +285,40 @@ Required verification widths: `390px`, `768px`, and `1440px`.
 - No ambient loops, parallax, cinematic reveal, or celebratory animation.
 - Under `prefers-reduced-motion: reduce`, remove nonessential transitions and all smooth scrolling.
 
-## 19. Forbidden patterns
+## 19. Reader word learning
+
+Reader lookup is an in-prose state change, not a dictionary overlay. The English
+token becomes a short rectangular block immediately after tap, then resolves in
+place to a Korean contextual gloss. Do not add a popover, rounded dictionary
+card, spinner, glow, bouncing motion, or loading underline.
+
+- **Tap / pending:** use `--ready-word-block` plus the orange
+  `--ready-word-block-edge`. This means “working now.” It must remain distinct
+  from prior-learning tint.
+- **Gloss:** Korean is ordinary reading text with button semantics but no button
+  chrome. Long contextual glosses may reflow naturally and must never be
+  clipped, marquee-scrolled, or compressed to the English width.
+- **Save toggle:** `✓` and `−` share one fixed visual box. The visible mark is
+  small, while a pseudo-element extends the touch target. The sentence must not
+  shift when the mark changes.
+- **Return:** canonical English returns through a 560ms opacity-led dissolve.
+  Geometry stays fixed; blur is limited to a sub-pixel midpoint and disappears
+  under reduced motion.
+- **Memory tint:** only saved English tokens receive level 1/2/3 olive-neutral
+  backgrounds. Level 1 is barely present, level 2 is readable on inspection,
+  and level 3 is strongest without becoming a highlighter field. Lookup block
+  remains orange and must never reuse these tints.
+- **Question/Workbook future rule:** hide memory tint during solving. A submitted
+  or result state may reveal the same level 1/2/3 scale later; this design pass
+  does not add lookup behavior to either surface.
+
+Word Review uses four aligned navigation cells with visible counts: `WORD`,
+`SENTENCE`, `WORKBOOK`, `QUESTION`. Word rows prioritize lemma, then core Korean
+meaning, then memory metadata. Expanded context history uses compact rows and
+thin dividers instead of nested cards. Meaning add/delete and saved-word removal
+may be explicit here because Review is the management surface.
+
+## 20. Forbidden patterns
 
 - Breeze visual identity, serif display typography, scenic imagery, or blue brand accent.
 - Wrapping every element in a rounded card.
@@ -298,7 +331,7 @@ Required verification widths: `390px`, `768px`, and `1440px`.
 - New UI framework introduced for the redesign.
 - Question Contract, Interaction Contract, importer, validator, grader, Attempt, READY/DROP, source filter, Shorts behavior, Workbook, authentication, API, or DB changes made for visual reasons.
 
-## 20. Implementation gate
+## 21. Implementation gate
 
 Before changing production UI:
 

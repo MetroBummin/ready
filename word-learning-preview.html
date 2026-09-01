@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>READY · Word Learning Visual Pass</title>
+  <link rel="stylesheet" href="design-tokens.css">
+  <link rel="stylesheet" href="ready/design.css">
+  <style>
+    *{box-sizing:border-box}
+    html{background:var(--ready-canvas);scroll-behavior:smooth}
+    body[data-ready-mode]{margin:0;color:var(--ready-ink);background:var(--ready-canvas);font-family:var(--ready-font-sans);font-size:16px;line-height:1.55;-webkit-font-smoothing:antialiased}
+    button{font:inherit}
+    .preview-top{position:sticky;top:0;z-index:20;display:flex;align-items:center;gap:24px;min-height:58px;padding:0 max(20px,calc((100vw - 1180px)/2));border-bottom:1px solid var(--ready-hairline);background:color-mix(in srgb,var(--ready-canvas) 94%,transparent);backdrop-filter:blur(12px)}
+    .preview-top strong{letter-spacing:.07em}.preview-top nav{display:flex;gap:18px;margin-left:auto}.preview-top a{color:var(--ready-muted);font:650 11px/1 var(--ready-font-mono);text-decoration:none}.preview-top a:hover{color:var(--ready-ink)}
+    .preview-main{width:min(calc(100% - 40px),1180px);margin:auto}
+    .preview-hero{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:64px;align-items:end;padding:76px 0 58px;border-bottom:1px solid var(--ready-hairline)}
+    .preview-eyebrow{margin:0 0 10px;color:var(--ready-muted);font:750 11px/1.3 var(--ready-font-mono);letter-spacing:.1em;text-transform:uppercase}
+    .preview-hero h1{max-width:760px;margin:0;font-size:clamp(40px,6vw,72px);font-weight:560;line-height:1;letter-spacing:-.05em}.preview-hero p:not(.preview-eyebrow){max-width:680px;margin:20px 0 0;color:var(--ready-body);font-size:17px}
+    .preview-note{padding:18px;border-top:3px solid var(--ready-primary);background:var(--ready-surface);font-size:13px}.preview-note b{display:block;margin-bottom:5px;font:750 11px/1 var(--ready-font-mono);letter-spacing:.08em}.preview-note span{color:var(--ready-muted)}
+    .preview-section{padding:58px 0;border-bottom:1px solid var(--ready-hairline)}
+    .preview-section-head{display:grid;grid-template-columns:170px minmax(0,1fr);gap:28px;margin-bottom:28px}.preview-section-head h2{margin:0;font-size:26px;letter-spacing:-.025em}.preview-section-head p{max-width:680px;margin:6px 0 0;color:var(--ready-body)}
+    .state-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+    .preview-state{min-width:0;border:1px solid var(--ready-hairline);background:var(--ready-surface)}
+    .preview-state-head{display:flex;align-items:center;justify-content:space-between;gap:16px;min-height:42px;padding:0 14px;border-bottom:1px solid var(--ready-hairline);color:var(--ready-muted);font:700 10px/1.2 var(--ready-font-mono);letter-spacing:.07em;text-transform:uppercase}
+    .preview-state-body{min-height:142px;padding:24px;color:var(--ready-body)}
+    .preview-state-body p{margin:0;font-size:17px;line-height:1.75}.preview-state-body p+p{margin-top:12px}
+    .preview-state.wide{grid-column:1/-1}.preview-state.wide .preview-state-body{min-height:0}
+    .normal-token{padding:0 .04em}
+    .memory-key{display:grid;grid-template-columns:repeat(3,1fr);border-top:1px solid var(--ready-hairline);border-left:1px solid var(--ready-hairline)}
+    .memory-key>div{display:grid;gap:10px;padding:18px;border-right:1px solid var(--ready-hairline);border-bottom:1px solid var(--ready-hairline)}.memory-key small{color:var(--ready-muted);font:700 10px/1 var(--ready-font-mono)}
+    .dense-copy{font-size:17px;line-height:1.82!important}
+    .motion-track{display:grid;grid-template-columns:1fr 52px 1fr 52px 1fr;align-items:center;gap:14px}.motion-frame{padding:18px;border-left:2px solid var(--ready-hairline);background:var(--ready-canvas-quiet);font-size:17px}.motion-frame.mid{opacity:.32;filter:blur(.35px)}.motion-arrow{color:var(--ready-muted);font:700 10px/1.3 var(--ready-font-mono);text-align:center}
+    .review-preview{padding:28px;border:1px solid var(--ready-hairline);background:var(--ready-surface)}
+    .review-preview h3{margin:0 0 18px;font-size:24px}
+    .device-grid{display:grid;grid-template-columns:minmax(0,390px) minmax(0,1fr);gap:24px;align-items:start}
+    .device{min-width:0;border:1px solid var(--ready-hairline);background:var(--ready-surface)}.device-bar{display:flex;align-items:center;justify-content:space-between;min-height:42px;padding:0 14px;border-bottom:1px solid var(--ready-hairline);color:var(--ready-muted);font:700 10px/1 var(--ready-font-mono)}.device-content{padding:22px}.device-content p{margin:0;font-size:17px;line-height:1.8}.device-content p+p{margin-top:16px}.mobile-frame{display:block;width:100%;height:620px;border:0;background:var(--ready-canvas)}
+    .dark-surface{--ready-canvas:#171713;--ready-canvas-quiet:#20201b;--ready-surface:#24241f;--ready-ink:#f4f2ea;--ready-body:#cbc8bd;--ready-muted:#98958b;--ready-hairline:#3a3932;--ready-hairline-strong:#5a584f;--ready-focus:#f4f2ea;--ready-word-block:#30251e;--ready-word-block-strong:#39291f;--ready-word-memory-edge:#b9a15d;--ready-word-memory-1:#20201b;--ready-word-memory-2:#2a291f;--ready-word-memory-3:#373321;color:var(--ready-ink);background:var(--ready-canvas);color-scheme:dark}.dark-surface .device-content{background:var(--ready-canvas)}
+    .large-text{font-size:19px!important;line-height:1.82!important}
+    .preview-footer{display:flex;justify-content:space-between;gap:20px;padding:30px 0;color:var(--ready-muted);font-size:12px}
+    @media(max-width:820px){.preview-top nav{display:none}.preview-hero{grid-template-columns:1fr;gap:28px}.preview-section-head{grid-template-columns:1fr}.state-grid,.device-grid{grid-template-columns:1fr}.preview-state.wide{grid-column:auto}.motion-track{grid-template-columns:1fr}.motion-arrow{padding:2px}.memory-key{grid-template-columns:1fr}.review-preview{padding:18px}}
+    @media(max-width:480px){.preview-main{width:calc(100% - 28px)}.preview-top{padding:0 14px}.preview-hero{padding:48px 0 38px}.preview-hero h1{font-size:42px}.preview-section{padding:42px 0}.preview-state-body{padding:18px}.device-content{padding:18px}}
+    @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+  </style>
+</head>
+<body data-ready-mode="student">
+  <header class="preview-top"><strong>READY</strong><nav><a href="#reader">READER</a><a href="#memory">MEMORY</a><a href="#review">REVIEW</a><a href="#responsive">MOBILE / DARK</a></nav><span class="preview-eyebrow" style="margin:0">WORD SYSTEM 01</span></header>
+  <main class="preview-main">
+    <section class="preview-hero"><div><p class="preview-eyebrow">READY Word Learning</p><h1>본문 안에서<br>기억이 바뀐다.</h1><p>Dictionary popup이 아니라 읽고 있는 문장 자체가 즉시 반응한다. 현재 lookup과 이전 학습 흔적은 서로 다른 시각 언어를 쓴다.</p></div><aside class="preview-note"><b>DESIGN BOUNDARY</b><span>CSS + tokens + preview only.<br>Reader visual states and Word Review.</span></aside></section>
+
+    <section class="preview-section" id="reader"><div class="preview-section-head"><p class="preview-eyebrow">01–04 / Reader states</p><div><h2>Tap은 단호하게, 뜻은 본문처럼</h2><p>현재 동작은 짧은 주황 edge block으로 보이고, 결과는 chrome 없는 한국어와 고정 폭 저장 control로 이어진다.</p></div></div>
+      <div class="state-grid">
+        <article class="preview-state"><header class="preview-state-head"><span>01 · Reader normal</span><span>idle</span></header><div class="preview-state-body"><p>Companies build customer <button class="reader-inline-source">loyalty</button> by using the subscription model.</p></div></article>
+        <article class="preview-state"><header class="preview-state-head"><span>02 · Tap / block</span><span>next paint</span></header><div class="preview-state-body"><p>Companies build customer <button class="reader-inline-source is-pending" aria-busy="true">loyalty</button> by using the subscription model.</p></div></article>
+        <article class="preview-state"><header class="preview-state-head"><span>03 · Unsaved gloss</span><span>save ✓</span></header><div class="preview-state-body"><p>Companies build customer <span class="reader-inline-replacement" data-word-saved="false"><button class="reader-inline-gloss">고객 충성도</button><button class="reader-inline-save-toggle" aria-label="단어 저장">✓</button></span> by using the subscription model.</p></div></article>
+        <article class="preview-state"><header class="preview-state-head"><span>04 · Saved gloss</span><span>remove −</span></header><div class="preview-state-body"><p>They create value <span class="reader-inline-replacement" data-word-saved="true"><button class="reader-inline-gloss">서비스를 구독함으로써</button><button class="reader-inline-save-toggle" data-word-saved="true" aria-label="저장 단어 제거">−</button></span> rather than buying every product.</p></div></article>
+      </div>
+    </section>
+
+    <section class="preview-section" id="memory"><div class="preview-section-head"><p class="preview-eyebrow">05–08 / Memory</p><div><h2>이전 학습 흔적은 조용한 tint</h2><p>주황 block은 지금 누른 상태, 올리브 tint는 전에 저장한 기억이다. 여러 단어가 겹쳐도 본문이 먼저 읽혀야 한다.</p></div></div>
+      <div class="memory-key">
+        <div><small>05 · LEVEL 1</small><p>provide <button class="reader-inline-source" data-word-saved="true" data-memory-level="1">continuing</button> value</p></div>
+        <div><small>06 · LEVEL 2</small><p>provide <button class="reader-inline-source" data-word-saved="true" data-memory-level="2">continuing</button> value</p></div>
+        <div><small>07 · LEVEL 3</small><p>provide <button class="reader-inline-source" data-word-saved="true" data-memory-level="3">continuing</button> value</p></div>
+      </div>
+      <article class="preview-state wide" style="margin-top:16px"><header class="preview-state-head"><span>08 · Dense paragraph</span><span>12 saved words</span></header><div class="preview-state-body"><p class="dense-copy">The <button class="reader-inline-source" data-word-saved="true" data-memory-level="1">subscription</button> economy gives customers <button class="reader-inline-source" data-word-saved="true" data-memory-level="2">access</button> to products while companies earn <button class="reader-inline-source" data-word-saved="true" data-memory-level="3">stable</button> revenue. The model can <button class="reader-inline-source" data-word-saved="true" data-memory-level="1">increase</button> convenience, strengthen <button class="reader-inline-source" data-word-saved="true" data-memory-level="2">loyalty</button>, and support <button class="reader-inline-source" data-word-saved="true" data-memory-level="3">personalization</button>. Customers <button class="reader-inline-source" data-word-saved="true" data-memory-level="1">prioritize</button> access over <button class="reader-inline-source" data-word-saved="true" data-memory-level="2">ownership</button>, while providers <button class="reader-inline-source" data-word-saved="true" data-memory-level="3">maintain</button> long-term relationships and deliver <button class="reader-inline-source" data-word-saved="true" data-memory-level="1">continuous</button> updates across <button class="reader-inline-source" data-word-saved="true" data-memory-level="2">industries</button> and digital <button class="reader-inline-source" data-word-saved="true" data-memory-level="3">platforms</button>.</p></div></article>
+    </section>
+
+    <section class="preview-section"><div class="preview-section-head"><p class="preview-eyebrow">09 / Return motion</p><div><h2>560ms opacity dissolve</h2><p>10초 뒤 영어로 돌아올 때 레이아웃은 고정하고, midpoint에서만 아주 약하게 흐려진다. reduced motion에서는 즉시 복원된다.</p></div></div><div class="motion-track"><div class="motion-frame">서비스를 구독함으로써</div><span class="motion-arrow">0ms →</span><div class="motion-frame mid">서비스를 구독함으로써</div><span class="motion-arrow">280ms →</span><div class="motion-frame">by subscribing to the service</div></div></section>
+
+    <section class="preview-section" id="review"><div class="preview-section-head"><p class="preview-eyebrow">10–11 / Word Review</p><div><h2>Count를 숨기지 않는 관리 화면</h2><p>Lemma → core meaning → memory level 순서다. 펼친 문맥은 얇은 divider와 compact row로 읽는다.</p></div></div>
+      <div class="review-preview word-review-dashboard">
+        <nav class="word-review-nav" aria-label="Review categories"><button class="word-review-tab is-active" aria-current="page"><span>WORD</span><b>127</b></button><button class="word-review-tab"><span>SENTENCE</span><b>18</b></button><button class="word-review-tab"><span>WORKBOOK</span><b>7</b></button><button class="word-review-tab"><span>QUESTION</span><b>4</b></button></nav>
+        <div class="word-review-list">
+          <article class="word-review-item"><div class="word-review-summary"><strong class="word-review-lemma">maintain</strong><span class="word-review-meaning">유지하다</span><span class="word-review-memory">LEVEL 2</span><button class="word-review-expand" aria-label="maintain 더보기">＋</button></div></article>
+          <article class="word-review-item is-expanded"><div class="word-review-summary"><strong class="word-review-lemma">subscribe</strong><span class="word-review-meaning">구독하다</span><span class="word-review-memory">LEVEL 3</span><button class="word-review-expand" aria-label="subscribe 접기">−</button></div><div class="word-review-detail"><div class="word-review-core-controls"><strong>CORE MEANING · 구독하다</strong><div class="word-review-actions"><button class="word-review-action">뜻 추가</button><button class="word-review-action">뜻 삭제</button><button class="word-review-action is-destructive">저장 제거</button></div></div><div class="word-context-history"><div class="word-context-row"><p class="word-context-en">by subscribing to the service</p><p class="word-context-ko">서비스를 구독함으로써 …<span class="word-context-gloss">문맥 뜻 · 서비스를 구독함으로써</span></p></div><div class="word-context-row"><p class="word-context-en">users subscribe to regular updates</p><p class="word-context-ko">사용자들은 정기 업데이트를 …<span class="word-context-gloss">문맥 뜻 · 구독한다</span></p></div></div></div></article>
+        </div>
+      </div>
+    </section>
+
+    <section class="preview-section" id="responsive"><div class="preview-section-head"><p class="preview-eyebrow">12 / Mobile + dark</p><div><h2>좁고 어두워도 본문이 우선</h2><p>390px, dark mode, large-text에 가까운 크기를 함께 압박한다. 긴 gloss는 자르지 않고 reflow한다.</p></div></div>
+      <div class="device-grid">
+        <article class="device"><header class="device-bar"><span>390 × 844</span><span>LIGHT / LARGE TEXT</span></header><iframe class="mobile-frame" src="word-learning-mobile-frame.html" title="READY Word Learning mobile preview"></iframe></article>
+        <article class="device dark-surface"><header class="device-bar"><span>DESKTOP READER</span><span>DARK</span></header><div class="device-content"><p>Customers can benefit <span class="reader-inline-replacement" data-word-saved="true"><button class="reader-inline-gloss">서비스를 구독함으로써</button><button class="reader-inline-save-toggle" data-word-saved="true">−</button></span> instead of buying every item.</p><p>Saved words stay quiet: <button class="reader-inline-source" data-word-saved="true" data-memory-level="1">updates</button>, <button class="reader-inline-source" data-word-saved="true" data-memory-level="2">content</button>, and <button class="reader-inline-source" data-word-saved="true" data-memory-level="3">support</button>.</p><p>Active lookup remains distinct: <button class="reader-inline-source is-pending">personalization</button>.</p></div></article>
+      </div>
+    </section>
+    <footer class="preview-footer"><span>READY Word Learning · visual/UI pass</span><span>CSS / TOKENS / ARTIFACTS ONLY</span></footer>
+  </main>
+</body>
+</html>
