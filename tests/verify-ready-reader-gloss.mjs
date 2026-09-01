@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {resolve,dirname} from 'node:path';
 import {fileURLToPath} from 'node:url';
-import {clearReaderGlossMemory,rangesOverlap,readerGlossCacheKey,readerSentenceMarkup,resolveReaderGlossCached,validReaderGlossResult} from '../ready/reader-inline-gloss.js';
+import {clearReaderGlossMemory,deleteReaderGlossCache,rangesOverlap,readerGlossCacheKey,readerSentenceMarkup,resolveReaderGlossCached,validReaderGlossResult} from '../ready/reader-inline-gloss.js';
 
 const root=resolve(dirname(fileURLToPath(import.meta.url)),'..'),read=path=>readFileSync(resolve(root,path),'utf8');
 const store=new Map();globalThis.localStorage={getItem:key=>store.get(key)??null,setItem:(key,value)=>store.set(key,value),removeItem:key=>store.delete(key)};
@@ -12,6 +12,7 @@ assert(validReaderGlossResult(phrase,{sentenceId:sentence.id,text:sentence.text}
 assert(!validReaderGlossResult({...phrase,end:16},{sentenceId:sentence.id,text:sentence.text}),'Drifted resolver range must be rejected');
 const phraseHtml=readerSentenceMarkup(sentence,[phrase]);
 assert.match(phraseHtml,/class="reader-inline-replacement"[\s\S]*data-reader-gloss-reset="5:17"[\s\S]*구독하다/,'Phrase must directly replace its exact English span with a restorable block');
+assert.match(phraseHtml,/data-reader-gloss-retry="5:17"[\s\S]*다른 뜻 다시 찾기/,'Resolved gloss must expose a separate retry action');
 assert.doesNotMatch(phraseHtml.replace(/<[^>]+>/g,''),/subscribe to/,'Replaced English must not remain visible');
 const multiple=readerSentenceMarkup(sentence,[phrase,{resolved:true,sentenceId:sentence.id,start:22,end:27,sourceText:'music',gloss:'음악',lemma:'music',kind:'word',confidence:.98}]);
 assert.match(multiple,/구독하다[\s\S]*음악/,'Non-overlapping replacements must coexist');
@@ -21,6 +22,7 @@ clearReaderGlossMemory();store.clear();const key=readerGlossCacheKey({passageId:
 const request=()=>{calls+=1;return Promise.resolve({resolved:true,sentenceId:'s',start:0,end:4,sourceText:'They',gloss:'그들은',lemma:'they',kind:'word',confidence:.99});};
 const [first,second]=await Promise.all([resolveReaderGlossCached(key,request),resolveReaderGlossCached(key,request)]);assert.equal(calls,1,'Concurrent identical lookups must deduplicate');assert.deepEqual(first,second);
 clearReaderGlossMemory();const cached=await resolveReaderGlossCached(key,()=>{throw new Error('offline cache miss');});assert.equal(cached.gloss,'그들은','Local revision cache must work offline');
+deleteReaderGlossCache(key);const refreshed=await resolveReaderGlossCached(key,request);assert.equal(refreshed.gloss,'그들은');assert.equal(calls,2,'Retry must invalidate both memory and local caches');
 const nextRevision=readerGlossCacheKey({passageId:'p',revision:'r2',sentenceId:'s',start:0,end:4,sourceText:'They'});assert.notEqual(key,nextRevision,'Passage revision must invalidate cache keys');
 
 const app=read('ready/app.js'),glossModule=read('ready/reader-inline-gloss.js'),edge=read('server/ready/index.ts'),css=read('ready/design.css');
@@ -32,9 +34,14 @@ assert.match(edge,/sentence\.slice\(start,end\)!==surfaceText/,'Server must reje
 assert.match(edge,/confidence>=0\.85[\s\S]*matches\.length===1/,'Phrase expansion must require high confidence and one exact containing span');
 assert.match(glossModule,/accepted:true[\s\S]*redraw\(sentenceId\)[\s\S]*READER_GLOSS_LOADING_DELAY_MS/,'Accepted taps must paint before the delayed network state');
 assert.match(glossModule,/if\(!online\(\)\)[\s\S]*오프라인에서는 단어 뜻을 불러올 수 없어요/,'Offline cache misses must preserve English and show a short local notice');
+assert.match(glossModule,/retry:true,previousGloss:replacement\.gloss/,'Retry must request an alternate gloss using the currently shown meaning');
+assert.match(glossModule,/replacement\.lookupRequest/,'Phrase retries must preserve the original clicked word range');
+assert.match(edge,/다른 자연스러운 뜻이 없다면 정확성을 위해 기존 뜻을 유지하세요/,'Retry must prefer an alternate without inventing an inaccurate meaning');
 assert.match(css,/reader-inline-source\.is-pending[\s\S]*box-shadow:inset/,'Reader pending feedback must fill the rectangular token box');
 assert.doesNotMatch(css,/reader-gloss-loading|is-loading[^}]*text-decoration/,'Reader loading must not use an underline animation');
 assert.doesNotMatch(css,/reader-inline-source[^}]*text-decoration:(?!none)/,'Reader source states must not use underlines');
-assert.match(css,/reader-inline-replacement\{[\s\S]*display:inline-flex[\s\S]*box-shadow:inset 3px 0 0/,'Resolved gloss must render as a compact READY block');
+assert.match(css,/reader-inline-replacement\{[\s\S]*display:inline-flex[\s\S]*box-shadow:inset 2px 0 0/,'Resolved gloss must render as a compact READY block');
+assert.match(css,/body\[data-ready-mode\] \.reader-inline-gloss\{[^}]*font:inherit[^}]*font-weight:400/,'Korean gloss must inherit the exact English text size and weight');
+assert.match(css,/reader-inline-replacement\.is-refreshing \.reader-inline-retry/,'Retry must have a local loading state');
 assert.match(css,/reader-gloss-dissolve 160ms/);assert.match(css,/@media \(prefers-reduced-motion:reduce\)/);
 console.log('READY Reader inline gloss contract verified');

@@ -10,6 +10,11 @@ export function workbookRecallCue(value,mode){
   return text.match(/[A-Za-z]/)?.[0]?.toLowerCase()||'';
 }
 
+export function workbookSlotCh(value){
+  const width=[...String(value??'').normalize('NFKC')].reduce((sum,character)=>sum+(/[\u1100-\u11ff\u2e80-\u9fff\uac00-\ud7af\uff01-\uff60\uffe0-\uffe6]/u.test(character)?2:character===' '?.65:1),0);
+  return Math.min(72,Math.max(4,Math.ceil(width)));
+}
+
 export function normalizedPrefixSteps(value){
   const text=String(value??'');
   const steps=[];

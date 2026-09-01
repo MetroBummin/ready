@@ -38,3 +38,11 @@ export function gradeLocalWorkbook(contract={},responses=[],{usedFullAnswerHint=
   const completed=slotResults.every(Boolean),correct=completed&&!usedFullAnswerHint;
   return {valid:true,correct,completedAfterHint:completed&&usedFullAnswerHint,answers:correct?[]:answers,slotResults,needsServer:false};
 }
+
+export function revealLocalWorkbook(contract={},responses=[]){
+  if(contract.mode!=='deterministic')return {valid:false,needsServer:true};
+  const answers=list(contract.answers),values=list(responses);
+  if(!answers.length)return {valid:false,needsServer:false};
+  const slotResults=answers.map((answer,index)=>!!String(values[index]??'').trim()&&normalizeDeterministicAnswer(values[index])===normalizeDeterministicAnswer(answer));
+  return {valid:true,correct:false,revealedAnswer:true,answers,slotResults,needsServer:false};
+}

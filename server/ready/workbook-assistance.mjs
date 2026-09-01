@@ -37,9 +37,9 @@ export async function publicWorkbookAssistance(item, sha256Hex, cryptoImpl = glo
   return { mode: 'prefix_typing', slots };
 }
 
-export function stageNineHint(answer, level) {
+export function stageNineHint(answer) {
   const text = String(answer ?? '').trim();
-  if (Number(level) >= 2) return text;
-  const words = text.split(/\s+/).filter(Boolean);
-  return words.length > 1 ? words[0] : (workbookRecallCue(text, 'english_initial') || text.slice(0, 1));
+  const words = text.match(/[A-Za-z]+(?:[’'][A-Za-z]+)*/g) || [];
+  if (words.length) return words.map(word => `${word.slice(0, 1)}…`).join(' ');
+  return `${text.slice(0, 1)}…`;
 }

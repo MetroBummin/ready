@@ -91,11 +91,12 @@ async function callGeminiLook(word: string, clicked: string, sentence: string) {
   throw new ApiError(502, "Gemini 단어 사전을 잠시 사용할 수 없습니다.");
 }
 
-function geminiInlineGlossPrompt(clicked: string, sentence: string) {
+function geminiInlineGlossPrompt(clicked: string, sentence: string, previousGloss = "") {
   return `영어 문장에서 클릭한 단어의 문맥상 뜻을 짧은 한국어로 치환하려고 합니다.
 
 문장: ${sentence}
 클릭한 표면형: ${clicked}
+${previousGloss?`학생이 마음에 들지 않아 다시 요청한 기존 뜻: ${previousGloss}\n- 문맥에 맞는 다른 짧은 뜻이 있으면 그것을 우선하세요. 다른 자연스러운 뜻이 없다면 정확성을 위해 기존 뜻을 유지하세요.`:""}
 
 - gloss: 이 문맥에서만 자연스러운 짧은 한국어 뜻. 설명문 금지
 - lemma: 영어 표제어
@@ -104,12 +105,12 @@ function geminiInlineGlossPrompt(clicked: string, sentence: string) {
 
 {"gloss":"","lemma":"","phrase":"","confidence":0}`;
 }
-async function callGeminiInlineGloss(clicked: string, sentence: string) {
+async function callGeminiInlineGloss(clicked: string, sentence: string, previousGloss = "") {
   const provider=(Deno.env.get("AI_PROVIDER")??"").trim().toLowerCase(),key=Deno.env.get("GEMINI_API_KEY");
   if(provider!=="gemini"||!key)throw new ApiError(503,"Gemini 문맥 뜻풀이가 아직 연결되지 않았습니다.");
   const url=`https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${key}`,base={maxOutputTokens:180,temperature:0.1,responseMimeType:"application/json"};let lastError="";
   for(const generationConfig of [{...base,thinkingConfig:{thinkingBudget:0}},base]){
-    const response=await fetch(url,{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({system_instruction:{parts:[{text:GEMINI_SYSTEM}]},contents:[{role:"user",parts:[{text:geminiInlineGlossPrompt(clicked,sentence)}]}],generationConfig})});
+    const response=await fetch(url,{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({system_instruction:{parts:[{text:GEMINI_SYSTEM}]},contents:[{role:"user",parts:[{text:geminiInlineGlossPrompt(clicked,sentence,previousGloss)}]}],generationConfig})});
     if(response.ok){const payload=await response.json(),text=(payload?.candidates?.[0]?.content?.parts||[]).map((part:{text?:string})=>part?.text||"").join("").trim(),parsed=parseJson(text);if(parsed)return parsed;throw new ApiError(502,"Gemini 문맥 뜻풀이를 읽지 못했습니다.");}
     lastError=(await response.text()).slice(0,300);if(response.status!==400)break;
   }
@@ -815,13 +816,14 @@ async function verifyHintReceipt(token: unknown, expected: any) {
 
 async function workbookHint(body: any, session: ReadySession) {
   const student = await studentForSession(session), examId = required(body.examId, "Exam", 80), passageId = required(body.passageId, "지문", 80), itemKey = required(body.itemKey, "워크북 문제", 120);
-  const passage = await studentPassageAccess(examId, passageId, student), catalog = workbookForPassage(passage), item = workbookItem(catalog, itemKey), slot = Number(body.slot);
-  if (!catalog || !item || Number(item.stage) !== 9 || !Number.isInteger(slot) || slot < 0 || slot >= item.answers.length) throw new ApiError(404, "현재 힌트를 제공할 수 없는 빈칸입니다.");
+  const passage = await studentPassageAccess(examId, passageId, student), catalog = workbookForPassage(passage), item = workbookItem(catalog, itemKey);
+  const requestedSlots = [...new Set((Array.isArray(body.slots) ? body.slots : [body.slot]).map(Number).filter(slot => Number.isInteger(slot) && slot >= 0 && slot < (item?.answers?.length || 0)))];
+  if (!catalog || !item || Number(item.stage) !== 9 || !requestedSlots.length) throw new ApiError(404, "현재 힌트를 제공할 수 없는 빈칸입니다.");
   const identity = { studentId: student.id, examId, passageId, itemKey }, prior = body.hintReceipt ? await verifyHintReceipt(body.hintReceipt, identity) : null;
   if (body.hintReceipt && !prior) throw new ApiError(400, "힌트 상태를 다시 시작해 주세요.");
-  const hintCount = Math.min(2, Number(prior?.hintCount || 0) + 1), usedFullAnswerHint = hintCount >= 2;
+  const hintCount = 1, usedFullAnswerHint = false;
   const hintReceipt = await signHintReceipt({ ...identity, hintCount, usedFullAnswerHint, issuedAt: new Date().toISOString() });
-  return { slot, level: hintCount, fragment: stageNineHint(item.answers[slot], hintCount), hintCount, usedFullAnswerHint, hintReceipt };
+  return { fragments: requestedSlots.map(slot => ({ slot, fragment: stageNineHint(item.answers[slot]) })), hintCount, usedFullAnswerHint, hintReceipt };
 }
 async function setWorkbookBookmark(body: any, session: ReadySession) {
   const student = await studentForSession(session), examId = required(body.examId, "Exam", 80), passageId = required(body.passageId, "지문", 80), itemKey = required(body.itemKey, "워크북 문제", 120), bookmarked = body.bookmarked === true;
@@ -840,19 +842,20 @@ async function submitWorkbookAttempt(body: any, session: ReadySession) {
   const student = await studentForSession(session), examId = required(body.examId, "Exam", 80), passageId = required(body.passageId, "지문", 80), itemKey = required(body.itemKey, "워크북 문제", 120);
   const passage = await studentPassageAccess(examId, passageId, student), catalog = workbookForPassage(passage), item = workbookItem(catalog, itemKey);
   if (!catalog || !item) throw new ApiError(404, "현재 풀 수 없는 워크북 문제입니다.");
-  const responses = cleanList(body.responses, 80, 1_000);
-  if (responses.length !== item.answers.length) throw new ApiError(400, "모든 빈칸을 입력해 주세요.");
-  let slotResults = responses.map((response, index) => normalizeWorkbookAnswer(response) === normalizeWorkbookAnswer(item.answers[index])), correct = slotResults.every(Boolean), aiFeedback = "", aiFeedbackLines: string[] = [], aiScore: number | null = null, gradingPolicy: string | null = null, aiRequestId: string | null = null;
+  const revealedAnswer = body.revealAnswer === true, rawResponses = Array.isArray(body.responses) ? body.responses : [];
+  const responses = revealedAnswer ? Array.from({ length: item.answers.length }, (_, index) => clean(rawResponses[index], 1_000)) : cleanList(rawResponses, 80, 1_000);
+  if (!revealedAnswer && responses.length !== item.answers.length) throw new ApiError(400, "모든 빈칸을 입력해 주세요.");
+  let slotResults = responses.map((response, index) => !!response && normalizeWorkbookAnswer(response) === normalizeWorkbookAnswer(item.answers[index])), correct = !revealedAnswer && slotResults.every(Boolean), aiFeedback = "", aiFeedbackLines: string[] = [], aiScore: number | null = null, gradingPolicy: string | null = null, aiRequestId: string | null = null;
   let hintCount = 0, usedFullAnswerHint = false, completedAfterHint = false;
   if (Number(item.stage) === 9 && body.hintReceipt) {
     const hintState = await verifyHintReceipt(body.hintReceipt, { studentId: student.id, examId, passageId, itemKey });
     if (!hintState) throw new ApiError(400, "힌트 상태를 확인할 수 없습니다. 다시 시도해 주세요.");
     hintCount = Math.min(2, Math.max(0, Number(hintState.hintCount) || 0));
-    usedFullAnswerHint = hintState.usedFullAnswerHint === true || hintCount >= 2;
+    usedFullAnswerHint = revealedAnswer || hintState.usedFullAnswerHint === true || hintCount >= 2;
     completedAfterHint = correct && usedFullAnswerHint;
     if (usedFullAnswerHint) correct = false;
   }
-  if(item.kind==="translation_ai"){
+  if(item.kind==="translation_ai"&&!revealedAnswer){
     const today = new Date(); today.setHours(0, 0, 0, 0);
     const used = await db.from("ready_workbook_ai_grading_requests").select("id", { count: "exact", head: true }).eq("student_id", student.id).gte("created_at", today.toISOString());
     if (used.error) throw new ApiError(500, used.error.message);
@@ -872,7 +875,7 @@ async function submitWorkbookAttempt(body: any, session: ReadySession) {
   }
   const inserted = rows<any>(await db.from("ready_workbook_attempts").insert({
     student_id: student.id, exam_id: examId, passage_id: passageId, workbook_key: catalog.workbookKey,
-    item_key: item.key, stage: item.stage, response: { responses }, correct, ai_grading_request_id: aiRequestId,
+    item_key: item.key, stage: item.stage, response: { responses, revealedAnswer }, correct, ai_grading_request_id: aiRequestId,
     hint_count: hintCount, used_full_answer_hint: usedFullAnswerHint, completed_after_hint: completedAfterHint,
   }).select("id,correct,created_at").single());
   if (!correct) {
@@ -884,7 +887,7 @@ async function submitWorkbookAttempt(body: any, session: ReadySession) {
   }
   const bookmark = await db.from("ready_workbook_bookmarks").select("item_key").eq("student_id", student.id).eq("exam_id", examId).eq("passage_id", passageId).eq("workbook_key", catalog.workbookKey).eq("item_key", item.key).maybeSingle();
   if (bookmark.error) throw new ApiError(500, bookmark.error.message);
-  return { attempt: inserted, correct, answers: correct ? [] : item.answers, slotResults, aiFeedback, aiFeedbackLines, aiScore, gradingPolicy, aiRequestId, hintCount, usedFullAnswerHint, completedAfterHint, bookmarked: !!bookmark.data, reviewCount: (await eligibleReviewQuestionIds(student.id, examId)).length + await workbookReviewCount(student.id, examId) };
+  return { attempt: inserted, correct, revealedAnswer, answers: correct ? [] : item.answers, slotResults, aiFeedback, aiFeedbackLines, aiScore, gradingPolicy, aiRequestId, hintCount, usedFullAnswerHint, completedAfterHint, bookmarked: !!bookmark.data, reviewCount: (await eligibleReviewQuestionIds(student.id, examId)).length + await workbookReviewCount(student.id, examId) };
 }
 function normalizedWord(value: unknown) { return clean(value, 100).toLowerCase().replace(/[^a-z']/g, "").replace(/^'+|'+$/g, ""); }
 async function studyContext(body: any, session: ReadySession, sentenceRequired = false) { const student = await studentForSession(session), examId = required(body.examId, "Exam", 80), passageId = required(body.passageId, "지문", 80), passage = await studentPassageAccess(examId, passageId, student), sentenceId = clean(body.sentenceId, 80); let sentence:any = null; if (sentenceRequired || sentenceId) { sentence = rows<any>(await db.from("ready_passage_sentences").select("id,text,translation").eq("id", required(sentenceId, "문장", 80)).eq("passage_id", passage.id).single()); } return { student, examId, passage, sentence }; }
@@ -929,7 +932,7 @@ async function readerInlineGloss(body:any,session:ReadySession){
   if(requestedRevision&&requestedRevision!==clean(context.passage.updated_at,100))throw new ApiError(409,"지문이 수정되었습니다. 다시 열어 주세요.");
   if(!/^[A-Za-z]+(?:[’'][A-Za-z]+)*$/.test(surfaceText))throw new ApiError(400,"영어 단어만 뜻을 볼 수 있습니다.");
   const today=new Date();today.setHours(0,0,0,0);const used=await db.from("ready_word_lookup_events").select("id",{count:"exact",head:true}).eq("student_id",context.student.id).gte("created_at",today.toISOString());if(used.error)throw new ApiError(500,used.error.message);if((used.count||0)>=AI_DAILY_LIMIT)throw new ApiError(429,`오늘 Gemini 문맥 뜻풀이 ${AI_DAILY_LIMIT}회를 모두 사용했습니다.`);
-  const ai=await callGeminiInlineGloss(surfaceText,sentence),confidence=Math.max(0,Math.min(1,Number(ai.confidence)||0)),gloss=clean(ai.gloss,30),root=clean(ai.lemma,100)||lemma(surfaceText),phrase=clean(ai.phrase,100);let resolvedStart=start,resolvedEnd=end,kind="word";
+  const previousGloss=body.retry?clean(body.previousGloss,30):"",ai=await callGeminiInlineGloss(surfaceText,sentence,previousGloss),confidence=Math.max(0,Math.min(1,Number(ai.confidence)||0)),gloss=clean(ai.gloss,30),root=clean(ai.lemma,100)||lemma(surfaceText),phrase=clean(ai.phrase,100);let resolvedStart=start,resolvedEnd=end,kind="word";
   if(phrase&&confidence>=0.85){const folded=sentence.toLocaleLowerCase(),needle=phrase.toLocaleLowerCase(),matches=[];let offset=0;while((offset=folded.indexOf(needle,offset))>=0){const phraseEnd=offset+phrase.length;if(offset<=start&&phraseEnd>=end)matches.push({start:offset,end:phraseEnd});offset+=Math.max(1,needle.length);}if(matches.length===1){resolvedStart=matches[0].start;resolvedEnd=matches[0].end;kind="phrase";}}
   const resolved=confidence>=0.65&&!!gloss,sourceText=sentence.slice(resolvedStart,resolvedEnd);const event=await db.from("ready_word_lookup_events").insert({student_id:context.student.id,exam_id:context.examId,passage_id:context.passage.id,sentence_id:context.sentence.id,surface_word:surfaceText,normalized_word:lemma(surfaceText),source_text_snapshot:resolved?sourceText:surfaceText,start_offset:resolved?resolvedStart:start,end_offset:resolved?resolvedEnd:end,gloss_snapshot:resolved?gloss:null,lemma_snapshot:root,lookup_kind:resolved?kind:"word",confidence,passage_revision:context.passage.updated_at});if(event.error)throw new ApiError(500,event.error.message);
   return resolved?{resolved:true,sentenceId:context.sentence.id,start:resolvedStart,end:resolvedEnd,sourceText,gloss,lemma:root,kind,confidence}:{resolved:false,sentenceId:context.sentence.id,start,end,sourceText:surfaceText,confidence};

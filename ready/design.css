@@ -314,32 +314,29 @@ body[data-ready-mode="student"] .reading-passage{margin:0;color:var(--ready-body
 .reader-inline-notice{position:fixed;z-index:30;right:max(16px,env(safe-area-inset-right));bottom:max(18px,calc(env(safe-area-inset-bottom) + 12px));max-width:min(360px,calc(100vw - 32px));margin:0;padding:10px 12px;border:1px solid var(--ready-hairline);border-radius:0;color:var(--ready-body);background:var(--ready-surface);box-shadow:var(--shadow-sheet);font-size:12px;line-height:1.45}
 .reader-inline-replacement{
   display:inline-flex;
-  min-height:1.55em;
+  min-height:1.32em;
   align-items:center;
-  gap:.14em;
-  margin:-.14em .08em;
-  padding:.08em .18em .08em .38em;
+  gap:.05em;
+  margin:-.08em .06em;
+  padding:.02em .08em .02em .28em;
   border:1px solid color-mix(in srgb,var(--ready-primary) 38%,var(--ready-hairline));
   border-radius:var(--ready-radius-xs);
   color:var(--ready-primary);
   background:color-mix(in srgb,var(--ready-primary) 11%,var(--ready-surface));
-  box-shadow:inset 3px 0 0 var(--ready-primary);
-  font:inherit;
-  font-weight:760;
-  line-height:1.15;
-  letter-spacing:inherit;
-  text-align:inherit;
+  box-shadow:inset 2px 0 0 var(--ready-primary);
   vertical-align:.06em;
   white-space:nowrap;
-  cursor:pointer;
 }
 .reader-inline-replacement:hover{border-color:color-mix(in srgb,var(--ready-primary) 62%,var(--ready-hairline));background:color-mix(in srgb,var(--ready-primary) 16%,var(--ready-surface))}
-.reader-inline-replacement:focus-visible{outline:2px solid var(--ready-focus);outline-offset:2px}
-.reader-inline-gloss{display:inline;line-height:1.15}
-.reader-inline-reset{display:inline-grid;width:1.15em;height:1.15em;place-items:center;color:color-mix(in srgb,var(--ready-primary) 70%,var(--ready-muted));font:750 .72em/1 var(--ready-font-sans)}
+body[data-ready-mode] .reader-inline-gloss{display:inline;margin:0;padding:0;border:0;color:inherit;background:transparent;font:inherit;font-weight:400;line-height:1.25;letter-spacing:inherit;cursor:pointer}
+body[data-ready-mode] .reader-inline-retry{display:inline-grid;width:1.45em;height:1.45em;place-items:center;margin:0;padding:0;border:0;border-radius:50%;color:color-mix(in srgb,var(--ready-primary) 58%,var(--ready-muted));background:transparent;font:700 .62em/1 var(--ready-font-sans);cursor:pointer}
+.reader-inline-gloss:focus-visible,.reader-inline-retry:focus-visible{outline:2px solid var(--ready-focus);outline-offset:1px}
+.reader-inline-retry:hover{color:var(--ready-primary);background:color-mix(in srgb,var(--ready-primary) 10%,transparent)}
+.reader-inline-replacement.is-refreshing .reader-inline-retry{animation:reader-gloss-retry 900ms linear infinite}
+@keyframes reader-gloss-retry{to{transform:rotate(1turn)}}
 .reader-inline-dissolve{animation:reader-gloss-dissolve 160ms ease-out both}
 @keyframes reader-gloss-dissolve{from{opacity:.3;filter:blur(1.5px);transform:translateY(1px)}to{opacity:1;filter:blur(0);transform:translateY(0)}}
-@media (prefers-reduced-motion:reduce){.reader-inline-dissolve{animation-name:reader-gloss-fade;animation-duration:160ms}.reader-inline-dissolve.reduced-motion{animation-name:reader-gloss-fade}@keyframes reader-gloss-fade{from{opacity:.45}to{opacity:1}}}
+@media (prefers-reduced-motion:reduce){.reader-inline-dissolve{animation-name:reader-gloss-fade;animation-duration:160ms}.reader-inline-dissolve.reduced-motion{animation-name:reader-gloss-fade}.reader-inline-replacement.is-refreshing .reader-inline-retry{animation:none}@keyframes reader-gloss-fade{from{opacity:.45}to{opacity:1}}}
 
 /* Question renderer: keep contract-shaped DOM, restyle rows and states. */
 body[data-ready-mode="student"] .question-layout{width:min(100%,880px);margin:0 auto}
@@ -523,7 +520,9 @@ body[data-ready-mode="student"] .question-passage .reading-sentence{display:inli
 .workbook-card blockquote,.workbook-task-passage{margin:0 0 var(--ready-space-5);padding:var(--ready-space-4);border:0;border-left:2px solid var(--ready-ink);border-radius:0;color:var(--ready-body);background:var(--ready-canvas-quiet);font-size:16px;line-height:1.7;overflow-wrap:anywhere}
 .workbook-prompt{min-width:0;color:var(--ready-ink);font-size:16px;font-weight:500;line-height:1.8;overflow-wrap:anywhere}
 .workbook-blank{display:inline-grid;width:auto;min-width:0;gap:3px;margin:0 3px;vertical-align:middle}
-body[data-ready-mode] .workbook-blank input{box-sizing:border-box;width:calc(var(--workbook-slot-ch,8)*1ch + 28px);min-width:56px;max-width:220px;min-height:34px;height:34px;padding:2px 7px;border:0;border-bottom:2px solid var(--ready-ink);border-radius:0;background:var(--ready-canvas-quiet);font-size:15px;text-align:center}
+body[data-ready-mode] .workbook-blank input{box-sizing:border-box;width:calc(var(--workbook-slot-ch,8)*1ch + 28px);min-width:56px;max-width:320px;min-height:34px;height:34px;padding:2px 7px;border:0;border-bottom:2px solid var(--ready-ink);border-radius:0;background:var(--ready-canvas-quiet);font-size:15px;text-align:center}
+.workbook-blank.long-slot{width:min(100%,calc(var(--workbook-slot-ch)*1ch + 28px));margin-block:6px}
+body[data-ready-mode] .workbook-blank.long-slot input{width:100%;max-width:none;text-align:left}
 .workbook-blank input::placeholder{color:var(--ready-body);opacity:.72}
 .workbook-blank input:focus::placeholder{color:transparent}
 .workbook-blank.correct input{border-color:var(--ready-success);background:var(--ready-success-soft)}
@@ -534,10 +533,9 @@ body[data-ready-mode] .workbook-blank input{box-sizing:border-box;width:calc(var
 .workbook-live-copy,.workbook-slot-hint{grid-column:1;color:var(--ready-muted);font-size:11px;font-weight:650;line-height:1.35;text-align:left}
 .workbook-live-copy b{color:var(--ready-error)}
 .workbook-slot-hint{color:var(--ready-primary)}
-.workbook-hint-actions{display:flex;align-items:center;gap:var(--ready-space-3);margin-top:var(--ready-space-4)}
-.workbook-hint-actions small{color:var(--ready-muted);font-size:12px;line-height:1.45}
 .workbook-feedback{display:flex;gap:var(--ready-space-2);margin-top:var(--ready-space-5);padding:var(--ready-space-3) 0;border-top:2px solid currentColor;border-radius:0;font-size:13px;line-height:1.5}
 .workbook-feedback-copy{display:grid;gap:2px}
+.workbook-revealed-answer{margin-bottom:4px;color:var(--ready-ink);font-size:15px;font-weight:650;line-height:1.65}
 .workbook-feedback.correct{color:var(--ready-success);background:transparent}.workbook-feedback.wrong{color:var(--ready-error);background:transparent}
 .workbook-actions{display:flex;justify-content:flex-end;gap:var(--ready-space-2);margin-top:var(--ready-space-5)}
 .workbook-actions .button{min-width:112px}.workbook-nav{display:flex;justify-content:space-between;margin-top:var(--ready-space-4)}
@@ -556,6 +554,8 @@ body[data-ready-mode] .workbook-correction-row input{min-height:36px;height:36px
 .workbook-correction-row.correct{background:var(--ready-success-soft)}.workbook-correction-row.wrong{background:var(--ready-error-soft)}
 .workbook-order-group{display:inline-flex;width:100%;max-width:100%;gap:var(--ready-space-3);margin:var(--ready-space-3) 0 0;padding:0;border:0;background:transparent;vertical-align:middle;flex-direction:column}
 .workbook-state{display:flex;align-items:center;gap:var(--ready-space-2)}.workbook-state>b{font:750 13px/1 var(--ready-font-mono)}.workbook-state .question-bookmark{width:32px;height:32px}
+.workbook-answer-action{min-height:32px;padding:4px 7px;border:0;border-radius:var(--ready-radius-xs);color:var(--ready-muted);background:transparent;font:700 12px/1.2 var(--ready-font-sans);cursor:pointer}
+.workbook-answer-action:hover,.workbook-answer-action:focus-visible{color:var(--ready-ink);background:var(--ready-canvas-quiet)}
 .workbook-order-built,.workbook-order-bank{display:flex;flex-wrap:wrap;gap:var(--ready-space-2);align-items:center}.workbook-order-bank-slot{display:inline-flex;min-height:36px}.workbook-order-bank-slot.used{visibility:hidden;pointer-events:none}
 .workbook-translation{display:grid;gap:var(--ready-space-2);color:var(--ready-muted);font-size:12px;font-weight:750}.workbook-translation textarea{width:100%;min-height:84px;padding:10px;border:1px solid var(--ready-hairline-strong);color:var(--ready-ink);background:var(--ready-canvas-quiet);font:500 15px/1.55 var(--ready-font-sans);resize:vertical}.workbook-word-bank{display:flex;flex-wrap:wrap;gap:var(--ready-space-1);align-items:center;margin:0 0 var(--ready-space-4)}.workbook-word-bank small{margin-right:var(--ready-space-2);color:var(--ready-muted);font-weight:750}.workbook-word-bank span{padding:5px 8px;border:1px solid var(--ready-hairline);background:var(--ready-canvas-quiet);font-size:13px}
 .workbook-order-built{box-sizing:border-box;width:100%;min-width:0;min-height:68px;padding:8px 0 12px;border-bottom:1px solid var(--ready-hairline-strong)}

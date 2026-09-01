@@ -8,9 +8,9 @@ import { validateQuestionSpec } from '../server/ready/question-spec.mjs';
 import { compileAndValidateInteraction, compileInteractionContract } from '../tools/ready-interaction-contract.mjs';
 import { contractChoiceCopyHtml, contractPassageHtml, contractRenderCounts, contractResponseComplete } from '../ready/interaction-runtime.js';
 import { WORKBOOK_TRANSLATION_GRADING_POLICY, workbookTranslationPass } from '../server/ready/workbook-grading-policy.mjs';
-import { normalizeWorkbookAnswer as normalizeWorkbookAnswerClient, livePrefixState, workbookRecallCue as workbookRecallCueClient } from '../ready/workbook-assistance.js';
+import { normalizeWorkbookAnswer as normalizeWorkbookAnswerClient, livePrefixState, workbookRecallCue as workbookRecallCueClient, workbookSlotCh } from '../ready/workbook-assistance.js';
 import { normalizeWorkbookAnswer as normalizeWorkbookAnswerServer, publicWorkbookAssistance, stageNineHint, workbookAssistanceMode, workbookRecallCue as workbookRecallCueServer } from '../server/ready/workbook-assistance.mjs';
-import { gradeLocalQuestion, gradeLocalWorkbook, normalizeDeterministicAnswer } from '../ready/deterministic-grading.js';
+import { gradeLocalQuestion, gradeLocalWorkbook, normalizeDeterministicAnswer, revealLocalWorkbook } from '../ready/deterministic-grading.js';
 
 const root=resolve(dirname(fileURLToPath(import.meta.url)),'..');
 const read=path=>readFileSync(resolve(root,path),'utf8');
@@ -29,6 +29,10 @@ assert.equal(normalizeWorkbookAnswerClient(' While  scrolling! '),normalizeWorkb
 assert.equal(workbookRecallCueClient('퍼지고 있다','korean_syllable'),'퍼');
 assert.equal(workbookRecallCueServer('퍼지고 있다','korean_syllable'),'퍼');
 assert.equal(workbookRecallCueClient('turned out','english_initial'),'t');
+assert.equal(workbookSlotCh('revenue'),7);
+assert.equal(workbookSlotCh('학술 강의'),9);
+assert.equal(workbookSlotCh('personalization'),15);
+assert.equal(workbookSlotCh('will be continuously provided'),28);
 assert.equal(normalizeDeterministicAnswer(' While  scrolling! '),'while scrolling');
 assert.deepEqual(workbookAssistanceMode({stage:2}),{mode:'recall_local',recallMode:'korean_syllable'});
 assert.deepEqual(workbookAssistanceMode({stage:3}),{mode:'recall_local',recallMode:'english_initial'});
@@ -37,9 +41,9 @@ assert.deepEqual(await livePrefixState('While scrol',prefixContract.slots[0]),{v
 assert.deepEqual(await livePrefixState('While scrolx',prefixContract.slots[0]),{valid:false,mismatchIndex:11,complete:false});
 assert.equal((await livePrefixState('While scrolling',prefixContract.slots[0])).complete,true);
 assert.equal(JSON.stringify(prefixContract).includes('while scrolling'),false,'Prefix contract must not expose the answer');
-assert.equal(stageNineHint('provocative false stories',1),'provocative');
-assert.equal(stageNineHint('provocative false stories',2),'provocative false stories');
-assert.equal(stageNineHint('provocative',1),'p');
+assert.equal(stageNineHint('provocative false stories'),'p… f… s…');
+assert.equal(stageNineHint('While scrolling'),'W… s…');
+assert.equal(stageNineHint('provocative'),'p…');
 
 function objective(overrides={}){
   const payload={
@@ -121,6 +125,7 @@ assert.equal(gradeLocalQuestion(writtenClientContract,{responses:['The police de
 assert.equal(gradeLocalQuestion(writtenClientContract,{responses:['A different answer','to find clues in the picture']}).needsServer,true,'Non-exact writing must stay on the AI slow path');
 assert.deepEqual(gradeLocalWorkbook({mode:'deterministic',answers:['퍼지고 있다']},['퍼지고 있다']),{valid:true,correct:true,completedAfterHint:false,answers:[],slotResults:[true],needsServer:false});
 assert.equal(gradeLocalWorkbook({mode:'deterministic',answers:['While scrolling']},['While scrolling'],{usedFullAnswerHint:true}).correct,false,'Full-answer hints must remain wrong in the local fast path');
+assert.deepEqual(revealLocalWorkbook({mode:'deterministic',answers:['stable','revenue']},['stable','']),{valid:true,correct:false,revealedAnswer:true,answers:['stable','revenue'],slotResults:[true,false],needsServer:false});
 
 const passageAnswer=structuredClone(written);
 passageAnswer.prompt='다음 본문을 읽고 영어 질문에 답하시오.';
@@ -208,6 +213,8 @@ assert.match(importer,/reorder_contract\(prompt, groups, reorder_corpus\)/,'Stag
 assert.match(importer,/merge_adjacent_reorder_groups\(prompt, groups\)/,'Stage 8 must merge whitespace-only PDF presentation splits');
 assert.match(importer,/reorder answers do not round-trip to canonical sentence/,'Stage 8 importer must fail closed when its reconstructed sentence drifts');
 assert.match(app,/placeholder="\$\{esc\(hint\|\|'\'\)\}"/,'Stage 5 base verbs must be input placeholders, not exposed labels');
+assert.match(app,/reserved=recall\?item\.grading\?\.answers\?\.\[slot\]/,'Recall slots must reserve the completed answer width before reveal');
+assert.match(app,/function syncWorkbookSlotWidth\(input\)[^\n]*long-slot/,'Typed blank slots must grow and promote long responses to a wide field');
 assert.match(app,/workbook-order-bank-slot \$\{chosenSet\.has\(chipIndex\)\?'used'/,'Stage 8 must preserve every bank slot after selection');
 assert.match(app,/changeWorkbookOrder[\s\S]*refreshWorkbookOrderGroup\(group\)/,'Stage 8 chip changes must locally refresh only their group');
 assert.doesNotMatch(app,/changeWorkbookOrder[^\n]*renderWorkbook\(\)/,'Stage 8 chip changes must not rerender the full Workbook');
@@ -240,6 +247,10 @@ assert.match(app,/cue!==expected[^\n]*composing[^\n]*flashRecallWrong/,'IME comp
 assert.match(app,/flashRecallWrong[\s\S]*220/,'A wrong recall cue must clear after a brief red signal');
 assert.match(app,/data-workbook-live-prefix[\s\S]*workbook-live-copy/,'Stage 9 must show live mismatch feedback without ending the attempt');
 assert.match(app,/hintReceipt[\s\S]*completedAfterHint/,'Stage 9 hint state must survive through final grading');
+assert.match(app,/firstStageNineHint[\s\S]*힌트 보기[\s\S]*정답 보기/,'Stage 9 must promote its single toolbar hint to answer reveal');
+assert.match(app,/data-workbook-reveal[\s\S]*revealWorkbookAnswer/,'Workbook answer reveal must be owned by the focused toolbar action');
+assert.doesNotMatch(app,/workbook-hint-actions/,'Stage 9 hint controls must not remain below the prompt');
+assert.match(edge,/revealedAnswer = body\.revealAnswer === true[\s\S]*correct = !revealedAnswer/,'Answer reveal must be persisted as an explicit wrong attempt');
 assert.match(app,/bookmark-star[\s\S]*★[\s\S]*☆/,'Question and Workbook bookmarks must share star language');
 
 console.log('READY executable Question contract checks passed');
