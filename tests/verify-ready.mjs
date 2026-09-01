@@ -11,6 +11,7 @@ import { WORKBOOK_TRANSLATION_GRADING_POLICY, workbookTranslationPass } from '..
 import { normalizeWorkbookAnswer as normalizeWorkbookAnswerClient, livePrefixState, workbookRecallCue as workbookRecallCueClient, workbookSlotCh } from '../ready/workbook-assistance.js';
 import { normalizeWorkbookAnswer as normalizeWorkbookAnswerServer, publicWorkbookAssistance, stageNineHint, workbookAssistanceMode, workbookRecallCue as workbookRecallCueServer } from '../server/ready/workbook-assistance.mjs';
 import { gradeLocalQuestion, gradeLocalWorkbook, normalizeDeterministicAnswer, revealLocalWorkbook } from '../ready/deterministic-grading.js';
+import { CURRENT_QUESTION_PUBLICATION_VERSION, questionPublicationStatus } from '../server/ready/question-pipeline.mjs';
 
 const root=resolve(dirname(fileURLToPath(import.meta.url)),'..');
 const read=path=>readFileSync(resolve(root,path),'utf8');
@@ -19,6 +20,9 @@ const escape=value=>String(value??'').replace(/[&<>"']/g,character=>({'&':'&amp;
 assert.equal(validPin('1234'),true);
 assert.equal(validPin('123456'),true);
 assert.equal(validPin('123'),false);
+assert.equal(CURRENT_QUESTION_PUBLICATION_VERSION,3);
+assert.equal(questionPublicationStatus({publication_version:3}),'CURRENT');
+assert.equal(questionPublicationStatus({publication_version:2}),'STALE');
 const token=randomSessionToken();
 assert.match(token,/^[A-Za-z0-9_-]{43}$/);
 assert.equal(bearerToken(`Bearer ${token}`),token);
@@ -44,6 +48,18 @@ assert.equal(JSON.stringify(prefixContract).includes('while scrolling'),false,'P
 assert.equal(stageNineHint('provocative false stories'),'p… f… s…');
 assert.equal(stageNineHint('While scrolling'),'W… s…');
 assert.equal(stageNineHint('provocative'),'p…');
+
+const studentHtml=read('ready/index.html'),studentApp=read('ready/app.js'),adminApp=read('ready/admin/app.js'),edgeLoginSource=read('server/ready/index.ts'),codeMigration=read('supabase/migrations/20260902110000_ready_student_login_codes.sql');
+assert.match(studentHtml,/id="student-code-form"/);
+assert.doesNotMatch(studentHtml,/student-list|pin-form|pin-login/,'student identity list and PIN step must not be public');
+assert.doesNotMatch(studentApp,/list_students|set_student_pin|selectedStudent/);
+assert.match(adminApp,/set_student_code/);
+assert.match(edgeLoginSource,/ready_verify_student_code/);
+assert.match(edgeLoginSource,/READY_STUDENT_CODE_PEPPER/,'student code lookup fingerprint must use a dedicated deployment secret');
+assert.doesNotMatch(edgeLoginSource,/case "list_students"/);
+assert.match(codeMigration,/create unique index[\s\S]*login_code_fingerprint/i,'student code uniqueness must be a DB invariant');
+assert.match(codeMigration,/extensions\.crypt\(p_code/,'plaintext student codes must use the existing bcrypt verifier');
+assert.match(codeMigration,/update ready_sessions set revoked_at = now\(\)/,'changing a student code must revoke remembered sessions');
 
 function objective(overrides={}){
   const payload={

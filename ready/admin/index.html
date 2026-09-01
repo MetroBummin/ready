@@ -177,15 +177,16 @@
                   <option value="3학년">3학년</option>
                 </select></label
               ><label
-                ><span>개인 PIN</span
+                ><span>학생 코드</span
                 ><input
-                  name="pin"
+                  name="code"
                   type="password"
                   inputmode="numeric"
-                  pattern="[0-9]{4,6}"
-                  minlength="4"
+                  pattern="[0-9]{6}"
+                  minlength="6"
                   maxlength="6"
                   autocomplete="new-password"
+                  placeholder="직접 정한 6자리"
                   required /></label
               ><button class="button primary" type="submit">학생 추가</button>
             </form>

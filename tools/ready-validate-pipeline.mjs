@@ -6,6 +6,7 @@ import { buildObjectiveSourceContract } from './ready-source-contract.mjs';
 import { applyAnswerKeyWordCounts } from './ready-written-contract.mjs';
 import { compileAndValidateInteraction } from './ready-interaction-contract.mjs';
 import { contractChoiceCopyHtml, contractPassageHtml, contractRenderCounts, contractResponseControlHtml } from '../ready/interaction-runtime.js';
+import { CURRENT_QUESTION_PUBLICATION_VERSION } from '../server/ready/question-pipeline.mjs';
 
 const args=process.argv.slice(2),value=name=>{const index=args.indexOf(name);return index>=0?args[index+1]:'';};
 const input=value('--input'),output=value('--output'),samples=value('--samples'),full=args.includes('--full'),typeFilter=value('--type');
@@ -47,6 +48,7 @@ for(const question of selected){
   errors.push(...renderErrors);
   if(Number(payload.pipeline_contract?.version)!==2)errors.push('block-first pipeline contract v2 is missing');
   const ready=!errors.length;
+  if(ready)payload.publication_version=CURRENT_QUESTION_PUBLICATION_VERSION;
   payload.import_status=ready?'ready':'drop';if(payload.spec)payload.spec.importStatus=payload.import_status;question.status=ready?'available':'draft';
   report.push({source:payload.source,type:question.type,status:ready?'ready':'drop',round_trip:ready?'pass':'drop',errors:[...new Set(errors)]});
 }

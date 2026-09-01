@@ -7,6 +7,12 @@ assert.equal(config.appName, 'READY');
 assert.equal(config.webDir, 'dist');
 assert.equal(config.server?.url, undefined, 'native shell must bundle the same web build, not point at a second runtime');
 
+const packageJson = JSON.parse(await readFile(new URL('../package.json', import.meta.url)));
+assert.match(packageJson.scripts['native:sync'], /native:build/, 'native sync must use the student-only bundle');
+const build = await readFile(new URL('../tools/build-pages.mjs', import.meta.url), 'utf8');
+assert.match(build, /READY_NATIVE_BUILD/);
+assert.match(build, /rm\(resolve\(output, 'admin'\)/, 'native bundle must remove Admin routes and assets');
+
 const info = await readFile(new URL('../ios/App/App/Info.plist', import.meta.url), 'utf8');
 assert.equal((info.match(/UIInterfaceOrientationPortrait/g) || []).length, 2, 'iPhone and iPad should both be portrait-only');
 assert.doesNotMatch(info, /UIInterfaceOrientationLandscape/);

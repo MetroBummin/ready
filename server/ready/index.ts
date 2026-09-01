@@ -2,7 +2,7 @@
 // Custom opaque sessions are validated here. Deploy this Edge Function with JWT verification disabled.
 
 import { createClient } from "jsr:@supabase/supabase-js@2";
-import { bearerToken, randomSessionToken, secureEqual, sha256Hex, validPin } from "./auth-core.mjs";
+import { bearerToken, randomSessionToken, secureEqual, sha256Hex } from "./auth-core.mjs";
 import { lemma, tokenizeSentence } from "./lexical-core.mjs";
 import { NE_MINBYEONGCHEON_L1_WORKBOOK } from "./workbook-ne-l1.mjs";
 import { NE_MINBYEONGCHEON_L2_WORKBOOK } from "./workbook-ne-l2.mjs";
@@ -13,6 +13,7 @@ import { validateQuestionSpec } from "./question-spec.mjs";
 import { deterministicClientContract, deterministicGrade, publicInteractionContract } from "./interaction-contract.mjs";
 import { WORKBOOK_TRANSLATION_GRADING_POLICY, workbookTranslationPass } from "./workbook-grading-policy.mjs";
 import { normalizeWorkbookAnswer, publicWorkbookAssistance, stageNineHint, workbookAssistanceMode } from "./workbook-assistance.mjs";
+import { CURRENT_QUESTION_PUBLICATION_VERSION } from "./question-pipeline.mjs";
 
 const CORS = { "Access-Control-Allow-Origin": "*", "Access-Control-Allow-Headers": "authorization, apikey, content-type, x-client-info", "Access-Control-Allow-Methods": "POST, OPTIONS" };
 const json = (body: unknown, status = 200) => new Response(JSON.stringify(body), { status, headers: { ...CORS, "Content-Type": "application/json", "Cache-Control": "no-store" } });
@@ -25,9 +26,9 @@ function supabaseAdminKey() {
   return Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "";
 }
 const db = createClient(Deno.env.get("SUPABASE_URL") ?? "", supabaseAdminKey(), { auth: { persistSession: false } });
-const adminOps = new Set(["teacher_bootstrap", "delete_impact", "assign_scope_passages", "set_scope_passages", "create_passage", "update_passage", "delete_passage", "create_student", "set_student_pin", "delete_student", "import_questions", "import_explanations"]);
+const adminOps = new Set(["teacher_bootstrap", "delete_impact", "assign_scope_passages", "set_scope_passages", "create_passage", "update_passage", "delete_passage", "create_student", "set_student_code", "delete_student", "import_questions", "import_explanations"]);
 const studentOps = new Set(["student_bootstrap", "student_passage", "word_lookup_meaning", "save_reader_word", "remove_reader_word", "update_reader_word_meaning", "student_questions", "student_question_filters", "student_question_queue", "student_review_questions", "set_question_bookmark", "submit_attempt", "student_workbook", "workbook_assistance", "set_workbook_bookmark", "workbook_hint", "submit_workbook_attempt"]);
-const publicOps = new Set(["list_students", "student_login", "admin_login"]);
+const publicOps = new Set(["student_login", "admin_login"]);
 // Match Breeze's free Gemini dictionary defaults. The API key remains a
 // Supabase Edge Function Secret and is never part of any public response.
 const GEMINI_MODEL = "gemini-3.5-flash-lite";
@@ -234,14 +235,20 @@ async function assertLoginAllowed(identifier: string) {
 async function recordLogin(identifier: string, successful: boolean) { const result = await db.from("ready_login_attempts").insert({ identifier, successful }); if (result.error) console.error("ready_login_attempts:", result.error.message); }
 async function revokeSession(session: ReadySession) { const result = await db.from("ready_sessions").update({ revoked_at: new Date().toISOString() }).eq("id", session.id); if (result.error) throw new ApiError(500, result.error.message); return { loggedOut: true }; }
 
-async function listStudents() { return { students: rows(await db.from("ready_students").select("id,name").eq("active", true).not("pin_hash", "is", null).order("school").order("grade").order("name")) }; }
+function validStudentCode(value:string){return /^\d{6}$/.test(value);}
+async function studentCodeFingerprint(code:string){
+  const pepper=Deno.env.get("READY_STUDENT_CODE_PEPPER")||supabaseAdminKey();
+  const key=await crypto.subtle.importKey("raw",new TextEncoder().encode(`${pepper}:ready-student-code-v1`),{name:"HMAC",hash:"SHA-256"},false,["sign"]);
+  const signature=await crypto.subtle.sign("HMAC",key,new TextEncoder().encode(code));
+  return [...new Uint8Array(signature)].map(value=>value.toString(16).padStart(2,"0")).join("");
+}
+function codeRpcError(error:{message:string}|null){if(!error)return;if(/이미 사용 중인 학생 코드|unique/i.test(error.message))throw new ApiError(409,"이미 사용 중인 학생 코드입니다.");throw new ApiError(500,error.message);}
 async function studentLogin(body: any) {
-  const studentId = required(body.studentId, "학생", 80), pin = clean(body.pin, 10);
-  if (!validPin(pin)) throw new ApiError(400, "PIN은 숫자 4~6자리입니다.");
-  const identifier = `student:${studentId}`; await assertLoginAllowed(identifier);
-  const verified = await db.rpc("ready_verify_student_pin", { p_student_id: studentId, p_pin: pin });
-  if (verified.error) throw new ApiError(500, verified.error.message);
-  const ok = verified.data === true; await recordLogin(identifier, ok); if (!ok) throw new ApiError(401, "PIN이 맞지 않습니다.");
+  const code=clean(body.code,10);if(!validStudentCode(code))throw new ApiError(400,"학생 코드는 숫자 6자리입니다.");
+  const fingerprint=await studentCodeFingerprint(code),identifier=`student-code:${fingerprint.slice(0,16)}`;await assertLoginAllowed(identifier);
+  const verified=await db.rpc("ready_verify_student_code",{p_code_fingerprint:fingerprint,p_code:code});
+  if(verified.error)throw new ApiError(500,verified.error.message);
+  const studentId=clean(verified.data,80),ok=!!studentId;await recordLogin(identifier,ok);if(!ok)throw new ApiError(401,"학생 코드를 확인해 주세요.");
   const student = rows<any>(await db.from("ready_students").select("id,name,school,grade").eq("id", studentId).eq("active", true).single());
   return { session: await createSession("student", student.id, body.remember === true), student };
 }
@@ -252,12 +259,13 @@ async function adminLogin(body: any) {
   return { session: await createSession("admin", null, false) };
 }
 async function createStudent(body: any) {
-  const name = required(body.name, "학생 이름", 40), school = required(body.school, "학교", 80), grade = required(body.grade, "학년", 40), pin = clean(body.pin, 10);
-  if (!validPin(pin)) throw new ApiError(400, "PIN은 숫자 4~6자리여야 합니다.");
-  const result = await db.rpc("ready_create_student", { p_name: name, p_school: school, p_grade: grade, p_pin: pin, p_sort_order: 0 });
+  const name=required(body.name,"학생 이름",40),school=required(body.school,"학교",80),grade=required(body.grade,"학년",40),code=clean(body.code,10);
+  if(!validStudentCode(code))throw new ApiError(400,"학생 코드는 숫자 6자리여야 합니다.");
+  const result=await db.rpc("ready_create_student_with_code",{p_name:name,p_school:school,p_grade:grade,p_code:code,p_code_fingerprint:await studentCodeFingerprint(code),p_sort_order:0});
+  codeRpcError(result.error);
   return { student: rows<any[]>(result)[0] };
 }
-async function setStudentPin(body: any) { const studentId = required(body.studentId, "학생", 80), pin = clean(body.pin, 10); if (!validPin(pin)) throw new ApiError(400, "PIN은 숫자 4~6자리여야 합니다."); const result = await db.rpc("ready_set_student_pin", { p_student_id: studentId, p_pin: pin }); if (result.error) throw new ApiError(500, result.error.message); return { updated: studentId }; }
+async function setStudentCode(body:any){const studentId=required(body.studentId,"학생",80),code=clean(body.code,10);if(!validStudentCode(code))throw new ApiError(400,"학생 코드는 숫자 6자리여야 합니다.");const result=await db.rpc("ready_set_student_code",{p_student_id:studentId,p_code:code,p_code_fingerprint:await studentCodeFingerprint(code)});codeRpcError(result.error);return {updated:studentId};}
 async function countWhere(table: string, column: string, value: string) {
   const result = await db.from(table).select("*", { count: "exact", head: true }).eq(column, value);
   if (result.error) throw new ApiError(500, result.error.message);
@@ -365,6 +373,7 @@ async function importQuestions(body: any) {
     if (validation.errors.length) throw new ApiError(400, `${index + 1}번 문제의 출제 명세가 불완전합니다: ${validation.errors.join(", ")}`);
     if (validation.spec.importStatus === "ready" && question?.status !== "available") throw new ApiError(400, `${index + 1}번 문제는 ready이므로 available 상태여야 합니다.`);
     if (validation.spec.importStatus !== "ready" && question?.status === "available") throw new ApiError(400, `${index + 1}번 문제는 검수 전이므로 공개할 수 없습니다.`);
+    if(Number(question?.payload?.publication_version)!==CURRENT_QUESTION_PUBLICATION_VERSION)throw new ApiError(400,`${index + 1}번 문제는 현재 publication pipeline v${CURRENT_QUESTION_PUBLICATION_VERSION} 검증이 필요합니다.`);
   }
   const result = await db.rpc("ready_import_question_bundle", { p_questions: incoming });
   if (result.error) throw new ApiError(400, result.error.message);
@@ -965,8 +974,8 @@ async function personalLibrary(_body:any,session:ReadySession){const student=awa
   db.from("ready_saved_sentences").select("id,sentence_id,source_text_snapshot,translation_snapshot,created_at,passage:ready_passages(title)").eq("student_id",student.id).order("created_at",{ascending:false})]);return {words:rows(words),sentences:rows(sentences)};}
 async function dispatch(op: string, body: any, session: ReadySession | null) {
   switch (op) {
-    case "list_students": return listStudents(); case "student_login": return studentLogin(body); case "admin_login": return adminLogin(body); case "logout": return revokeSession(session as ReadySession);
-    case "teacher_bootstrap": return teacherBootstrap(); case "delete_impact": return deleteImpact(body); case "create_student": return createStudent(body); case "set_student_pin": return setStudentPin(body); case "delete_student": return deleteStudent(body);
+    case "student_login": return studentLogin(body); case "admin_login": return adminLogin(body); case "logout": return revokeSession(session as ReadySession);
+    case "teacher_bootstrap": return teacherBootstrap(); case "delete_impact": return deleteImpact(body); case "create_student": return createStudent(body); case "set_student_code": return setStudentCode(body); case "delete_student": return deleteStudent(body);
     case "assign_scope_passages": return setScopePassages(body, false); case "set_scope_passages": return setScopePassages(body, true); case "create_passage": return createPassage(body); case "update_passage": return updatePassage(body); case "delete_passage": return deletePassage(body); case "import_questions": return importQuestions(body); case "import_explanations": return importExplanations(body);
     case "student_bootstrap": return studentBootstrap(session as ReadySession); case "student_passage": return studentPassage(body, session as ReadySession); case "word_lookup_meaning": return readerInlineGloss(body, session as ReadySession); case "save_reader_word": return saveReaderWord(body, session as ReadySession); case "remove_reader_word": return removeReaderWord(body, session as ReadySession); case "update_reader_word_meaning": return updateReaderWordMeaning(body, session as ReadySession); case "student_questions": return studentQuestions(body, session as ReadySession); case "student_question_filters": return studentQuestionFilters(body, session as ReadySession); case "student_question_queue": return studentQuestionQueue(body, session as ReadySession); case "student_review_questions": return studentReviewQuestions(body, session as ReadySession); case "set_question_bookmark": return setQuestionBookmark(body, session as ReadySession); case "submit_attempt": return submitAttempt(body, session as ReadySession); case "student_workbook": return studentWorkbook(body, session as ReadySession); case "workbook_assistance": return workbookAssistance(body, session as ReadySession); case "set_workbook_bookmark": return setWorkbookBookmark(body, session as ReadySession); case "workbook_hint": return workbookHint(body, session as ReadySession); case "submit_workbook_attempt": return submitWorkbookAttempt(body, session as ReadySession);
     default: throw new ApiError(404, "알 수 없는 READY 작업입니다.");

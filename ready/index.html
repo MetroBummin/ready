@@ -24,15 +24,10 @@
     <nav id="student-nav" class="student-nav" hidden><button type="button" data-student-route="passages">Home</button><button type="button" data-student-route="review">Review</button></nav><div class="session-actions"><button id="theme-toggle" class="icon-button" type="button" aria-label="색상 모드 바꾸기">◐</button><button id="logout" class="button quiet small" type="button" hidden>로그아웃</button></div>
   </header>
   <main>
-    <section id="student-home" aria-labelledby="student-title">
-      <p class="eyebrow">READY</p><h1 id="student-title">학생을 선택하세요.</h1>
-      <div id="student-list" class="student-grid" aria-live="polite"></div>
-    </section>
-    <section id="pin-login" class="auth-wrap" hidden aria-labelledby="pin-title">
-      <button class="button quiet small" type="button" data-back-students>← 이름 선택</button>
-      <form id="pin-form" class="card auth-card">
-        <p class="eyebrow">STUDENT PIN</p><h1 id="pin-title"><span id="pin-student-name"></span> 학생</h1>
-        <label><span>개인 PIN</span><input id="student-pin" name="pin" type="password" inputmode="numeric" pattern="[0-9]{4,6}" minlength="4" maxlength="6" autocomplete="one-time-code" required></label>
+    <section id="student-home" class="auth-wrap" aria-labelledby="student-title">
+      <form id="student-code-form" class="card auth-card">
+        <p class="eyebrow">READY STUDENT</p><h1 id="student-title">학생 코드</h1>
+        <label><span>관리자에게 받은 코드</span><input id="student-code" name="code" type="password" inputmode="numeric" pattern="[0-9]{6}" minlength="6" maxlength="6" autocomplete="one-time-code" required></label>
         <label class="remember"><input name="remember" type="checkbox"><span>이 기기에서 로그인 유지</span></label>
         <button class="button primary" type="submit">학습 시작</button>
       </form>
