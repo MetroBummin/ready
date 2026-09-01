@@ -11,7 +11,7 @@ const phrase={resolved:true,sentenceId:sentence.id,start:5,end:17,sourceText:'su
 assert(validReaderGlossResult(phrase,{sentenceId:sentence.id,text:sentence.text}),'Exact resolver range must be accepted');
 assert(!validReaderGlossResult({...phrase,end:16},{sentenceId:sentence.id,text:sentence.text}),'Drifted resolver range must be rejected');
 const phraseHtml=readerSentenceMarkup(sentence,[phrase]);
-assert.match(phraseHtml,/구독하다[\s\S]*data-reader-gloss-reset="5:17"/,'Phrase must directly replace its exact English span');
+assert.match(phraseHtml,/class="reader-inline-replacement"[\s\S]*data-reader-gloss-reset="5:17"[\s\S]*구독하다/,'Phrase must directly replace its exact English span with a restorable block');
 assert.doesNotMatch(phraseHtml.replace(/<[^>]+>/g,''),/subscribe to/,'Replaced English must not remain visible');
 const multiple=readerSentenceMarkup(sentence,[phrase,{resolved:true,sentenceId:sentence.id,start:22,end:27,sourceText:'music',gloss:'음악',lemma:'music',kind:'word',confidence:.98}]);
 assert.match(multiple,/구독하다[\s\S]*음악/,'Non-overlapping replacements must coexist');
@@ -34,5 +34,7 @@ assert.match(glossModule,/accepted:true[\s\S]*redraw\(sentenceId\)[\s\S]*READER_
 assert.match(glossModule,/if\(!online\(\)\)[\s\S]*오프라인에서는 단어 뜻을 불러올 수 없어요/,'Offline cache misses must preserve English and show a short local notice');
 assert.match(css,/reader-inline-source\.is-pending[\s\S]*box-shadow:inset/,'Reader pending feedback must fill the rectangular token box');
 assert.doesNotMatch(css,/reader-gloss-loading|is-loading[^}]*text-decoration/,'Reader loading must not use an underline animation');
+assert.doesNotMatch(css,/reader-inline-source[^}]*text-decoration:(?!none)/,'Reader source states must not use underlines');
+assert.match(css,/reader-inline-replacement\{[\s\S]*display:inline-flex[\s\S]*box-shadow:inset 3px 0 0/,'Resolved gloss must render as a compact READY block');
 assert.match(css,/reader-gloss-dissolve 160ms/);assert.match(css,/@media \(prefers-reduced-motion:reduce\)/);
 console.log('READY Reader inline gloss contract verified');

@@ -19,7 +19,7 @@ export function readerSentenceMarkup(sentence,replacements=[],pending=[]){
   for(const replacement of occupied){
     if(replacement.start<cursor)continue;
     html+=sourceMarkup(text.slice(cursor,replacement.start),sentence,pendingByStart,esc,replacement.start,cursor);
-    html+=`<span class="reader-inline-replacement" data-reader-range="${replacement.start}:${replacement.end}"><span class="reader-inline-gloss" lang="ko">${esc(replacement.gloss)}</span><button type="button" class="reader-inline-reset" data-reader-gloss-reset="${replacement.start}:${replacement.end}" aria-label="${esc(replacement.sourceText)} 원문으로 되돌리기">↺</button></span>`;
+    html+=`<button type="button" class="reader-inline-replacement" data-reader-range="${replacement.start}:${replacement.end}" data-reader-gloss-reset="${replacement.start}:${replacement.end}" aria-label="${esc(replacement.gloss)}. ${esc(replacement.sourceText)} 원문으로 되돌리기"><span class="reader-inline-gloss" lang="ko">${esc(replacement.gloss)}</span><span class="reader-inline-reset" aria-hidden="true">↺</span></button>`;
     cursor=replacement.end;
   }
   html+=sourceMarkup(text.slice(cursor),sentence,pendingByStart,esc,text.length,cursor);
