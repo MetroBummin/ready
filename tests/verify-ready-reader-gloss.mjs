@@ -40,9 +40,9 @@ assert.match(edge,/다른 자연스러운 뜻이 없다면 정확성을 위해 �
 assert.match(css,/reader-inline-source\.is-pending[\s\S]*box-shadow:inset/,'Reader pending feedback must fill the rectangular token box');
 assert.doesNotMatch(css,/reader-gloss-loading|is-loading[^}]*text-decoration/,'Reader loading must not use an underline animation');
 assert.doesNotMatch(css,/reader-inline-source[^}]*text-decoration:(?!none)/,'Reader source states must not use underlines');
-assert.match(css,/reader-inline-replacement\{[\s\S]*display:inline-flex[\s\S]*box-shadow:inset 1px 0 0/,'Resolved gloss must render as a quiet compact READY block');
-assert.match(css,/body\[data-ready-mode\] \.reader-inline-gloss\{[^}]*font:500 \.82em\/1\.25/,'Korean gloss must be optically smaller than the surrounding English text');
-assert.match(css,/body\[data-ready-mode\] \.reader-inline-retry\{[^}]*width:1\.02em[^}]*font:650 \.46em\/1/,'Retry control must remain visually subordinate to the gloss');
+assert.match(css,/reader-inline-replacement\{[\s\S]*display:inline-flex[\s\S]*background:transparent[\s\S]*box-shadow:none/,'Resolved gloss wrapper must not look like a warning badge');
+assert.match(css,/body\[data-ready-mode\] \.reader-inline-gloss\{[^}]*color:inherit[^}]*box-shadow:inset 1\.5px 0 0[^}]*font:520 \.9em\/1\.25/,'Korean gloss must use neutral text and a restrained READY accent');
+assert.match(css,/body\[data-ready-mode\] \.reader-inline-retry\{[^}]*width:\.94em[^}]*font:650 \.5em\/1/,'Retry control must remain visually subordinate to the gloss');
 assert.match(css,/reader-inline-replacement\.is-refreshing \.reader-inline-retry/,'Retry must have a local loading state');
 assert.match(css,/reader-gloss-dissolve 160ms/);assert.match(css,/@media \(prefers-reduced-motion:reduce\)/);
 console.log('READY Reader inline gloss contract verified');

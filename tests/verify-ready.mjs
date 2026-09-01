@@ -247,7 +247,7 @@ assert.match(app,/cue!==expected[^\n]*composing[^\n]*flashRecallWrong/,'IME comp
 assert.match(app,/flashRecallWrong[\s\S]*220/,'A wrong recall cue must clear after a brief red signal');
 assert.match(app,/data-workbook-live-prefix[\s\S]*workbook-live-copy/,'Stage 9 must show live mismatch feedback without ending the attempt');
 assert.match(app,/hintReceipt[\s\S]*completedAfterHint/,'Stage 9 hint state must survive through final grading');
-assert.match(app,/firstStageNineHint[\s\S]*힌트 보기[\s\S]*정답 보기/,'Stage 9 must promote its single toolbar hint to answer reveal');
+assert.match(app,/firstStageNineHint[\s\S]*Hint[\s\S]*Answer/,'Stage 9 must promote its single toolbar Hint to Answer');
 assert.match(app,/data-workbook-reveal[\s\S]*revealWorkbookAnswer/,'Workbook answer reveal must be owned by the focused toolbar action');
 assert.doesNotMatch(app,/workbook-hint-actions/,'Stage 9 hint controls must not remain below the prompt');
 assert.match(edge,/revealedAnswer = body\.revealAnswer === true[\s\S]*correct = !revealedAnswer/,'Answer reveal must be persisted as an explicit wrong attempt');

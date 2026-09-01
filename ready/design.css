@@ -314,22 +314,21 @@ body[data-ready-mode="student"] .reading-passage{margin:0;color:var(--ready-body
 .reader-inline-notice{position:fixed;z-index:30;right:max(16px,env(safe-area-inset-right));bottom:max(18px,calc(env(safe-area-inset-bottom) + 12px));max-width:min(360px,calc(100vw - 32px));margin:0;padding:10px 12px;border:1px solid var(--ready-hairline);border-radius:0;color:var(--ready-body);background:var(--ready-surface);box-shadow:var(--shadow-sheet);font-size:12px;line-height:1.45}
 .reader-inline-replacement{
   display:inline-flex;
-  min-height:1.12em;
+  min-height:1.2em;
   align-items:center;
-  gap:.02em;
-  margin:-.02em .05em;
-  padding:.01em .04em .01em .2em;
+  gap:.08em;
+  margin:-.04em .05em;
+  padding:0;
   border:0;
-  border-radius:2px;
-  color:var(--ready-primary);
-  background:color-mix(in srgb,var(--ready-primary) 7%,var(--ready-surface));
-  box-shadow:inset 1px 0 0 color-mix(in srgb,var(--ready-primary) 72%,transparent);
-  vertical-align:.08em;
+  color:var(--ready-ink);
+  background:transparent;
+  box-shadow:none;
+  vertical-align:.04em;
   white-space:nowrap;
 }
-.reader-inline-replacement:hover{background:color-mix(in srgb,var(--ready-primary) 11%,var(--ready-surface))}
-body[data-ready-mode] .reader-inline-gloss{display:inline;margin:0;padding:0;border:0;color:inherit;background:transparent;font:500 .82em/1.25 var(--ready-font-sans);letter-spacing:-.015em;cursor:pointer}
-body[data-ready-mode] .reader-inline-retry{display:inline-grid;width:1.02em;height:1.02em;place-items:center;margin:0;padding:0;border:0;border-radius:50%;color:color-mix(in srgb,var(--ready-primary) 46%,var(--ready-muted));background:transparent;font:650 .46em/1 var(--ready-font-sans);cursor:pointer}
+.reader-inline-replacement:hover .reader-inline-gloss{background:color-mix(in srgb,var(--ready-primary) 14%,var(--ready-surface))}
+body[data-ready-mode] .reader-inline-gloss{display:inline;margin:0;padding:.04em .28em .08em .36em;border:0;border-radius:3px;color:inherit;background:color-mix(in srgb,var(--ready-primary) 9%,var(--ready-surface));box-shadow:inset 1.5px 0 0 color-mix(in srgb,var(--ready-primary) 78%,transparent);font:520 .9em/1.25 var(--ready-font-sans);letter-spacing:-.01em;cursor:pointer;transition:background-color 140ms ease,color 140ms ease}
+body[data-ready-mode] .reader-inline-retry{display:inline-grid;width:.94em;height:.94em;place-items:center;margin:0;padding:0;border:0;border-radius:50%;color:color-mix(in srgb,var(--ready-muted) 78%,transparent);background:transparent;font:650 .5em/1 var(--ready-font-sans);cursor:pointer;transition:color 140ms ease,background-color 140ms ease}
 .reader-inline-gloss:focus-visible,.reader-inline-retry:focus-visible{outline:2px solid var(--ready-focus);outline-offset:1px}
 .reader-inline-retry:hover{color:var(--ready-primary);background:color-mix(in srgb,var(--ready-primary) 8%,transparent)}
 .reader-inline-replacement.is-refreshing .reader-inline-retry{animation:reader-gloss-retry 900ms linear infinite}
