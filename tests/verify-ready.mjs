@@ -180,8 +180,9 @@ const {NE_MINBYEONGCHEON_L1_WORKBOOK}=await import('../server/ready/workbook-ne-
 const {NE_MINBYEONGCHEON_L2_WORKBOOK}=await import('../server/ready/workbook-ne-l2.mjs');
 const {YBM_PARKJUNEON_L1_WORKBOOK}=await import('../server/ready/workbook-ybm-l1.mjs');
 const {YBM_PARKJUNEON_L2_WORKBOOK}=await import('../server/ready/workbook-ybm-l2.mjs');
-const workbooks=[NE_MINBYEONGCHEON_L1_WORKBOOK,NE_MINBYEONGCHEON_L2_WORKBOOK,YBM_PARKJUNEON_L1_WORKBOOK,YBM_PARKJUNEON_L2_WORKBOOK];
-assert.deepEqual(workbooks.map(book=>book.stages.flatMap(stage=>stage.items).length),[295,364,329,394]);
+const {DONGA_LEEBYEONGMIN_L4_WORKBOOK}=await import('../server/ready/workbook-donga-l4.mjs');
+const workbooks=[NE_MINBYEONGCHEON_L1_WORKBOOK,NE_MINBYEONGCHEON_L2_WORKBOOK,YBM_PARKJUNEON_L1_WORKBOOK,YBM_PARKJUNEON_L2_WORKBOOK,DONGA_LEEBYEONGMIN_L4_WORKBOOK];
+assert.deepEqual(workbooks.map(book=>book.stages.flatMap(stage=>stage.items).length),[295,364,329,394,286]);
 for(const book of workbooks)assert.deepEqual(book.stages.map(stage=>stage.stage),[2,3,4,5,6,7,8,9],`${book.workbookKey} must expose every requested workbook stage`);
 const workbookItems=workbooks.flatMap(book=>book.stages.flatMap(stage=>stage.items));
 assert.equal(new Set(workbookItems.map(item=>item.key)).size,workbookItems.length);

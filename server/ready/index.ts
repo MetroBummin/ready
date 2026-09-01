@@ -8,6 +8,7 @@ import { NE_MINBYEONGCHEON_L1_WORKBOOK } from "./workbook-ne-l1.mjs";
 import { NE_MINBYEONGCHEON_L2_WORKBOOK } from "./workbook-ne-l2.mjs";
 import { YBM_PARKJUNEON_L1_WORKBOOK } from "./workbook-ybm-l1.mjs";
 import { YBM_PARKJUNEON_L2_WORKBOOK } from "./workbook-ybm-l2.mjs";
+import { DONGA_LEEBYEONGMIN_L4_WORKBOOK } from "./workbook-donga-l4.mjs";
 import { validateQuestionSpec } from "./question-spec.mjs";
 import { deterministicClientContract, deterministicGrade, publicInteractionContract } from "./interaction-contract.mjs";
 import { WORKBOOK_TRANSLATION_GRADING_POLICY, workbookTranslationPass } from "./workbook-grading-policy.mjs";
@@ -758,9 +759,10 @@ async function submitAttempt(body: any, session: ReadySession) {
 
 function workbookForPassage(passage: any) {
   const identity = [passage?.title, passage?.source_label].map(value => clean(value, 300)).join(" ");
-  const lesson = /(?:Lesson|레슨|제)\s*2|2\s*과/i.test(identity) ? 2 : /(?:Lesson|레슨|제)\s*1|1\s*과/i.test(identity) ? 1 : 0;
+  const lesson = /(?:Lesson|레슨|제)\s*4|4\s*과/i.test(identity) ? 4 : /(?:Lesson|레슨|제)\s*2|2\s*과/i.test(identity) ? 2 : /(?:Lesson|레슨|제)\s*1|1\s*과/i.test(identity) ? 1 : 0;
   if(/(?:민병천|NE\s*능률|NE\s*\()/i.test(identity))return lesson===2?NE_MINBYEONGCHEON_L2_WORKBOOK:lesson===1?NE_MINBYEONGCHEON_L1_WORKBOOK:null;
   if(/(?:박준언|YBM)/i.test(identity))return lesson===2?YBM_PARKJUNEON_L2_WORKBOOK:lesson===1?YBM_PARKJUNEON_L1_WORKBOOK:null;
+  if(/(?:동아|이병민)/i.test(identity))return lesson===4?DONGA_LEEBYEONGMIN_L4_WORKBOOK:null;
   return null;
 }
 function workbookItem(catalog: any, itemKey: string) {
