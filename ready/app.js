@@ -2,7 +2,7 @@ import { readyApi } from './api.js';
 import { contractChoiceCopyHtml, contractPassageHtml, contractResponseComplete, contractResponseControlHtml } from './interaction-runtime.js';
 import { createShortsWheelGesture, normalizeWheelDelta } from './shorts-navigation.js';
 import { livePrefixState, workbookRecallCue, workbookSlotCh } from './workbook-assistance.js?v=workbook-answer-action-1';
-import { createReaderInlineGloss, readerSentenceMarkup } from './reader-inline-gloss.js?v=reader-word-learning-1';
+import { createReaderInlineGloss, readerSentenceMarkup } from './reader-inline-gloss.js?v=reader-word-learning-2';
 import { gradeLocalQuestion, gradeLocalWorkbook, revealLocalWorkbook } from './deterministic-grading.js?v=workbook-answer-action-1';
 
 const $=selector=>document.querySelector(selector);
