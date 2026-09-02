@@ -3,9 +3,16 @@
 // maps and content order; READY does not infer publisher columns from magic
 // coordinates or inspect raw compressed PDF objects.
 
-import { getDocument } from 'pdfjs-dist/legacy/build/pdf.mjs';
-
 const clean = value => String(value ?? '').replace(/\u0000|[\uD800-\uDFFF]/g, '').replace(/\u00a0/g, ' ').trim();
+
+function ensureTextExtractionGlobals() {
+  // PDF.js initializes one identity matrix for its optional canvas renderer at
+  // module load. Edge text extraction never renders a page, but Deno does not
+  // expose DOMMatrix. Keep the compatibility surface deliberately minimal.
+  if (!globalThis.DOMMatrix) globalThis.DOMMatrix = class TextExtractionDOMMatrix {
+    constructor(values = [1, 0, 0, 1, 0, 0]) { [this.a, this.b, this.c, this.d, this.e, this.f] = values; }
+  };
+}
 
 function decodeBase64(base64) {
   const encoded = clean(base64).replace(/^data:application\/pdf;base64,/i, '').replace(/\s+/g, '');
@@ -30,6 +37,8 @@ function pageText(items) {
 
 export async function extractUnicodePdfText(base64) {
   const data = decodeBase64(base64);
+  ensureTextExtractionGlobals();
+  const { getDocument } = await import('pdfjs-dist/legacy/build/pdf.mjs');
   let document;
   try {
     document = await getDocument({ data, disableWorker: true, useWorkerFetch: false }).promise;
