@@ -2,7 +2,7 @@
 // Gemini access so its parsing, generation and fail-closed validation can be
 // exercised as a normal Node golden-path test as well as in the Edge Function.
 
-const clean = (value, max = 6000) => String(value ?? '').replace(/\u00a0/g, ' ').trim().slice(0, max);
+const clean = (value, max = 6000) => String(value ?? '').replace(/\u0000|[\uD800-\uDFFF]/g, '').replace(/\u00a0/g, ' ').trim().slice(0, max);
 const fold = value => clean(value).toLowerCase().replace(/[“”‘’]/g, "'").replace(/\s+/g, ' ');
 const words = value => clean(value).match(/[A-Za-z]+(?:[’'][A-Za-z]+)*/g) || [];
 const koWords = value => clean(value).match(/[가-힣]+(?:[·ㆍ][가-힣]+)*/g) || [];

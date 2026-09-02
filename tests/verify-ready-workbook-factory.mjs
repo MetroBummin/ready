@@ -25,6 +25,8 @@ assert.equal(semanticWorkbookType('Writing'),'writing');
 // re-numbering are all represented by the final row order passed to generation.
 const only=extractSentenceRows('Humans excel at visual imagery.\nOur brains evolved this ability for survival.');
 assert.equal(only.needsTranslation,true);
+const pdfNoise=extractSentenceRows('Humans excel at visual imagery.\u0000\nOur brains evolved this ability for survival.');
+assert.ok(pdfNoise.rows.every(row=>!JSON.stringify(row).includes('\\u0000')),'PDF control characters must not reach JSONB storage.');
 const reviewed=[{text:'Humans excel at visual imagery.',translation:'인간은 시각적 심상에 뛰어나다.'},{text:'They improve when they reflect on feedback.',translation:'그들은 피드백을 돌아볼 때 향상된다.'},canonical[1]];
 const catalog=generateWorkbookCatalog({title:'Golden',workbookKey:'golden',rows:reviewed,ai:{5:[{sentenceIndex:1,prompt:'Humans excel at visual ____________.',hint:'image',answer:'imagery'}],6:[{sentenceIndex:2,prompt:'They improve when they reflect on ____________.',wrong:'feedforward',answer:'feedback'}],7:[{sentenceIndex:3,sentence:'Our brains evolve this ability for survival.',wrong:'evolve',correct:'evolved'}]}});
 assert.deepEqual(catalog.stages.map(stage=>stage.stage),[2,3,4,5,6,7,8,9]);

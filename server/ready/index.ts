@@ -41,7 +41,7 @@ const GEMINI_GRADING_SYSTEM = "You grade Korean secondary-school English answers
 type ReadySession = { id: string; actor_type: "student" | "admin"; student_id: string | null; remembered: boolean; expires_at: string };
 type Student = { id: string; name: string; school: string; grade: string };
 class ApiError extends Error { constructor(public status: number, message: string, public detail?: unknown) { super(message); } }
-function clean(value: unknown, max = 10_000) { return String(value ?? "").trim().slice(0, max); }
+function clean(value: unknown, max = 10_000) { return String(value ?? "").replace(/\u0000|[\uD800-\uDFFF]/g, "").trim().slice(0, max); }
 function required(value: unknown, name: string, max = 10_000) { const out = clean(value, max); if (!out) throw new ApiError(400, `${name} 값이 필요합니다.`); return out; }
 function rows<T>(result: { data: T | null; error: { message: string } | null }): T { if (result.error) throw new ApiError(500, result.error.message); return result.data as T; }
 function cleanList(value: unknown, count: number, max: number) { return (Array.isArray(value) ? value : []).map(item => clean(item, max)).filter(Boolean).slice(0, count); }
