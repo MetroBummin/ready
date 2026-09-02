@@ -358,33 +358,50 @@ async function factoryGemini(prompt: string, maxOutputTokens: number) {
   const provider = (Deno.env.get("AI_PROVIDER") ?? "").trim().toLowerCase(), key = Deno.env.get("GEMINI_API_KEY");
   if (provider !== "gemini" || !key) throw new ApiError(503, "Workbook Factory Gemini가 아직 연결되지 않았습니다.");
   const url = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${key}`;
-  const response = await fetch(url, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ system_instruction: { parts: [{ text: "You create structured, source-grounded English workbook data. Return only JSON. Never invent or alter a canonical sentence." }] }, contents: [{ role: "user", parts: [{ text: prompt }] }], generationConfig: { maxOutputTokens, temperature: 0.1, responseMimeType: "application/json", thinkingConfig: { thinkingBudget: 0 } } }) });
-  if (!response.ok) throw new ApiError(502, "Workbook Factory Gemini 결과를 받을 수 없습니다.");
-  const payload = await response.json(), parsed = parseJson((payload?.candidates?.[0]?.content?.parts || []).map((part: any) => part?.text || "").join(""));
-  if (!parsed) throw new ApiError(502, "Workbook Factory Gemini 결과 형식이 올바르지 않습니다.");
-  return { parsed, tokenUsage: Number(payload?.usageMetadata?.totalTokenCount) || 0 };
+  const base = { maxOutputTokens: Math.min(8_192, Math.max(256, maxOutputTokens)), temperature: 0.1, responseMimeType: "application/json" }, configs = [{ ...base, thinkingConfig: { thinkingBudget: 0 } }, base];
+  let lastStatus = 0, lastError = "";
+  for (const generationConfig of configs) {
+    const response = await fetch(url, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ system_instruction: { parts: [{ text: "You create structured, source-grounded English workbook data. Return only JSON. Never invent or alter a canonical sentence." }] }, contents: [{ role: "user", parts: [{ text: prompt }] }], generationConfig }) });
+    if (response.ok) { const payload = await response.json(), parsed = parseJson((payload?.candidates?.[0]?.content?.parts || []).map((part: any) => part?.text || "").join("")); if (!parsed) throw new ApiError(502, "Workbook Factory Gemini 결과 형식이 올바르지 않습니다."); return { parsed, tokenUsage: Number(payload?.usageMetadata?.totalTokenCount) || 0 }; }
+    lastStatus = response.status; lastError = (await response.text()).slice(0, 300); if (response.status !== 400) break;
+  }
+  console.error("READY Workbook Factory Gemini failed:", lastStatus, lastError);
+  throw new ApiError(502, `Workbook Factory Gemini 요청이 실패했습니다 (${lastStatus || "network"}).`);
 }
 async function factoryTranslate(rows: any[]) {
-  const result = await factoryGemini(`Translate each canonical English sentence into natural Korean. Preserve order; do not add meaning. Return {"translations":["..."]} with exactly ${rows.length} entries.\n${JSON.stringify(rows.map(row => row.text))}`, Math.min(12_000, 220 * rows.length + 300));
+  const result = await factoryGemini(`Translate each canonical English sentence into natural Korean. Preserve order; do not add meaning. Return {"translations":["..."]} with exactly ${rows.length} entries.\n${JSON.stringify(rows.map(row => row.text))}`, Math.min(8_192, 120 * rows.length + 400));
   const translations = Array.isArray(result.parsed?.translations) ? result.parsed.translations.map((value: unknown) => clean(value, 5000)) : [];
   if (translations.length !== rows.length || translations.some((value: string) => !value)) throw new ApiError(502, "문장별 한국어 해석을 검증하지 못했습니다.");
   return { rows: rows.map((row, index) => ({ ...row, translation: translations[index] })), tokenUsage: result.tokenUsage };
 }
-async function factoryExercises(rows: any[]) {
+async function factoryExercises(rows: any[], requestedStages = [5, 6, 7]) {
   const source = rows.map((row, index) => ({ sentenceIndex: index + 1, text: row.text, translation: row.translation }));
-  const prompt = `Create only source-grounded exercises for these canonical sentence pairs. Return {"5":[],"6":[],"7":[]}. Stage 5 item fields: sentenceIndex, prompt, hint, answer. prompt must equal canonical English with the exact answer replaced by 12 underscores; hint is the base verb. Stage 6 fields: sentenceIndex, prompt, wrong, answer. prompt must equal canonical English with answer replaced by 12 underscores. Stage 7 fields: sentenceIndex, sentence, wrong, correct. sentence must equal canonical English with one exact correct substring replaced by wrong. Use no more than one item per sentence and omit if unsure. Never create a new canonical answer.\n${JSON.stringify(source)}`;
-  const result = await factoryGemini(prompt, Math.min(16_000, 260 * rows.length + 800));
-  return { stages: { 5: Array.isArray(result.parsed?.[5]) ? result.parsed[5] : [], 6: Array.isArray(result.parsed?.[6]) ? result.parsed[6] : [], 7: Array.isArray(result.parsed?.[7]) ? result.parsed[7] : [] }, tokenUsage: result.tokenUsage };
+  const stages = requestedStages.filter((stage: number) => [5, 6, 7].includes(stage));
+  if (!stages.length) return { stages: { 5: [], 6: [], 7: [] }, tokenUsage: 0, callCount: 0 };
+  const prompt = `Create only source-grounded exercises for these canonical sentence pairs. Return JSON object keys only for requested READY stages ${JSON.stringify(stages)}. Stage 5 item fields: sentenceIndex, prompt, hint, answer. prompt must equal canonical English with the exact answer replaced by 12 underscores; hint is the base verb. Stage 6 fields: sentenceIndex, prompt, wrong, answer. prompt must equal canonical English with answer replaced by 12 underscores. Stage 7 fields: sentenceIndex, sentence, wrong, correct. sentence must equal canonical English with one exact correct substring replaced by wrong. Use no more than one item per sentence and omit if unsure. Never create a new canonical answer.\n${JSON.stringify(source)}`;
+  const result = await factoryGemini(prompt, Math.min(8_192, 170 * rows.length + 700));
+  return { stages: { 5: Array.isArray(result.parsed?.[5]) ? result.parsed[5] : [], 6: Array.isArray(result.parsed?.[6]) ? result.parsed[6] : [], 7: Array.isArray(result.parsed?.[7]) ? result.parsed[7] : [] }, tokenUsage: result.tokenUsage, callCount: 1 };
 }
 async function finalizeFactoryJob(job: any, confirmedRows?: unknown) {
   const rowsForCatalog = factoryRows(confirmedRows ?? job.extracted_rows);
   const metadata = job.source_metadata || {}, sourceType = metadata.sourceType === "MOCK_EXAM" ? "MOCK_EXAM" : "TEXTBOOK", title = required(job.title, "지문 제목", 120), grade = required(metadata.grade, "학년", 40), sourceYear = metadata.sourceYear ? Math.round(Number(metadata.sourceYear)) : null, sourceMonth = metadata.sourceMonth ? Math.round(Number(metadata.sourceMonth)) : null;
   if (sourceType === "MOCK_EXAM" && (!sourceYear || !sourceMonth)) throw new ApiError(400, "모의고사는 연도와 월이 필요합니다.");
-  const ai = await factoryExercises(rowsForCatalog);
+  const sourceExercises = Array.isArray(job.extraction?.sourceExercises) ? job.extraction.sourceExercises : [], fullWorkbook = job.extraction?.fullWorkbook === true;
+  const sourceTypes = new Set(sourceExercises.map((exercise: any) => clean(exercise?.type, 80))), neededStages = [[5, "verb_form"], [6, "grammar_vocab_choice"], [7, "error_correction"]].filter(([, type]) => !sourceTypes.has(type)).map(([stage]) => stage as number);
+  let ai = { stages: { 5: [], 6: [], 7: [] }, tokenUsage: 0, callCount: 0 }, fallbackError = "";
+  if (!fullWorkbook || neededStages.length) {
+    try { ai = await factoryExercises(rowsForCatalog, fullWorkbook ? neededStages : [5, 6, 7]); }
+    catch (error) {
+      // A publisher workbook must remain usable when an optional AI fallback
+      // is unavailable. Its unverified exercises become validator drops.
+      if (!fullWorkbook) throw error;
+      fallbackError = error instanceof Error ? clean(error.message, 500) : "factory_ai_fallback_failed";
+    }
+  }
   const passageId = rows<string>(await db.rpc("ready_create_passage_with_sentences", { p_title: title, p_source_type: sourceType, p_grade: grade, p_source_year: sourceYear, p_source_month: sourceMonth, p_source_label: clean(metadata.sourceLabel, 120), p_rows: rowsForCatalog }));
   const workbookKey = `factory-${passageId}`;
-  const provenance = { ...(job.extraction || {}), sourceKind: job.source_kind, documentSha256: clean(metadata.documentSha256, 128), documentName: clean(metadata.documentName, 240), geminiCallCount: 1, geminiTokenUsage: ai.tokenUsage, pdfExtractedExercises: Number(job.extraction?.exerciseCount) || 0 };
-  const catalog = generateWorkbookCatalog({ title: `${title} · READY 워크북`, workbookKey, rows: rowsForCatalog, ai: ai.stages, provenance });
+  const provenance = { ...(job.extraction || {}), sourceKind: job.source_kind, documentSha256: clean(metadata.documentSha256, 128), documentName: clean(metadata.documentName, 240), geminiCallCount: ai.callCount, geminiTokenUsage: ai.tokenUsage, pdfExtractedExercises: Number(job.extraction?.exerciseCount) || 0, ...(fallbackError ? { fallbackError } : {}) };
+  const catalog = generateWorkbookCatalog({ title: `${title} · READY 워크북`, workbookKey, rows: rowsForCatalog, ai: ai.stages, sourceExercises, provenance });
   const saved = await db.from("ready_workbook_catalogs").insert({ passage_id: passageId, workbook_key: catalog.workbookKey, catalog, provenance, metrics: catalog.metrics, factory_job_id: job.id });
   if (saved.error) throw new ApiError(500, saved.error.message);
   const completed = await db.from("ready_workbook_factory_jobs").update({ status: "ready", passage_id: passageId, extracted_rows: rowsForCatalog, metrics: catalog.metrics, completed_at: new Date().toISOString(), failure_reason: "" }).eq("id", job.id);
@@ -400,7 +417,7 @@ async function factoryStart(body: any) {
   if (rowsForReview.length && rowsForReview.some((row: any) => !clean(row.translation))) { const translated = await factoryTranslate(rowsForReview); rowsForReview = translated.rows; translationTokens = translated.tokenUsage; inspected.reviewRequired = true; }
   if (!rowsForReview.length) throw new ApiError(400, "영문 문장 경계를 확정하지 못했습니다. 줄바꿈된 영문/한글 문장을 붙여 넣어 주세요.");
   const metadata = { sourceType: body.sourceType, grade: body.grade, sourceYear: body.sourceYear, sourceMonth: body.sourceMonth, sourceLabel: body.sourceLabel, documentName: clean(body.documentName, 240), documentSha256: sourceKind === "pdf" ? await sha256Hex(sourceText) : "" };
-  const extraction = { fullWorkbook: !!inspected.fullWorkbook, reviewRequired: !!inspected.reviewRequired, reason: clean(inspected.reason, 500), headings: inspected.headings || [], exerciseCount: (inspected.exercises || []).length, pairing: inspected.pairing || "pdf" };
+  const extraction = { fullWorkbook: !!inspected.fullWorkbook, reviewRequired: !!inspected.reviewRequired, reason: clean(inspected.reason, 500), headings: inspected.headings || [], exerciseCount: (inspected.exercises || []).length, sourceExercises: (inspected.exercises || []).map((exercise: any) => ({ ...exercise, provenance: { page: Number(exercise.page) || null, semanticType: clean(exercise.type, 80), sourceExerciseNumber: Number(exercise.number) || null } })), pairing: inspected.pairing || "pdf" };
   const created = rows<any>(await db.from("ready_workbook_factory_jobs").insert({ status: "review_required", source_kind: sourceKind, title, source_metadata: metadata, extracted_rows: rowsForReview, extraction, metrics: { sentenceCount: rowsForReview.length, geminiCallCount: translationTokens ? 1 : 0, geminiTokenUsage: translationTokens } }).select().single());
   // A full workbook only bypasses the human checkpoint after the parser has
   // deterministic bilingual evidence. It still uses the same final validator.

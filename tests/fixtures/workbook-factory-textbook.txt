@@ -8,6 +8,15 @@ Stage 2 Korean blank
 Stage 4 Translation
 1. Humans excel at visual imagery. || 인간은 시각적 심상에 뛰어나다.
 2. Our brains evolved this ability for survival. || 우리의 뇌는 생존을 위해 이 능력을 발달시켰다.
+Stage 5 Verb form
+1. Humans excel at visual ____________. || imagery
+2. Our brains ____________ this ability for survival. || evolved
+Stage 6 Grammar choice
+1. Humans (excel/excels) at visual imagery. || excel
+2. Our brains (evolve/evolved) this ability for survival. || evolved
+Stage 7 Error correction
+1. Humans excels at visual imagery. || excels → excel
+2. Our brains evolve this ability for survival. || evolve → evolved
 Stage 9 Writing
 1. Humans excel at visual imagery. || Humans excel at visual imagery.
 Stage 10 Check

@@ -57,6 +57,8 @@ assert.match(student,/student_question_filters[\s\S]*question-source[\s\S]*quest
 assert.match(edge,/studentQuestionPool[\s\S]*providerSet[\s\S]*taxonomySet[\s\S]*publicQuestion/,'Server-side source and taxonomy filtering is missing');
 assert.match(edge,/has_workbook:\s*!!codeWorkbookForPassage\(passage\)\s*\|\|\s*factoryPassageIds\.has\(passage\.id\)/,'Student bootstrap must expose static and Factory workbook availability from the server catalog');
 assert.match(edge,/factory_start[\s\S]*factory_confirm[\s\S]*ready_workbook_catalogs/,'Workbook Factory admin operations or persisted catalog are missing');
+assert.match(edge,/fullWorkbook[\s\S]*neededStages[\s\S]*if \(!fullWorkbook \|\| neededStages\.length\)/,'Full Workbook source reuse must skip Gemini when every source stage is extracted');
+assert.match(edge,/Math\.min\(8_192[\s\S]*response\.status !== 400/,'Factory Gemini calls need a bounded output and model-compatibility fallback');
 assert.match(student,/function hasWorkbook\(passage\)\{return passage\?\.has_workbook===true;\}/,'Student home must use the server workbook flag instead of a textbook allowlist');
 assert.match(edge,/configs = \[\{ \.\.\.base, thinkingConfig[\s\S]*response\.status !== 400/,'AI grading lacks the model compatibility fallback used by dictionary calls');
 

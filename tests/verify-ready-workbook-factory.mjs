@@ -11,6 +11,7 @@ const canonical=[{text:'Humans excel at visual imagery.',translation:'인간은 
 // Case A: semantic headings win over publisher stage numbers, and Check is excluded.
 const textbook=inspectFullWorkbookText(fixture('workbook-factory-textbook.txt'));
 assert.equal(textbook.fullWorkbook,true);
+assert.equal(textbook.reviewRequired,false);
 assert.ok(textbook.headings.some(item=>item.type==='writing'));
 assert.equal(semanticWorkbookType('Stage 10 Check'),'check_mixed');
 
@@ -33,6 +34,18 @@ assert.equal(catalog.stages.find(stage=>stage.stage===5).items.length,1);
 assert.equal(catalog.stages.find(stage=>stage.stage===6).items.length,1);
 assert.equal(catalog.stages.find(stage=>stage.stage===7).items.length,1);
 assert.equal(catalog.metrics.validatorDrop,0);
+
+const fullReuse=generateWorkbookCatalog({title:'Publisher',workbookKey:'publisher',rows:canonical,sourceExercises:[
+  {type:'verb_form',number:1,prompt:'Humans excel at visual ____________.',answer:'imagery',provenance:{page:3}},
+  {type:'verb_form',number:2,prompt:'Our brains ____________ this ability for survival.',answer:'evolved',provenance:{page:3}},
+  {type:'grammar_vocab_choice',number:1,prompt:'Humans (excel/excels) at visual imagery.',answer:'excel',provenance:{page:4}},
+  {type:'grammar_vocab_choice',number:2,prompt:'Our brains (evolve/evolved) this ability for survival.',answer:'evolved',provenance:{page:4}},
+  {type:'error_correction',number:1,prompt:'Humans excels at visual imagery.',answer:'excels → excel',provenance:{page:5}},
+  {type:'error_correction',number:2,prompt:'Our brains evolve this ability for survival.',answer:'evolve → evolved',provenance:{page:5}},
+],provenance:{geminiCallCount:0}});
+assert.equal(fullReuse.metrics.geminiCallCount,0,'Full Workbook source reuse must not call Gemini');
+assert.deepEqual([5,6,7].map(stage=>fullReuse.stages.find(item=>item.stage===stage).items.length),[2,2,2]);
+assert.equal(fullReuse.metrics.validatorDrop,0);
 
 const invalid=generateWorkbookCatalog({title:'Invalid',workbookKey:'invalid',rows:canonical,ai:{5:[{sentenceIndex:1,prompt:'Invented sentence ____________.',hint:'invent',answer:'invented'}]}});
 assert.equal(invalid.stages.find(stage=>stage.stage===5).items.length,0);

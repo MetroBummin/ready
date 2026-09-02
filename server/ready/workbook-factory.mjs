@@ -59,7 +59,7 @@ export function extractSentenceRows(text) {
 }
 
 function pageBlocks(text) {
-  const lines = sentenceLines(text), blocks = [], headings = [];
+  const lines = clean(text, 80_000).split(/\r?\n/).map(line => clean(line)).filter(Boolean), blocks = [], headings = [];
   let current = { title: '', body: [], page: 1 };
   for (const line of lines) {
     const page = line.match(/^\[?page\s*(\d+)\]?$/i);
@@ -76,8 +76,10 @@ function pageBlocks(text) {
 function numberedPairs(lines) {
   const out = [];
   for (const line of lines) {
-    const match = line.match(/^\s*(\d+)[.)]\s*(.+?)(?:\s*(?:\|\||\[?answer:?|정답[:：])\s*([^\]\n]+)\]?)?$/i);
-    if (match) out.push({ number: Number(match[1]), prompt: clean(match[2]), answer: clean(match[3] || '') });
+    const match = line.match(/^\s*(\d+)[.)]\s*(.+)$/);
+    if (!match) continue;
+    const source = clean(match[2]), divider = source.match(/^(.*?)\s*(?:\|\||\[?answer:?|정답[:：])\s*([^\]\n]+)\]?$/i);
+    out.push({ number: Number(match[1]), prompt: clean(divider?.[1] || source), answer: clean(divider?.[2] || '') });
   }
   return out;
 }
@@ -91,9 +93,10 @@ export function inspectFullWorkbookText(text) {
   const fullWorkbook = answerKey && new Set(semantic.filter(type => !['unknown', 'check_mixed', 'paragraph_ordering'].includes(type))).size >= 3;
   const translationBlocks = blocks.filter(block => semanticWorkbookType(block.title) === 'translation');
   const candidate = translationBlocks.flatMap(block => numberedPairs(block.body));
-  const extracted = extractSentenceRows(text);
-  const rows = extracted.rows;
-  const confident = fullWorkbook && rows.length >= 2 && !extracted.needsTranslation && candidate.length >= rows.length;
+  const stageFourPairs = candidate.filter(item => isEnglish(item.prompt) && isKorean(item.answer)).map(item => ({ text: item.prompt, translation: item.answer }));
+  const prose = clean(text, 80_000).split(/\r?\n/).filter(line => !/^\s*\d+[.)]/.test(line) && semanticWorkbookType(line) === 'unknown' && !/answer\s*key|정답\s*(및|표|해설)?/i.test(line)).join('\n');
+  const extracted = extractSentenceRows(prose), rows = stageFourPairs.length ? stageFourPairs : extracted.rows;
+  const confident = fullWorkbook && rows.length >= 2 && (stageFourPairs.length >= 2 || (!extracted.needsTranslation && candidate.length >= rows.length));
   return {
     fullWorkbook, reviewRequired: !confident, rows, headings,
     exercises: blocks.flatMap(block => numberedPairs(block.body).map(item => ({ ...item, type: semanticWorkbookType(block.title), page: block.page, label: block.title }))),
@@ -132,6 +135,31 @@ function deterministicItems(rows, prefix) {
   return byStage;
 }
 
+function sourceStage(type) { return ({ korean_blank: 2, english_blank: 3, translation: 4, verb_form: 5, grammar_vocab_choice: 6, error_correction: 7, sentence_ordering: 8, writing: 9 })[type] || 0; }
+function sourceChoice(prompt, answer) {
+  const match = clean(prompt).match(/\(([^()]{3,240})\)/); if (!match) return null;
+  const options = match[1].split(/\s*(?:\/|\||,|or)\s*/i).map(value => clean(value)).filter(Boolean);
+  if (options.length < 2 || !options.includes(answer)) return null;
+  return { prompt: prompt.replace(match[0], '⟦CHOICE:0⟧'), options };
+}
+function sourceCorrection(prompt, answer) {
+  const pair = clean(answer).match(/^(.+?)\s*(?:→|->|⇒)\s*(.+)$/); if (!pair) return null;
+  const wrong = clean(pair[1]), correct = clean(pair[2]);
+  return wrong && correct && wrong !== correct ? { wrong, correct, prompt: clean(prompt) } : null;
+}
+function fullWorkbookItems(sourceExercises, rows, prefix) {
+  const byStage = new Map([5, 6, 7].map(stage => [stage, []]));
+  for (const source of Array.isArray(sourceExercises) ? sourceExercises : []) {
+    const stage = sourceStage(source?.type), number = Number(source?.number), row = rows[number - 1], prompt = clean(source?.prompt, 2_000), answer = clean(source?.answer, 300);
+    if (!row || ![5, 6, 7].includes(stage) || !prompt || !answer) continue;
+    const key = factoryKey(prefix, stage, number), en = clean(row.text), ko = clean(row.translation);
+    if (stage === 5 && restoreBlank(prompt, answer) === en) byStage.get(5).push(item(5, number, key, { kind: 'verb_form', source: ko, prompt, hints: [answer], answers: [answer], provenance: source.provenance }));
+    if (stage === 6) { const choice = sourceChoice(prompt, answer); if (choice && choice.prompt.replace('⟦CHOICE:0⟧', answer) === en) byStage.get(6).push(item(6, number, key, { kind: 'choice_groups', source: ko, prompt: choice.prompt, groups: [choice.options], answers: [answer], provenance: source.provenance })); }
+    if (stage === 7) { const correction = sourceCorrection(prompt, answer); if (correction && correction.prompt.replace(correction.wrong, correction.correct) === en) byStage.get(7).push(item(7, number, key, { kind: 'correction_pairs', source: '', prompt: correction.prompt, pairCount: 1, subtype: 'sentence', answers: [correction.wrong, correction.correct], provenance: source.provenance })); }
+  }
+  return byStage;
+}
+
 function normalizeAiItem(stage, raw, rows, prefix, number) {
   const sentenceIndex = Number(raw?.sentenceIndex) - 1, row = rows[sentenceIndex]; if (!row) return null;
   const canonicalNumber = sentenceIndex + 1, en = clean(row.text), ko = clean(row.translation), key = factoryKey(prefix, stage, canonicalNumber);
@@ -164,12 +192,14 @@ function validateItem(stage, candidate, rowByNumber) {
   return 'unsupported_stage';
 }
 
-export function generateWorkbookCatalog({ title, workbookKey, rows, ai = {}, provenance = {} }) {
+export function generateWorkbookCatalog({ title, workbookKey, rows, ai = {}, sourceExercises = [], provenance = {} }) {
   const started = Date.now(), canonical = rows.map((row, index) => ({ text: clean(row?.text), translation: clean(row?.translation), index: index + 1 })).filter(row => row.text && row.translation);
   if (!canonical.length || canonical.length !== rows.length) throw new Error('Canonical English/Korean sentence pairs are required.');
   const prefix = clean(workbookKey, 100).replace(/[^a-z0-9-]/gi, '-').toLowerCase() || 'factory';
   const generated = deterministicItems(canonical, prefix), rowByNumber = new Map(canonical.map(row => [row.index, row])), drops = [];
-  for (const stage of [5, 6, 7]) (Array.isArray(ai[stage]) ? ai[stage] : []).forEach((raw, index) => {
+  const sourceItems = fullWorkbookItems(sourceExercises, canonical, prefix);
+  for (const stage of [5, 6, 7]) generated.set(stage, sourceItems.get(stage).length ? sourceItems.get(stage) : generated.get(stage));
+  for (const stage of [5, 6, 7]) if (!(sourceItems.get(stage)?.length)) (Array.isArray(ai[stage]) ? ai[stage] : []).forEach((raw, index) => {
     const candidate = normalizeAiItem(stage, raw, canonical, prefix, index + 1); if (candidate) generated.get(stage).push(candidate); else drops.push({ stage, number: Number(raw?.sentenceIndex) || index + 1, reason: `stage${stage}_round_trip` });
   });
   const stages = FACTORY_STAGES.map(stage => {
