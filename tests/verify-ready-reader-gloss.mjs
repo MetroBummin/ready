@@ -22,6 +22,9 @@ assert.match(module,/data-word-anchor-active/,'Active word semantic hook is requ
 assert.match(module,/word-popup[\s\S]*wordPopupState/,'Word popup state hook is required.');
 assert.match(module,/lookupContext=sentence\.lookupContext[\s\S]*\.\.\.record\.lookupContext/,'Submitted Question and Workbook lookup context must survive the overlay.');
 assert.match(module,/sentence-sheet-scrim[\s\S]*sentence-structure/,'Sentence sheet hooks are required.');
+assert.match(module,/sentence-sheet-header[\s\S]*data-sheet-drag-handle[\s\S]*sentence-sheet-close/,'Sentence sheet header, visual drag hook, and close hook are required.');
+assert.match(module,/data-sentence-sheet-close[\s\S]*dismissSheet/,'Sentence sheet close control must reuse dismissSheet.');
+assert.match(module,/setAttribute\('data-sentence-structure-open'/,'Expanded sentence structure must expose a semantic state hook.');
 assert.match(baseCss,/position:fixed[\s\S]*pointer-events:auto/,'Popup must remain outside document flow.');
 assert.match(baseCss,/sentence-sheet-scrim[\s\S]*touch-action:none/,'Scrim must own overlay input.');
 assert.match(migration,/ready_saved_word_senses[\s\S]*unique \(saved_word_id, meaning_key\)/,'Senses must be normalized and unique.');
