@@ -22,7 +22,7 @@ const shortsMigration=read('supabase/migrations/20260831113000_ready_shorts_book
 const operationPattern=/(?:call|readyApi|record)\(['"]([a-z_]+)['"]/g;
 const clientOps=new Set([...admin.matchAll(operationPattern),...student.matchAll(operationPattern)].map(match=>match[1]));
 const serverOps=new Set([...edge.matchAll(/case "([a-z_]+)"/g)].map(match=>match[1]));
-const serverOnlyOps=new Set(['create_passage','delete_student','delete_passage','import_questions','import_explanations']);
+const serverOnlyOps=new Set(['create_passage','delete_student','delete_passage','import_questions','import_explanations','sentence_structure']);
 for(const op of clientOps)assert(serverOps.has(op),`Frontend operation has no server contract: ${op}`);
 for(const op of serverOps)assert(clientOps.has(op)||serverOnlyOps.has(op),`Server operation has no active caller: ${op}`);
 

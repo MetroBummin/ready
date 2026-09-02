@@ -20,7 +20,7 @@
     <span class="sr-only" data-reader-gloss-live aria-live="polite"></span>
   </main>
   <script type="module">
-    import {createReaderInlineGloss,readerSentenceMarkup} from '/ready/reader-inline-gloss.js';
+    import {createReaderInlineGloss,readerSentenceMarkup} from '/ready/reader-inline-gloss.js?v=inline-reader-2';
     const sentences=[
       {id:'reader-1',text:'She enjoys discovering new songs by subscribing to the service and will take part in the project.'},
       {id:'choice-1',text:'The subscription provides extraordinarily detailed recommendations for every student.'}
@@ -37,9 +37,15 @@
     };
     let retryCount=0;
     try{
-      createReaderInlineGloss({root,passage:{id:'motion-fixture',updated_at:'v1'},sentences,savedWords:[{id:'saved-subscribe',lemma:'subscribe',meaning:'구독하다',memoryLevel:2}],request:data=>new Promise(resolve=>setTimeout(()=>{const result=meaningFor(data);if(data.retry&&result.lemma==='discover')result.meaning=++retryCount%2?'새롭게 찾아내다':'발견하다';resolve({resolved:true,eventId:`event-${Date.now()}`,sentenceId:data.sentenceId,confidence:.99,...result});},650)),saveWord:async({lemma})=>({saved:true,savedWordId:`saved-${lemma}`,lemma,meaning:'발견하다',memoryLevel:1}),removeWord:async()=>({saved:false})});
+      let sentenceRequests=0;
+      const params=new URLSearchParams(location.search),fixtureRevision=params.get('revision')||'v1';
+      createReaderInlineGloss({root,passage:{id:'motion-fixture',updated_at:fixtureRevision},sentences,savedWords:[{id:'saved-subscribe',lemma:'subscribe',meaning:'구독하다',memoryLevel:2,senses:[]}],request:data=>new Promise(resolve=>setTimeout(()=>{const result=meaningFor(data);if(data.retry&&result.lemma==='discover')result.meaning=++retryCount%2?'새롭게 찾아내다':'발견하다';resolve({resolved:true,eventId:`event-${Date.now()}`,sentenceId:data.sentenceId,confidence:.99,...result});},650)),saveWord:async({lemma})=>({saved:true,savedWordId:`saved-${lemma}`,lemma,meaning:'발견하다',memoryLevel:1,senses:[{meaning:'발견하다'}]}),removeWord:async()=>({saved:false}),requestSentence:async()=>{sentenceRequests+=1;return {translation:'그녀는 새로운 노래를 발견하고 프로젝트에 참여하는 것을 즐깁니다.'};},sentenceReturnMs:1200});
       root.dataset.qaReady='true';
-      window.__readyGlossQA={sentence:()=>firstSentence,stableNode:()=>stableFirst,identityPreserved:()=>firstSentence.firstChild===stableFirst,overflow:()=>document.documentElement.scrollWidth-document.documentElement.clientWidth};
+      window.__readyGlossQA={sentence:()=>firstSentence,stableNode:()=>stableFirst,identityPreserved:()=>firstSentence.firstChild===stableFirst,overflow:()=>document.documentElement.scrollWidth-document.documentElement.clientWidth,sentenceRequests:()=>sentenceRequests};
+      if(params.has('sentence')){
+        const hold=delay=>setTimeout(()=>{const target=firstSentence.querySelector('[data-reader-gloss-source]'),pointerId=91;target.dispatchEvent(new PointerEvent('pointerdown',{bubbles:true,pointerId,clientX:20,clientY:20}));setTimeout(()=>target.dispatchEvent(new PointerEvent('pointerup',{bubbles:true,pointerId,clientX:20,clientY:20})),620);},delay);
+        hold(40);hold(1900);
+      }
     }catch(error){root.dataset.qaError=String(error?.stack||error);window.__readyGlossError=String(error?.stack||error);}
   </script>
 </body>

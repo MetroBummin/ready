@@ -33,14 +33,14 @@ if (!nativeBuild) {
     ['../../design-tokens.css', '../design-tokens.css'],
   ]);
 }
-await replace(resolve(output, 'reader-learning-overlays.js'), [
+await replace(resolve(output, 'reader-inline-gloss.js'), [
   ["../modules/lexical/core.js", "./modules/lexical/core.js"],
 ]);
 await writeFile(resolve(output, '.nojekyll'), '');
 
 const student = await readFile(resolve(output, 'index.html'), 'utf8');
 const admin = nativeBuild ? '' : await readFile(resolve(output, 'admin/index.html'), 'utf8');
-const readerGloss = await readFile(resolve(output, 'reader-learning-overlays.js'), 'utf8');
+const readerGloss = await readFile(resolve(output, 'reader-inline-gloss.js'), 'utf8');
 const lexicalCore = await readFile(resolve(output, 'modules/lexical/core.js'), 'utf8');
 if (/\.\.\/(?:assets|styles)\//.test(student) || /\.\.\/\.\.\/(?:assets|styles)\//.test(admin)) {
   throw new Error('GitHub Pages build contains unresolved parent asset paths.');

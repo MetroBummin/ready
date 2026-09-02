@@ -13,8 +13,8 @@
   <main class="fixture">
     <h1>Question 선택지 Word Lookup · 390px</h1>
     <section class="question-answer-area" aria-label="Word Lookup overflow fixtures">
-      <div class="question-choice"><span class="question-choice-mark">①</span><span class="question-choice-copy">A <span class="reader-inline-sentence"><span class="reader-inline-replacement"><button class="reader-inline-gloss">정기적으로 구독하여 이용하다</button><button class="reader-word-toggle">✓</button></span></span> plan.</span></div>
-      <div class="question-choice"><span class="question-choice-mark">②</span><span class="question-choice-copy">This is an intentionally long choice that already wraps onto multiple lines before <span class="reader-inline-sentence"><span class="reader-inline-replacement"><button class="reader-inline-gloss">새롭고 중요한 사실을 우연히 발견하다</button><button class="reader-word-toggle">✓</button></span></span> appears.</span></div>
+      <div class="question-choice"><span class="question-choice-mark">①</span><span class="question-choice-copy">A <span class="reader-inline-sentence"><span class="reader-inline-replacement"><button class="reader-inline-gloss">정기적으로 구독하여 이용하다</button><button class="reader-word-toggle">+</button></span></span> plan.</span></div>
+      <div class="question-choice"><span class="question-choice-mark">②</span><span class="question-choice-copy">This is an intentionally long choice that already wraps onto multiple lines before <span class="reader-inline-sentence"><span class="reader-inline-replacement"><button class="reader-inline-gloss">새롭고 중요한 사실을 우연히 발견하다</button><button class="reader-word-toggle">+</button></span></span> appears.</span></div>
       <div class="question-choice"><span class="question-choice-mark">③</span><span class="question-choice-copy"><span class="reader-inline-sentence"><span class="reader-inline-replacement"><button class="reader-inline-gloss">구독하다</button><button class="reader-word-toggle">−</button></span></span> and <span class="reader-inline-sentence"><span class="reader-inline-replacement"><button class="reader-inline-gloss">발견하다</button><button class="reader-word-toggle">✓</button></span></span> every day.</span></div>
       <div class="question-choice"><span class="question-choice-mark">④</span><span class="question-choice-copy">Students <span class="reader-inline-sentence"><span class="reader-inline-replacement"><button class="reader-inline-gloss">적극적으로 참여하다</button><button class="reader-word-toggle">✓</button></span></span> the project.</span></div>
       <div class="question-choice correct"><span class="question-choice-mark">⑤</span><span class="question-choice-copy">Saved same meaning <span class="reader-inline-sentence"><span class="reader-inline-replacement" data-word-saved="true"><button class="reader-inline-gloss">구독하다</button><button class="reader-word-toggle">−</button></span></span>.</span></div>
@@ -34,7 +34,7 @@
     measure();addEventListener('resize',measure);setTimeout(()=>{document.querySelector('#auto-return').innerHTML='Auto return <span class="reader-inline-sentence"><button class="reader-inline-source">subscribing</button></span>.';document.body.dataset.autoReturned='true';measure();},10_000);
   </script>
   <script type="module">
-    import {createReaderInlineGloss,readerSentenceMarkup} from '../ready/reader-inline-gloss.js?v=local-saved-fast-path-2';
+    import {createReaderInlineGloss,readerSentenceMarkup} from '../ready/reader-inline-gloss.js?v=inline-reader-2';
     const root=document.querySelector('#fast-path-root'),sentence={id:'fast-sentence',text:'She enjoys subscribing to the service.'},saved={id:'saved-subscribe',lemma:'subscribe',meaning:'구독하다',memoryLevel:2};
     root.querySelector('[data-reader-sentence-id]').innerHTML=readerSentenceMarkup(sentence,[],[],new Map([[saved.lemma,saved]]));
     document.body.dataset.lookupRequests='0';
