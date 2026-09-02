@@ -24,6 +24,8 @@ assert.match(app,/sentenceEnabled:root\.id==='student-reader'/,'Sentence long pr
 assert.match(module,/UNDECIDED[\s\S]*SENTENCE[\s\S]*SCROLL/,'Gesture ownership states must remain explicit.');
 assert.match(module,/pointer\.cancelled=true[\s\S]*owner='SCROLL'/,'Movement must permanently cancel the current gesture.');
 assert.match(module,/setSourceState\(button,'pending'\)/,'Orange word feedback must begin only after a confirmed tap.');
+assert.doesNotMatch(css,/\.reader-inline-source:hover,\.reader-inline-source:focus-visible/,'Touch hover must not color a word before gesture ownership is decided.');
+assert.match(css,/@media \(hover:hover\) and \(pointer:fine\)\{\.reader-inline-source:hover/,'Hover feedback must be limited to real hover pointers.');
 assert.match(module,/reader-inline-replacement[\s\S]*reader-inline-english[\s\S]*reader-inline-meaning/,'Words must crossfade inside a persistent inline slot.');
 assert.match(module,/preferredSavedSense[\s\S]*occurrenceKey[\s\S]*saved\.meaning/,'Saved fast path must prefer exact occurrence then primary sense.');
 assert.match(module,/sameSaved\?'−':'\+'/,'Inline word controls must expose only add and whole-lemma remove.');
@@ -37,5 +39,6 @@ assert.match(migration,/ready_sentence_learning_cache/,'Sentence cache migration
 assert.match(edge,/saveReaderWord[\s\S]*ready_saved_word_senses/,'Explicit add must append an idempotent sense.');
 assert.match(edge,/removeReaderWord[\s\S]*\.delete\(\)\.eq\("student_id"/,'Whole lemma remove must delete the parent row.');
 assert.match(edge,/sentenceEasyTranslation[\s\S]*sentenceStructure/,'Easy translation and dormant structure endpoints must remain intact.');
+assert.match(edge,/context\.sentence\.translation[\s\S]*publisher_reference/,'Publisher translation must keep sentence long press usable without a Gemini round trip.');
 assert.match(build,/reader-inline-gloss\.js/,'Pages build must include the inline runtime.');
 console.log('READY inline word, multi-sense, sentence translation, and gesture contracts verified');
