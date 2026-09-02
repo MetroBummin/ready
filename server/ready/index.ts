@@ -15,7 +15,6 @@ import { WORKBOOK_TRANSLATION_GRADING_POLICY, workbookTranslationPass } from "./
 import { normalizeWorkbookAnswer, publicWorkbookAssistance, stageNineHint, workbookAssistanceMode } from "./workbook-assistance.mjs";
 import { CURRENT_QUESTION_PUBLICATION_VERSION } from "./question-pipeline.mjs";
 import { extractSentenceRows, generateWorkbookCatalog, inspectFullWorkbookText } from "./workbook-factory.mjs";
-import { extractUnicodePdfText } from "./pdf-text-extract.mjs";
 
 const CORS = { "Access-Control-Allow-Origin": "*", "Access-Control-Allow-Headers": "authorization, apikey, content-type, x-client-info", "Access-Control-Allow-Methods": "POST, OPTIONS" };
 const json = (body: unknown, status = 200) => new Response(JSON.stringify(body), { status, headers: { ...CORS, "Content-Type": "application/json", "Cache-Control": "no-store" } });
@@ -410,7 +409,7 @@ async function factoryStart(body: any) {
   const sourceKind = body.sourceKind === "pdf" ? "pdf" : "text", title = required(body.title, "지문 제목", 120);
   let sourceText = clean(body.sourceText, 80_000);
   if (sourceKind === "pdf") {
-    try { sourceText = await extractUnicodePdfText(body.pdfBase64); }
+    try { const { extractUnicodePdfText } = await import("./pdf-text-extract.mjs"); sourceText = await extractUnicodePdfText(body.pdfBase64); }
     catch {
       throw new ApiError(400, "이 PDF의 실제 텍스트를 읽을 수 없습니다. 스캔 PDF는 OCR 후 다시 올리거나, 영문과 한글 문장을 붙여 넣어 주세요.");
     }
