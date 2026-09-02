@@ -353,13 +353,13 @@ function factoryRows(value: unknown) {
 async function factoryGemini(prompt: string, maxOutputTokens: number) {
   const provider = (Deno.env.get("AI_PROVIDER") ?? "").trim().toLowerCase(), key = Deno.env.get("GEMINI_API_KEY");
   if (provider !== "gemini" || !key) throw new ApiError(503, "Workbook Factory Gemini가 아직 연결되지 않았습니다.");
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${key}`;
   const base = { maxOutputTokens: Math.min(8_192, Math.max(256, maxOutputTokens)), temperature: 0.1, responseMimeType: "application/json" }, configs = [{ ...base, thinkingConfig: { thinkingBudget: 0 } }, base];
   let lastStatus = 0, lastError = "";
-  for (const generationConfig of configs) {
+  for (const model of geminiModels()) for (const generationConfig of configs) {
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${key}`;
     const response = await fetch(url, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ system_instruction: { parts: [{ text: "You create structured, source-grounded English workbook data. Return only JSON. Never invent or alter a canonical sentence." }] }, contents: [{ role: "user", parts: [{ text: prompt }] }], generationConfig }) });
     if (response.ok) { const payload = await response.json(), parsed = parseJson((payload?.candidates?.[0]?.content?.parts || []).map((part: any) => part?.text || "").join("")); if (!parsed) throw new ApiError(502, "Workbook Factory Gemini 결과 형식이 올바르지 않습니다."); return { parsed, tokenUsage: Number(payload?.usageMetadata?.totalTokenCount) || 0 }; }
-    lastStatus = response.status; lastError = (await response.text()).slice(0, 300); if (response.status !== 400) break;
+    lastStatus = response.status; lastError = (await response.text()).slice(0, 300); if (response.status === 400) continue; if (response.status === 429) break; throw new ApiError(502, `Workbook Factory Gemini 요청이 실패했습니다 (${response.status}).`);
   }
   console.error("READY Workbook Factory Gemini failed:", lastStatus, lastError);
   throw new ApiError(502, `Workbook Factory Gemini 요청이 실패했습니다 (${lastStatus || "network"}).`);
@@ -383,7 +383,9 @@ async function finalizeFactoryJob(job: any, confirmedRows?: unknown) {
   const metadata = job.source_metadata || {}, sourceType = metadata.sourceType === "MOCK_EXAM" ? "MOCK_EXAM" : "TEXTBOOK", title = required(job.title, "지문 제목", 120), grade = required(metadata.grade, "학년", 40), sourceYear = metadata.sourceYear ? Math.round(Number(metadata.sourceYear)) : null, sourceMonth = metadata.sourceMonth ? Math.round(Number(metadata.sourceMonth)) : null;
   if (sourceType === "MOCK_EXAM" && (!sourceYear || !sourceMonth)) throw new ApiError(400, "모의고사는 연도와 월이 필요합니다.");
   const sourceExercises = Array.isArray(job.extraction?.sourceExercises) ? job.extraction.sourceExercises : [], fullWorkbook = job.extraction?.fullWorkbook === true;
-  const sourceTypes = new Set(sourceExercises.map((exercise: any) => clean(exercise?.type, 80))), neededStages = [[5, "verb_form"], [6, "grammar_vocab_choice"], [7, "error_correction"]].filter(([, type]) => !sourceTypes.has(type)).map(([stage]) => stage as number);
+  const executableTypes = new Set(sourceExercises.filter((exercise: any) => clean(exercise?.answer, 300) || (Array.isArray(exercise?.answers) && exercise.answers.length)).map((exercise: any) => clean(exercise?.type, 80)));
+  const incompleteStages = new Set((Array.isArray(job.extraction?.incompleteStages) ? job.extraction.incompleteStages : []).map(Number));
+  const neededStages = [[5, "verb_form"], [6, "grammar_vocab_choice"], [7, "error_correction"]].filter(([stage, type]) => incompleteStages.has(Number(stage)) || !executableTypes.has(type as string)).map(([stage]) => stage as number);
   let ai = { stages: { 5: [], 6: [], 7: [] }, tokenUsage: 0, callCount: 0 }, fallbackError = "";
   if (!fullWorkbook || neededStages.length) {
     try { ai = await factoryExercises(rowsForCatalog, fullWorkbook ? neededStages : [5, 6, 7]); }
@@ -399,7 +401,7 @@ async function finalizeFactoryJob(job: any, confirmedRows?: unknown) {
   const provenance = { ...(job.extraction || {}), sourceKind: job.source_kind, documentSha256: clean(metadata.documentSha256, 128), documentName: clean(metadata.documentName, 240), geminiCallCount: ai.callCount, geminiTokenUsage: ai.tokenUsage, pdfExtractedExercises: Number(job.extraction?.exerciseCount) || 0, ...(fallbackError ? { fallbackError } : {}) };
   const catalog = generateWorkbookCatalog({ title: `${title} · READY 워크북`, workbookKey, rows: rowsForCatalog, ai: ai.stages, sourceExercises, provenance });
   const saved = await db.from("ready_workbook_catalogs").insert({ passage_id: passageId, workbook_key: catalog.workbookKey, catalog, provenance, metrics: catalog.metrics, factory_job_id: job.id });
-  if (saved.error) throw new ApiError(500, saved.error.message);
+  if (saved.error) { await db.from("ready_passages").delete().eq("id", passageId); throw new ApiError(500, saved.error.message); }
   const completed = await db.from("ready_workbook_factory_jobs").update({ status: "ready", passage_id: passageId, extracted_rows: rowsForCatalog, metrics: catalog.metrics, completed_at: new Date().toISOString(), failure_reason: "" }).eq("id", job.id);
   if (completed.error) throw new ApiError(500, completed.error.message);
   return { passageId, catalog, metrics: catalog.metrics };

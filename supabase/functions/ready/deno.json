@@ -1,0 +1,5 @@
+{
+  "imports": {
+    "pdfjs-dist/": "npm:pdfjs-dist@5.7.284/"
+  }
+}

@@ -25,6 +25,10 @@ assert.equal(semanticWorkbookType('Writing'),'writing');
 // re-numbering are all represented by the final row order passed to generation.
 const only=extractSentenceRows('Humans excel at visual imagery.\nOur brains evolved this ability for survival.');
 assert.equal(only.needsTranslation,true);
+const tsv=extractSentenceRows('English\tKorean\nHumans excel at visual imagery.\t인간은 시각적 심상에 뛰어나다.\nOur brains evolved this ability for survival.\t우리의 뇌는 생존을 위해 이 능력을 발달시켰다.');
+assert.equal(tsv.pairing,'tsv_two_column');
+assert.equal(tsv.rows.length,2);
+assert.equal(extractSentenceRows('Humans excel.\t인간은 뛰어나다.\nloose note').pairing,'invalid_mixed_tsv','Mixed TSV must fail closed rather than silently dropping a line.');
 const pdfNoise=extractSentenceRows('Humans excel at visual imagery.\u0000\nOur brains evolved this ability for survival.');
 assert.ok(pdfNoise.rows.every(row=>!JSON.stringify(row).includes('\\u0000')),'PDF control characters must not reach JSONB storage.');
 const reviewed=[{text:'Humans excel at visual imagery.',translation:'인간은 시각적 심상에 뛰어나다.'},{text:'They improve when they reflect on feedback.',translation:'그들은 피드백을 돌아볼 때 향상된다.'},canonical[1]];
@@ -47,7 +51,16 @@ const fullReuse=generateWorkbookCatalog({title:'Publisher',workbookKey:'publishe
 ],provenance:{geminiCallCount:0}});
 assert.equal(fullReuse.metrics.geminiCallCount,0,'Full Workbook source reuse must not call Gemini');
 assert.deepEqual([5,6,7].map(stage=>fullReuse.stages.find(item=>item.stage===stage).items.length),[2,2,2]);
+assert.equal(fullReuse.metrics.sourceReusedExercises,6);
+assert.equal(fullReuse.metrics.geminiGeneratedExercises,0);
 assert.equal(fullReuse.metrics.validatorDrop,0);
+
+const partialReuse=generateWorkbookCatalog({title:'Partial',workbookKey:'partial',rows:canonical,sourceExercises:[
+  {type:'verb_form',number:1,prompt:'Humans excel at visual ____________.',answer:'imagery',provenance:{page:3}},
+],ai:{5:[{sentenceIndex:1,prompt:'Humans excel at visual ____________.',hint:'image',answer:'imagery'},{sentenceIndex:2,prompt:'Our brains ____________ this ability for survival.',hint:'evolve',answer:'evolved'}]},provenance:{geminiCallCount:1}});
+assert.deepEqual(partialReuse.stages.find(stage=>stage.stage===5).items.map(item=>item.number),[1,2],'AI may fill only missing source items without replacing publisher exercises.');
+assert.equal(partialReuse.metrics.sourceReusedExercises,1);
+assert.equal(partialReuse.metrics.geminiGeneratedExercises,1);
 
 const invalid=generateWorkbookCatalog({title:'Invalid',workbookKey:'invalid',rows:canonical,ai:{5:[{sentenceIndex:1,prompt:'Invented sentence ____________.',hint:'invent',answer:'invented'}]}});
 assert.equal(invalid.stages.find(stage=>stage.stage===5).items.length,0);

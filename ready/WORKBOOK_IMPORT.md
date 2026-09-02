@@ -28,3 +28,26 @@ source, prompt, reason을 남긴다. 현재 학생 학습 범위는 2~9단계이
 
 새 PDF에서 기존 규칙으로 충분한 READY exercise를 얻지 못하면 importer를 즉시 확장하지
 말고 실패 이유를 먼저 분류한다. 여러 문서에 반복되는 일반 패턴일 때만 계약을 확장한다.
+
+## Workbook Factory input
+
+Admin Factory는 다음 입력을 같은 canonical sentence review 단계로 모은다.
+
+- 텍스트층이 있는 전체 Workbook PDF
+- 영문 본문과 출판사 해석이 함께 있는 PDF
+- 영문/우리말 교대 텍스트
+- `English<TAB>Korean` 두 열 TSV
+- 영문만 있는 본문 텍스트(출판사 해석이 없음을 명시하고 review에서 멈춤)
+
+PDF는 PDF.js의 표준 Unicode text layer로 읽고 페이지 표지만 보존한다. 출판사명, 파일명,
+페이지 좌표, 폰트명 또는 임의 x 좌표로 열을 추측하지 않는다. 스캔 PDF나 손상된 문자맵은
+조용히 일부만 수용하지 않고 review/unsupported로 멈춘다.
+
+전체 Workbook에서 번호가 일치하는 2단계 영문과 3단계 우리말을 canonical pair로 만들고,
+5·6·7단계는 출판사 문제와 Answer Key의 같은 번호를 연결한다. 원문을 복원하는 round-trip이
+성공한 source exercise를 먼저 재사용하며, 부족한 번호만 한 번의 구조화 배치 생성 대상으로
+보낸다. 2·3·4·8·9단계는 검토가 끝난 canonical pair에서 결정론적으로 생성한다.
+
+Factory는 문장쌍이나 정답 연결이 불완전한 상태에서 일부 catalog를 publish하지 않는다.
+각 exercise validator 실패만 INVALID로 남기며, 기존 학생 Attempt/Review 데이터는 append-only
+정책을 그대로 따른다.
