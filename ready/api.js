@@ -1,7 +1,7 @@
 const getConfig = () => window.READY_CONFIG || {};
 const READ_ONLY_OPS = new Set([
   'teacher_bootstrap', 'delete_impact', 'student_bootstrap',
-  'student_passage', 'word_lookup_meaning', 'student_questions', 'student_question_filters', 'student_question_queue', 'student_review_questions',
+  'student_passage', 'word_lookup_meaning', 'sentence_easy_translation', 'sentence_structure', 'student_questions', 'student_question_filters', 'student_question_queue', 'student_review_questions',
   'student_workbook', 'workbook_assistance', 'workbook_hint',
 ]);
 
