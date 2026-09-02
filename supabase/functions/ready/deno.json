@@ -1,5 +1,5 @@
 {
   "imports": {
-    "pdfjs-dist/": "npm:pdfjs-dist@5.7.284/"
+    "pdfjs-dist/legacy/build/pdf.mjs": "npm:pdfjs-dist@5.7.284/legacy/build/pdf.mjs"
   }
 }
