@@ -20,6 +20,7 @@ assert.match(module,/UNDECIDED[\s\S]*SCROLL[\s\S]*SENTENCE/,'Gesture ownership s
 assert.match(module,/shouldBecomeScroll[\s\S]*dismissWord/,'Scroll ownership must dismiss an open popup.');
 assert.match(module,/data-word-anchor-active/,'Active word semantic hook is required.');
 assert.match(module,/word-popup[\s\S]*wordPopupState/,'Word popup state hook is required.');
+assert.match(module,/lookupContext=sentence\.lookupContext[\s\S]*\.\.\.record\.lookupContext/,'Submitted Question and Workbook lookup context must survive the overlay.');
 assert.match(module,/sentence-sheet-scrim[\s\S]*sentence-structure/,'Sentence sheet hooks are required.');
 assert.match(baseCss,/position:fixed[\s\S]*pointer-events:auto/,'Popup must remain outside document flow.');
 assert.match(baseCss,/sentence-sheet-scrim[\s\S]*touch-action:none/,'Scrim must own overlay input.');
