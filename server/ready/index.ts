@@ -15,6 +15,7 @@ import { WORKBOOK_TRANSLATION_GRADING_POLICY, workbookTranslationPass } from "./
 import { normalizeWorkbookAnswer, publicWorkbookAssistance, stageNineHint, workbookAssistanceMode } from "./workbook-assistance.mjs";
 import { CURRENT_QUESTION_PUBLICATION_VERSION } from "./question-pipeline.mjs";
 import { extractSentenceRows, generateWorkbookCatalog, inspectFullWorkbookText } from "./workbook-factory.mjs";
+import { extractUnicodePdfText } from "./pdf-text-extract.mjs";
 
 const CORS = { "Access-Control-Allow-Origin": "*", "Access-Control-Allow-Headers": "authorization, apikey, content-type, x-client-info", "Access-Control-Allow-Methods": "POST, OPTIONS" };
 const json = (body: unknown, status = 200) => new Response(JSON.stringify(body), { status, headers: { ...CORS, "Content-Type": "application/json", "Cache-Control": "no-store" } });
@@ -344,16 +345,6 @@ function factoryRows(value: unknown) {
     return { text, translation };
   });
 }
-function factoryPdfText(base64: unknown) {
-  const encoded = clean(base64, 12_000_000); if (!encoded) return "";
-  let binary = ""; try { binary = atob(encoded.replace(/^data:application\/pdf;base64,/i, "")); } catch { throw new ApiError(400, "PDF 파일을 읽을 수 없습니다."); }
-  // v1 intentionally supports only PDFs whose text operators expose Unicode
-  // text.  Scanned/OCR PDFs and font-only streams fail into the explicit error
-  // path below rather than inventing sentence boundaries.
-  const readable = binary.replace(/\\([()\\])/g, "$1");
-  const pieces = [...readable.matchAll(/\(([^()]{1,4000})\)\s*(?:Tj|['\"])/g)].map(match => match[1]);
-  return pieces.join("\n").replace(/\\n/g, "\n").replace(/\\r/g, "\n");
-}
 async function factoryGemini(prompt: string, maxOutputTokens: number) {
   const provider = (Deno.env.get("AI_PROVIDER") ?? "").trim().toLowerCase(), key = Deno.env.get("GEMINI_API_KEY");
   if (provider !== "gemini" || !key) throw new ApiError(503, "Workbook Factory Gemini가 아직 연결되지 않았습니다.");
@@ -410,7 +401,13 @@ async function finalizeFactoryJob(job: any, confirmedRows?: unknown) {
 }
 async function factoryStart(body: any) {
   const sourceKind = body.sourceKind === "pdf" ? "pdf" : "text", title = required(body.title, "지문 제목", 120);
-  const sourceText = sourceKind === "pdf" ? factoryPdfText(body.pdfBase64) : clean(body.sourceText, 80_000);
+  let sourceText = clean(body.sourceText, 80_000);
+  if (sourceKind === "pdf") {
+    try { sourceText = await extractUnicodePdfText(body.pdfBase64); }
+    catch {
+      throw new ApiError(400, "이 PDF의 실제 텍스트를 읽을 수 없습니다. 스캔 PDF는 OCR 후 다시 올리거나, 영문과 한글 문장을 붙여 넣어 주세요.");
+    }
+  }
   if (!sourceText) throw new ApiError(400, sourceKind === "pdf" ? "텍스트를 추출할 수 없는 PDF입니다. OCR PDF는 지원하지 않습니다." : "본문을 입력해 주세요.");
   const inspected = sourceKind === "pdf" ? inspectFullWorkbookText(sourceText) : { fullWorkbook: false, reviewRequired: true, ...extractSentenceRows(sourceText), exercises: [], headings: [], reason: "passage input requires review" };
   let rowsForReview = inspected.rows || [], translationTokens = 0;
