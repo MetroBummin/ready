@@ -99,6 +99,7 @@ assert.match(admin,/existing\?\{\}:\{sentenceRows:state\.factoryRows\}/,'Admin m
 assert.match(edge,/factoryFallbackTargets\(previewCatalog, rowsForCatalog, sourceExercises\)/,'Factory fallback must target missing sentence numbers rather than only wholly absent stages.');
 assert.match(edge,/offset \+= 6[\s\S]*Return exactly \{\"\$\{stage\}\":\[\.\.\.\]\}/,'Factory AI fallback must use small stage-specific batches with an explicit response shape.');
 assert.match(edge,/round < 3[\s\S]*factoryFallbackTargets\(previewCatalog/,'Factory fallback must retry only the still-missing validated sentence coverage.');
+assert.match(edge,/intentionally wrong option or faulty exercise prompt[\s\S]*restore the unchanged canonical sentence exactly/,'Factory system instructions must allow distractors without permitting canonical-answer invention.');
 assert.match(edge,/incompleteReview[\s\S]*allowIncomplete/,'Incomplete grammar stages must require an explicit publication decision.');
 assert.match(admin,/data-factory-confirm-incomplete[\s\S]*confirmFactory\(true\)/,'Admin must show coverage and require explicit confirmation before publishing an incomplete catalog.');
 assert.match(edge,/factory_regenerate[\s\S]*factoryRegenerate/,'Factory catalog regeneration must be an authenticated explicit admin operation.');
