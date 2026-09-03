@@ -8,6 +8,7 @@ on:
       - .github/workflows/factory-stage5-7-confirm-temp.yml
       - tools/factory-stage5-7-confirm-temp.py
       - tools/factory-stage5-7-boundary-temp.py
+      - tools/factory-stage5-7-cleanup-temp.py
 
 permissions:
   contents: write
@@ -28,6 +29,7 @@ jobs:
         run: |
           python3 tools/factory-stage5-7-confirm-temp.py
           python3 tools/factory-stage5-7-boundary-temp.py
+          python3 tools/factory-stage5-7-cleanup-temp.py
       - run: npm run ready:test
       - run: npm run build
       - run: npm run native:verify
