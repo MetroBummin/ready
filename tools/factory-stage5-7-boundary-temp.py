@@ -11,13 +11,25 @@ if insert not in text:
     text = text.replace(needle, needle + insert, 1)
 path.write_text(text)
 
-# The final-confirmation label lives inside a ternary template expression, so
-# assert the literal label rather than requiring it to be static HTML.
+# Update regressions for the new two-step preview/finalize contract.
 path = Path('tests/verify-ready-workbook-factory.mjs')
 text = path.read_text()
-old = "assert.match(adminFactorySource,/>최종 확정</,'Complete Factory preview must expose an explicit final confirmation.');"
-new = "assert.match(adminFactorySource,/'최종 확정'/,'Complete Factory preview must expose an explicit final confirmation.');"
-if old not in text:
-    raise SystemExit('final confirmation assertion marker missing')
-text = text.replace(old, new, 1)
+replacements = [
+    (
+        "assert.match(adminFactorySource,/>최종 확정</,'Complete Factory preview must expose an explicit final confirmation.');",
+        "assert.match(adminFactorySource,/'최종 확정'/,'Complete Factory preview must expose an explicit final confirmation.');",
+    ),
+    (
+        "assert.match(admin,/existing\\?\\{\\}:\\{sentenceRows:state\\.factoryRows\\}/,'Admin must not submit editable sentence rows in existing Passage mode.');",
+        "assert.match(admin,/!finalize&&!existing\\?\\{sentenceRows:state\\.factoryRows\\}:\\{\\}/,'Admin must not submit editable sentence rows in existing Passage mode.');",
+    ),
+    (
+        "assert.match(admin,/data-factory-confirm-incomplete[\\s\\S]*confirmFactory\\(true\\)/,'Admin must show coverage and require explicit confirmation before publishing an incomplete catalog.');",
+        "assert.match(admin,/data-factory-finalize-incomplete[\\s\\S]*confirmFactory\\(\\{finalize:true,allowIncomplete:true\\}\\)/,'Admin must show coverage and require explicit confirmation before publishing an incomplete catalog.');",
+    ),
+]
+for old, new in replacements:
+    if old not in text:
+        raise SystemExit(f'test patch marker missing: {old[:70]}')
+    text = text.replace(old, new, 1)
 path.write_text(text)
