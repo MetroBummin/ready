@@ -1,0 +1,19 @@
+name: Temporary PR verify
+on:
+  push:
+    branches: [fix/workbook-source-stage6-7]
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run ready:test
+      - run: npm run build
+      - run: npm run native:verify
