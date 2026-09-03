@@ -28,28 +28,6 @@ jobs:
         run: |
           python3 tools/factory-stage5-7-confirm-temp.py
           python3 tools/factory-stage5-7-boundary-temp.py
-      - name: Debug real PDF Stage 7
-        run: |
-          node --input-type=module <<'NODE'
-          import { readFile } from 'node:fs/promises';
-          import { extractUnicodePdfText } from './server/ready/pdf-text-extract.mjs';
-          import { inspectFullWorkbookText } from './server/ready/workbook-factory.mjs';
-          const bytes = await readFile('ready/workbooks/ne-minbyeongcheon-lesson-1.pdf');
-          const text = await extractUnicodePdfText(`data:application/pdf;base64,${bytes.toString('base64')}`);
-          const audit = inspectFullWorkbookText(text);
-          const beforeAnswers = text.slice(0, text.search(/Answer\s*Key/i));
-          const promptMatches = [...beforeAnswers.matchAll(/(?:^|\n)\s*(\d+)\s+다음 글의 밑줄 친 부분 중\s*(문맥상|어법상)\s*어색한 것을\s*(?:두|세|네|\d+)\s*개 찾아 바르게 고쳐 쓰시오\./g)].map(match => ({number:Number(match[1]), family:match[2]}));
-          console.log('STAGE7_PROMPTS', JSON.stringify(promptMatches));
-          console.log('STAGE7_DEBUG', JSON.stringify(audit.exercises.filter(item => item.type === 'error_correction').map(item => ({number:item.number, sourceNumber:item.sourceNumber, subtype:item.subtype, canonicalStart:item.canonicalStart, canonicalEnd:item.canonicalEnd, provenance:item.provenance, answer:item.answer})), null, 2));
-          const answerAt = text.search(/Answer\s*Key/i), answerText = text.slice(answerAt);
-          const starts = [...answerText.matchAll(/(?:^|\n)\s*(\d+)\)\s*\(1\)\s*/g)];
-          console.log('ANSWER_BLOCK_COUNT', starts.length);
-          for (let i=0;i<starts.length;i++) {
-            const from=starts[i].index, to=i+1<starts.length?starts[i+1].index:answerText.length;
-            const block=answerText.slice(from,to).replace(/\s+/g,' ').slice(0,700);
-            if (/^(?:\n|\s)*(?:1|2|3|4)\)/.test(block)) console.log(`ANSWER_BLOCK_${i}`, block);
-          }
-          NODE
       - run: npm run ready:test
       - run: npm run build
       - run: npm run native:verify
@@ -57,6 +35,6 @@ jobs:
         run: |
           git config user.name 'MetroBummin'
           git config user.email 'iamthefreeman@naver.com'
-          git add server/ready/workbook-factory.mjs server/ready/index.ts ready/admin/app.js tests/verify-ready-workbook-factory.mjs
+          git add server/ready/workbook-factory.mjs server/ready/index.ts ready/admin/app.js tests/verify-ready-workbook-factory.mjs tests/verify-ready-pdf-text.mjs
           git commit -m 'fix: require final workbook confirmation and recover publisher items'
           git push origin HEAD:fix/factory-final-confirm-stage5-7
