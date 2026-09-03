@@ -1,0 +1,140 @@
+name: Temporary factory performance patch
+
+on:
+  push:
+    branches: [fix/factory-546-performance]
+    paths: [.github/workflows/factory-perf-patch-temp.yml]
+
+permissions:
+  contents: write
+
+jobs:
+  patch-and-verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: fix/factory-546-performance
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Baseline span lookup benchmark
+        run: |
+          node --input-type=module <<'NODE'
+          import { generateWorkbookCatalog } from './server/ready/workbook-factory.mjs';
+          const rows=Array.from({length:60},(_,i)=>({text:`Sentence ${i+1} contains unique token word${i+1}.`,translation:`번역 ${i+1}`}));
+          const sourceExercises=rows.map((row,i)=>({type:'grammar_vocab_choice',number:i+1,prompt:row.text.replace(`word${i+1}`,'⟦CHOICE:0⟧'),groups:[[ `wrong${i+1}`, `word${i+1}` ]],answers:[`word${i+1}`],provenance:{origin:'benchmark'}}));
+          const start=performance.now();
+          for(let i=0;i<8;i++) generateWorkbookCatalog({title:'benchmark',workbookKey:`bench-${i}`,rows,sourceExercises});
+          console.log(`baseline_ms=${(performance.now()-start).toFixed(1)}`);
+          NODE
+      - name: Patch cached canonical span lookup
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          path=Path('server/ready/workbook-factory.mjs')
+          text=path.read_text()
+          old="""function canonicalSpanMatches(value, rows) {
+  const matches = [];
+  for (let start = 0; start < rows.length; start += 1) {
+    let span = '';
+    for (let end = start; end < rows.length; end += 1) {
+      span = `${span} ${clean(rows[end]?.text)}`.trim();
+      if (sameEnglish(value, span)) matches.push({ start: start + 1, end: end + 1 });
+    }
+  }
+  return matches;
+}
+"""
+          new="""const canonicalSpanIndexCache = new WeakMap();
+function canonicalSpanIndex(rows) {
+  if (!Array.isArray(rows)) return new Map();
+  const cached = canonicalSpanIndexCache.get(rows);
+  if (cached) return cached;
+  const index = new Map();
+  for (let start = 0; start < rows.length; start += 1) {
+    let span = '';
+    for (let end = start; end < rows.length; end += 1) {
+      span = `${span} ${clean(rows[end]?.text)}`.trim();
+      const key = comparableEnglish(span), range = { start: start + 1, end: end + 1 }, matches = index.get(key);
+      if (matches) matches.push(range); else index.set(key, [range]);
+    }
+  }
+  canonicalSpanIndexCache.set(rows, index);
+  return index;
+}
+function canonicalSpanMatches(value, rows) {
+  return canonicalSpanIndex(rows).get(comparableEnglish(value)) || [];
+}
+"""
+          if old not in text: raise SystemExit('canonicalSpanMatches block not found')
+          text=text.replace(old,new,1)
+          old2="""  const matches = new Map(), visit = (value, pairIndex) => {
+    if (pairIndex === pairs.length) {
+      for (const span of canonicalSpanMatches(value, rows)) matches.set(`${span.start}:${span.end}:${canonicalText(value)}`, { value, span });
+      return;
+    }
+    const [wrong, correct] = pairs[pairIndex], positions = literalOccurrences(value, wrong);
+    for (const position of positions) visit(`${value.slice(0, position)}${correct}${value.slice(position + wrong.length)}`, pairIndex + 1);
+  };
+"""
+          new2="""  const matches = new Map(), visited = new Set(), visit = (value, pairIndex) => {
+    if (matches.size > 1) return;
+    const visitKey = `${pairIndex}:${value}`;
+    if (visited.has(visitKey)) return;
+    visited.add(visitKey);
+    if (pairIndex === pairs.length) {
+      for (const span of canonicalSpanMatches(value, rows)) matches.set(`${span.start}:${span.end}:${canonicalText(value)}`, { value, span });
+      return;
+    }
+    const [wrong, correct] = pairs[pairIndex], positions = literalOccurrences(value, wrong);
+    for (const position of positions) visit(`${value.slice(0, position)}${correct}${value.slice(position + wrong.length)}`, pairIndex + 1);
+  };
+"""
+          if old2 not in text: raise SystemExit('correctionRoundTrip block not found')
+          text=text.replace(old2,new2,1)
+          path.write_text(text)
+
+          test=Path('tests/verify-ready-workbook-factory.mjs')
+          t=test.read_text()
+          marker="""assert.equal(new Set(parsedCatalog.stages.find(stage=>stage.stage===7).items.map(item=>item.key)).size,2,'Context 1 and grammar 1 must not collide.');
+"""
+          addition="""
+
+// Canonical range lookup is shared across publisher items, while duplicate
+// canonical spans must still fail closed instead of becoming an arbitrary match.
+const duplicateSpanRows=[
+  {text:'The same sentence appears here.',translation:'같은 문장 1.'},
+  {text:'The same sentence appears here.',translation:'같은 문장 2.'},
+];
+const duplicateSpan=generateWorkbookCatalog({title:'Duplicate span',workbookKey:'duplicate-span',rows:duplicateSpanRows,sourceExercises:[
+  {type:'grammar_vocab_choice',number:1,prompt:'The same sentence appears ⟦CHOICE:0⟧.',groups:[['there','here']],answers:['here'],provenance:{page:1}},
+]});
+assert.equal(duplicateSpan.stages.find(stage=>stage.stage===6).items.length,0,'Ambiguous canonical spans must remain rejected after span-index caching.');
+"""
+          if marker not in t: raise SystemExit('test insertion marker not found')
+          t=t.replace(marker,marker+addition,1)
+          test.write_text(t)
+          PY
+      - name: Optimized span lookup benchmark
+        run: |
+          node --input-type=module <<'NODE'
+          import { generateWorkbookCatalog } from './server/ready/workbook-factory.mjs';
+          const rows=Array.from({length:60},(_,i)=>({text:`Sentence ${i+1} contains unique token word${i+1}.`,translation:`번역 ${i+1}`}));
+          const sourceExercises=rows.map((row,i)=>({type:'grammar_vocab_choice',number:i+1,prompt:row.text.replace(`word${i+1}`,'⟦CHOICE:0⟧'),groups:[[ `wrong${i+1}`, `word${i+1}` ]],answers:[`word${i+1}`],provenance:{origin:'benchmark'}}));
+          const start=performance.now();
+          for(let i=0;i<8;i++) generateWorkbookCatalog({title:'benchmark',workbookKey:`bench-${i}`,rows,sourceExercises});
+          console.log(`optimized_ms=${(performance.now()-start).toFixed(1)}`);
+          NODE
+      - run: npm run ready:test
+      - run: npm run build
+      - run: npm run native:verify
+      - name: Commit patch
+        run: |
+          git config user.name 'MetroBummin'
+          git config user.email 'iamthefreeman@naver.com'
+          git add server/ready/workbook-factory.mjs tests/verify-ready-workbook-factory.mjs
+          git commit -m 'perf: cache workbook canonical span matching'
+          git push origin HEAD:fix/factory-546-performance
