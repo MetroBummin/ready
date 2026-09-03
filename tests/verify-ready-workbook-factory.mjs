@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { compareCanonicalRows, extractSentenceRows, generateWorkbookCatalog, inspectFullWorkbookText, semanticWorkbookType } from '../server/ready/workbook-factory.mjs';
+import { compareCanonicalRows, extractSentenceRows, factoryFallbackTargets, generateWorkbookCatalog, inspectFullWorkbookText, semanticWorkbookType } from '../server/ready/workbook-factory.mjs';
 
 const root=resolve(dirname(fileURLToPath(import.meta.url)),'..');
 const fixture=name=>readFileSync(resolve(root,'tests/fixtures',name),'utf8');
@@ -43,6 +43,8 @@ assert.equal(catalog.stages.find(stage=>stage.stage===5).items.length,1);
 assert.equal(catalog.stages.find(stage=>stage.stage===6).items.length,1);
 assert.equal(catalog.stages.find(stage=>stage.stage===7).items.length,1);
 assert.equal(catalog.metrics.validatorDrop,0);
+assert.ok(catalog.stages.find(stage=>stage.stage===8).items[0].groups[0].every(token=>!token.includes(' ')),'Factory Stage 8 must render one English word per chip.');
+assert.deepEqual(catalog.metrics.stageCoverage[8],{ready:3,expected:3});
 
 const fullReuse=generateWorkbookCatalog({title:'Publisher',workbookKey:'publisher',rows:canonical,sourceExercises:[
   {type:'verb_form',number:1,prompt:'Humans excel at visual ____________.',answer:'imagery',provenance:{page:3}},
@@ -58,12 +60,24 @@ assert.equal(fullReuse.metrics.sourceReusedExercises,6);
 assert.equal(fullReuse.metrics.geminiGeneratedExercises,0);
 assert.equal(fullReuse.metrics.validatorDrop,0);
 
+const passageCorrection=generateWorkbookCatalog({title:'Publisher passage correction',workbookKey:'publisher-passage',rows:canonical,sourceExercises:[
+  {type:'error_correction',number:1,prompt:'Humans excels at visual imagery. Our brains evolve this ability for survival.',answer:'excels → excel / evolve → evolved',provenance:{page:5}},
+]});
+const passageCorrectionItem=passageCorrection.stages.find(stage=>stage.stage===7).items[0];
+assert.equal(passageCorrectionItem.pairCount,2,'Publisher Stage 7 must preserve multiple correction pairs in one passage/range exercise.');
+assert.deepEqual(passageCorrection.metrics.stageCoverage[7],{ready:1,expected:1},'Publisher passage exercises use publisher exercise count rather than sentence count.');
+
 const partialReuse=generateWorkbookCatalog({title:'Partial',workbookKey:'partial',rows:canonical,sourceExercises:[
   {type:'verb_form',number:1,prompt:'Humans excel at visual ____________.',answer:'imagery',provenance:{page:3}},
 ],ai:{5:[{sentenceIndex:1,prompt:'Humans excel at visual ____________.',hint:'image',answer:'imagery'},{sentenceIndex:2,prompt:'Our brains ____________ this ability for survival.',hint:'evolve',answer:'evolved'}]},provenance:{geminiCallCount:1}});
 assert.deepEqual(partialReuse.stages.find(stage=>stage.stage===5).items.map(item=>item.number),[1,2],'AI may fill only missing source items without replacing publisher exercises.');
 assert.equal(partialReuse.metrics.sourceReusedExercises,1);
 assert.equal(partialReuse.metrics.geminiGeneratedExercises,1);
+assert.deepEqual(partialReuse.metrics.stageCoverage[5],{ready:2,expected:2},'Source and AI exercises must combine into sentence-level Stage 5 coverage.');
+const partialSourceOnly=generateWorkbookCatalog({title:'Partial source only',workbookKey:'partial-source',rows:canonical,sourceExercises:[
+  {type:'verb_form',number:1,prompt:'Humans excel at visual ____________.',answer:'imagery',provenance:{page:3}},
+]});
+assert.deepEqual(factoryFallbackTargets(partialSourceOnly,canonical,[{type:'verb_form',number:1,prompt:'x',answer:'x'}]),{5:[2],6:[1,2],7:[1,2]},'Fallback must request only missing validated sentence coverage.');
 
 const invalid=generateWorkbookCatalog({title:'Invalid',workbookKey:'invalid',rows:canonical,ai:{5:[{sentenceIndex:1,prompt:'Invented sentence ____________.',hint:'invent',answer:'invented'}]}});
 assert.equal(invalid.stages.find(stage=>stage.stage===5).items.length,0);
@@ -75,4 +89,12 @@ assert.match(edge,/codeWorkbookForPassage\(passageResult\.data\)[\s\S]*ready_wor
 assert.match(edge,/if \(!existingMode\) await db\.from\("ready_passages"\)\.delete/,'A failed existing catalog insert must never delete the existing passage.');
 assert.match(adminHtml,/existing_passage[\s\S]*factory-existing-passage/,'Admin must expose the existing Passage mode and selector.');
 assert.match(admin,/existing\?\{\}:\{sentenceRows:state\.factoryRows\}/,'Admin must not submit editable sentence rows in existing Passage mode.');
+assert.match(edge,/factoryFallbackTargets\(sourcePreview, rowsForCatalog, sourceExercises\)/,'Factory fallback must target missing sentence numbers rather than only wholly absent stages.');
+assert.match(edge,/offset \+= 12[\s\S]*Return exactly \{\"\$\{stage\}\":\[\.\.\.\]\}/,'Factory AI fallback must use small stage-specific batches with an explicit response shape.');
+assert.match(edge,/incompleteReview[\s\S]*allowIncomplete/,'Incomplete grammar stages must require an explicit publication decision.');
+assert.match(admin,/data-factory-confirm-incomplete[\s\S]*confirmFactory\(true\)/,'Admin must show coverage and require explicit confirmation before publishing an incomplete catalog.');
+assert.match(edge,/factory_regenerate[\s\S]*factoryRegenerate/,'Factory catalog regeneration must be an authenticated explicit admin operation.');
+assert.match(edge,/replaceExistingCatalog[\s\S]*ready_workbook_catalogs"\)\.update\(catalogRow\)[\s\S]*factory_job_id/,'Regeneration must atomically update the catalog tied to its original factory job.');
+assert.doesNotMatch(edge,/factoryRegenerate[\s\S]{0,1200}ready_workbook_catalogs"\)\.delete/,'Regeneration must never delete the live catalog before replacement.');
+assert.match(admin,/data-regenerate-workbook[\s\S]*regenerateFactoryWorkbook/,'Admin must expose regeneration only for factory-backed workbooks.');
 console.log('READY Workbook Factory golden paths verified.');

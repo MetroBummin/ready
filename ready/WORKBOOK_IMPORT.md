@@ -47,9 +47,21 @@ Factory에는 두 target mode가 있다.
   PDF가 있으면 exercise와 Answer Key만 추출하고 PDF 본문은 canonical rows와의 일치 검사에만
   사용한다. 기존 factory catalog 또는 code-backed workbook이 있으면 시작과 확정 시점 모두 막는다.
 
+이미 게시된 Factory catalog는 일반 생성 mode로 덮어쓰지 않는다. Admin의 명시적 `factory_regenerate`
+경로만 원본 factory job, 현재 canonical sentence snapshot, 최신 validator를 다시 확인한 뒤 같은
+`passage_id`의 catalog row를 원자적으로 update한다. 검증 중에는 기존 catalog를 삭제하지 않으며,
+5·6·7단계 coverage가 불완전하면 기존 catalog를 유지한 채 재생성을 중단한다. code-backed workbook은
+이 경로에서도 변경할 수 없다.
+
 `existing_passage` review의 문장쌍은 읽기 전용이다. Factory 시작 후 canonical rows가 바뀌면
 스냅샷 검증을 실패시키고 새 작업을 요구한다. 최종 validator를 통과한 catalog만 기존
 `passage_id`로 insert하며, `ready_workbook_catalogs.passage_id` 기본키가 동시 중복도 막는다.
+
+Factory Stage 5·6은 canonical 문장별 coverage를 계산하고, 출판사 source에서 검증된 문항이
+없는 sentence만 Gemini fallback 대상으로 보낸다. Stage 7의 출판사 passage/range 문항은
+여러 correction pair를 하나의 exercise로 보존하며, source가 전혀 없을 때만 문장별 fallback을
+사용한다. 최종 5·6·7 coverage가 기대 수량보다 적으면 바로 게시하지 않고 Admin 확인을 요구한다.
+Stage 8의 generated order bank는 한 영어 단어당 chip 하나를 사용한다.
 
 PDF는 PDF.js의 표준 Unicode text layer로 읽고 페이지 표지만 보존한다. 출판사명, 파일명,
 페이지 좌표, 폰트명 또는 임의 x 좌표로 열을 추측하지 않는다. 스캔 PDF나 손상된 문자맵은

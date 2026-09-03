@@ -14,7 +14,7 @@ import { deterministicClientContract, deterministicGrade, publicInteractionContr
 import { WORKBOOK_TRANSLATION_GRADING_POLICY, workbookTranslationPass } from "./workbook-grading-policy.mjs";
 import { normalizeWorkbookAnswer, publicWorkbookAssistance, stageNineHint, workbookAssistanceMode } from "./workbook-assistance.mjs";
 import { CURRENT_QUESTION_PUBLICATION_VERSION } from "./question-pipeline.mjs";
-import { compareCanonicalRows, extractSentenceRows, generateWorkbookCatalog, inspectFullWorkbookText } from "./workbook-factory.mjs";
+import { compareCanonicalRows, extractSentenceRows, factoryFallbackTargets, generateWorkbookCatalog, inspectFullWorkbookText } from "./workbook-factory.mjs";
 
 const CORS = { "Access-Control-Allow-Origin": "*", "Access-Control-Allow-Headers": "authorization, apikey, content-type, x-client-info", "Access-Control-Allow-Methods": "POST, OPTIONS" };
 const json = (body: unknown, status = 200) => new Response(JSON.stringify(body), { status, headers: { ...CORS, "Content-Type": "application/json", "Cache-Control": "no-store" } });
@@ -27,7 +27,7 @@ function supabaseAdminKey() {
   return Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "";
 }
 const db = createClient(Deno.env.get("SUPABASE_URL") ?? "", supabaseAdminKey(), { auth: { persistSession: false } });
-const adminOps = new Set(["teacher_bootstrap", "delete_impact", "assign_scope_passages", "set_scope_passages", "create_passage", "update_passage", "delete_passage", "create_student", "set_student_code", "delete_student", "import_questions", "import_explanations", "factory_start", "factory_confirm"]);
+const adminOps = new Set(["teacher_bootstrap", "delete_impact", "assign_scope_passages", "set_scope_passages", "create_passage", "update_passage", "delete_passage", "create_student", "set_student_code", "delete_student", "import_questions", "import_explanations", "factory_start", "factory_confirm", "factory_regenerate"]);
 const studentOps = new Set(["student_bootstrap", "student_passage", "word_lookup_meaning", "save_reader_word", "remove_reader_word", "update_reader_word_meaning", "sentence_easy_translation", "sentence_structure", "student_questions", "student_question_filters", "student_question_queue", "student_review_questions", "set_question_bookmark", "submit_attempt", "student_workbook", "workbook_assistance", "set_workbook_bookmark", "workbook_hint", "submit_workbook_attempt"]);
 const publicOps = new Set(["student_login", "admin_login"]);
 // Match Breeze's free Gemini dictionary defaults. The API key remains a
@@ -351,18 +351,18 @@ function factoryRows(value: unknown) {
     return { text, translation };
   });
 }
-async function existingFactoryPassage(passageIdValue: unknown) {
+async function existingFactoryPassage(passageIdValue: unknown, allowFactoryCatalog = false) {
   const passageId = required(passageIdValue, "기존 Passage", 80);
   const passageResult = await db.from("ready_passages").select("id,title,source_type,grade,source_year,source_month,source_label").eq("id", passageId).maybeSingle();
   if (passageResult.error) throw new ApiError(500, passageResult.error.message);
   if (!passageResult.data) throw new ApiError(404, "선택한 기존 Passage를 찾지 못했습니다.");
   if (codeWorkbookForPassage(passageResult.data)) throw new ApiError(409, "이 Passage에는 코드 워크북이 이미 연결되어 있습니다.");
-  const catalogResult = await db.from("ready_workbook_catalogs").select("passage_id").eq("passage_id", passageId).maybeSingle();
+  const catalogResult = await db.from("ready_workbook_catalogs").select("passage_id,factory_job_id").eq("passage_id", passageId).maybeSingle();
   if (catalogResult.error) throw new ApiError(500, catalogResult.error.message);
-  if (catalogResult.data) throw new ApiError(409, "이 Passage에는 Factory 워크북이 이미 있습니다. 기존 catalog는 덮어쓸 수 없습니다.");
+  if (catalogResult.data && !allowFactoryCatalog) throw new ApiError(409, "이 Passage에는 Factory 워크북이 이미 있습니다. 기존 catalog는 덮어쓸 수 없습니다.");
   const sentenceResult = await db.from("ready_passage_sentences").select("id,sentence_index,text,translation").eq("passage_id", passageId).order("sentence_index");
   const sentenceRows = rows<any[]>(sentenceResult);
-  return { passage: passageResult.data, sentenceRows, canonicalRows: factoryRows(sentenceRows) };
+  return { passage: passageResult.data, sentenceRows, canonicalRows: factoryRows(sentenceRows), catalog: catalogResult.data };
 }
 async function factoryGemini(prompt: string, maxOutputTokens: number) {
   const provider = (Deno.env.get("AI_PROVIDER") ?? "").trim().toLowerCase(), key = Deno.env.get("GEMINI_API_KEY");
@@ -376,7 +376,7 @@ async function factoryGemini(prompt: string, maxOutputTokens: number) {
     lastStatus = response.status; lastError = (await response.text()).slice(0, 300); if (response.status === 400) continue; if (response.status === 429) break; throw new ApiError(502, `Workbook Factory Gemini 요청이 실패했습니다 (${response.status}).`);
   }
   console.error("READY Workbook Factory Gemini failed:", lastStatus, lastError);
-  throw new ApiError(502, `Workbook Factory Gemini 요청이 실패했습니다 (${lastStatus || "network"}).`);
+  throw new ApiError(lastStatus === 429 ? 429 : 502, `Workbook Factory Gemini 요청이 실패했습니다 (${lastStatus || "network"}).`);
 }
 async function factoryTranslate(rows: any[]) {
   const result = await factoryGemini(`Translate each canonical English sentence into natural Korean. Preserve order; do not add meaning. Return {"translations":["..."]} with exactly ${rows.length} entries.\n${JSON.stringify(rows.map(row => row.text))}`, Math.min(8_192, 120 * rows.length + 400));
@@ -384,17 +384,30 @@ async function factoryTranslate(rows: any[]) {
   if (translations.length !== rows.length || translations.some((value: string) => !value)) throw new ApiError(502, "문장별 한국어 해석을 검증하지 못했습니다.");
   return { rows: rows.map((row, index) => ({ ...row, translation: translations[index] })), tokenUsage: result.tokenUsage };
 }
-async function factoryExercises(rows: any[], requestedStages = [5, 6, 7]) {
-  const source = rows.map((row, index) => ({ sentenceIndex: index + 1, text: row.text, translation: row.translation }));
-  const stages = requestedStages.filter((stage: number) => [5, 6, 7].includes(stage));
-  if (!stages.length) return { stages: { 5: [], 6: [], 7: [] }, tokenUsage: 0, callCount: 0 };
-  const prompt = `Create only source-grounded exercises for these canonical sentence pairs. Return JSON object keys only for requested READY stages ${JSON.stringify(stages)}. Stage 5 item fields: sentenceIndex, prompt, hint, answer. prompt must equal canonical English with the exact answer replaced by 12 underscores; hint is the base verb. Stage 6 fields: sentenceIndex, prompt, wrong, answer. prompt must equal canonical English with answer replaced by 12 underscores. Stage 7 fields: sentenceIndex, sentence, wrong, correct. sentence must equal canonical English with one exact correct substring replaced by wrong. Use no more than one item per sentence and omit if unsure. Never create a new canonical answer.\n${JSON.stringify(source)}`;
-  const result = await factoryGemini(prompt, Math.min(8_192, 170 * rows.length + 700));
-  return { stages: { 5: Array.isArray(result.parsed?.[5]) ? result.parsed[5] : [], 6: Array.isArray(result.parsed?.[6]) ? result.parsed[6] : [], 7: Array.isArray(result.parsed?.[7]) ? result.parsed[7] : [] }, tokenUsage: result.tokenUsage, callCount: 1 };
+async function factoryExercises(rows: any[], requestedTargets: Record<number, number[]>) {
+  const targets = Object.fromEntries([5, 6, 7].map(stage => [stage, [...new Set((requestedTargets?.[stage] || []).map(Number).filter(number => Number.isInteger(number) && number >= 1 && number <= rows.length))]]));
+  const stages = [5, 6, 7].filter(stage => targets[stage].length);
+  const generated: Record<number, any[]> = { 5: [], 6: [], 7: [] }, errors: string[] = [];
+  let tokenUsage = 0, callCount = 0, quotaStopped = false;
+  for (const stage of stages) for (let offset = 0; offset < targets[stage].length && !quotaStopped; offset += 12) {
+    const batch = targets[stage].slice(offset, offset + 12), source = batch.map(sentenceIndex => ({ sentenceIndex, text: rows[sentenceIndex - 1].text, translation: rows[sentenceIndex - 1].translation }));
+    const fields = stage === 5 ? "sentenceIndex, prompt, hint, answer. prompt must equal canonical English with the exact answer replaced by 12 underscores; hint is the base verb" : stage === 6 ? "sentenceIndex, prompt, wrong, answer. prompt must equal canonical English with answer replaced by 12 underscores" : "sentenceIndex, sentence, wrong, correct. sentence must equal canonical English with one exact correct substring replaced by wrong";
+    const prompt = `Create only source-grounded READY Stage ${stage} exercises for the supplied canonical sentence pairs. Return exactly {"${stage}":[...]} and no other key. Item fields: ${fields}. Eligible sentence indexes: ${JSON.stringify(batch)}. Use no more than one item per eligible sentence and omit if unsure. Never create a new canonical answer.\n${JSON.stringify(source)}`;
+    callCount += 1;
+    try {
+      const result = await factoryGemini(prompt, Math.min(8_192, 220 * batch.length + 500)); tokenUsage += result.tokenUsage;
+      const accepted = (Array.isArray(result.parsed?.[stage]) ? result.parsed[stage] : []).filter((item: any) => batch.includes(Number(item?.sentenceIndex)));
+      generated[stage].push(...accepted);
+    } catch (error) {
+      errors.push(`stage${stage}:${error instanceof Error ? clean(error.message, 240) : "factory_ai_batch_failed"}`);
+      quotaStopped = error instanceof ApiError && (error.status === 429 || error.status === 503);
+    }
+  }
+  return { stages: generated, tokenUsage, callCount, errors };
 }
-async function finalizeFactoryJob(job: any, confirmedRows?: unknown) {
+async function finalizeFactoryJob(job: any, confirmedRows?: unknown, allowIncomplete = false, replaceExistingCatalog = false) {
   const metadata = job.source_metadata || {}, existingMode = metadata.factoryMode === "existing_passage";
-  const existingContext = existingMode ? await existingFactoryPassage(metadata.existingPassageId) : null;
+  const existingContext = existingMode ? await existingFactoryPassage(metadata.existingPassageId, replaceExistingCatalog) : null;
   const rowsForCatalog = existingMode ? existingContext.canonicalRows : factoryRows(confirmedRows ?? job.extracted_rows);
   if (existingMode) {
     const snapshotCheck = compareCanonicalRows(rowsForCatalog, factoryRows(job.extracted_rows));
@@ -403,26 +416,31 @@ async function finalizeFactoryJob(job: any, confirmedRows?: unknown) {
   }
   const sourceType = existingMode ? existingContext.passage.source_type : metadata.sourceType === "MOCK_EXAM" ? "MOCK_EXAM" : "TEXTBOOK", title = existingMode ? existingContext.passage.title : required(job.title, "지문 제목", 120), grade = existingMode ? existingContext.passage.grade : required(metadata.grade, "학년", 40), sourceYear = existingMode ? existingContext.passage.source_year : metadata.sourceYear ? Math.round(Number(metadata.sourceYear)) : null, sourceMonth = existingMode ? existingContext.passage.source_month : metadata.sourceMonth ? Math.round(Number(metadata.sourceMonth)) : null;
   if (sourceType === "MOCK_EXAM" && (!sourceYear || !sourceMonth)) throw new ApiError(400, "모의고사는 연도와 월이 필요합니다.");
-  const sourceExercises = Array.isArray(job.extraction?.sourceExercises) ? job.extraction.sourceExercises : [], fullWorkbook = job.extraction?.fullWorkbook === true;
-  const executableTypes = new Set(sourceExercises.filter((exercise: any) => clean(exercise?.answer, 300) || (Array.isArray(exercise?.answers) && exercise.answers.length)).map((exercise: any) => clean(exercise?.type, 80)));
-  const incompleteStages = new Set((Array.isArray(job.extraction?.incompleteStages) ? job.extraction.incompleteStages : []).map(Number));
-  const neededStages = [[5, "verb_form"], [6, "grammar_vocab_choice"], [7, "error_correction"]].filter(([stage, type]) => incompleteStages.has(Number(stage)) || !executableTypes.has(type as string)).map(([stage]) => stage as number);
-  let ai = { stages: { 5: [], 6: [], 7: [] }, tokenUsage: 0, callCount: 0 }, fallbackError = "";
-  if (!fullWorkbook || neededStages.length) {
-    try { ai = await factoryExercises(rowsForCatalog, fullWorkbook ? neededStages : [5, 6, 7]); }
-    catch (error) {
-      // A publisher workbook must remain usable when an optional AI fallback
-      // is unavailable. Its unverified exercises become validator drops.
-      if (!fullWorkbook) throw error;
-      fallbackError = error instanceof Error ? clean(error.message, 500) : "factory_ai_fallback_failed";
+  const sourceExercises = Array.isArray(job.extraction?.sourceExercises) ? job.extraction.sourceExercises : [], previewKey = `factory-preview-${existingMode ? existingContext.passage.id : job.id}`;
+  const sourcePreview = generateWorkbookCatalog({ title: `${title} · READY 워크북`, workbookKey: previewKey, rows: rowsForCatalog, sourceExercises, provenance: { pdfExtractedExercises: Number(job.extraction?.exerciseCount) || 0 } });
+  const fallbackTargets = factoryFallbackTargets(sourcePreview, rowsForCatalog, sourceExercises);
+  let ai = { stages: { 5: [], 6: [], 7: [] }, tokenUsage: 0, callCount: 0, errors: [] as string[] };
+  if ([5, 6, 7].some(stage => fallbackTargets[stage].length)) {
+    ai = await factoryExercises(rowsForCatalog, fallbackTargets);
+  }
+  const provenance = { ...(job.extraction || {}), factoryMode: existingMode ? "existing_passage" : "new_passage", canonicalSource: existingMode ? "ready_passage_sentences" : "factory_review", sourceKind: job.source_kind, documentSha256: clean(metadata.documentSha256, 128), documentName: clean(metadata.documentName, 240), geminiCallCount: ai.callCount, geminiTokenUsage: ai.tokenUsage, pdfExtractedExercises: Number(job.extraction?.exerciseCount) || 0, ...(ai.errors.length ? { fallbackError: clean(ai.errors.join(" | "), 500) } : {}) };
+  const previewCatalog = generateWorkbookCatalog({ title: `${title} · READY 워크북`, workbookKey: previewKey, rows: rowsForCatalog, ai: ai.stages, sourceExercises, provenance });
+  if (previewCatalog.metrics.incompleteStages.length && !allowIncomplete) {
+    if (!replaceExistingCatalog) {
+      const reviewed = await db.from("ready_workbook_factory_jobs").update({ status: "review_required", metrics: previewCatalog.metrics, failure_reason: "" }).eq("id", job.id);
+      if (reviewed.error) throw new ApiError(500, reviewed.error.message);
     }
+    return { incompleteReview: true, metrics: previewCatalog.metrics, message: "5·6·7단계 중 생성되지 않은 문제가 있습니다. 단계별 수량을 확인해 주세요." };
   }
   const passageId = existingMode ? existingContext.passage.id : rows<string>(await db.rpc("ready_create_passage_with_sentences", { p_title: title, p_source_type: sourceType, p_grade: grade, p_source_year: sourceYear, p_source_month: sourceMonth, p_source_label: clean(metadata.sourceLabel, 120), p_rows: rowsForCatalog }));
   const workbookKey = `factory-${passageId}`;
-  const provenance = { ...(job.extraction || {}), factoryMode: existingMode ? "existing_passage" : "new_passage", canonicalSource: existingMode ? "ready_passage_sentences" : "factory_review", sourceKind: job.source_kind, documentSha256: clean(metadata.documentSha256, 128), documentName: clean(metadata.documentName, 240), geminiCallCount: ai.callCount, geminiTokenUsage: ai.tokenUsage, pdfExtractedExercises: Number(job.extraction?.exerciseCount) || 0, ...(fallbackError ? { fallbackError } : {}) };
   const catalog = generateWorkbookCatalog({ title: `${title} · READY 워크북`, workbookKey, rows: rowsForCatalog, ai: ai.stages, sourceExercises, provenance });
-  const saved = await db.from("ready_workbook_catalogs").insert({ passage_id: passageId, workbook_key: catalog.workbookKey, catalog, provenance, metrics: catalog.metrics, factory_job_id: job.id });
+  const catalogRow = { passage_id: passageId, workbook_key: catalog.workbookKey, catalog, provenance, metrics: catalog.metrics, factory_job_id: job.id };
+  const saved = replaceExistingCatalog
+    ? await db.from("ready_workbook_catalogs").update(catalogRow).eq("passage_id", passageId).eq("factory_job_id", job.id).select("passage_id").maybeSingle()
+    : await db.from("ready_workbook_catalogs").insert(catalogRow);
   if (saved.error) { if (!existingMode) await db.from("ready_passages").delete().eq("id", passageId); throw new ApiError(saved.error.code === "23505" ? 409 : 500, saved.error.code === "23505" ? "이 Passage에는 워크북 catalog가 이미 있습니다." : saved.error.message); }
+  if (replaceExistingCatalog && !saved.data) throw new ApiError(409, "기존 Factory catalog와 원본 작업의 연결을 확인하지 못해 재생성을 중단했습니다.");
   const completed = await db.from("ready_workbook_factory_jobs").update({ status: "ready", passage_id: passageId, extracted_rows: rowsForCatalog, metrics: catalog.metrics, completed_at: new Date().toISOString(), failure_reason: "" }).eq("id", job.id);
   if (completed.error) throw new ApiError(500, completed.error.message);
   return { passageId, catalog, metrics: catalog.metrics };
@@ -454,15 +472,28 @@ async function factoryStart(body: any) {
   const created = rows<any>(await db.from("ready_workbook_factory_jobs").insert({ status: "review_required", source_kind: sourceKind, title, source_metadata: metadata, extracted_rows: rowsForReview, extraction, metrics: { sentenceCount: rowsForReview.length, geminiCallCount: translationTokens ? 1 : 0, geminiTokenUsage: translationTokens } }).select().single());
   // A full workbook only bypasses the human checkpoint after the parser has
   // deterministic bilingual evidence. It still uses the same final validator.
-  if (!existingMode && inspected.fullWorkbook && !inspected.reviewRequired) return { job: created, autoCompleted: true, result: await finalizeFactoryJob(created) };
+  if (!existingMode && inspected.fullWorkbook && !inspected.reviewRequired) {
+    const result = await finalizeFactoryJob(created);
+    if (result.incompleteReview) return { job: { ...created, metrics: result.metrics }, autoCompleted: false, reviewRequired: true, incompleteReview: true };
+    return { job: created, autoCompleted: true, result };
+  }
   return { job: created, autoCompleted: false, reviewRequired: true };
 }
 async function factoryConfirm(body: any) {
   const jobId = required(body.jobId, "Factory 작업", 80), job = rows<any>(await db.from("ready_workbook_factory_jobs").select("*").eq("id", jobId).maybeSingle());
   if (!job) throw new ApiError(404, "Factory 작업을 찾지 못했습니다.");
   if (job.status === "ready") throw new ApiError(409, "이미 워크북이 생성된 작업입니다.");
-  try { return await finalizeFactoryJob(job, body.sentenceRows); }
+  try { return await finalizeFactoryJob(job, body.sentenceRows, body.allowIncomplete === true); }
   catch (error) { await db.from("ready_workbook_factory_jobs").update({ status: "failed", failure_reason: error instanceof Error ? clean(error.message, 500) : "unknown" }).eq("id", job.id); throw error; }
+}
+async function factoryRegenerate(body: any) {
+  const passageId = required(body.passageId, "기존 Passage", 80), existingContext = await existingFactoryPassage(passageId, true);
+  const factoryJobId = clean(existingContext.catalog?.factory_job_id, 80);
+  if (!factoryJobId) throw new ApiError(409, "Factory 원본 작업이 연결된 catalog만 재생성할 수 있습니다.");
+  const job = rows<any>(await db.from("ready_workbook_factory_jobs").select("*").eq("id", factoryJobId).maybeSingle());
+  if (!job) throw new ApiError(404, "기존 Factory 원본 작업을 찾지 못했습니다.");
+  const regenerationJob = { ...job, source_metadata: { ...(job.source_metadata || {}), factoryMode: "existing_passage", existingPassageId: passageId } };
+  return finalizeFactoryJob(regenerationJob, undefined, false, true);
 }
 async function updatePassage(body: any) {
   const passageId = required(body.passageId, "지문", 80), sourceType = body.sourceType === "MOCK_EXAM" ? "MOCK_EXAM" : "TEXTBOOK", sourceYear = body.sourceYear ? Math.round(Number(body.sourceYear)) : null, sourceMonth = body.sourceMonth ? Math.round(Number(body.sourceMonth)) : null;
@@ -1136,7 +1167,7 @@ async function dispatch(op: string, body: any, session: ReadySession | null) {
   switch (op) {
     case "student_login": return studentLogin(body); case "admin_login": return adminLogin(body); case "logout": return revokeSession(session as ReadySession);
     case "teacher_bootstrap": return teacherBootstrap(); case "delete_impact": return deleteImpact(body); case "create_student": return createStudent(body); case "set_student_code": return setStudentCode(body); case "delete_student": return deleteStudent(body);
-    case "assign_scope_passages": return setScopePassages(body, false); case "set_scope_passages": return setScopePassages(body, true); case "create_passage": return createPassage(body); case "update_passage": return updatePassage(body); case "delete_passage": return deletePassage(body); case "import_questions": return importQuestions(body); case "import_explanations": return importExplanations(body); case "factory_start": return factoryStart(body); case "factory_confirm": return factoryConfirm(body);
+    case "assign_scope_passages": return setScopePassages(body, false); case "set_scope_passages": return setScopePassages(body, true); case "create_passage": return createPassage(body); case "update_passage": return updatePassage(body); case "delete_passage": return deletePassage(body); case "import_questions": return importQuestions(body); case "import_explanations": return importExplanations(body); case "factory_start": return factoryStart(body); case "factory_confirm": return factoryConfirm(body); case "factory_regenerate": return factoryRegenerate(body);
     case "student_bootstrap": return studentBootstrap(session as ReadySession); case "student_passage": return studentPassage(body, session as ReadySession); case "word_lookup_meaning": return readerInlineGloss(body, session as ReadySession); case "save_reader_word": return saveReaderWord(body, session as ReadySession); case "remove_reader_word": return removeReaderWord(body, session as ReadySession); case "update_reader_word_meaning": return updateReaderWordMeaning(body, session as ReadySession); case "sentence_easy_translation": return sentenceEasyTranslation(body, session as ReadySession); case "sentence_structure": return sentenceStructure(body, session as ReadySession); case "student_questions": return studentQuestions(body, session as ReadySession); case "student_question_filters": return studentQuestionFilters(body, session as ReadySession); case "student_question_queue": return studentQuestionQueue(body, session as ReadySession); case "student_review_questions": return studentReviewQuestions(body, session as ReadySession); case "set_question_bookmark": return setQuestionBookmark(body, session as ReadySession); case "submit_attempt": return submitAttempt(body, session as ReadySession); case "student_workbook": return studentWorkbook(body, session as ReadySession); case "workbook_assistance": return workbookAssistance(body, session as ReadySession); case "set_workbook_bookmark": return setWorkbookBookmark(body, session as ReadySession); case "workbook_hint": return workbookHint(body, session as ReadySession); case "submit_workbook_attempt": return submitWorkbookAttempt(body, session as ReadySession);
     default: throw new ApiError(404, "알 수 없는 READY 작업입니다.");
   }
