@@ -281,7 +281,7 @@ function stage7AnswerItems(text) {
     const pairs = stage7PairsFromBlock(value);
     if (pairs.length >= 2 && pairs.length <= 4) output.push({ family, number, pairs });
   };
-  const markers = [...answerText.matchAll(/워크북\s*7\s*어색한 곳 찾기 연습[^\n]*/g)];
+  const markers = [...answerText.matchAll(/워크북\s*7\s*어색한 곳 찾기 연습/g)];
   for (const marker of markers) {
     const following = answerText.slice(marker.index + marker[0].length), nextStage = following.search(/워크북\s*8(?:\D|$)/), block = following.slice(0, nextStage >= 0 ? nextStage : following.length), headings = [...block.matchAll(/(문맥상|어법상)\s*어색한 것 찾기/g)];
     for (let headingIndex = 0; headingIndex < headings.length; headingIndex += 1) {
