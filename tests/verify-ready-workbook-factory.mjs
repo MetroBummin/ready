@@ -96,8 +96,9 @@ assert.match(edge,/codeWorkbookForPassage\(passageResult\.data\)[\s\S]*ready_wor
 assert.match(edge,/if \(!existingMode\) await db\.from\("ready_passages"\)\.delete/,'A failed existing catalog insert must never delete the existing passage.');
 assert.match(adminHtml,/existing_passage[\s\S]*factory-existing-passage/,'Admin must expose the existing Passage mode and selector.');
 assert.match(admin,/existing\?\{\}:\{sentenceRows:state\.factoryRows\}/,'Admin must not submit editable sentence rows in existing Passage mode.');
-assert.match(edge,/factoryFallbackTargets\(sourcePreview, rowsForCatalog, sourceExercises\)/,'Factory fallback must target missing sentence numbers rather than only wholly absent stages.');
-assert.match(edge,/offset \+= 12[\s\S]*Return exactly \{\"\$\{stage\}\":\[\.\.\.\]\}/,'Factory AI fallback must use small stage-specific batches with an explicit response shape.');
+assert.match(edge,/factoryFallbackTargets\(previewCatalog, rowsForCatalog, sourceExercises\)/,'Factory fallback must target missing sentence numbers rather than only wholly absent stages.');
+assert.match(edge,/offset \+= 6[\s\S]*Return exactly \{\"\$\{stage\}\":\[\.\.\.\]\}/,'Factory AI fallback must use small stage-specific batches with an explicit response shape.');
+assert.match(edge,/round < 3[\s\S]*factoryFallbackTargets\(previewCatalog/,'Factory fallback must retry only the still-missing validated sentence coverage.');
 assert.match(edge,/incompleteReview[\s\S]*allowIncomplete/,'Incomplete grammar stages must require an explicit publication decision.');
 assert.match(admin,/data-factory-confirm-incomplete[\s\S]*confirmFactory\(true\)/,'Admin must show coverage and require explicit confirmation before publishing an incomplete catalog.');
 assert.match(edge,/factory_regenerate[\s\S]*factoryRegenerate/,'Factory catalog regeneration must be an authenticated explicit admin operation.');

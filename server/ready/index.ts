@@ -389,8 +389,8 @@ async function factoryExercises(rows: any[], requestedTargets: Record<number, nu
   const stages = [5, 6, 7].filter(stage => targets[stage].length);
   const generated: Record<number, any[]> = { 5: [], 6: [], 7: [] }, errors: string[] = [];
   let tokenUsage = 0, callCount = 0, quotaStopped = false;
-  for (const stage of stages) for (let offset = 0; offset < targets[stage].length && !quotaStopped; offset += 12) {
-    const batch = targets[stage].slice(offset, offset + 12), source = batch.map(sentenceIndex => ({ sentenceIndex, text: rows[sentenceIndex - 1].text, translation: rows[sentenceIndex - 1].translation }));
+  for (const stage of stages) for (let offset = 0; offset < targets[stage].length && !quotaStopped; offset += 6) {
+    const batch = targets[stage].slice(offset, offset + 6), source = batch.map(sentenceIndex => ({ sentenceIndex, text: rows[sentenceIndex - 1].text, translation: rows[sentenceIndex - 1].translation }));
     const fields = stage === 5 ? "sentenceIndex, prompt, hint, answer. prompt must equal canonical English with the exact answer replaced by 12 underscores; hint is the base verb" : stage === 6 ? "sentenceIndex, prompt, wrong, answer. prompt must equal canonical English with answer replaced by 12 underscores" : "sentenceIndex, sentence, wrong, correct. sentence must equal canonical English with one exact correct substring replaced by wrong";
     const prompt = `Create only source-grounded READY Stage ${stage} exercises for the supplied canonical sentence pairs. Return exactly {"${stage}":[...]} and no other key. Item fields: ${fields}. Eligible sentence indexes: ${JSON.stringify(batch)}. Return exactly one item for every eligible sentence index and preserve each canonical sentence byte-for-byte except for the one requested blank or substitution. For Stage 7, if a natural grammar error is difficult, use one clear lexical or inflection error whose correction restores the canonical sentence exactly. Never create a new canonical answer.\n${JSON.stringify(source)}`;
     callCount += 1;
@@ -417,14 +417,19 @@ async function finalizeFactoryJob(job: any, confirmedRows?: unknown, allowIncomp
   const sourceType = existingMode ? existingContext.passage.source_type : metadata.sourceType === "MOCK_EXAM" ? "MOCK_EXAM" : "TEXTBOOK", title = existingMode ? existingContext.passage.title : required(job.title, "지문 제목", 120), grade = existingMode ? existingContext.passage.grade : required(metadata.grade, "학년", 40), sourceYear = existingMode ? existingContext.passage.source_year : metadata.sourceYear ? Math.round(Number(metadata.sourceYear)) : null, sourceMonth = existingMode ? existingContext.passage.source_month : metadata.sourceMonth ? Math.round(Number(metadata.sourceMonth)) : null;
   if (sourceType === "MOCK_EXAM" && (!sourceYear || !sourceMonth)) throw new ApiError(400, "모의고사는 연도와 월이 필요합니다.");
   const sourceExercises = Array.isArray(job.extraction?.sourceExercises) ? job.extraction.sourceExercises : [], previewKey = `factory-preview-${existingMode ? existingContext.passage.id : job.id}`;
-  const sourcePreview = generateWorkbookCatalog({ title: `${title} · READY 워크북`, workbookKey: previewKey, rows: rowsForCatalog, sourceExercises, provenance: { pdfExtractedExercises: Number(job.extraction?.exerciseCount) || 0 } });
-  const fallbackTargets = factoryFallbackTargets(sourcePreview, rowsForCatalog, sourceExercises);
-  let ai = { stages: { 5: [], 6: [], 7: [] }, tokenUsage: 0, callCount: 0, errors: [] as string[] };
-  if ([5, 6, 7].some(stage => fallbackTargets[stage].length)) {
-    ai = await factoryExercises(rowsForCatalog, fallbackTargets);
+  let previewCatalog = generateWorkbookCatalog({ title: `${title} · READY 워크북`, workbookKey: previewKey, rows: rowsForCatalog, sourceExercises, provenance: { pdfExtractedExercises: Number(job.extraction?.exerciseCount) || 0 } });
+  let ai: { stages: Record<number, any[]>; tokenUsage: number; callCount: number; errors: string[] } = { stages: { 5: [], 6: [], 7: [] }, tokenUsage: 0, callCount: 0, errors: [] };
+  for (let round = 0; round < 3; round += 1) {
+    const fallbackTargets = factoryFallbackTargets(previewCatalog, rowsForCatalog, sourceExercises);
+    if (![5, 6, 7].some(stage => fallbackTargets[stage].length)) break;
+    const next = await factoryExercises(rowsForCatalog, fallbackTargets);
+    for (const stage of [5, 6, 7]) ai.stages[stage].push(...next.stages[stage]);
+    ai.tokenUsage += next.tokenUsage; ai.callCount += next.callCount; ai.errors.push(...next.errors);
+    previewCatalog = generateWorkbookCatalog({ title: `${title} · READY 워크북`, workbookKey: previewKey, rows: rowsForCatalog, ai: ai.stages, sourceExercises, provenance: { pdfExtractedExercises: Number(job.extraction?.exerciseCount) || 0 } });
+    if (next.errors.some(error => /한도|연결되지/.test(error))) break;
   }
   const provenance = { ...(job.extraction || {}), factoryMode: existingMode ? "existing_passage" : "new_passage", canonicalSource: existingMode ? "ready_passage_sentences" : "factory_review", sourceKind: job.source_kind, documentSha256: clean(metadata.documentSha256, 128), documentName: clean(metadata.documentName, 240), geminiCallCount: ai.callCount, geminiTokenUsage: ai.tokenUsage, pdfExtractedExercises: Number(job.extraction?.exerciseCount) || 0, ...(ai.errors.length ? { fallbackError: clean(ai.errors.join(" | "), 500) } : {}) };
-  const previewCatalog = generateWorkbookCatalog({ title: `${title} · READY 워크북`, workbookKey: previewKey, rows: rowsForCatalog, ai: ai.stages, sourceExercises, provenance });
+  previewCatalog = generateWorkbookCatalog({ title: `${title} · READY 워크북`, workbookKey: previewKey, rows: rowsForCatalog, ai: ai.stages, sourceExercises, provenance });
   if (previewCatalog.metrics.incompleteStages.length && !allowIncomplete) {
     if (!replaceExistingCatalog) {
       const reviewed = await db.from("ready_workbook_factory_jobs").update({ status: "review_required", metrics: previewCatalog.metrics, failure_reason: "" }).eq("id", job.id);

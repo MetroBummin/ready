@@ -331,8 +331,8 @@ export function generateWorkbookCatalog({ title, workbookKey, rows, ai = {}, sou
   const generated = deterministicItems(canonical, prefix), rowByNumber = new Map(canonical.map(row => [row.index, row])), drops = [];
   const sourceItems = fullWorkbookItems(sourceExercises, canonical, prefix);
   for (const stage of [5, 6, 7]) generated.set(stage, [...sourceItems.get(stage)]);
-  for (const stage of [5, 6, 7]) { const sourceNumbers = new Set(sourceItems.get(stage).map(candidate => candidate.number)); (Array.isArray(ai[stage]) ? ai[stage] : []).forEach((raw, index) => {
-    const candidate = normalizeAiItem(stage, raw, canonical, prefix, index + 1); if (candidate && !sourceNumbers.has(candidate.number)) generated.get(stage).push(candidate); else if (!candidate) drops.push({ stage, number: Number(raw?.sentenceIndex) || index + 1, reason: `stage${stage}_round_trip` });
+  for (const stage of [5, 6, 7]) { const acceptedNumbers = new Set(sourceItems.get(stage).map(candidate => candidate.number)); (Array.isArray(ai[stage]) ? ai[stage] : []).forEach((raw, index) => {
+    const candidate = normalizeAiItem(stage, raw, canonical, prefix, index + 1); if (candidate && !acceptedNumbers.has(candidate.number)) { generated.get(stage).push(candidate); acceptedNumbers.add(candidate.number); } else if (!candidate) drops.push({ stage, number: Number(raw?.sentenceIndex) || index + 1, reason: `stage${stage}_round_trip` });
   });
   }
   const stages = FACTORY_STAGES.map(stage => {
