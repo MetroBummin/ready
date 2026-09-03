@@ -136,6 +136,8 @@ const factoryServerSource=readFileSync(resolve(root,'server/ready/index.ts'),'ut
 assert.match(adminFactorySource,/누락을 인정하고 최종 확정/,'Incomplete Factory preview must expose an explicit final confirmation.');
 assert.match(adminFactorySource,/'최종 확정'/,'Complete Factory preview must expose an explicit final confirmation.');
 assert.match(factoryServerSource,/body\.finalize !== true/,'Factory confirm must preview unless the admin explicitly finalizes.');
+assert.match(factoryServerSource,/previewAi/,'Final confirmation must reuse the validated preview supplement instead of regenerating it.');
+assert.match(adminFactorySource,/finalize&&result\.incompleteReview/,'Finalization must remain fail-closed if the server reports a changed incomplete result.');
 assert.doesNotMatch(factoryServerSource,/autoCompleted: true/,'Full workbooks must never auto-create a Passage.');
 
 

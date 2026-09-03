@@ -421,10 +421,14 @@ async function finalizeFactoryJob(job: any, confirmedRows?: unknown, allowIncomp
   if (sourceType === "MOCK_EXAM" && (!sourceYear || !sourceMonth)) throw new ApiError(400, "모의고사는 연도와 월이 필요합니다.");
   const sourceExercises = Array.isArray(job.extraction?.sourceExercises) ? job.extraction.sourceExercises : [], previewKey = `factory-preview-${existingMode ? existingContext.passage.id : job.id}`;
   let previewCatalog = generateWorkbookCatalog({ title: `${title} · READY 워크북`, workbookKey: previewKey, rows: rowsForCatalog, sourceExercises, provenance: { pdfExtractedExercises: Number(job.extraction?.exerciseCount) || 0 } });
-  let ai: { stages: Record<number, any[]>; tokenUsage: number; callCount: number; errors: string[] } = { stages: { 5: [], 6: [], 7: [] }, tokenUsage: 0, callCount: 0, errors: [] };
+  const cachedPreview: any = !previewOnly && !replaceExistingCatalog && job.extraction?.previewAi && typeof job.extraction.previewAi === "object" ? job.extraction.previewAi : null;
+  let ai: { stages: Record<number, any[]>; tokenUsage: number; callCount: number; errors: string[] } = cachedPreview
+    ? { stages: { 5: Array.isArray(cachedPreview.stages?.[5]) ? cachedPreview.stages[5] : [], 6: Array.isArray(cachedPreview.stages?.[6]) ? cachedPreview.stages[6] : [], 7: Array.isArray(cachedPreview.stages?.[7]) ? cachedPreview.stages[7] : [] }, tokenUsage: Math.max(0, Math.round(Number(cachedPreview.tokenUsage)) || 0), callCount: Math.max(0, Math.round(Number(cachedPreview.callCount)) || 0), errors: Array.isArray(cachedPreview.errors) ? cachedPreview.errors.map(error => clean(error, 240)).filter(Boolean) : [] }
+    : { stages: { 5: [], 6: [], 7: [] }, tokenUsage: 0, callCount: 0, errors: [] };
   // Keep the Edge request bounded: one source-grounded AI pass is followed by
   // the validated deterministic fallback for any remaining Stage 6/7 gaps.
-  for (let round = 0; useAiFallback && round < 1; round += 1) {
+  // Final confirmation reuses the already validated preview supplement.
+  for (let round = 0; !cachedPreview && useAiFallback && round < 1; round += 1) {
     const fallbackTargets = factoryFallbackTargets(previewCatalog, rowsForCatalog, sourceExercises);
     if (![5, 6, 7].some(stage => fallbackTargets[stage].length)) break;
     const next = await factoryExercises(rowsForCatalog, fallbackTargets);
@@ -437,7 +441,8 @@ async function finalizeFactoryJob(job: any, confirmedRows?: unknown, allowIncomp
   previewCatalog = generateWorkbookCatalog({ title: `${title} · READY 워크북`, workbookKey: previewKey, rows: rowsForCatalog, ai: ai.stages, sourceExercises, provenance, allowDerivedFallback: true });
   if (previewOnly) {
     if (!replaceExistingCatalog) {
-      const reviewed = await db.from("ready_workbook_factory_jobs").update({ status: "review_required", extracted_rows: rowsForCatalog, metrics: previewCatalog.metrics, failure_reason: "" }).eq("id", job.id);
+      const previewExtraction = { ...(job.extraction || {}), previewAi: { stages: ai.stages, tokenUsage: ai.tokenUsage, callCount: ai.callCount, errors: ai.errors } };
+      const reviewed = await db.from("ready_workbook_factory_jobs").update({ status: "review_required", extracted_rows: rowsForCatalog, extraction: previewExtraction, metrics: previewCatalog.metrics, failure_reason: "" }).eq("id", job.id);
       if (reviewed.error) throw new ApiError(500, reviewed.error.message);
     }
     return { confirmationRequired: true, incompleteReview: previewCatalog.metrics.incompleteStages.length > 0, metrics: previewCatalog.metrics };
@@ -458,7 +463,8 @@ async function finalizeFactoryJob(job: any, confirmedRows?: unknown, allowIncomp
     : await db.from("ready_workbook_catalogs").insert(catalogRow);
   if (saved.error) { if (!existingMode) await db.from("ready_passages").delete().eq("id", passageId); throw new ApiError(saved.error.code === "23505" ? 409 : 500, saved.error.code === "23505" ? "이 Passage에는 워크북 catalog가 이미 있습니다." : saved.error.message); }
   if (replaceExistingCatalog && !saved.data) throw new ApiError(409, "기존 Factory catalog와 원본 작업의 연결을 확인하지 못해 재생성을 중단했습니다.");
-  const completed = await db.from("ready_workbook_factory_jobs").update({ status: "ready", passage_id: passageId, extracted_rows: rowsForCatalog, metrics: catalog.metrics, completed_at: new Date().toISOString(), failure_reason: "" }).eq("id", job.id);
+  const completedExtraction = { ...(job.extraction || {}) }; delete completedExtraction.previewAi;
+  const completed = await db.from("ready_workbook_factory_jobs").update({ status: "ready", passage_id: passageId, extracted_rows: rowsForCatalog, extraction: completedExtraction, metrics: catalog.metrics, completed_at: new Date().toISOString(), failure_reason: "" }).eq("id", job.id);
   if (completed.error) throw new ApiError(500, completed.error.message);
   return { passageId, catalog, metrics: catalog.metrics };
 }
