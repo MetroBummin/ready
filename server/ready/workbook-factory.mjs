@@ -314,6 +314,41 @@ function validateItem(stage, candidate, rowByNumber, canonicalRows) {
   return 'unsupported_stage';
 }
 
+function simpleDistractor(answer) {
+  const value = clean(answer, 160), swaps = { is: 'are', are: 'is', was: 'were', were: 'was', has: 'have', have: 'has', does: 'do', do: 'does' };
+  if (swaps[value.toLowerCase()]) return swaps[value.toLowerCase()];
+  if (!/^[A-Za-z]+$/.test(value)) return '';
+  return value.endsWith('s') && value.length > 2 ? value.slice(0, -1) : `${value}s`;
+}
+function fillStageFiveAsChoice(candidate, targetIndex) {
+  let index = 0;
+  return clean(candidate.prompt).replace(/_{5,}/g, () => { const current = index; index += 1; return current === targetIndex ? `⟦CHOICE:0⟧` : clean(candidate.answers?.[current]); });
+}
+function addDerivedGrammarFallback(generated, canonical, prefix, publisherStage7Count) {
+  const stageFiveByNumber = new Map((generated.get(5) || []).map(candidate => [candidate.number, candidate]));
+  const stageSixNumbers = new Set((generated.get(6) || []).map(candidate => candidate.number));
+  for (const row of canonical) {
+    if (stageSixNumbers.has(row.index)) continue;
+    const stageFive = stageFiveByNumber.get(row.index); let prompt = '', answer = '', wrong = '', derivation = 'deterministic_distractor';
+    if (stageFive) {
+      const target = stageFive.answers.findIndex((value, index) => clean(stageFive.hints?.[index]) && clean(stageFive.hints[index]) !== clean(value));
+      if (target >= 0) { answer = clean(stageFive.answers[target], 160); wrong = clean(stageFive.hints[target], 160); prompt = fillStageFiveAsChoice(stageFive, target); derivation = 'validated_stage5_boundary'; }
+    }
+    if (!prompt) { answer = chooseEnglish(row.text); wrong = simpleDistractor(answer); const blank = replaceOne(row.text, answer); prompt = blank ? blank.replace(/_{5,}/, '⟦CHOICE:0⟧') : ''; }
+    const candidate = item(6, row.index, factoryKey(prefix, 6, row.index), { kind: 'choice_groups', source: row.translation, prompt, groups: [[wrong, answer]], answers: [answer], derivation });
+    if (!validateItem(6, candidate, new Map([[row.index, row]]), canonical)) { generated.get(6).push(candidate); stageSixNumbers.add(row.index); }
+  }
+  if (publisherStage7Count) return;
+  const stageSevenNumbers = new Set((generated.get(7) || []).map(candidate => candidate.number));
+  for (const stageSix of generated.get(6) || []) {
+    if (stageSevenNumbers.has(stageSix.number) || stageSix.groups?.length !== 1 || stageSix.answers?.length !== 1) continue;
+    const answer = clean(stageSix.answers[0], 160), wrong = clean(stageSix.groups[0]?.find(value => clean(value) !== answer), 160);
+    const faulty = clean(stageSix.prompt).replace('⟦CHOICE:0⟧', wrong);
+    const candidate = item(7, stageSix.number, factoryKey(prefix, 7, stageSix.number), { kind: 'correction_pairs', source: '', prompt: faulty, pairCount: 1, subtype: 'sentence', answers: [wrong, answer], derivation: 'validated_stage6_boundary' });
+    if (!validateItem(7, candidate, new Map(), canonical)) { generated.get(7).push(candidate); stageSevenNumbers.add(stageSix.number); }
+  }
+}
+
 export function factoryFallbackTargets(catalog, rows, sourceExercises = []) {
   const allNumbers = (Array.isArray(rows) ? rows : []).map((_row, index) => index + 1), stageItems = stage => catalog?.stages?.find(entry => entry.stage === stage)?.items || [];
   const publisherStage7 = (Array.isArray(sourceExercises) ? sourceExercises : []).some(source => sourceStage(source?.type) === 7 && clean(source?.prompt) && (clean(source?.answer) || (Array.isArray(source?.answers) && source.answers.length)));
@@ -324,7 +359,7 @@ export function factoryFallbackTargets(catalog, rows, sourceExercises = []) {
   };
 }
 
-export function generateWorkbookCatalog({ title, workbookKey, rows, ai = {}, sourceExercises = [], provenance = {} }) {
+export function generateWorkbookCatalog({ title, workbookKey, rows, ai = {}, sourceExercises = [], provenance = {}, allowDerivedFallback = false }) {
   const started = Date.now(), canonical = rows.map((row, index) => ({ text: clean(row?.text), translation: clean(row?.translation), index: index + 1 })).filter(row => row.text && row.translation);
   if (!canonical.length || canonical.length !== rows.length) throw new Error('Canonical English/Korean sentence pairs are required.');
   const prefix = clean(workbookKey, 100).replace(/[^a-z0-9-]/gi, '-').toLowerCase() || 'factory';
@@ -335,6 +370,8 @@ export function generateWorkbookCatalog({ title, workbookKey, rows, ai = {}, sou
     const candidate = normalizeAiItem(stage, raw, canonical, prefix, index + 1); if (candidate && !acceptedNumbers.has(candidate.number)) { generated.get(stage).push(candidate); acceptedNumbers.add(candidate.number); } else if (!candidate) drops.push({ stage, number: Number(raw?.sentenceIndex) || index + 1, reason: `stage${stage}_round_trip` });
   });
   }
+  const publisherStage7Count = sourceExercises.filter(source => sourceStage(source?.type) === 7 && clean(source?.prompt) && (clean(source?.answer) || (Array.isArray(source?.answers) && source.answers.length))).length;
+  if (allowDerivedFallback) addDerivedGrammarFallback(generated, canonical, prefix, publisherStage7Count);
   const stages = FACTORY_STAGES.map(stage => {
     const valid = [];
     for (const candidate of generated.get(stage) || []) { const reason = validateItem(stage, candidate, rowByNumber, canonical); if (reason) drops.push({ stage, number: candidate.number, reason }); else valid.push(candidate); }
@@ -342,9 +379,8 @@ export function generateWorkbookCatalog({ title, workbookKey, rows, ai = {}, sou
   });
   const count = stage => stages.find(item => item.stage === stage)?.items.length || 0;
   const sourceReusedExercises = [5, 6, 7].reduce((sum, stage) => sum + stages.find(item => item.stage === stage).items.filter(candidate => candidate.provenance).length, 0);
-  const publisherStage7Count = sourceExercises.filter(source => sourceStage(source?.type) === 7 && clean(source?.prompt) && (clean(source?.answer) || (Array.isArray(source?.answers) && source.answers.length))).length;
   const stageCoverage = Object.fromEntries(FACTORY_STAGES.map(stage => [stage, { ready: count(stage), expected: stage === 7 && publisherStage7Count ? publisherStage7Count : canonical.length }]));
   const incompleteStages = [5, 6, 7].filter(stage => stageCoverage[stage].ready < stageCoverage[stage].expected);
-  const metrics = { elapsedMs: Date.now() - started, sentenceCount: canonical.length, stageCoverage, incompleteStages, pdfExtractedExercises: Number(provenance.pdfExtractedExercises) || 0, sourceReusedExercises, deterministicGeneratedExercises: [2, 3, 4, 8, 9].reduce((sum, stage) => sum + count(stage), 0), geminiGeneratedExercises: [5, 6, 7].reduce((sum, stage) => sum + stages.find(item => item.stage === stage).items.filter(candidate => !candidate.provenance).length, 0), geminiCallCount: Number(provenance.geminiCallCount) || 0, geminiTokenUsage: Number(provenance.geminiTokenUsage) || 0, validatorPass: stages.reduce((sum, stage) => sum + stage.items.length, 0), validatorDrop: drops.length, dropReasons: drops.reduce((all, drop) => ({ ...all, [drop.reason]: (all[drop.reason] || 0) + 1 }), {}) };
+  const metrics = { elapsedMs: Date.now() - started, sentenceCount: canonical.length, stageCoverage, incompleteStages, pdfExtractedExercises: Number(provenance.pdfExtractedExercises) || 0, sourceReusedExercises, deterministicGeneratedExercises: [2, 3, 4, 8, 9].reduce((sum, stage) => sum + count(stage), 0), derivedFallbackExercises: [6, 7].reduce((sum, stage) => sum + stages.find(item => item.stage === stage).items.filter(candidate => candidate.derivation).length, 0), geminiGeneratedExercises: [5, 6, 7].reduce((sum, stage) => sum + stages.find(item => item.stage === stage).items.filter(candidate => !candidate.provenance && !candidate.derivation).length, 0), geminiCallCount: Number(provenance.geminiCallCount) || 0, geminiTokenUsage: Number(provenance.geminiTokenUsage) || 0, validatorPass: stages.reduce((sum, stage) => sum + stage.items.length, 0), validatorDrop: drops.length, dropReasons: drops.reduce((all, drop) => ({ ...all, [drop.reason]: (all[drop.reason] || 0) + 1 }), {}) };
   return { workbookKey: prefix, title: clean(title, 120) || 'READY Workbook', source: provenance, importReport: { factory: true, metrics, drops }, stages, metrics };
 }

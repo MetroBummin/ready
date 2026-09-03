@@ -90,6 +90,11 @@ const normalizedAi=generateWorkbookCatalog({title:'Normalized AI',workbookKey:'n
 assert.equal(normalizedAi.stages.find(stage=>stage.stage===6).items.length,1,'Stage 6 may normalize harmless contraction and punctuation differences after exact answer restoration.');
 assert.equal(normalizedAi.stages.find(stage=>stage.stage===7).items[0].prompt,"It's use.",'Stage 7 may construct the faulty prompt from a validated wrong/correct pair when Gemini echoes the canonical sentence.');
 
+const derivedFallback=generateWorkbookCatalog({title:'Derived fallback',workbookKey:'derived-fallback',rows:canonical,allowDerivedFallback:true});
+assert.deepEqual([6,7].map(stage=>derivedFallback.stages.find(item=>item.stage===stage).items.length),[2,2],'Validated deterministic distractors must keep Stage 6 and 7 available when source and AI omit them.');
+assert.equal(derivedFallback.metrics.incompleteStages.includes(6),false);
+assert.equal(derivedFallback.metrics.incompleteStages.includes(7),false);
+
 const edge=readFileSync(resolve(root,'server/ready/index.ts'),'utf8'),admin=readFileSync(resolve(root,'ready/admin/app.js'),'utf8'),adminHtml=readFileSync(resolve(root,'ready/admin/index.html'),'utf8');
 assert.match(edge,/existingMode \? existingContext\.passage\.id : rows<string>\(await db\.rpc\("ready_create_passage_with_sentences"/,'Existing Passage finalization must reuse its passage_id instead of creating a passage.');
 assert.match(edge,/codeWorkbookForPassage\(passageResult\.data\)[\s\S]*ready_workbook_catalogs[\s\S]*ready_passage_sentences/,'Existing Passage preflight must reject static/factory duplicates before loading canonical rows.');
