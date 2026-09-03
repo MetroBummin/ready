@@ -320,11 +320,36 @@ function simpleDistractor(answer) {
   if (!/^[A-Za-z]+$/.test(value)) return '';
   return value.endsWith('s') && value.length > 2 ? value.slice(0, -1) : `${value}s`;
 }
+function simpleVerbHint(answer) {
+  const value = clean(answer, 160), lower = value.toLowerCase();
+  const irregular = { am: 'be', is: 'be', are: 'be', was: 'be', were: 'be', has: 'have', had: 'have', does: 'do', did: 'do' };
+  if (irregular[lower]) return irregular[lower];
+  if (!/^[A-Za-z]+$/.test(value)) return '';
+  if (lower.endsWith('ying') && value.length > 5) return `${value.slice(0, -4)}ie`;
+  if (lower.endsWith('ing') && value.length > 5) {
+    let root = value.slice(0, -3);
+    if (/([b-df-hj-np-tv-z])\1$/i.test(root)) root = root.slice(0, -1);
+    return root;
+  }
+  if (lower.endsWith('ied') && value.length > 4) return `${value.slice(0, -3)}y`;
+  if (lower.endsWith('ed') && value.length > 4) return value.slice(0, -2);
+  if (lower.endsWith('ies') && value.length > 4) return `${value.slice(0, -3)}y`;
+  if (lower.endsWith('s') && !lower.endsWith('ss') && value.length > 3) return value.slice(0, -1);
+  return '';
+}
 function fillStageFiveAsChoice(candidate, targetIndex) {
   let index = 0;
   return clean(candidate.prompt).replace(/_{5,}/g, () => { const current = index; index += 1; return current === targetIndex ? `⟦CHOICE:0⟧` : clean(candidate.answers?.[current]); });
 }
 function addDerivedGrammarFallback(generated, canonical, prefix, publisherStage7Count) {
+  const stageFiveNumbers = new Set((generated.get(5) || []).map(candidate => candidate.number));
+  for (const row of canonical) {
+    if (stageFiveNumbers.has(row.index)) continue;
+    const answer = words(row.text).find(value => simpleVerbHint(value));
+    const hint = simpleVerbHint(answer), prompt = answer ? replaceOne(row.text, answer) : '';
+    const candidate = item(5, row.index, factoryKey(prefix, 5, row.index), { kind: 'verb_form', source: row.translation, prompt, hints: [hint], answers: [answer], derivation: 'deterministic_verb_form' });
+    if (answer && hint && !validateItem(5, candidate, new Map([[row.index, row]]), canonical)) { generated.get(5).push(candidate); stageFiveNumbers.add(row.index); }
+  }
   const stageFiveByNumber = new Map((generated.get(5) || []).map(candidate => [candidate.number, candidate]));
   const stageSixNumbers = new Set((generated.get(6) || []).map(candidate => candidate.number));
   for (const row of canonical) {
@@ -381,6 +406,6 @@ export function generateWorkbookCatalog({ title, workbookKey, rows, ai = {}, sou
   const sourceReusedExercises = [5, 6, 7].reduce((sum, stage) => sum + stages.find(item => item.stage === stage).items.filter(candidate => candidate.provenance).length, 0);
   const stageCoverage = Object.fromEntries(FACTORY_STAGES.map(stage => [stage, { ready: count(stage), expected: stage === 7 && publisherStage7Count ? publisherStage7Count : canonical.length }]));
   const incompleteStages = [5, 6, 7].filter(stage => stageCoverage[stage].ready < stageCoverage[stage].expected);
-  const metrics = { elapsedMs: Date.now() - started, sentenceCount: canonical.length, stageCoverage, incompleteStages, pdfExtractedExercises: Number(provenance.pdfExtractedExercises) || 0, sourceReusedExercises, deterministicGeneratedExercises: [2, 3, 4, 8, 9].reduce((sum, stage) => sum + count(stage), 0), derivedFallbackExercises: [6, 7].reduce((sum, stage) => sum + stages.find(item => item.stage === stage).items.filter(candidate => candidate.derivation).length, 0), geminiGeneratedExercises: [5, 6, 7].reduce((sum, stage) => sum + stages.find(item => item.stage === stage).items.filter(candidate => !candidate.provenance && !candidate.derivation).length, 0), geminiCallCount: Number(provenance.geminiCallCount) || 0, geminiTokenUsage: Number(provenance.geminiTokenUsage) || 0, validatorPass: stages.reduce((sum, stage) => sum + stage.items.length, 0), validatorDrop: drops.length, dropReasons: drops.reduce((all, drop) => ({ ...all, [drop.reason]: (all[drop.reason] || 0) + 1 }), {}) };
+  const metrics = { elapsedMs: Date.now() - started, sentenceCount: canonical.length, stageCoverage, incompleteStages, pdfExtractedExercises: Number(provenance.pdfExtractedExercises) || 0, sourceReusedExercises, deterministicGeneratedExercises: [2, 3, 4, 8, 9].reduce((sum, stage) => sum + count(stage), 0), derivedFallbackExercises: [5, 6, 7].reduce((sum, stage) => sum + stages.find(item => item.stage === stage).items.filter(candidate => candidate.derivation).length, 0), geminiGeneratedExercises: [5, 6, 7].reduce((sum, stage) => sum + stages.find(item => item.stage === stage).items.filter(candidate => !candidate.provenance && !candidate.derivation).length, 0), geminiCallCount: Number(provenance.geminiCallCount) || 0, geminiTokenUsage: Number(provenance.geminiTokenUsage) || 0, validatorPass: stages.reduce((sum, stage) => sum + stage.items.length, 0), validatorDrop: drops.length, dropReasons: drops.reduce((all, drop) => ({ ...all, [drop.reason]: (all[drop.reason] || 0) + 1 }), {}) };
   return { workbookKey: prefix, title: clean(title, 120) || 'READY Workbook', source: provenance, importReport: { factory: true, metrics, drops }, stages, metrics };
 }

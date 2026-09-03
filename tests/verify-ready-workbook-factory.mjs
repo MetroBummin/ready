@@ -95,6 +95,10 @@ assert.deepEqual([6,7].map(stage=>derivedFallback.stages.find(item=>item.stage==
 assert.equal(derivedFallback.metrics.incompleteStages.includes(6),false);
 assert.equal(derivedFallback.metrics.incompleteStages.includes(7),false);
 
+const derivedVerb=generateWorkbookCatalog({title:'Derived verb',workbookKey:'derived-verb',rows:[{text:'Let’s find out whether you fall into any of the following categories.',translation:'다음 항목을 확인하자.'}],allowDerivedFallback:true});
+const derivedVerbItem=derivedVerb.stages.find(stage=>stage.stage===5).items[0];
+assert.deepEqual({answer:derivedVerbItem.answers[0],hint:derivedVerbItem.hints[0]},{answer:'following',hint:'follow'},'A missing Stage 5 item may be recovered only from a clear canonical inflection.');
+
 const edge=readFileSync(resolve(root,'server/ready/index.ts'),'utf8'),admin=readFileSync(resolve(root,'ready/admin/app.js'),'utf8'),adminHtml=readFileSync(resolve(root,'ready/admin/index.html'),'utf8');
 assert.match(edge,/existingMode \? existingContext\.passage\.id : rows<string>\(await db\.rpc\("ready_create_passage_with_sentences"/,'Existing Passage finalization must reuse its passage_id instead of creating a passage.');
 assert.match(edge,/codeWorkbookForPassage\(passageResult\.data\)[\s\S]*ready_workbook_catalogs[\s\S]*ready_passage_sentences/,'Existing Passage preflight must reject static/factory duplicates before loading canonical rows.');
@@ -109,6 +113,7 @@ assert.match(edge,/intentionally wrong option or faulty exercise prompt[\s\S]*re
 assert.match(edge,/incompleteReview[\s\S]*allowIncomplete/,'Incomplete grammar stages must require an explicit publication decision.');
 assert.match(admin,/data-factory-confirm-incomplete[\s\S]*confirmFactory\(true\)/,'Admin must show coverage and require explicit confirmation before publishing an incomplete catalog.');
 assert.match(edge,/factory_regenerate[\s\S]*factoryRegenerate/,'Factory catalog regeneration must be an authenticated explicit admin operation.');
+assert.match(edge,/finalizeFactoryJob\(regenerationJob, undefined, false, true, false\)/,'Catalog regeneration must avoid Edge-bound AI calls and use only validated source and deterministic recovery.');
 assert.match(edge,/replaceExistingCatalog[\s\S]*ready_workbook_catalogs"\)\.update\(catalogRow\)[\s\S]*factory_job_id/,'Regeneration must atomically update the catalog tied to its original factory job.');
 assert.doesNotMatch(edge,/factoryRegenerate[\s\S]{0,1200}ready_workbook_catalogs"\)\.delete/,'Regeneration must never delete the live catalog before replacement.');
 assert.match(admin,/data-regenerate-workbook[\s\S]*regenerateFactoryWorkbook/,'Admin must expose regeneration only for factory-backed workbooks.');

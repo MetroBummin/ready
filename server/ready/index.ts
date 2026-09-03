@@ -406,7 +406,7 @@ async function factoryExercises(rows: any[], requestedTargets: Record<number, nu
   }
   return { stages: generated, tokenUsage, callCount, errors };
 }
-async function finalizeFactoryJob(job: any, confirmedRows?: unknown, allowIncomplete = false, replaceExistingCatalog = false) {
+async function finalizeFactoryJob(job: any, confirmedRows?: unknown, allowIncomplete = false, replaceExistingCatalog = false, useAiFallback = true) {
   const metadata = job.source_metadata || {}, existingMode = metadata.factoryMode === "existing_passage";
   const existingContext = existingMode ? await existingFactoryPassage(metadata.existingPassageId, replaceExistingCatalog) : null;
   const rowsForCatalog = existingMode ? existingContext.canonicalRows : factoryRows(confirmedRows ?? job.extracted_rows);
@@ -422,7 +422,7 @@ async function finalizeFactoryJob(job: any, confirmedRows?: unknown, allowIncomp
   let ai: { stages: Record<number, any[]>; tokenUsage: number; callCount: number; errors: string[] } = { stages: { 5: [], 6: [], 7: [] }, tokenUsage: 0, callCount: 0, errors: [] };
   // Keep the Edge request bounded: one source-grounded AI pass is followed by
   // the validated deterministic fallback for any remaining Stage 6/7 gaps.
-  for (let round = 0; round < 1; round += 1) {
+  for (let round = 0; useAiFallback && round < 1; round += 1) {
     const fallbackTargets = factoryFallbackTargets(previewCatalog, rowsForCatalog, sourceExercises);
     if (![5, 6, 7].some(stage => fallbackTargets[stage].length)) break;
     const next = await factoryExercises(rowsForCatalog, fallbackTargets);
@@ -501,7 +501,7 @@ async function factoryRegenerate(body: any) {
   const job = rows<any>(await db.from("ready_workbook_factory_jobs").select("*").eq("id", factoryJobId).maybeSingle());
   if (!job) throw new ApiError(404, "기존 Factory 원본 작업을 찾지 못했습니다.");
   const regenerationJob = { ...job, source_metadata: { ...(job.source_metadata || {}), factoryMode: "existing_passage", existingPassageId: passageId } };
-  return finalizeFactoryJob(regenerationJob, undefined, false, true);
+  return finalizeFactoryJob(regenerationJob, undefined, false, true, false);
 }
 async function updatePassage(body: any) {
   const passageId = required(body.passageId, "지문", 80), sourceType = body.sourceType === "MOCK_EXAM" ? "MOCK_EXAM" : "TEXTBOOK", sourceYear = body.sourceYear ? Math.round(Number(body.sourceYear)) : null, sourceMonth = body.sourceMonth ? Math.round(Number(body.sourceMonth)) : null;

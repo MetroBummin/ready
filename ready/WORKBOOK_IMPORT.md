@@ -66,6 +66,9 @@ Stage 8의 generated order bank는 한 영어 단어당 chip 하나를 사용한
 Gemini fallback 뒤에도 6·7단계가 비면 검증된 5·6단계의 answer boundary에서 오답 선택지와
 correction pair를 결정론적으로 파생한다. 파생 문항도 정답을 대입했을 때 canonical English가
 정확히 복원되는 경우만 READY이며, metrics의 `derivedFallbackExercises`로 별도 집계한다.
+재생성은 기존 PDF/source exercise를 우선 재사용하고 AI 호출 없이 실행한다. 비어 있는
+5단계는 canonical English에서 일반 동사 활용 규칙으로 base form이 명확한 경우만
+결정론적으로 복구하며, 불확실하면 기존 catalog를 유지하고 재생성을 멈춘다.
 Edge 재생성은 자원 한도 안에서 끝나도록 단계별 최대 6문장의 Gemini batch를 한 차례만
 실행하고, 그 후 남은 6·7단계를 위 검증 절차로 채운다. 전체 문장 수와 관계없이 Gemini
 호출은 5·6·7단계 각 1회, 최대 3회로 제한된다.
