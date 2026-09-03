@@ -114,6 +114,7 @@ assert.match(edge,/incompleteReview[\s\S]*allowIncomplete/,'Incomplete grammar s
 assert.match(admin,/data-factory-confirm-incomplete[\s\S]*confirmFactory\(true\)/,'Admin must show coverage and require explicit confirmation before publishing an incomplete catalog.');
 assert.match(edge,/factory_regenerate[\s\S]*factoryRegenerate/,'Factory catalog regeneration must be an authenticated explicit admin operation.');
 assert.match(edge,/finalizeFactoryJob\(regenerationJob, undefined, false, true, false\)/,'Catalog regeneration must avoid Edge-bound AI calls and use only validated source and deterministic recovery.');
+assert.doesNotMatch(edge,/const provenance = \{ \.\.\.\(job\.extraction/,'Catalog provenance must not duplicate the full PDF source exercise payload retained by the Factory job.');
 assert.match(edge,/replaceExistingCatalog[\s\S]*ready_workbook_catalogs"\)\.update\(catalogRow\)[\s\S]*factory_job_id/,'Regeneration must atomically update the catalog tied to its original factory job.');
 assert.doesNotMatch(edge,/factoryRegenerate[\s\S]{0,1200}ready_workbook_catalogs"\)\.delete/,'Regeneration must never delete the live catalog before replacement.');
 assert.match(admin,/data-regenerate-workbook[\s\S]*regenerateFactoryWorkbook/,'Admin must expose regeneration only for factory-backed workbooks.');
