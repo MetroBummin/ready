@@ -22,6 +22,7 @@ const comparableEnglish = value => fold(value)
   .replace(/\b(i)'m\b/g, '$1 am')
   .replace(/\b(you|we|they)'re\b/g, '$1 are')
   .replace(/\b(he|she|it)'s\b/g, '$1 is')
+  .replace(/\blet's\b/g, 'let us')
   .replace(/\b([a-z]+)n't\b/g, (_, word) => word === 'ca' ? 'cannot' : word === 'wo' ? 'will not' : `${word} not`)
   .replace(/\b([a-z]+)'ve\b/g, '$1 have')
   .replace(/\b([a-z]+)'ll\b/g, '$1 will')
@@ -248,26 +249,60 @@ function publisherGrammarExercises(text, rows) {
 }
 function stage7PromptItems(text) {
   const value = workbookStagePages(text, 7).join('\n'), starts = [...value.matchAll(/(?:^|\n)\s*(\d+)\s+다음 글의 밑줄 친 부분 중\s*(문맥상|어법상)\s*어색한 것을\s*(?:두|세|네|\d+)\s*개 찾아 바르게 고쳐 쓰시오\.\s*(?:\d+\))?\s*/g)], output = [];
+  let section = 0;
   for (let index = 0; index < starts.length; index += 1) {
-    const number = Number(starts[index][1]), family = starts[index][2] === '문맥상' ? 'context' : 'grammar', from = starts[index].index + starts[index][0].length, to = index + 1 < starts.length ? starts[index + 1].index : value.length, block = value.slice(from, to), blank = block.search(/\(1\)\s*_{5,}/), prompt = clean((blank >= 0 ? block.slice(0, blank) : block).replace(/\[PAGE\s+\d+\][\s\S]*$/i, '')).replace(/\s+/g, ' ');
-    if (prompt && isEnglish(prompt)) output.push({ family, number, prompt });
+    const number = Number(starts[index][1]), family = starts[index][2] === '문맥상' ? 'context' : 'grammar';
+    if (family === 'context' && number === 1 && output.some(item => item.section === section && item.family === 'grammar')) section += 1;
+    const from = starts[index].index + starts[index][0].length, to = index + 1 < starts.length ? starts[index + 1].index : value.length, block = value.slice(from, to), blank = block.search(/\(1\)\s*_{5,}/), prompt = clean((blank >= 0 ? block.slice(0, blank) : block).replace(/\[PAGE\s+\d+\][\s\S]*$/i, '')).replace(/\s+/g, ' ');
+    if (prompt && isEnglish(prompt)) output.push({ family, number, prompt, section });
   }
   return output;
 }
+function stage7AnswerPart(value) {
+  return canonicalText(String(value ?? '')
+    .replace(/\[PAGE\s+\d+\]/gi, ' ')
+    .replace(/워크북\s*[2-9][^\n]*/g, ' ')
+    .replace(/[가-힣]+/g, ' ')
+    .replace(/\bLesson\s+\d+\b/gi, ' ')
+    .replace(/\bAnswer\s*Key\b/gi, ' ')
+    .replace(/[│◗]/g, ' ')
+    .replace(/\s+-\s*\d+\s*-\s+/g, ' '));
+}
+function stage7PairsFromBlock(value) {
+  const raw = String(value ?? ''), nextStage = raw.search(/워크북\s*8(?:\D|$)/), bounded = nextStage >= 0 ? raw.slice(0, nextStage) : raw, scoped = bounded.replace(/\[PAGE\s+\d+\][\s\S]*?(?=\(\d+\)\s*)/gi, ' ');
+  return [...scoped.matchAll(/\((\d+)\)\s*([\s\S]*?)\s*(?:→|->|⇒)\s*([\s\S]*?)(?=\(\d+\)\s*|$)/g)]
+    .map(match => [stage7AnswerPart(match[2]), stage7AnswerPart(match[3])])
+    .filter(pair => pair[0] && pair[1] && !sameOption(pair[0], pair[1]));
+}
 function stage7AnswerItems(text) {
   const answerAt = text.search(/Answer\s*Key/i); if (answerAt < 0) return [];
-  const answerText = text.slice(answerAt), markers = [...answerText.matchAll(/워크북\s*7\s*어색한 곳 찾기 연습[^\n]*/g)], output = [];
+  const answerText = text.slice(answerAt), output = [];
+  const add = (family, number, value) => {
+    const pairs = stage7PairsFromBlock(value);
+    if (pairs.length >= 2 && pairs.length <= 4) output.push({ family, number, pairs });
+  };
+  const markers = [...answerText.matchAll(/워크북\s*7\s*어색한 곳 찾기 연습[^\n]*/g)];
   for (const marker of markers) {
     const following = answerText.slice(marker.index + marker[0].length), nextStage = following.search(/워크북\s*8(?:\D|$)/), block = following.slice(0, nextStage >= 0 ? nextStage : following.length), headings = [...block.matchAll(/(문맥상|어법상)\s*어색한 것 찾기/g)];
     for (let headingIndex = 0; headingIndex < headings.length; headingIndex += 1) {
       const family = headings[headingIndex][1] === '문맥상' ? 'context' : 'grammar', from = headings[headingIndex].index + headings[headingIndex][0].length, to = headingIndex + 1 < headings.length ? headings[headingIndex + 1].index : block.length, section = block.slice(from, to), starts = [...section.matchAll(/(?:^|\n)\s*(\d+)\)\s*\(1\)\s*/g)];
       for (let index = 0; index < starts.length; index += 1) {
-        const number = Number(starts[index][1]), start = starts[index].index + starts[index][0].length, end = index + 1 < starts.length ? starts[index + 1].index : section.length, itemText = `(1) ${section.slice(start, end)}`, pairs = [...itemText.matchAll(/\((\d+)\)\s*([\s\S]*?)\s*(?:→|->|⇒)\s*([\s\S]*?)(?=\(\d+\)\s*|$)/g)].map(match => [clean(match[2]), clean(match[3])]).filter(pair => pair[0] && pair[1] && !sameOption(pair[0], pair[1]));
-        if (pairs.length) output.push({ family, number, pairs });
+        const number = Number(starts[index][1]), begin = starts[index].index + starts[index][0].length, finish = index + 1 < starts.length ? starts[index + 1].index : section.length;
+        add(family, number, `(1) ${section.slice(begin, finish)}`);
       }
     }
   }
-  return output;
+  // PDF text layers can emit a continuation column before the repeated
+  // "워크북 7" heading on the next answer-key page. Rescue every numbered
+  // arrow-pair block globally, then let the canonical round-trip below decide
+  // which context/grammar prompt it belongs to. This stays fail-closed.
+  const starts = [...answerText.matchAll(/(?:^|\n)\s*(\d+)\)\s*\(1\)\s*/g)];
+  for (let index = 0; index < starts.length; index += 1) {
+    const number = Number(starts[index][1]), begin = starts[index].index + starts[index][0].length, finish = index + 1 < starts.length ? starts[index + 1].index : answerText.length;
+    add('', number, `(1) ${answerText.slice(begin, finish)}`);
+  }
+  const unique = new Map(output.map(item => [`${item.family}:${item.number}:${JSON.stringify(item.pairs)}`, item]));
+  return [...unique.values()];
 }
 function literalOccurrences(value, needle) {
   const output = [], haystack = String(value), target = String(needle);
@@ -299,16 +334,28 @@ function correctionRoundTrip(prompt, flatAnswers, rows) {
   return matches.size === 1 ? matches.values().next().value : null;
 }
 function publisherStage7Exercises(text, rows) {
-  const prompts = stage7PromptItems(text), answers = stage7AnswerItems(text), exercises = [];
-  for (const promptItem of prompts) {
-    const matches = [];
-    for (const answerItem of answers.filter(item => item.family === promptItem.family && item.number === promptItem.number)) {
+  const prompts = stage7PromptItems(text), answers = stage7AnswerItems(text), resolved = new Map(), selectedSections = new Set();
+  for (let promptIndex = 0; promptIndex < prompts.length; promptIndex += 1) {
+    const promptItem = prompts[promptIndex], matches = [];
+    for (const answerItem of answers.filter(item => item.number === promptItem.number && (!item.family || item.family === promptItem.family))) {
       const flat = answerItem.pairs.flat(), restored = correctionRoundTrip(promptItem.prompt, flat, rows);
       if (restored) matches.push({ answerItem, restored });
     }
     const signatures = new Map(matches.map(match => [`${match.restored.span.start}:${match.restored.span.end}:${JSON.stringify(match.answerItem.pairs)}`, match]));
     if (signatures.size !== 1) continue;
-    const match = signatures.values().next().value, flat = match.answerItem.pairs.flat(), sourceNumber = promptItem.number, number = exercises.length + 1;
+    resolved.set(promptIndex, signatures.values().next().value);
+    selectedSections.add(promptItem.section);
+  }
+  const exercises = [];
+  for (let promptIndex = 0; promptIndex < prompts.length; promptIndex += 1) {
+    const promptItem = prompts[promptIndex];
+    if (!selectedSections.has(promptItem.section)) continue;
+    const sourceNumber = promptItem.number, number = exercises.length + 1, match = resolved.get(promptIndex);
+    if (!match) {
+      exercises.push({ type: 'error_correction', number, sourceNumber, subtype: promptItem.family, prompt: promptItem.prompt, answers: [], answer: '', canonicalStart: null, canonicalEnd: null, page: null, label: '워크북 7 어색한 곳 찾기 연습', provenance: { origin: 'publisher_prompt' } });
+      continue;
+    }
+    const flat = match.answerItem.pairs.flat();
     exercises.push({ type: 'error_correction', number, sourceNumber, subtype: promptItem.family, prompt: promptItem.prompt, answers: flat, answer: match.answerItem.pairs.map(pair => `${pair[0]} → ${pair[1]}`).join(' / '), canonicalStart: match.restored.span.start, canonicalEnd: match.restored.span.end, page: null, label: '워크북 7 어색한 곳 찾기 연습', provenance: { origin: 'publisher_answer_key' } });
   }
   return exercises;
@@ -502,7 +549,7 @@ function addDerivedVerbFallback(generated, canonical, prefix) {
 
 export function factoryFallbackTargets(catalog, rows, sourceExercises = []) {
   const allNumbers = (Array.isArray(rows) ? rows : []).map((_row, index) => index + 1), stageItems = stage => catalog?.stages?.find(entry => entry.stage === stage)?.items || [];
-  const publisherStage = stage => (Array.isArray(sourceExercises) ? sourceExercises : []).some(source => sourceStage(source?.type) === stage && clean(source?.prompt) && (clean(source?.answer) || (Array.isArray(source?.answers) && source.answers.length)));
+  const publisherStage = stage => (Array.isArray(sourceExercises) ? sourceExercises : []).some(source => sourceStage(source?.type) === stage && clean(source?.prompt) && (stage === 7 || clean(source?.answer) || (Array.isArray(source?.answers) && source.answers.length)));
   return {
     5: allNumbers.filter(number => !stageItems(5).some(item => item.number === number)),
     6: publisherStage(6) ? [] : allNumbers.filter(number => !stageItems(6).some(item => item.number === number)),
@@ -521,7 +568,7 @@ export function generateWorkbookCatalog({ title, workbookKey, rows, ai = {}, sou
     const candidate = normalizeAiItem(stage, raw, canonical, prefix, index + 1); if (candidate && !acceptedNumbers.has(candidate.number)) { generated.get(stage).push(candidate); acceptedNumbers.add(candidate.number); } else if (!candidate) drops.push({ stage, number: Number(raw?.sentenceIndex) || index + 1, reason: `stage${stage}_round_trip` });
   });
   }
-  const publisherCounts = Object.fromEntries([5, 6, 7].map(stage => [stage, sourceExercises.filter(source => sourceStage(source?.type) === stage && clean(source?.prompt) && (clean(source?.answer) || (Array.isArray(source?.answers) && source.answers.length))).length]));
+  const publisherCounts = Object.fromEntries([5, 6, 7].map(stage => [stage, sourceExercises.filter(source => sourceStage(source?.type) === stage && clean(source?.prompt) && (stage === 7 || clean(source?.answer) || (Array.isArray(source?.answers) && source.answers.length))).length]));
   if (allowDerivedFallback) addDerivedVerbFallback(generated, canonical, prefix);
   const stages = FACTORY_STAGES.map(stage => {
     const valid = [];

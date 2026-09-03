@@ -66,6 +66,8 @@ const passageCorrectionItem=fullReuse.stages.find(stage=>stage.stage===7).items[
 assert.equal(passageCorrectionItem.pairCount,2,'Publisher Stage 7 must preserve source correction pairs in one passage/range exercise.');
 assert.equal(passageCorrectionItem.sentenceIndexes,undefined,'Publisher Stage 7 remains its original range item.');
 assert.deepEqual(fullReuse.metrics.stageCoverage[7],{ready:1,expected:1},'Stage 7 expected count is source exercise count, never sentence count.');
+const incompletePublisherStage7=generateWorkbookCatalog({title:'Incomplete publisher Stage 7',workbookKey:'incomplete-publisher-stage7',rows:qualityRows,sourceExercises:[{type:'error_correction',number:1,sourceNumber:1,subtype:'grammar',prompt:stageSevenPrompt,answer:'has → have / explain → explains',provenance:{page:5}},{type:'error_correction',number:2,sourceNumber:2,subtype:'grammar',prompt:'Unresolved publisher prompt',answers:[],answer:'',provenance:{page:6}}]});
+assert.deepEqual(incompletePublisherStage7.metrics.stageCoverage[7],{ready:1,expected:2},'Stage 7 coverage must count unresolved publisher prompts so a partial parse cannot report a false complete total.');
 const commaLemma=generateWorkbookCatalog({title:'Comma lemma list',workbookKey:'comma-lemma',rows:qualityRows,sourceExercises:[
   {type:'grammar_vocab_choice',number:1,prompt:'They (have, probably, hear / have probably heard) the news.',answer:'have probably heard'},
 ]});
@@ -115,6 +117,26 @@ assert.deepEqual(parsedCatalog.metrics.stageCoverage[6],{ready:2,expected:2});
 assert.deepEqual(parsedCatalog.metrics.stageCoverage[7],{ready:2,expected:2});
 assert.deepEqual(parsedCatalog.stages.find(stage=>stage.stage===7).items.map(item=>item.pairCount),[2,3]);
 assert.equal(new Set(parsedCatalog.stages.find(stage=>stage.stage===7).items.map(item=>item.key)).size,2,'Context 1 and grammar 1 must not collide.');
+
+
+// Donga-style Stage 5 uses (Let) us in the exercise while canonical English
+// uses the contraction “Let’s”.
+const letWorkbook=`[PAGE 1]\n워크북 2 빈칸 연습 (한글)\n1. Let’s find out whether you fall into any of the following categories.1)\n해당하는 범주를 알아보자.\n[PAGE 2]\n워크북 3 빈칸 연습 (영문)\n1. 해당하는 범주를 알아보자.1)\nLet’s ____________.\n[PAGE 3]\n워크북 5 동사형 연습\n1. 해당하는 범주를 알아보자.1)\n(Let) us (find) out whether you (fall) into any of the (follow) categories.\n[PAGE 4]\nAnswer Key\n워크북 5 동사형 연습\n1) Let / find / fall / following`;
+const letAudit=inspectFullWorkbookText(letWorkbook);
+assert.equal(letAudit.exercises.filter(item=>item.type==='verb_form'&&item.provenance?.origin==='publisher_answer_key').length,1,'Stage 5 must accept publisher Let us against canonical Let’s.');
+
+// Answer-key column extraction can place a Stage 7 continuation item before
+// the repeated Stage 7 heading.
+const orphanStage7=`[PAGE 1]\n워크북 2 빈칸 연습 (한글)\n1. Alpha beta gamma.1)\n알파 베타 감마.\n[PAGE 2]\n워크북 3 빈칸 연습 (영문)\n1. 알파 베타 감마.1)\nAlpha beta gamma.\n[PAGE 3]\n워크북 7 어색한 곳 찾기 연습\n어법상 어색한 것 찾기\n5 다음 글의 밑줄 친 부분 중 어법상 어색한 것을 두 개 찾아 바르게 고쳐 쓰시오.5)\nWrongA WrongB gamma.\n(1) __________________ → __________________\n(2) __________________ → __________________\n[PAGE 4]\nAnswer Key\n5) (1) WrongA → Alpha\n(2) WrongB → beta\n워크북 7 어색한 곳 찾기 연습\n어법상 어색한 것 찾기\n워크북 8 순서배열 연습`;
+const orphanAudit=inspectFullWorkbookText(orphanStage7);
+assert.equal(orphanAudit.exercises.filter(item=>item.type==='error_correction'&&item.sourceNumber===5).length,1,'Stage 7 must recover an answer-key continuation emitted before its repeated heading.');
+
+const adminFactorySource=readFileSync(resolve(root,'ready/admin/app.js'),'utf8');
+const factoryServerSource=readFileSync(resolve(root,'server/ready/index.ts'),'utf8');
+assert.match(adminFactorySource,/누락을 인정하고 최종 확정/,'Incomplete Factory preview must expose an explicit final confirmation.');
+assert.match(adminFactorySource,/'최종 확정'/,'Complete Factory preview must expose an explicit final confirmation.');
+assert.match(factoryServerSource,/body\.finalize !== true/,'Factory confirm must preview unless the admin explicitly finalizes.');
+assert.doesNotMatch(factoryServerSource,/autoCompleted: true/,'Full workbooks must never auto-create a Passage.');
 
 
 // Canonical range lookup is shared across publisher items, while duplicate
@@ -170,14 +192,14 @@ assert.match(edge,/existingMode \? existingContext\.passage\.id : rows<string>\(
 assert.match(edge,/codeWorkbookForPassage\(passageResult\.data\)[\s\S]*ready_workbook_catalogs[\s\S]*ready_passage_sentences/,'Existing Passage preflight must reject static/factory duplicates before loading canonical rows.');
 assert.match(edge,/if \(!existingMode\) await db\.from\("ready_passages"\)\.delete/,'A failed existing catalog insert must never delete the existing passage.');
 assert.match(adminHtml,/existing_passage[\s\S]*factory-existing-passage/,'Admin must expose the existing Passage mode and selector.');
-assert.match(admin,/existing\?\{\}:\{sentenceRows:state\.factoryRows\}/,'Admin must not submit editable sentence rows in existing Passage mode.');
+assert.match(admin,/!finalize&&!existing\?\{sentenceRows:state\.factoryRows\}:\{\}/,'Admin must not submit editable sentence rows in existing Passage mode.');
 assert.match(edge,/factoryFallbackTargets\(previewCatalog, rowsForCatalog, sourceExercises\)/,'Factory fallback must target missing sentence numbers rather than only wholly absent stages.');
 assert.match(edge,/offset \+= 6[\s\S]*Return exactly \{\"\$\{stage\}\":\[\.\.\.\]\}/,'Factory AI fallback must use small stage-specific batches with an explicit response shape.');
 assert.match(edge,/filter\(number =>[\s\S]*\)\)\]\.slice\(0, 6\)/,'Factory AI fallback must cap each stage at one six-item batch.');
 assert.match(edge,/round < 1[\s\S]*factoryFallbackTargets\(previewCatalog/,'Factory AI fallback must stay within one bounded Edge pass before deterministic completion.');
 assert.match(edge,/intentionally wrong option or faulty exercise prompt[\s\S]*restore the unchanged canonical sentence exactly/,'Factory system instructions must allow distractors without permitting canonical-answer invention.');
 assert.match(edge,/incompleteReview[\s\S]*allowIncomplete/,'Incomplete grammar stages must require an explicit publication decision.');
-assert.match(admin,/data-factory-confirm-incomplete[\s\S]*confirmFactory\(true\)/,'Admin must show coverage and require explicit confirmation before publishing an incomplete catalog.');
+assert.match(admin,/data-factory-finalize-incomplete[\s\S]*confirmFactory\(\{finalize:true,allowIncomplete:true\}\)/,'Admin must show coverage and require explicit confirmation before publishing an incomplete catalog.');
 assert.match(edge,/factory_regenerate[\s\S]*factoryRegenerate/,'Factory catalog regeneration must be an authenticated explicit admin operation.');
 assert.match(edge,/finalizeFactoryJob\(regenerationJob, undefined, false, true, false\)/,'Catalog regeneration must avoid Edge-bound AI calls and use only validated source and deterministic recovery.');
 assert.doesNotMatch(edge,/const provenance = \{ \.\.\.\(job\.extraction/,'Catalog provenance must not duplicate the full PDF source exercise payload retained by the Factory job.');
