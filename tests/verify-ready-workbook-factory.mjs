@@ -138,6 +138,8 @@ assert.match(adminFactorySource,/'최종 확정'/,'Complete Factory preview must
 assert.match(factoryServerSource,/body\.finalize !== true/,'Factory confirm must preview unless the admin explicitly finalizes.');
 assert.match(factoryServerSource,/previewAi/,'Final confirmation must reuse the validated preview supplement instead of regenerating it.');
 assert.match(adminFactorySource,/finalize&&result\.incompleteReview/,'Finalization must remain fail-closed if the server reports a changed incomplete result.');
+assert.match(adminFactorySource,/selectedFactoryPdf[\s\S]*input\?\.files\?\.\[0\]/,'Factory PDF upload must read the file input directly before relying on FormData.');
+assert.doesNotMatch(adminFactorySource,/async function startFactory[\s\S]{0,800}instanceof File/,'Factory PDF upload must not reject a selected file only because instanceof File fails.');
 assert.doesNotMatch(factoryServerSource,/autoCompleted: true/,'Full workbooks must never auto-create a Passage.');
 
 
@@ -194,6 +196,7 @@ assert.match(edge,/existingMode \? existingContext\.passage\.id : rows<string>\(
 assert.match(edge,/codeWorkbookForPassage\(passageResult\.data\)[\s\S]*ready_workbook_catalogs[\s\S]*ready_passage_sentences/,'Existing Passage preflight must reject static/factory duplicates before loading canonical rows.');
 assert.match(edge,/if \(!existingMode\) await db\.from\("ready_passages"\)\.delete/,'A failed existing catalog insert must never delete the existing passage.');
 assert.match(adminHtml,/existing_passage[\s\S]*factory-existing-passage/,'Admin must expose the existing Passage mode and selector.');
+assert.match(adminHtml,/app\.js\?v=workbook-factory-pdf-input-1/,'Admin must cache-bust the corrected PDF upload module.');
 assert.match(admin,/!finalize&&!existing\?\{sentenceRows:state\.factoryRows\}:\{\}/,'Admin must not submit editable sentence rows in existing Passage mode.');
 assert.match(edge,/factoryFallbackTargets\(previewCatalog, rowsForCatalog, sourceExercises\)/,'Factory fallback must target missing sentence numbers rather than only wholly absent stages.');
 assert.match(edge,/offset \+= 6[\s\S]*Return exactly \{\"\$\{stage\}\":\[\.\.\.\]\}/,'Factory AI fallback must use small stage-specific batches with an explicit response shape.');
