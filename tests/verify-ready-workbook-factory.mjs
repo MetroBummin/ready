@@ -103,7 +103,7 @@ assert.match(adminHtml,/existing_passage[\s\S]*factory-existing-passage/,'Admin 
 assert.match(admin,/existing\?\{\}:\{sentenceRows:state\.factoryRows\}/,'Admin must not submit editable sentence rows in existing Passage mode.');
 assert.match(edge,/factoryFallbackTargets\(previewCatalog, rowsForCatalog, sourceExercises\)/,'Factory fallback must target missing sentence numbers rather than only wholly absent stages.');
 assert.match(edge,/offset \+= 6[\s\S]*Return exactly \{\"\$\{stage\}\":\[\.\.\.\]\}/,'Factory AI fallback must use small stage-specific batches with an explicit response shape.');
-assert.match(edge,/round < 3[\s\S]*factoryFallbackTargets\(previewCatalog/,'Factory fallback must retry only the still-missing validated sentence coverage.');
+assert.match(edge,/round < 1[\s\S]*factoryFallbackTargets\(previewCatalog/,'Factory AI fallback must stay within one bounded Edge pass before deterministic completion.');
 assert.match(edge,/intentionally wrong option or faulty exercise prompt[\s\S]*restore the unchanged canonical sentence exactly/,'Factory system instructions must allow distractors without permitting canonical-answer invention.');
 assert.match(edge,/incompleteReview[\s\S]*allowIncomplete/,'Incomplete grammar stages must require an explicit publication decision.');
 assert.match(admin,/data-factory-confirm-incomplete[\s\S]*confirmFactory\(true\)/,'Admin must show coverage and require explicit confirmation before publishing an incomplete catalog.');

@@ -420,7 +420,9 @@ async function finalizeFactoryJob(job: any, confirmedRows?: unknown, allowIncomp
   const sourceExercises = Array.isArray(job.extraction?.sourceExercises) ? job.extraction.sourceExercises : [], previewKey = `factory-preview-${existingMode ? existingContext.passage.id : job.id}`;
   let previewCatalog = generateWorkbookCatalog({ title: `${title} · READY 워크북`, workbookKey: previewKey, rows: rowsForCatalog, sourceExercises, provenance: { pdfExtractedExercises: Number(job.extraction?.exerciseCount) || 0 } });
   let ai: { stages: Record<number, any[]>; tokenUsage: number; callCount: number; errors: string[] } = { stages: { 5: [], 6: [], 7: [] }, tokenUsage: 0, callCount: 0, errors: [] };
-  for (let round = 0; round < 3; round += 1) {
+  // Keep the Edge request bounded: one source-grounded AI pass is followed by
+  // the validated deterministic fallback for any remaining Stage 6/7 gaps.
+  for (let round = 0; round < 1; round += 1) {
     const fallbackTargets = factoryFallbackTargets(previewCatalog, rowsForCatalog, sourceExercises);
     if (![5, 6, 7].some(stage => fallbackTargets[stage].length)) break;
     const next = await factoryExercises(rowsForCatalog, fallbackTargets);
