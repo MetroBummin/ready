@@ -28,6 +28,21 @@ jobs:
         run: |
           python3 tools/factory-stage5-7-confirm-temp.py
           python3 tools/factory-stage5-7-boundary-temp.py
+      - name: Debug real PDF Stage 7
+        run: |
+          node --input-type=module <<'NODE'
+          import { readFile } from 'node:fs/promises';
+          import { extractUnicodePdfText } from './server/ready/pdf-text-extract.mjs';
+          import { inspectFullWorkbookText } from './server/ready/workbook-factory.mjs';
+          const bytes = await readFile('ready/workbooks/ne-minbyeongcheon-lesson-1.pdf');
+          const text = await extractUnicodePdfText(`data:application/pdf;base64,${bytes.toString('base64')}`);
+          const audit = inspectFullWorkbookText(text);
+          console.log('STAGE7_DEBUG', JSON.stringify(audit.exercises.filter(item => item.type === 'error_correction').map(item => ({
+            number:item.number, sourceNumber:item.sourceNumber, subtype:item.subtype,
+            canonicalStart:item.canonicalStart, canonicalEnd:item.canonicalEnd,
+            provenance:item.provenance, label:item.label, answer:item.answer
+          })), null, 2));
+          NODE
       - run: npm run ready:test
       - run: npm run build
       - run: npm run native:verify
