@@ -467,7 +467,7 @@ async function factoryStart(body: any) {
     }
   }
   if (!sourceText && (!existingMode || sourceKind === "pdf")) throw new ApiError(400, sourceKind === "pdf" ? "텍스트를 추출할 수 없는 PDF입니다. OCR PDF는 지원하지 않습니다." : "본문을 입력해 주세요.");
-  const inspected: any = sourceKind === "pdf" ? inspectFullWorkbookText(sourceText) : sourceText ? { fullWorkbook: false, reviewRequired: true, ...extractSentenceRows(sourceText), exercises: [], headings: [], reason: "passage input requires review" } : { fullWorkbook: false, reviewRequired: true, rows: [], exercises: [], headings: [], reason: "기존 canonical 문장을 사용합니다." };
+  const inspected: any = sourceKind === "pdf" ? inspectFullWorkbookText(sourceText, existingMode ? existingContext.canonicalRows : null) : sourceText ? { fullWorkbook: false, reviewRequired: true, ...extractSentenceRows(sourceText), exercises: [], headings: [], reason: "passage input requires review" } : { fullWorkbook: false, reviewRequired: true, rows: [], exercises: [], headings: [], reason: "기존 canonical 문장을 사용합니다." };
   let rowsForReview = existingMode ? existingContext.canonicalRows : inspected.rows || [], translationTokens = 0;
   if (existingMode && sourceKind === "pdf") {
     const consistency = compareCanonicalRows(existingContext.canonicalRows, inspected.rows || []);

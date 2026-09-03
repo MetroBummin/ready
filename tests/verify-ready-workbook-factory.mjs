@@ -63,13 +63,58 @@ assert.equal(fullReuse.metrics.geminiCallCount,0,'Full Workbook source reuse mus
 const sourceStageSix=fullReuse.stages.find(stage=>stage.stage===6).items[0];
 assert.deepEqual(sourceStageSix.groups,[['have','has'],['probably','rarely']],'Publisher Stage 6 local choice groups must be preserved.');
 const passageCorrectionItem=fullReuse.stages.find(stage=>stage.stage===7).items[0];
-assert.equal(passageCorrectionItem.pairCount,2,'Publisher Stage 7 must preserve 2-3 correction pairs in one passage/range exercise.');
+assert.equal(passageCorrectionItem.pairCount,2,'Publisher Stage 7 must preserve source correction pairs in one passage/range exercise.');
 assert.equal(passageCorrectionItem.sentenceIndexes,undefined,'Publisher Stage 7 remains its original range item.');
 assert.deepEqual(fullReuse.metrics.stageCoverage[7],{ready:1,expected:1},'Stage 7 expected count is source exercise count, never sentence count.');
 const commaLemma=generateWorkbookCatalog({title:'Comma lemma list',workbookKey:'comma-lemma',rows:qualityRows,sourceExercises:[
   {type:'grammar_vocab_choice',number:1,prompt:'They (have, probably, hear / have probably heard) the news.',answer:'have probably heard'},
 ]});
 assert.equal(commaLemma.stages.find(stage=>stage.stage===6).items.length,0,'Comma-separated lemma lists are not valid Stage 6 options.');
+
+// Real publisher semantics: Stage 6 exercise numbering is not a canonical sentence id.
+const dongaLikeRows=[
+  {text:'This is an example of stress eating.',translation:'이것은 스트레스로 인한 먹기의 일례이다.'},
+  {text:'Stress eaters use food to make themselves feel better.',translation:'스트레스로 인해 먹는 사람들은 기분을 풀기 위해 음식을 이용한다.'},
+  {text:'They try to escape reality.',translation:'그들은 현실에서 벗어나려고 한다.'},
+];
+const dongaLike=generateWorkbookCatalog({title:'Donga-like',workbookKey:'donga-like',rows:dongaLikeRows,sourceExercises:[
+  {type:'grammar_vocab_choice',number:1,prompt:'This is an example of stress eating. Stress eaters ⟦CHOICE:0⟧ food to make ⟦CHOICE:1⟧ ⟦CHOICE:2⟧ better.',groups:[['use','uses'],['themselves','them'],['feel','to feel']],answers:['use','themselves','feel'],canonicalStart:1,canonicalEnd:2,provenance:{page:25}},
+  {type:'grammar_vocab_choice',number:2,prompt:'They ⟦CHOICE:0⟧ to escape reality.',groups:[['try','tries']],answers:['try'],canonicalStart:3,canonicalEnd:3,provenance:{page:25}},
+]});
+assert.equal(dongaLike.stages.find(stage=>stage.stage===6).items.length,2,'A publisher Stage 6 item may cover multiple canonical sentences.');
+assert.deepEqual(dongaLike.metrics.stageCoverage[6],{ready:2,expected:2},'Publisher Stage 6 expected count is source exercise count, not sentence count.');
+assert.deepEqual(factoryFallbackTargets(dongaLike,dongaLikeRows,[{type:'grammar_vocab_choice',number:1,prompt:'x',answer:'x'}])[6],[],'Publisher Stage 6 must not be replaced by AI just because exercise count differs from sentence count.');
+
+// Validation normalizes typography only for matching; displayed local options remain source-backed.
+const quoteRows=[{text:"In other words, if we don't reduce carbon emissions sufficiently, atmospheric carbon will continue to accumulate.",translation:'다시 말하면 탄소 배출을 충분히 줄이지 않으면 대기 중 탄소는 계속 축적될 것이다.'}];
+const quoteChoice=generateWorkbookCatalog({title:'Quote normalization',workbookKey:'quote-normalization',rows:quoteRows,sourceExercises:[
+  {type:'grammar_vocab_choice',number:1,prompt:'In other words, if we ⟦CHOICE:0⟧ reduce carbon emissions sufficiently, atmospheric carbon will continue to accumulate.',groups:[["won‘t","don't"]],answers:['don‘t'],provenance:{page:27}},
+]});
+const quoteItem=quoteChoice.stages.find(stage=>stage.stage===6).items[0];
+assert.equal(quoteItem.answers[0],"don't");
+assert.deepEqual(quoteItem.groups[0],["won‘t","don't"]);
+
+// Publisher Stage 7 allows the source's actual 2/3/4 correction count.
+const fourPairRows=[{text:'Alpha beta gamma delta epsilon.',translation:'알파 베타 감마 델타 엡실론.'}];
+const fourPair=generateWorkbookCatalog({title:'Four corrections',workbookKey:'four-pair',rows:fourPairRows,sourceExercises:[
+  {type:'error_correction',number:1,sourceNumber:4,subtype:'grammar',prompt:'WrongA WrongB WrongC WrongD epsilon.',answers:['WrongA','Alpha','WrongB','beta','WrongC','gamma','WrongD','delta'],provenance:{page:34}},
+]});
+assert.equal(fourPair.stages.find(stage=>stage.stage===7).items[0].pairCount,4,'Publisher Stage 7 must preserve a four-pair source exercise.');
+
+// Parser regression for the actual Exam4you format: Stage 6 can merge sentences,
+// Stage 7 item numbers have no dot and restart between context/grammar families.
+const publisherText=`[PAGE 1]\n워크북 2 빈칸 연습 (한글)\n1. This is an example of stress eating.1)\n이것은 ____________.\n2. Stress eaters use food to make themselves feel better.2)\n스트레스 먹는 사람들은 ____________.\n3. They try to escape reality.3)\n그들은 ____________.\n[PAGE 2]\n워크북 3 빈칸 연습 (영문)\n1. 이것은 스트레스로 인한 먹기의 일례이다.1)\nThis is ____________.\n2. 스트레스로 인해 먹는 사람들은 기분을 풀기 위해 음식을 이용한다.2)\nStress eaters ____________.\n3. 그들은 현실에서 벗어나려고 한다.3)\nThey ____________.\n[PAGE 3]\n워크북 6 어법 선택형 연습\n1. 이것은 스트레스로 인한 먹기의 일례이다. 스트레스로 인해 먹는 사람들은 기분을 풀기 위해 음식을 이용한다.1)\nThis is an example of stress eating. Stress eaters [use / uses] food to make [themselves / them] [feel / to feel] better.\n2. 그들은 현실에서 벗어나려고 한다.2)\nThey [try / tries] to escape reality.\n[PAGE 4]\n워크북 7 어색한 곳 찾기 연습\n문맥상 어색한 것 찾기\n1 다음 글의 밑줄 친 부분 중 문맥상 어색한 것을 두 개 찾아 바르게 고쳐 쓰시오.1)\nThis is an opposite of stress eating. Stress eaters use food to make themselves feel worse. They try to escape reality.\n(1) __________________ → __________________\n(2) __________________ → __________________\n어법상 어색한 것 찾기\n1 다음 글의 밑줄 친 부분 중 어법상 어색한 것을 세 개 찾아 바르게 고쳐 쓰시오.1)\nThis are an example of stress eating. Stress eaters uses food to make themselves feel better. They tries to escape reality.\n(1) __________________ → __________________\n(2) __________________ → __________________\n(3) __________________ → __________________\n[PAGE 5]\nAnswer Key\n워크북 6 어법 선택형 연습\n1) use / themselves / feel\n2) try\n워크북 7 어색한 곳 찾기 연습\n문맥상 어색한 것 찾기\n1) (1) opposite → example\n(2) worse → better\n어법상 어색한 것 찾기\n1) (1) are → is\n(2) uses → use\n(3) tries → try\n워크북 8 순서배열 연습`;
+const inspectedPublisher=inspectFullWorkbookText(publisherText);
+assert.equal(inspectedPublisher.rows.length,3);
+assert.equal(inspectedPublisher.exercises.filter(item=>item.type==='grammar_vocab_choice').length,2,'Stage 6 parser must preserve a source count different from sentence count.');
+const parsedStage7=inspectedPublisher.exercises.filter(item=>item.type==='error_correction');
+assert.equal(parsedStage7.length,2,'Stage 7 parser must read no-dot item numbers and both subtype families.');
+assert.deepEqual(parsedStage7.map(item=>item.subtype),['context','grammar']);
+const parsedCatalog=generateWorkbookCatalog({title:'Parsed publisher',workbookKey:'parsed-publisher',rows:inspectedPublisher.rows,sourceExercises:inspectedPublisher.exercises});
+assert.deepEqual(parsedCatalog.metrics.stageCoverage[6],{ready:2,expected:2});
+assert.deepEqual(parsedCatalog.metrics.stageCoverage[7],{ready:2,expected:2});
+assert.deepEqual(parsedCatalog.stages.find(stage=>stage.stage===7).items.map(item=>item.pairCount),[2,3]);
+assert.equal(new Set(parsedCatalog.stages.find(stage=>stage.stage===7).items.map(item=>item.key)).size,2,'Context 1 and grammar 1 must not collide.');
 
 const partialReuse=generateWorkbookCatalog({title:'Partial',workbookKey:'partial',rows:canonical,sourceExercises:[
   {type:'verb_form',number:1,prompt:'Humans excel at visual ____________.',answer:'imagery',provenance:{page:3}},
