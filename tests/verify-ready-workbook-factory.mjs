@@ -83,6 +83,13 @@ const invalid=generateWorkbookCatalog({title:'Invalid',workbookKey:'invalid',row
 assert.equal(invalid.stages.find(stage=>stage.stage===5).items.length,0);
 assert.equal(invalid.metrics.dropReasons.stage5_round_trip,1);
 
+const normalizedAi=generateWorkbookCatalog({title:'Normalized AI',workbookKey:'normalized-ai',rows:[{text:"It's useful.",translation:'그것은 유용하다.'}],ai:{
+  6:[{sentenceIndex:1,prompt:'It is ____________.',wrong:'useless',answer:'useful'}],
+  7:[{sentenceIndex:1,sentence:"It's useful.",wrong:'use',correct:'useful'}],
+}});
+assert.equal(normalizedAi.stages.find(stage=>stage.stage===6).items.length,1,'Stage 6 may normalize harmless contraction and punctuation differences after exact answer restoration.');
+assert.equal(normalizedAi.stages.find(stage=>stage.stage===7).items[0].prompt,"It's use.",'Stage 7 may construct the faulty prompt from a validated wrong/correct pair when Gemini echoes the canonical sentence.');
+
 const edge=readFileSync(resolve(root,'server/ready/index.ts'),'utf8'),admin=readFileSync(resolve(root,'ready/admin/app.js'),'utf8'),adminHtml=readFileSync(resolve(root,'ready/admin/index.html'),'utf8');
 assert.match(edge,/existingMode \? existingContext\.passage\.id : rows<string>\(await db\.rpc\("ready_create_passage_with_sentences"/,'Existing Passage finalization must reuse its passage_id instead of creating a passage.');
 assert.match(edge,/codeWorkbookForPassage\(passageResult\.data\)[\s\S]*ready_workbook_catalogs[\s\S]*ready_passage_sentences/,'Existing Passage preflight must reject static/factory duplicates before loading canonical rows.');

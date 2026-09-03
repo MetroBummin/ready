@@ -284,11 +284,13 @@ function normalizeAiItem(stage, raw, rows, prefix, number) {
   }
   if (stage === 6) {
     const answer = clean(raw?.answer, 160), wrong = clean(raw?.wrong, 160), prompt = clean(raw?.prompt, 2000);
-    return answer && wrong && answer !== wrong && prompt && restoreBlank(prompt, answer) === en ? item(6, canonicalNumber, key, { kind: 'choice_groups', source: ko, prompt: prompt.replace(/_{5,}/, '⟦CHOICE:0⟧'), groups: [[wrong, answer]], answers: [answer] }) : null;
+    return answer && wrong && answer !== wrong && prompt && sameEnglish(restoreBlank(prompt, answer), en) ? item(6, canonicalNumber, key, { kind: 'choice_groups', source: ko, prompt: prompt.replace(/_{5,}/, '⟦CHOICE:0⟧'), groups: [[wrong, answer]], answers: [answer] }) : null;
   }
   if (stage === 7) {
     const wrong = clean(raw?.wrong, 160), correct = clean(raw?.correct, 160), sentence = clean(raw?.sentence, 2000);
-    return wrong && correct && wrong !== correct && sentence === en.replace(correct, wrong) && en.includes(correct) ? item(7, canonicalNumber, key, { kind: 'correction_pairs', source: '', prompt: sentence, pairCount: 1, subtype: 'sentence', answers: [wrong, correct] }) : null;
+    if (!wrong || !correct || wrong === correct) return null;
+    const faulty = sentence.includes(wrong) && sameEnglish(sentence.replace(wrong, correct), en) ? sentence : en.includes(correct) ? en.replace(correct, wrong) : '';
+    return faulty && faulty.includes(wrong) && sameEnglish(faulty.replace(wrong, correct), en) ? item(7, canonicalNumber, key, { kind: 'correction_pairs', source: '', prompt: faulty, pairCount: 1, subtype: 'sentence', answers: [wrong, correct] }) : null;
   }
   return null;
 }
