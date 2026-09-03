@@ -116,6 +116,7 @@ assert.match(edge,/factory_regenerate[\s\S]*factoryRegenerate/,'Factory catalog 
 assert.match(edge,/finalizeFactoryJob\(regenerationJob, undefined, false, true, false\)/,'Catalog regeneration must avoid Edge-bound AI calls and use only validated source and deterministic recovery.');
 assert.doesNotMatch(edge,/const provenance = \{ \.\.\.\(job\.extraction/,'Catalog provenance must not duplicate the full PDF source exercise payload retained by the Factory job.');
 assert.match(edge,/replaceExistingCatalog[\s\S]*ready_workbook_catalogs"\)\.update\(catalogRow\)[\s\S]*factory_job_id/,'Regeneration must atomically update the catalog tied to its original factory job.');
+assert.match(edge,/factory_job_id: job\.id, updated_at: new Date\(\)\.toISOString\(\)/,'Catalog regeneration must advance updated_at for cache and provenance freshness.');
 assert.doesNotMatch(edge,/factoryRegenerate[\s\S]{0,1200}ready_workbook_catalogs"\)\.delete/,'Regeneration must never delete the live catalog before replacement.');
 assert.match(admin,/data-regenerate-workbook[\s\S]*regenerateFactoryWorkbook/,'Admin must expose regeneration only for factory-backed workbooks.');
 console.log('READY Workbook Factory golden paths verified.');

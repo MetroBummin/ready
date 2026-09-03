@@ -443,7 +443,7 @@ async function finalizeFactoryJob(job: any, confirmedRows?: unknown, allowIncomp
   const passageId = existingMode ? existingContext.passage.id : rows<string>(await db.rpc("ready_create_passage_with_sentences", { p_title: title, p_source_type: sourceType, p_grade: grade, p_source_year: sourceYear, p_source_month: sourceMonth, p_source_label: clean(metadata.sourceLabel, 120), p_rows: rowsForCatalog }));
   const workbookKey = `factory-${passageId}`;
   const catalog = generateWorkbookCatalog({ title: `${title} · READY 워크북`, workbookKey, rows: rowsForCatalog, ai: ai.stages, sourceExercises, provenance, allowDerivedFallback: true });
-  const catalogRow = { passage_id: passageId, workbook_key: catalog.workbookKey, catalog, provenance, metrics: catalog.metrics, factory_job_id: job.id };
+  const catalogRow = { passage_id: passageId, workbook_key: catalog.workbookKey, catalog, provenance, metrics: catalog.metrics, factory_job_id: job.id, updated_at: new Date().toISOString() };
   const saved = replaceExistingCatalog
     ? await db.from("ready_workbook_catalogs").update(catalogRow).eq("passage_id", passageId).eq("factory_job_id", job.id).select("passage_id").maybeSingle()
     : await db.from("ready_workbook_catalogs").insert(catalogRow);
