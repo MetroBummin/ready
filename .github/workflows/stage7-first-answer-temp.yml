@@ -1,0 +1,36 @@
+name: Temporary Stage 7 first-answer verify
+
+on:
+  push:
+    branches:
+      - fix/stage7-first-answer-block
+    paths:
+      - .github/workflows/stage7-first-answer-temp.yml
+      - tools/stage7-first-answer-temp.py
+
+permissions:
+  contents: write
+
+jobs:
+  patch-and-verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: fix/stage7-first-answer-block
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: python3 tools/stage7-first-answer-temp.py
+      - run: npm run ready:test
+      - run: npm run build
+      - run: npm run native:verify
+      - name: Commit focused Stage 7 fix
+        run: |
+          git config user.name 'MetroBummin'
+          git config user.email 'iamthefreeman@naver.com'
+          git add server/ready/workbook-factory.mjs tests/verify-ready-workbook-factory.mjs
+          git commit -m 'fix: preserve first Stage 7 answer block'
+          git push origin HEAD:fix/stage7-first-answer-block
