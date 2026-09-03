@@ -3,51 +3,19 @@ on:
   push:
     branches: [fix/workbook-source-stage6-7]
 permissions:
-  contents: write
+  contents: read
 jobs:
   verify:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Apply narrow source-parser follow-up
-        shell: python
-        run: |
-          from pathlib import Path
-
-          factory = Path('server/ready/workbook-factory.mjs')
-          text = factory.read_text()
-          old = "const number = Number(starts[index][1]), start = starts[index].index + starts[index][0].length - 3, end = index + 1 < starts.length ? starts[index + 1].index : section.length, itemText = section.slice(start, end), pairs = [...itemText.matchAll(/\\((\\d+)\\)\\s*([\\s\\S]*?)\\s*(?:→|->|⇒)\\s*([\\s\\S]*?)(?=\\(\\d+\\)\\s*|$)/g)].map(match => [clean(match[2]), clean(match[3])]).filter(pair => pair[0] && pair[1] && !sameOption(pair[0], pair[1]));"
-          new = "const number = Number(starts[index][1]), start = starts[index].index + starts[index][0].length, end = index + 1 < starts.length ? starts[index + 1].index : section.length, itemText = `(1) ${section.slice(start, end)}`, pairs = [...itemText.matchAll(/\\((\\d+)\\)\\s*([\\s\\S]*?)\\s*(?:→|->|⇒)\\s*([\\s\\S]*?)(?=\\(\\d+\\)\\s*|$)/g)].map(match => [clean(match[2]), clean(match[3])]).filter(pair => pair[0] && pair[1] && !sameOption(pair[0], pair[1]));"
-          if old not in text:
-              raise SystemExit('stage7 answer parser target not found')
-          text = text.replace(old, new, 1)
-          old = "const inlineExercises = blocks.flatMap(block => numberedPairs(block.body).map(item => ({ ...item, type: semanticWorkbookType(block.title), page: block.page, label: block.title }))), publisherExercises = canonicalRows.length ? [...publisherGrammarExercises(text, rows), ...publisherStage7Exercises(text, rows)] : [], exercises = [...publisherExercises, ...inlineExercises], answeredExercises = exercises.filter(item => clean(item.answer) || (Array.isArray(item.answers) && item.answers.length));"
-          new = "const inlineExercises = blocks.flatMap(block => numberedPairs(block.body).map(item => ({ ...item, type: semanticWorkbookType(block.title), page: block.page, label: block.title }))), publisherExercises = canonicalRows.length ? [...publisherGrammarExercises(text, rows), ...publisherStage7Exercises(text, rows)] : [], publisherStages = new Set(publisherExercises.map(item => sourceStage(item.type)).filter(Boolean)), exercises = [...publisherExercises, ...inlineExercises.filter(item => !publisherStages.has(sourceStage(item.type)))], answeredExercises = exercises.filter(item => clean(item.answer) || (Array.isArray(item.answers) && item.answers.length));"
-          if old not in text:
-              raise SystemExit('publisher exercise merge target not found')
-          factory.write_text(text.replace(old, new, 1))
-
-          edge = Path('server/ready/index.ts')
-          text = edge.read_text()
-          old = 'sourceKind === "pdf" ? inspectFullWorkbookText(sourceText) : sourceText ?'
-          new = 'sourceKind === "pdf" ? inspectFullWorkbookText(sourceText, existingMode ? existingContext.canonicalRows : null) : sourceText ?'
-          if old not in text:
-              raise SystemExit('factoryStart inspection target not found')
-          edge.write_text(text.replace(old, new, 1))
-      - name: Commit parser follow-up if needed
-        run: |
-          if ! git diff --quiet; then
-            git config user.name github-actions[bot]
-            git config user.email 41898282+github-actions[bot]@users.noreply.github.com
-            git add server/ready/workbook-factory.mjs server/ready/index.ts
-            git commit -m "fix: match publisher workbook source ranges"
-            git push
-          fi
       - uses: actions/setup-node@v4
         with:
           node-version: 22
           cache: npm
       - run: npm ci
+      - name: Audit real publisher PDF
+        run: node --input-type=module -e "import {readFileSync} from 'node:fs'; import {extractUnicodePdfText} from './server/ready/pdf-text-extract.mjs'; import {inspectFullWorkbookText} from './server/ready/workbook-factory.mjs'; const b=readFileSync('./ready/workbooks/ne-minbyeongcheon-lesson-1.pdf').toString('base64'); const t=await extractUnicodePdfText(b); const a=inspectFullWorkbookText(t); console.log(JSON.stringify({reviewRequired:a.reviewRequired,incompleteStages:a.incompleteStages,counts:Object.fromEntries([5,6,7].map(s=>[s,a.exercises.filter(x=>({verb_form:5,grammar_vocab_choice:6,error_correction:7}[x.type]===s&&x.provenance?.origin==='publisher_answer_key').length])),stage7:a.exercises.filter(x=>x.type==='error_correction'&&x.provenance?.origin==='publisher_answer_key').map(x=>({n:x.number,sourceNumber:x.sourceNumber,subtype:x.subtype,pairs:x.answers?.length/2,start:x.canonicalStart,end:x.canonicalEnd}))},null,2));"
       - run: npm run ready:test
       - run: npm run build
       - run: npm run native:verify
