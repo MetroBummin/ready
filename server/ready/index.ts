@@ -408,7 +408,7 @@ async function factoryExercises(rows: any[], requestedTargets: Record<number, nu
   }
   return { stages: generated, tokenUsage, callCount, errors };
 }
-async function finalizeFactoryJob(job: any, confirmedRows?: unknown, allowIncomplete = false, replaceExistingCatalog = false, useAiFallback = true) {
+async function finalizeFactoryJob(job: any, confirmedRows?: unknown, allowIncomplete = false, replaceExistingCatalog = false, useAiFallback = true, previewOnly = false) {
   const metadata = job.source_metadata || {}, existingMode = metadata.factoryMode === "existing_passage";
   const existingContext = existingMode ? await existingFactoryPassage(metadata.existingPassageId, replaceExistingCatalog) : null;
   const rowsForCatalog = existingMode ? existingContext.canonicalRows : factoryRows(confirmedRows ?? job.extracted_rows);
@@ -421,10 +421,14 @@ async function finalizeFactoryJob(job: any, confirmedRows?: unknown, allowIncomp
   if (sourceType === "MOCK_EXAM" && (!sourceYear || !sourceMonth)) throw new ApiError(400, "모의고사는 연도와 월이 필요합니다.");
   const sourceExercises = Array.isArray(job.extraction?.sourceExercises) ? job.extraction.sourceExercises : [], previewKey = `factory-preview-${existingMode ? existingContext.passage.id : job.id}`;
   let previewCatalog = generateWorkbookCatalog({ title: `${title} · READY 워크북`, workbookKey: previewKey, rows: rowsForCatalog, sourceExercises, provenance: { pdfExtractedExercises: Number(job.extraction?.exerciseCount) || 0 } });
-  let ai: { stages: Record<number, any[]>; tokenUsage: number; callCount: number; errors: string[] } = { stages: { 5: [], 6: [], 7: [] }, tokenUsage: 0, callCount: 0, errors: [] };
+  const cachedPreview: any = !previewOnly && !replaceExistingCatalog && job.extraction?.previewAi && typeof job.extraction.previewAi === "object" ? job.extraction.previewAi : null;
+  let ai: { stages: Record<number, any[]>; tokenUsage: number; callCount: number; errors: string[] } = cachedPreview
+    ? { stages: { 5: Array.isArray(cachedPreview.stages?.[5]) ? cachedPreview.stages[5] : [], 6: Array.isArray(cachedPreview.stages?.[6]) ? cachedPreview.stages[6] : [], 7: Array.isArray(cachedPreview.stages?.[7]) ? cachedPreview.stages[7] : [] }, tokenUsage: Math.max(0, Math.round(Number(cachedPreview.tokenUsage)) || 0), callCount: Math.max(0, Math.round(Number(cachedPreview.callCount)) || 0), errors: Array.isArray(cachedPreview.errors) ? cachedPreview.errors.map(error => clean(error, 240)).filter(Boolean) : [] }
+    : { stages: { 5: [], 6: [], 7: [] }, tokenUsage: 0, callCount: 0, errors: [] };
   // Keep the Edge request bounded: one source-grounded AI pass is followed by
   // the validated deterministic fallback for any remaining Stage 6/7 gaps.
-  for (let round = 0; useAiFallback && round < 1; round += 1) {
+  // Final confirmation reuses the already validated preview supplement.
+  for (let round = 0; !cachedPreview && useAiFallback && round < 1; round += 1) {
     const fallbackTargets = factoryFallbackTargets(previewCatalog, rowsForCatalog, sourceExercises);
     if (![5, 6, 7].some(stage => fallbackTargets[stage].length)) break;
     const next = await factoryExercises(rowsForCatalog, fallbackTargets);
@@ -435,6 +439,14 @@ async function finalizeFactoryJob(job: any, confirmedRows?: unknown, allowIncomp
   }
   const provenance = { factoryMode: existingMode ? "existing_passage" : "new_passage", canonicalSource: existingMode ? "ready_passage_sentences" : "factory_review", sourceKind: job.source_kind, documentSha256: clean(metadata.documentSha256, 128), documentName: clean(metadata.documentName, 240), extractionPairing: clean(job.extraction?.pairing, 40), fullWorkbook: job.extraction?.fullWorkbook === true, sourceExerciseCount: sourceExercises.length, geminiCallCount: ai.callCount, geminiTokenUsage: ai.tokenUsage, pdfExtractedExercises: Number(job.extraction?.exerciseCount) || 0, ...(ai.errors.length ? { fallbackError: clean(ai.errors.join(" | "), 500) } : {}) };
   previewCatalog = generateWorkbookCatalog({ title: `${title} · READY 워크북`, workbookKey: previewKey, rows: rowsForCatalog, ai: ai.stages, sourceExercises, provenance, allowDerivedFallback: true });
+  if (previewOnly) {
+    if (!replaceExistingCatalog) {
+      const previewExtraction = { ...(job.extraction || {}), previewAi: { stages: ai.stages, tokenUsage: ai.tokenUsage, callCount: ai.callCount, errors: ai.errors } };
+      const reviewed = await db.from("ready_workbook_factory_jobs").update({ status: "review_required", extracted_rows: rowsForCatalog, extraction: previewExtraction, metrics: previewCatalog.metrics, failure_reason: "" }).eq("id", job.id);
+      if (reviewed.error) throw new ApiError(500, reviewed.error.message);
+    }
+    return { confirmationRequired: true, incompleteReview: previewCatalog.metrics.incompleteStages.length > 0, metrics: previewCatalog.metrics };
+  }
   if (previewCatalog.metrics.incompleteStages.length && !allowIncomplete) {
     if (!replaceExistingCatalog) {
       const reviewed = await db.from("ready_workbook_factory_jobs").update({ status: "review_required", metrics: previewCatalog.metrics, failure_reason: "" }).eq("id", job.id);
@@ -451,7 +463,8 @@ async function finalizeFactoryJob(job: any, confirmedRows?: unknown, allowIncomp
     : await db.from("ready_workbook_catalogs").insert(catalogRow);
   if (saved.error) { if (!existingMode) await db.from("ready_passages").delete().eq("id", passageId); throw new ApiError(saved.error.code === "23505" ? 409 : 500, saved.error.code === "23505" ? "이 Passage에는 워크북 catalog가 이미 있습니다." : saved.error.message); }
   if (replaceExistingCatalog && !saved.data) throw new ApiError(409, "기존 Factory catalog와 원본 작업의 연결을 확인하지 못해 재생성을 중단했습니다.");
-  const completed = await db.from("ready_workbook_factory_jobs").update({ status: "ready", passage_id: passageId, extracted_rows: rowsForCatalog, metrics: catalog.metrics, completed_at: new Date().toISOString(), failure_reason: "" }).eq("id", job.id);
+  const completedExtraction = { ...(job.extraction || {}) }; delete completedExtraction.previewAi;
+  const completed = await db.from("ready_workbook_factory_jobs").update({ status: "ready", passage_id: passageId, extracted_rows: rowsForCatalog, extraction: completedExtraction, metrics: catalog.metrics, completed_at: new Date().toISOString(), failure_reason: "" }).eq("id", job.id);
   if (completed.error) throw new ApiError(500, completed.error.message);
   return { passageId, catalog, metrics: catalog.metrics };
 }
@@ -480,20 +493,15 @@ async function factoryStart(body: any) {
   const metadata = { factoryMode: existingMode ? "existing_passage" : "new_passage", existingPassageId: existingMode ? existingContext.passage.id : "", sourceType: existingMode ? existingContext.passage.source_type : body.sourceType, grade: existingMode ? existingContext.passage.grade : body.grade, sourceYear: existingMode ? existingContext.passage.source_year : body.sourceYear, sourceMonth: existingMode ? existingContext.passage.source_month : body.sourceMonth, sourceLabel: existingMode ? existingContext.passage.source_label : body.sourceLabel, documentName: clean(body.documentName, 240), documentSha256: sourceKind === "pdf" ? await sha256Hex(clean(body.pdfBase64, 20_000_000).replace(/^data:application\/pdf;base64,/i, "")) : "" };
   const extraction = { fullWorkbook: !!inspected.fullWorkbook, reviewRequired: existingMode ? true : !!inspected.reviewRequired, reason: existingMode ? "기존 ready_passage_sentences를 canonical source로 사용합니다." : clean(inspected.reason, 500), canonicalConsistency: inspected.canonicalConsistency || null, headings: inspected.headings || [], exerciseCount: (inspected.exercises || []).length, incompleteStages: inspected.incompleteStages || [], sourceExercises: (inspected.exercises || []).map((exercise: any) => ({ ...exercise, provenance: { page: Number(exercise.page) || null, semanticType: clean(exercise.type, 80), sourceExerciseNumber: Number(exercise.number) || null } })), pairing: inspected.pairing || (existingMode ? "existing_canonical" : "pdf") };
   const created = rows<any>(await db.from("ready_workbook_factory_jobs").insert({ status: "review_required", source_kind: sourceKind, title, source_metadata: metadata, extracted_rows: rowsForReview, extraction, metrics: { sentenceCount: rowsForReview.length, geminiCallCount: translationTokens ? 1 : 0, geminiTokenUsage: translationTokens } }).select().single());
-  // A full workbook only bypasses the human checkpoint after the parser has
-  // deterministic bilingual evidence. It still uses the same final validator.
-  if (!existingMode && inspected.fullWorkbook && !inspected.reviewRequired) {
-    const result = await finalizeFactoryJob(created);
-    if (result.incompleteReview) return { job: { ...created, metrics: result.metrics }, autoCompleted: false, reviewRequired: true, incompleteReview: true };
-    return { job: created, autoCompleted: true, result };
-  }
+  // Even a fully verified publisher workbook waits for an explicit admin
+  // confirmation before creating a Passage or publishing a catalog.
   return { job: created, autoCompleted: false, reviewRequired: true };
 }
 async function factoryConfirm(body: any) {
   const jobId = required(body.jobId, "Factory 작업", 80), job = rows<any>(await db.from("ready_workbook_factory_jobs").select("*").eq("id", jobId).maybeSingle());
   if (!job) throw new ApiError(404, "Factory 작업을 찾지 못했습니다.");
   if (job.status === "ready") throw new ApiError(409, "이미 워크북이 생성된 작업입니다.");
-  try { return await finalizeFactoryJob(job, body.sentenceRows, body.allowIncomplete === true); }
+  try { return await finalizeFactoryJob(job, body.sentenceRows, body.allowIncomplete === true, false, true, body.finalize !== true); }
   catch (error) { await db.from("ready_workbook_factory_jobs").update({ status: "failed", failure_reason: error instanceof Error ? clean(error.message, 500) : "unknown" }).eq("id", job.id); throw error; }
 }
 async function factoryRegenerate(body: any) {
