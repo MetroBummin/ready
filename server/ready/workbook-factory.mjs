@@ -200,6 +200,11 @@ function chooseKorean(sentence) { return koWords(sentence).filter(word => word.l
 function orderTokens(sentence) { const tokens = words(sentence); return tokens.length >= 2 ? tokens : []; }
 function item(stage, number, key, fields) { return { key, stage, number, ...fields }; }
 function factoryKey(prefix, stage, number) { return `${prefix}-s${stage}-${String(number).padStart(2, '0')}`; }
+function hashSeed(value) { let hash = 2_166_136_261; for (const char of String(value)) { hash ^= char.charCodeAt(0); hash = Math.imul(hash, 16_777_619); } return hash >>> 0; }
+function seededShuffle(tokens, seed) { const output = [...tokens]; let state = hashSeed(seed); const random = () => { state += 0x6D2B79F5; let value = state; value = Math.imul(value ^ value >>> 15, value | 1); value ^= value + Math.imul(value ^ value >>> 7, value | 61); return ((value ^ value >>> 14) >>> 0) / 4_294_967_296; }; for (let index = output.length - 1; index > 0; index -= 1) { const target = Math.floor(random() * (index + 1)); [output[index], output[target]] = [output[target], output[index]]; } return output; }
+function isCyclicRotation(candidate, canonical) { return candidate.length === canonical.length && candidate.some((_value, offset) => candidate.every((value, index) => value === canonical[(index + offset) % canonical.length])); }
+function sufficientlyShuffled(candidate, canonical) { return candidate.length >= 3 && !isCyclicRotation(candidate, canonical) && candidate.filter((value, index) => value !== canonical[index]).length >= Math.ceil(canonical.length / 2); }
+function factoryOrderBank(tokens, seed) { for (let attempt = 0; attempt < 16; attempt += 1) { const candidate = seededShuffle(tokens, `${seed}:${attempt}`); if (sufficientlyShuffled(candidate, tokens)) return candidate; } return []; }
 
 function deterministicItems(rows, prefix) {
   const byStage = new Map(FACTORY_STAGES.map(stage => [stage, []]));
@@ -210,19 +215,21 @@ function deterministicItems(rows, prefix) {
     if (enBlank && english) byStage.get(3).push(item(3, number, factoryKey(prefix, 3, number), { kind: 'blank_input', source: ko, prompt: enBlank, answers: [english] }));
     byStage.get(4).push(item(4, number, factoryKey(prefix, 4, number), { kind: 'translation_ai', source: en, prompt: '우리말 해석을 입력하세요.', answers: [ko] }));
     if (ordered.length) {
-      const shuffled = [...ordered.slice(1), ordered[0]];
+      const shuffled = factoryOrderBank(ordered, `${prefix}:${factoryKey(prefix, 8, number)}:${number}`);
+      if (shuffled.length) {
       byStage.get(8).push(item(8, number, factoryKey(prefix, 8, number), { kind: 'reorder_groups', source: ko, prompt: '⟦ORDER:0⟧.', groups: [shuffled], answers: [ordered.join(' ').toLowerCase()] }));
+      }
     }
     const writingWords = words(en);
-    if (writingWords.length) byStage.get(9).push(item(9, number, factoryKey(prefix, 9, number), { kind: 'blank_input', source: ko, prompt: writingWords.map(() => '______________').join(' '), wordBank: [...new Set(writingWords.map(word => word.toLowerCase()))], answers: writingWords }));
+    if (writingWords.length) byStage.get(9).push(item(9, number, factoryKey(prefix, 9, number), { kind: 'blank_input', source: ko, prompt: writingWords.map(() => '______________').join(' '), answers: writingWords }));
   });
   return byStage;
 }
 
 function sourceStage(type) { return ({ korean_blank: 2, english_blank: 3, translation: 4, verb_form: 5, grammar_vocab_choice: 6, error_correction: 7, sentence_ordering: 8, writing: 9 })[type] || 0; }
 function sourceChoice(prompt, answer) {
-  const match = clean(prompt).match(/\(([^()]{3,240})\)/); if (!match) return null;
-  const options = match[1].split(/\s*(?:\/|\||,|or)\s*/i).map(value => clean(value)).filter(Boolean);
+  const match = clean(prompt).match(/(?:\[([^\[\]]{3,240})\]|\(([^()]{3,240})\))/); if (!match) return null;
+  const options = clean(match[1] || match[2]).split(/\s*(?:\/|\|)\s*/).map(value => clean(value)).filter(Boolean);
   if (options.length < 2 || !options.includes(answer)) return null;
   return { prompt: prompt.replace(match[0], '⟦CHOICE:0⟧'), options };
 }
@@ -270,12 +277,19 @@ function fullWorkbookItems(sourceExercises, rows, prefix) {
         if (choice && sameEnglish(choice.prompt.replace('⟦CHOICE:0⟧', answers[0]), en)) byStage.get(6).push(item(6, number, key, { kind: 'choice_groups', source: ko, prompt: choice.prompt, groups: [choice.options], answers, provenance: source.provenance }));
       }
     }
-    if (stage === 7) { const pairs = sourceCorrections(source); if (pairs.length >= 2 && pairs.length % 2 === 0 && matchesCanonicalSpan(replaceCorrectionPairs(prompt, pairs), rows)) byStage.get(7).push(item(7, number, key, { kind: 'correction_pairs', source: '', prompt, pairCount: pairs.length / 2, subtype: pairs.length > 2 ? 'passage' : 'sentence', answers: pairs, provenance: source.provenance })); }
+    if (stage === 7) { const pairs = sourceCorrections(source), pairCount = pairs.length / 2; if (pairCount >= 2 && pairCount <= 3 && matchesCanonicalSpan(replaceCorrectionPairs(prompt, pairs), rows)) byStage.get(7).push(item(7, number, key, { kind: 'correction_pairs', source: '', prompt, pairCount, subtype: 'passage', answers: pairs, provenance: source.provenance })); }
   }
   return byStage;
 }
 
 function normalizeAiItem(stage, raw, rows, prefix, number) {
+  if (stage === 7) {
+    const indexes = [...new Set(Array.isArray(raw?.sentenceIndexes) ? raw.sentenceIndexes.map(Number) : [])].filter(index => Number.isInteger(index) && index >= 1 && index <= rows.length);
+    const corrections = Array.isArray(raw?.corrections) ? raw.corrections.map(pair => [clean(pair?.wrong, 160), clean(pair?.correct, 160)]).filter(pair => pair[0] && pair[1] && pair[0] !== pair[1]) : [];
+    const prompt = clean(raw?.prompt, 6_000), canonicalRange = indexes.map(index => clean(rows[index - 1]?.text)).join(' '), answers = corrections.flat();
+    if (indexes.length < 5 || indexes.length > 8 || indexes.some((index, offset) => offset && index !== indexes[offset - 1] + 1) || corrections.length < 2 || corrections.length > 3) return null;
+    return prompt && sameEnglish(replaceCorrectionPairs(prompt, answers), canonicalRange) ? item(7, indexes[0], `${prefix}-s7-range-${String(indexes[0]).padStart(2, '0')}`, { kind: 'correction_pairs', source: '', prompt, pairCount: corrections.length, subtype: 'passage', answers, sentenceIndexes: indexes }) : null;
+  }
   const sentenceIndex = Number(raw?.sentenceIndex) - 1, row = rows[sentenceIndex]; if (!row) return null;
   const canonicalNumber = sentenceIndex + 1, en = clean(row.text), ko = clean(row.translation), key = factoryKey(prefix, stage, canonicalNumber);
   if (stage === 5) {
@@ -286,17 +300,11 @@ function normalizeAiItem(stage, raw, rows, prefix, number) {
     const answer = clean(raw?.answer, 160), wrong = clean(raw?.wrong, 160), prompt = clean(raw?.prompt, 2000);
     return answer && wrong && answer !== wrong && prompt && sameEnglish(restoreBlank(prompt, answer), en) ? item(6, canonicalNumber, key, { kind: 'choice_groups', source: ko, prompt: prompt.replace(/_{5,}/, '⟦CHOICE:0⟧'), groups: [[wrong, answer]], answers: [answer] }) : null;
   }
-  if (stage === 7) {
-    const wrong = clean(raw?.wrong, 160), correct = clean(raw?.correct, 160), sentence = clean(raw?.sentence, 2000);
-    if (!wrong || !correct || wrong === correct) return null;
-    const faulty = sentence.includes(wrong) && sameEnglish(sentence.replace(wrong, correct), en) ? sentence : en.includes(correct) ? en.replace(correct, wrong) : '';
-    return faulty && faulty.includes(wrong) && sameEnglish(faulty.replace(wrong, correct), en) ? item(7, canonicalNumber, key, { kind: 'correction_pairs', source: '', prompt: faulty, pairCount: 1, subtype: 'sentence', answers: [wrong, correct] }) : null;
-  }
   return null;
 }
 
 function validateItem(stage, candidate, rowByNumber, canonicalRows) {
-  if (stage === 7) return candidate.kind === 'correction_pairs' && candidate.answers?.length >= 2 && candidate.answers.length % 2 === 0 && candidate.pairCount * 2 === candidate.answers.length && matchesCanonicalSpan(replaceCorrectionPairs(candidate.prompt, candidate.answers), canonicalRows) ? '' : 'stage7_round_trip';
+  if (stage === 7) return candidate.kind === 'correction_pairs' && candidate.pairCount >= 2 && candidate.pairCount <= 3 && candidate.answers?.length === candidate.pairCount * 2 && matchesCanonicalSpan(replaceCorrectionPairs(candidate.prompt, candidate.answers), canonicalRows) ? '' : 'stage7_round_trip';
   const row = rowByNumber.get(candidate.number); if (!row) return 'missing_canonical_sentence';
   const en = clean(row.text), ko = clean(row.translation);
   if (stage === 2) return candidate.answers?.length === 1 && candidate.source === en && restoreBlank(candidate.prompt, candidate.answers[0]) === ko ? '' : 'stage2_round_trip';
@@ -307,19 +315,13 @@ function validateItem(stage, candidate, rowByNumber, canonicalRows) {
     const answers = candidate.answers || [], groups = candidate.groups || [];
     let rebuilt = clean(candidate.prompt);
     answers.forEach((answer, index) => { rebuilt = rebuilt.replace(`⟦CHOICE:${index}⟧`, answer); });
-    return candidate.kind === 'choice_groups' && answers.length >= 1 && groups.length === answers.length && groups.every((group, index) => group.includes(answers[index])) && sameEnglish(rebuilt, en) ? '' : 'stage6_round_trip';
+    return candidate.kind === 'choice_groups' && answers.length >= 1 && groups.length === answers.length && groups.every((group, index) => group.length >= 2 && group.includes(answers[index]) && group.every(option => !/,/.test(option))) && sameEnglish(rebuilt, en) ? '' : 'stage6_round_trip';
   }
   if (stage === 8) return candidate.kind === 'reorder_groups' && candidate.answers?.[0] && fold(candidate.answers[0]) === fold(words(en).join(' ')) ? '' : 'stage8_round_trip';
   if (stage === 9) return candidate.kind === 'blank_input' && fold(candidate.answers?.join(' ')) === fold(words(en).join(' ')) ? '' : 'stage9_reference';
   return 'unsupported_stage';
 }
 
-function simpleDistractor(answer) {
-  const value = clean(answer, 160), swaps = { is: 'are', are: 'is', was: 'were', were: 'was', has: 'have', have: 'has', does: 'do', do: 'does' };
-  if (swaps[value.toLowerCase()]) return swaps[value.toLowerCase()];
-  if (!/^[A-Za-z]+$/.test(value)) return '';
-  return value.endsWith('s') && value.length > 2 ? value.slice(0, -1) : `${value}s`;
-}
 function simpleVerbHint(answer) {
   const value = clean(answer, 160), lower = value.toLowerCase();
   const irregular = { am: 'be', is: 'be', are: 'be', was: 'be', were: 'be', has: 'have', had: 'have', does: 'do', did: 'do' };
@@ -337,11 +339,7 @@ function simpleVerbHint(answer) {
   if (lower.endsWith('s') && !lower.endsWith('ss') && value.length > 3) return value.slice(0, -1);
   return '';
 }
-function fillStageFiveAsChoice(candidate, targetIndex) {
-  let index = 0;
-  return clean(candidate.prompt).replace(/_{5,}/g, () => { const current = index; index += 1; return current === targetIndex ? `⟦CHOICE:0⟧` : clean(candidate.answers?.[current]); });
-}
-function addDerivedGrammarFallback(generated, canonical, prefix, publisherStage7Count) {
+function addDerivedVerbFallback(generated, canonical, prefix) {
   const stageFiveNumbers = new Set((generated.get(5) || []).map(candidate => candidate.number));
   for (const row of canonical) {
     if (stageFiveNumbers.has(row.index)) continue;
@@ -349,28 +347,6 @@ function addDerivedGrammarFallback(generated, canonical, prefix, publisherStage7
     const hint = simpleVerbHint(answer), prompt = answer ? replaceOne(row.text, answer) : '';
     const candidate = item(5, row.index, factoryKey(prefix, 5, row.index), { kind: 'verb_form', source: row.translation, prompt, hints: [hint], answers: [answer], derivation: 'deterministic_verb_form' });
     if (answer && hint && !validateItem(5, candidate, new Map([[row.index, row]]), canonical)) { generated.get(5).push(candidate); stageFiveNumbers.add(row.index); }
-  }
-  const stageFiveByNumber = new Map((generated.get(5) || []).map(candidate => [candidate.number, candidate]));
-  const stageSixNumbers = new Set((generated.get(6) || []).map(candidate => candidate.number));
-  for (const row of canonical) {
-    if (stageSixNumbers.has(row.index)) continue;
-    const stageFive = stageFiveByNumber.get(row.index); let prompt = '', answer = '', wrong = '', derivation = 'deterministic_distractor';
-    if (stageFive) {
-      const target = stageFive.answers.findIndex((value, index) => clean(stageFive.hints?.[index]) && clean(stageFive.hints[index]) !== clean(value));
-      if (target >= 0) { answer = clean(stageFive.answers[target], 160); wrong = clean(stageFive.hints[target], 160); prompt = fillStageFiveAsChoice(stageFive, target); derivation = 'validated_stage5_boundary'; }
-    }
-    if (!prompt) { answer = chooseEnglish(row.text); wrong = simpleDistractor(answer); const blank = replaceOne(row.text, answer); prompt = blank ? blank.replace(/_{5,}/, '⟦CHOICE:0⟧') : ''; }
-    const candidate = item(6, row.index, factoryKey(prefix, 6, row.index), { kind: 'choice_groups', source: row.translation, prompt, groups: [[wrong, answer]], answers: [answer], derivation });
-    if (!validateItem(6, candidate, new Map([[row.index, row]]), canonical)) { generated.get(6).push(candidate); stageSixNumbers.add(row.index); }
-  }
-  if (publisherStage7Count) return;
-  const stageSevenNumbers = new Set((generated.get(7) || []).map(candidate => candidate.number));
-  for (const stageSix of generated.get(6) || []) {
-    if (stageSevenNumbers.has(stageSix.number) || stageSix.groups?.length !== 1 || stageSix.answers?.length !== 1) continue;
-    const answer = clean(stageSix.answers[0], 160), wrong = clean(stageSix.groups[0]?.find(value => clean(value) !== answer), 160);
-    const faulty = clean(stageSix.prompt).replace('⟦CHOICE:0⟧', wrong);
-    const candidate = item(7, stageSix.number, factoryKey(prefix, 7, stageSix.number), { kind: 'correction_pairs', source: '', prompt: faulty, pairCount: 1, subtype: 'sentence', answers: [wrong, answer], derivation: 'validated_stage6_boundary' });
-    if (!validateItem(7, candidate, new Map(), canonical)) { generated.get(7).push(candidate); stageSevenNumbers.add(stageSix.number); }
   }
 }
 
@@ -380,7 +356,7 @@ export function factoryFallbackTargets(catalog, rows, sourceExercises = []) {
   return {
     5: allNumbers.filter(number => !stageItems(5).some(item => item.number === number)),
     6: allNumbers.filter(number => !stageItems(6).some(item => item.number === number)),
-    7: publisherStage7 ? [] : allNumbers.filter(number => !stageItems(7).some(item => item.number === number)),
+    7: publisherStage7 ? [] : allNumbers.filter((_number, index) => index % 6 === 0 && index + 5 < allNumbers.length),
   };
 }
 
@@ -396,7 +372,7 @@ export function generateWorkbookCatalog({ title, workbookKey, rows, ai = {}, sou
   });
   }
   const publisherStage7Count = sourceExercises.filter(source => sourceStage(source?.type) === 7 && clean(source?.prompt) && (clean(source?.answer) || (Array.isArray(source?.answers) && source.answers.length))).length;
-  if (allowDerivedFallback) addDerivedGrammarFallback(generated, canonical, prefix, publisherStage7Count);
+  if (allowDerivedFallback) addDerivedVerbFallback(generated, canonical, prefix);
   const stages = FACTORY_STAGES.map(stage => {
     const valid = [];
     for (const candidate of generated.get(stage) || []) { const reason = validateItem(stage, candidate, rowByNumber, canonical); if (reason) drops.push({ stage, number: candidate.number, reason }); else valid.push(candidate); }
@@ -404,7 +380,8 @@ export function generateWorkbookCatalog({ title, workbookKey, rows, ai = {}, sou
   });
   const count = stage => stages.find(item => item.stage === stage)?.items.length || 0;
   const sourceReusedExercises = [5, 6, 7].reduce((sum, stage) => sum + stages.find(item => item.stage === stage).items.filter(candidate => candidate.provenance).length, 0);
-  const stageCoverage = Object.fromEntries(FACTORY_STAGES.map(stage => [stage, { ready: count(stage), expected: stage === 7 && publisherStage7Count ? publisherStage7Count : canonical.length }]));
+  const generatedStageSevenExpected = canonical.length >= 5 ? Math.floor(canonical.length / 6) : 0;
+  const stageCoverage = Object.fromEntries(FACTORY_STAGES.map(stage => [stage, { ready: count(stage), expected: stage === 7 ? publisherStage7Count || generatedStageSevenExpected : canonical.length }]));
   const incompleteStages = [5, 6, 7].filter(stage => stageCoverage[stage].ready < stageCoverage[stage].expected);
   const metrics = { elapsedMs: Date.now() - started, sentenceCount: canonical.length, stageCoverage, incompleteStages, pdfExtractedExercises: Number(provenance.pdfExtractedExercises) || 0, sourceReusedExercises, deterministicGeneratedExercises: [2, 3, 4, 8, 9].reduce((sum, stage) => sum + count(stage), 0), derivedFallbackExercises: [5, 6, 7].reduce((sum, stage) => sum + stages.find(item => item.stage === stage).items.filter(candidate => candidate.derivation).length, 0), geminiGeneratedExercises: [5, 6, 7].reduce((sum, stage) => sum + stages.find(item => item.stage === stage).items.filter(candidate => !candidate.provenance && !candidate.derivation).length, 0), geminiCallCount: Number(provenance.geminiCallCount) || 0, geminiTokenUsage: Number(provenance.geminiTokenUsage) || 0, validatorPass: stages.reduce((sum, stage) => sum + stage.items.length, 0), validatorDrop: drops.length, dropReasons: drops.reduce((all, drop) => ({ ...all, [drop.reason]: (all[drop.reason] || 0) + 1 }), {}) };
   return { workbookKey: prefix, title: clean(title, 120) || 'READY Workbook', source: provenance, importReport: { factory: true, metrics, drops }, stages, metrics };

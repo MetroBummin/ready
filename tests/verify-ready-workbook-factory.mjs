@@ -35,37 +35,41 @@ assert.equal(extractSentenceRows('Humans excel.\t인간은 뛰어나다.\nloose 
 const pdfNoise=extractSentenceRows('Humans excel at visual imagery.\u0000\nOur brains evolved this ability for survival.');
 assert.ok(pdfNoise.rows.every(row=>!JSON.stringify(row).includes('\\u0000')),'PDF control characters must not reach JSONB storage.');
 const reviewed=[{text:'Humans excel at visual imagery.',translation:'인간은 시각적 심상에 뛰어나다.'},{text:'They improve when they reflect on feedback.',translation:'그들은 피드백을 돌아볼 때 향상된다.'},canonical[1]];
-const catalog=generateWorkbookCatalog({title:'Golden',workbookKey:'golden',rows:reviewed,ai:{5:[{sentenceIndex:1,prompt:'Humans excel at visual ____________.',hint:'image',answer:'imagery'}],6:[{sentenceIndex:2,prompt:'They improve when they reflect on ____________.',wrong:'feedforward',answer:'feedback'}],7:[{sentenceIndex:3,sentence:'Our brains evolve this ability for survival.',wrong:'evolve',correct:'evolved'}]}});
+const catalog=generateWorkbookCatalog({title:'Golden',workbookKey:'golden',rows:reviewed,ai:{5:[{sentenceIndex:1,prompt:'Humans excel at visual ____________.',hint:'image',answer:'imagery'}],6:[{sentenceIndex:2,prompt:'They improve when they reflect on ____________.',wrong:'feedforward',answer:'feedback'}]}});
 assert.deepEqual(catalog.stages.map(stage=>stage.stage),[2,3,4,5,6,7,8,9]);
 assert.equal(catalog.stages.find(stage=>stage.stage===2).items[0].number,1);
 assert.equal(catalog.stages.find(stage=>stage.stage===9).items.length,3);
 assert.equal(catalog.stages.find(stage=>stage.stage===5).items.length,1);
 assert.equal(catalog.stages.find(stage=>stage.stage===6).items.length,1);
-assert.equal(catalog.stages.find(stage=>stage.stage===7).items.length,1);
+assert.equal(catalog.stages.find(stage=>stage.stage===7).items.length,0,'Stage 7 must not generate one error per sentence.');
 assert.equal(catalog.metrics.validatorDrop,0);
 assert.ok(catalog.stages.find(stage=>stage.stage===8).items[0].groups[0].every(token=>!token.includes(' ')),'Factory Stage 8 must render one English word per chip.');
 assert.deepEqual(catalog.metrics.stageCoverage[8],{ready:3,expected:3});
 
-const fullReuse=generateWorkbookCatalog({title:'Publisher',workbookKey:'publisher',rows:canonical,sourceExercises:[
-  {type:'verb_form',number:1,prompt:'Humans excel at visual ____________.',answer:'imagery',provenance:{page:3}},
-  {type:'verb_form',number:2,prompt:'Our brains ____________ this ability for survival.',answer:'evolved',provenance:{page:3}},
-  {type:'grammar_vocab_choice',number:1,prompt:'Humans (excel/excels) at visual imagery.',answer:'excel',provenance:{page:4}},
-  {type:'grammar_vocab_choice',number:2,prompt:'Our brains (evolve/evolved) this ability for survival.',answer:'evolved',provenance:{page:4}},
-  {type:'error_correction',number:1,prompt:'Humans excels at visual imagery.',answer:'excels → excel',provenance:{page:5}},
-  {type:'error_correction',number:2,prompt:'Our brains evolve this ability for survival.',answer:'evolve → evolved',provenance:{page:5}},
+const qualityRows=[
+  {text:'They have probably heard the news.',translation:'그들은 아마 그 소식을 들었을 것이다.'},
+  {text:'The teacher explains the lesson clearly.',translation:'선생님은 수업을 명확하게 설명한다.'},
+  {text:'Students learn from their mistakes.',translation:'학생들은 자신의 실수에서 배운다.'},
+  {text:'Our brains evolved this ability for survival.',translation:'우리의 뇌는 생존을 위해 이 능력을 발달시켰다.'},
+  {text:'People often make choices quickly.',translation:'사람들은 종종 빠르게 선택한다.'},
+  {text:'We should protect the environment.',translation:'우리는 환경을 보호해야 한다.'},
+];
+const stageSevenPrompt='They has probably heard the news. The teacher explain the lesson clearly. Students learn from their mistakes. Our brains evolved this ability for survival. People often make choices quickly. We should protect the environment.';
+const fullReuse=generateWorkbookCatalog({title:'Publisher',workbookKey:'publisher',rows:qualityRows,sourceExercises:[
+  {type:'grammar_vocab_choice',number:1,prompt:'They ⟦CHOICE:0⟧ ⟦CHOICE:1⟧ heard the news.',groups:[['have','has'],['probably','rarely']],answers:['have','probably'],provenance:{page:4}},
+  {type:'error_correction',number:1,prompt:stageSevenPrompt,answer:'has → have / explain → explains',provenance:{page:5}},
 ],provenance:{geminiCallCount:0}});
 assert.equal(fullReuse.metrics.geminiCallCount,0,'Full Workbook source reuse must not call Gemini');
-assert.deepEqual([5,6,7].map(stage=>fullReuse.stages.find(item=>item.stage===stage).items.length),[2,2,2]);
-assert.equal(fullReuse.metrics.sourceReusedExercises,6);
-assert.equal(fullReuse.metrics.geminiGeneratedExercises,0);
-assert.equal(fullReuse.metrics.validatorDrop,0);
-
-const passageCorrection=generateWorkbookCatalog({title:'Publisher passage correction',workbookKey:'publisher-passage',rows:canonical,sourceExercises:[
-  {type:'error_correction',number:1,prompt:'Humans excels at visual imagery. Our brains evolve this ability for survival.',answer:'excels → excel / evolve → evolved',provenance:{page:5}},
+const sourceStageSix=fullReuse.stages.find(stage=>stage.stage===6).items[0];
+assert.deepEqual(sourceStageSix.groups,[['have','has'],['probably','rarely']],'Publisher Stage 6 local choice groups must be preserved.');
+const passageCorrectionItem=fullReuse.stages.find(stage=>stage.stage===7).items[0];
+assert.equal(passageCorrectionItem.pairCount,2,'Publisher Stage 7 must preserve 2-3 correction pairs in one passage/range exercise.');
+assert.equal(passageCorrectionItem.sentenceIndexes,undefined,'Publisher Stage 7 remains its original range item.');
+assert.deepEqual(fullReuse.metrics.stageCoverage[7],{ready:1,expected:1},'Stage 7 expected count is source exercise count, never sentence count.');
+const commaLemma=generateWorkbookCatalog({title:'Comma lemma list',workbookKey:'comma-lemma',rows:qualityRows,sourceExercises:[
+  {type:'grammar_vocab_choice',number:1,prompt:'They (have, probably, hear / have probably heard) the news.',answer:'have probably heard'},
 ]});
-const passageCorrectionItem=passageCorrection.stages.find(stage=>stage.stage===7).items[0];
-assert.equal(passageCorrectionItem.pairCount,2,'Publisher Stage 7 must preserve multiple correction pairs in one passage/range exercise.');
-assert.deepEqual(passageCorrection.metrics.stageCoverage[7],{ready:1,expected:1},'Publisher passage exercises use publisher exercise count rather than sentence count.');
+assert.equal(commaLemma.stages.find(stage=>stage.stage===6).items.length,0,'Comma-separated lemma lists are not valid Stage 6 options.');
 
 const partialReuse=generateWorkbookCatalog({title:'Partial',workbookKey:'partial',rows:canonical,sourceExercises:[
   {type:'verb_form',number:1,prompt:'Humans excel at visual ____________.',answer:'imagery',provenance:{page:3}},
@@ -77,23 +81,28 @@ assert.deepEqual(partialReuse.metrics.stageCoverage[5],{ready:2,expected:2},'Sou
 const partialSourceOnly=generateWorkbookCatalog({title:'Partial source only',workbookKey:'partial-source',rows:canonical,sourceExercises:[
   {type:'verb_form',number:1,prompt:'Humans excel at visual ____________.',answer:'imagery',provenance:{page:3}},
 ]});
-assert.deepEqual(factoryFallbackTargets(partialSourceOnly,canonical,[{type:'verb_form',number:1,prompt:'x',answer:'x'}]),{5:[2],6:[1,2],7:[1,2]},'Fallback must request only missing validated sentence coverage.');
+assert.deepEqual(factoryFallbackTargets(partialSourceOnly,canonical,[{type:'verb_form',number:1,prompt:'x',answer:'x'}]),{5:[2],6:[1,2],7:[]},'Stage 7 needs a 5-8 sentence range and must not fall back per sentence.');
 
 const invalid=generateWorkbookCatalog({title:'Invalid',workbookKey:'invalid',rows:canonical,ai:{5:[{sentenceIndex:1,prompt:'Invented sentence ____________.',hint:'invent',answer:'invented'}]}});
 assert.equal(invalid.stages.find(stage=>stage.stage===5).items.length,0);
 assert.equal(invalid.metrics.dropReasons.stage5_round_trip,1);
 
-const normalizedAi=generateWorkbookCatalog({title:'Normalized AI',workbookKey:'normalized-ai',rows:[{text:"It's useful.",translation:'그것은 유용하다.'}],ai:{
-  6:[{sentenceIndex:1,prompt:'It is ____________.',wrong:'useless',answer:'useful'}],
-  7:[{sentenceIndex:1,sentence:"It's useful.",wrong:'use',correct:'useful'}],
-}});
+const normalizedAi=generateWorkbookCatalog({title:'Normalized AI',workbookKey:'normalized-ai',rows:[{text:"It's useful.",translation:'그것은 유용하다.'}],ai:{6:[{sentenceIndex:1,prompt:'It is ____________.',wrong:'useless',answer:'useful'}]}});
 assert.equal(normalizedAi.stages.find(stage=>stage.stage===6).items.length,1,'Stage 6 may normalize harmless contraction and punctuation differences after exact answer restoration.');
-assert.equal(normalizedAi.stages.find(stage=>stage.stage===7).items[0].prompt,"It's use.",'Stage 7 may construct the faulty prompt from a validated wrong/correct pair when Gemini echoes the canonical sentence.');
-
-const derivedFallback=generateWorkbookCatalog({title:'Derived fallback',workbookKey:'derived-fallback',rows:canonical,allowDerivedFallback:true});
-assert.deepEqual([6,7].map(stage=>derivedFallback.stages.find(item=>item.stage===stage).items.length),[2,2],'Validated deterministic distractors must keep Stage 6 and 7 available when source and AI omit them.');
-assert.equal(derivedFallback.metrics.incompleteStages.includes(6),false);
-assert.equal(derivedFallback.metrics.incompleteStages.includes(7),false);
+const generatedRange=generateWorkbookCatalog({title:'Generated range',workbookKey:'generated-range',rows:qualityRows,ai:{7:[{sentenceIndexes:[1,2,3,4,5,6],prompt:stageSevenPrompt,corrections:[{wrong:'has',correct:'have'},{wrong:'explain',correct:'explains'}]}]}});
+const generatedRangeItem=generatedRange.stages.find(stage=>stage.stage===7).items[0];
+assert.deepEqual(generatedRangeItem.sentenceIndexes,[1,2,3,4,5,6],'Generated Stage 7 must cover a contiguous 5-8 sentence range.');
+assert.equal(generatedRangeItem.pairCount,2);
+const noDerivedGrammar=generateWorkbookCatalog({title:'No derived grammar',workbookKey:'no-derived-grammar',rows:qualityRows,allowDerivedFallback:true});
+assert.deepEqual([6,7].map(stage=>noDerivedGrammar.stages.find(stageData=>stageData.stage===stage).items.length),[0,0],'Factory must not derive Stage 6 choices or Stage 7 errors.');
+const shuffledA=generateWorkbookCatalog({title:'Order',workbookKey:'order-seed',rows:qualityRows}),shuffledB=generateWorkbookCatalog({title:'Order',workbookKey:'order-seed',rows:qualityRows});
+const orderA=shuffledA.stages.find(stage=>stage.stage===8).items[0],orderB=shuffledB.stages.find(stage=>stage.stage===8).items[0],canonicalOrder=qualityRows[0].text.match(/[A-Za-z]+/g);
+assert.deepEqual(orderA.groups,orderB.groups,'Factory Stage 8 order must be deterministic by item seed.');
+assert.ok(orderA.groups[0].every(token=>!token.includes(' ')),'Factory Stage 8 chips must remain one word each.');
+assert.notDeepEqual(orderA.groups[0],canonicalOrder,'Factory Stage 8 must not start canonical.');
+assert.notDeepEqual(orderA.groups[0],[...canonicalOrder.slice(1),canonicalOrder[0]],'Factory Stage 8 must not use one-step rotation.');
+assert.ok(orderA.groups[0].filter((token,index)=>token!==canonicalOrder[index]).length>=Math.ceil(canonicalOrder.length/2));
+assert.ok(shuffledA.stages.find(stage=>stage.stage===9).items.every(item=>!Object.hasOwn(item,'wordBank')),'Factory Stage 9 must not expose an answer word bank.');
 
 const derivedVerb=generateWorkbookCatalog({title:'Derived verb',workbookKey:'derived-verb',rows:[{text:'Let’s find out whether you fall into any of the following categories.',translation:'다음 항목을 확인하자.'}],allowDerivedFallback:true});
 const derivedVerbItem=derivedVerb.stages.find(stage=>stage.stage===5).items[0];
