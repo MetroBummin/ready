@@ -30,6 +30,19 @@ jobs:
           python3 tools/factory-stage5-7-confirm-temp.py
           python3 tools/factory-stage5-7-boundary-temp.py
           python3 tools/factory-stage5-7-cleanup-temp.py
+      - name: Debug unresolved NE grammar 4
+        run: |
+          node --input-type=module <<'NODE'
+          import { readFile } from 'node:fs/promises';
+          import { extractUnicodePdfText } from './server/ready/pdf-text-extract.mjs';
+          import { inspectFullWorkbookText } from './server/ready/workbook-factory.mjs';
+          const bytes=await readFile('ready/workbooks/ne-minbyeongcheon-lesson-1.pdf');
+          const text=await extractUnicodePdfText(`data:application/pdf;base64,${bytes.toString('base64')}`);
+          const audit=inspectFullWorkbookText(text);
+          const item=audit.exercises.find(x=>x.type==='error_correction'&&x.subtype==='grammar'&&x.sourceNumber===4);
+          console.log('GRAMMAR4_ITEM',JSON.stringify(item,null,2));
+          console.log('GRAMMAR4_CANONICAL',audit.rows.slice(34,41).map(x=>x.text).join(' '));
+          NODE
       - run: npm run ready:test
       - run: npm run build
       - run: npm run native:verify
