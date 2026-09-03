@@ -183,16 +183,25 @@ function answerStageRows(text, stage, expectedCount) {
   const candidates = answerStageCandidates(text, stage, expectedCount);
   return candidates.length === 1 ? candidates[0] : [];
 }
-function canonicalSpanMatches(value, rows) {
-  const matches = [];
+const canonicalSpanIndexCache = new WeakMap();
+function canonicalSpanIndex(rows) {
+  if (!Array.isArray(rows)) return new Map();
+  const cached = canonicalSpanIndexCache.get(rows);
+  if (cached) return cached;
+  const index = new Map();
   for (let start = 0; start < rows.length; start += 1) {
     let span = '';
     for (let end = start; end < rows.length; end += 1) {
       span = `${span} ${clean(rows[end]?.text)}`.trim();
-      if (sameEnglish(value, span)) matches.push({ start: start + 1, end: end + 1 });
+      const key = comparableEnglish(span), range = { start: start + 1, end: end + 1 }, matches = index.get(key);
+      if (matches) matches.push(range); else index.set(key, [range]);
     }
   }
-  return matches;
+  canonicalSpanIndexCache.set(rows, index);
+  return index;
+}
+function canonicalSpanMatches(value, rows) {
+  return canonicalSpanIndex(rows).get(comparableEnglish(value)) || [];
 }
 function uniqueCanonicalSpan(value, rows) {
   const matches = canonicalSpanMatches(value, rows);
@@ -274,7 +283,11 @@ function correctionRoundTrip(prompt, flatAnswers, rows) {
   const pairs = [];
   for (let index = 0; index < flatAnswers.length; index += 2) pairs.push([clean(flatAnswers[index]), clean(flatAnswers[index + 1])]);
   if (!pairs.length || pairs.some(pair => !pair[0] || !pair[1])) return null;
-  const matches = new Map(), visit = (value, pairIndex) => {
+  const matches = new Map(), visited = new Set(), visit = (value, pairIndex) => {
+    if (matches.size > 1) return;
+    const visitKey = `${pairIndex}:${value}`;
+    if (visited.has(visitKey)) return;
+    visited.add(visitKey);
     if (pairIndex === pairs.length) {
       for (const span of canonicalSpanMatches(value, rows)) matches.set(`${span.start}:${span.end}:${canonicalText(value)}`, { value, span });
       return;

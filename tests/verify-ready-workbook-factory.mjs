@@ -116,6 +116,18 @@ assert.deepEqual(parsedCatalog.metrics.stageCoverage[7],{ready:2,expected:2});
 assert.deepEqual(parsedCatalog.stages.find(stage=>stage.stage===7).items.map(item=>item.pairCount),[2,3]);
 assert.equal(new Set(parsedCatalog.stages.find(stage=>stage.stage===7).items.map(item=>item.key)).size,2,'Context 1 and grammar 1 must not collide.');
 
+
+// Canonical range lookup is shared across publisher items, while duplicate
+// canonical spans must still fail closed instead of becoming an arbitrary match.
+const duplicateSpanRows=[
+  {text:'The same sentence appears here.',translation:'같은 문장 1.'},
+  {text:'The same sentence appears here.',translation:'같은 문장 2.'},
+];
+const duplicateSpan=generateWorkbookCatalog({title:'Duplicate span',workbookKey:'duplicate-span',rows:duplicateSpanRows,sourceExercises:[
+  {type:'grammar_vocab_choice',number:1,prompt:'The same sentence appears ⟦CHOICE:0⟧.',groups:[['there','here']],answers:['here'],provenance:{page:1}},
+]});
+assert.equal(duplicateSpan.stages.find(stage=>stage.stage===6).items.length,0,'Ambiguous canonical spans must remain rejected after span-index caching.');
+
 const partialReuse=generateWorkbookCatalog({title:'Partial',workbookKey:'partial',rows:canonical,sourceExercises:[
   {type:'verb_form',number:1,prompt:'Humans excel at visual ____________.',answer:'imagery',provenance:{page:3}},
 ],ai:{5:[{sentenceIndex:1,prompt:'Humans excel at visual ____________.',hint:'image',answer:'imagery'},{sentenceIndex:2,prompt:'Our brains ____________ this ability for survival.',hint:'evolve',answer:'evolved'}]},provenance:{geminiCallCount:1}});
