@@ -385,7 +385,7 @@ async function factoryTranslate(rows: any[]) {
   return { rows: rows.map((row, index) => ({ ...row, translation: translations[index] })), tokenUsage: result.tokenUsage };
 }
 async function factoryExercises(rows: any[], requestedTargets: Record<number, number[]>) {
-  const targets = Object.fromEntries([5, 6, 7].map(stage => [stage, [...new Set((requestedTargets?.[stage] || []).map(Number).filter(number => Number.isInteger(number) && number >= 1 && number <= rows.length))]]));
+  const targets = Object.fromEntries([5, 6, 7].map(stage => [stage, [...new Set((requestedTargets?.[stage] || []).map(Number).filter(number => Number.isInteger(number) && number >= 1 && number <= rows.length))].slice(0, 6)]));
   const stages = [5, 6, 7].filter(stage => targets[stage].length);
   const generated: Record<number, any[]> = { 5: [], 6: [], 7: [] }, errors: string[] = [];
   let tokenUsage = 0, callCount = 0, quotaStopped = false;

@@ -66,8 +66,9 @@ Stage 8의 generated order bank는 한 영어 단어당 chip 하나를 사용한
 Gemini fallback 뒤에도 6·7단계가 비면 검증된 5·6단계의 answer boundary에서 오답 선택지와
 correction pair를 결정론적으로 파생한다. 파생 문항도 정답을 대입했을 때 canonical English가
 정확히 복원되는 경우만 READY이며, metrics의 `derivedFallbackExercises`로 별도 집계한다.
-Edge 재생성은 자원 한도 안에서 끝나도록 누락 범위에 대한 Gemini batch를 한 차례만
-실행하고, 그 후 남은 6·7단계를 위 검증 절차로 채운다.
+Edge 재생성은 자원 한도 안에서 끝나도록 단계별 최대 6문장의 Gemini batch를 한 차례만
+실행하고, 그 후 남은 6·7단계를 위 검증 절차로 채운다. 전체 문장 수와 관계없이 Gemini
+호출은 5·6·7단계 각 1회, 최대 3회로 제한된다.
 
 PDF는 PDF.js의 표준 Unicode text layer로 읽고 페이지 표지만 보존한다. 출판사명, 파일명,
 페이지 좌표, 폰트명 또는 임의 x 좌표로 열을 추측하지 않는다. 스캔 PDF나 손상된 문자맵은
