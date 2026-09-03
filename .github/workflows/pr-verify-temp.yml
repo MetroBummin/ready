@@ -15,7 +15,24 @@ jobs:
           cache: npm
       - run: npm ci
       - name: Audit real publisher PDF
-        run: node --input-type=module -e "import {readFileSync} from 'node:fs'; import {extractUnicodePdfText} from './server/ready/pdf-text-extract.mjs'; import {inspectFullWorkbookText} from './server/ready/workbook-factory.mjs'; const b=readFileSync('./ready/workbooks/ne-minbyeongcheon-lesson-1.pdf').toString('base64'); const t=await extractUnicodePdfText(b); const a=inspectFullWorkbookText(t); console.log(JSON.stringify({reviewRequired:a.reviewRequired,incompleteStages:a.incompleteStages,counts:Object.fromEntries([5,6,7].map(s=>[s,a.exercises.filter(x=>({verb_form:5,grammar_vocab_choice:6,error_correction:7}[x.type]===s&&x.provenance?.origin==='publisher_answer_key').length])),stage7:a.exercises.filter(x=>x.type==='error_correction'&&x.provenance?.origin==='publisher_answer_key').map(x=>({n:x.number,sourceNumber:x.sourceNumber,subtype:x.subtype,pairs:x.answers?.length/2,start:x.canonicalStart,end:x.canonicalEnd}))},null,2));"
+        run: |
+          cat > /tmp/audit.mjs <<'EOF'
+          import { readFileSync } from 'node:fs';
+          import { extractUnicodePdfText } from '/home/runner/work/ready/ready/server/ready/pdf-text-extract.mjs';
+          import { inspectFullWorkbookText } from '/home/runner/work/ready/ready/server/ready/workbook-factory.mjs';
+          const source = readFileSync('/home/runner/work/ready/ready/ready/workbooks/ne-minbyeongcheon-lesson-1.pdf').toString('base64');
+          const text = await extractUnicodePdfText(source);
+          const audit = inspectFullWorkbookText(text);
+          const stageFor = {verb_form:5,grammar_vocab_choice:6,error_correction:7};
+          const publisher = audit.exercises.filter(item => item.provenance?.origin === 'publisher_answer_key');
+          console.log(JSON.stringify({
+            reviewRequired: audit.reviewRequired,
+            incompleteStages: audit.incompleteStages,
+            counts: Object.fromEntries([5,6,7].map(stage => [stage, publisher.filter(item => stageFor[item.type] === stage).length])),
+            stage7: publisher.filter(item => item.type === 'error_correction').map(item => ({number:item.number,sourceNumber:item.sourceNumber,subtype:item.subtype,pairCount:item.answers?.length/2,canonicalStart:item.canonicalStart,canonicalEnd:item.canonicalEnd}))
+          }, null, 2));
+          EOF
+          node /tmp/audit.mjs
       - run: npm run ready:test
       - run: npm run build
       - run: npm run native:verify
