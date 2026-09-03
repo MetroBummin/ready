@@ -2,11 +2,14 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { extractSentenceRows, generateWorkbookCatalog, inspectFullWorkbookText, semanticWorkbookType } from '../server/ready/workbook-factory.mjs';
+import { compareCanonicalRows, extractSentenceRows, generateWorkbookCatalog, inspectFullWorkbookText, semanticWorkbookType } from '../server/ready/workbook-factory.mjs';
 
 const root=resolve(dirname(fileURLToPath(import.meta.url)),'..');
 const fixture=name=>readFileSync(resolve(root,'tests/fixtures',name),'utf8');
 const canonical=[{text:'Humans excel at visual imagery.',translation:'인간은 시각적 심상에 뛰어나다.'},{text:'Our brains evolved this ability for survival.',translation:'우리의 뇌는 생존을 위해 이 능력을 발달시켰다.'}];
+assert.equal(compareCanonicalRows(canonical,canonical).consistent,true,'Existing Passage mode must accept the unchanged canonical sentence pairs.');
+assert.equal(compareCanonicalRows(canonical,[...canonical].reverse()).reason,'canonical_text_mismatch','Existing Passage mode must reject reordered PDF rows.');
+assert.equal(compareCanonicalRows(canonical,canonical.slice(0,1)).reason,'sentence_count_mismatch','Existing Passage mode must reject an incomplete PDF passage.');
 
 // Case A: semantic headings win over publisher stage numbers, and Check is excluded.
 const textbook=inspectFullWorkbookText(fixture('workbook-factory-textbook.txt'));
@@ -65,4 +68,11 @@ assert.equal(partialReuse.metrics.geminiGeneratedExercises,1);
 const invalid=generateWorkbookCatalog({title:'Invalid',workbookKey:'invalid',rows:canonical,ai:{5:[{sentenceIndex:1,prompt:'Invented sentence ____________.',hint:'invent',answer:'invented'}]}});
 assert.equal(invalid.stages.find(stage=>stage.stage===5).items.length,0);
 assert.equal(invalid.metrics.dropReasons.stage5_round_trip,1);
+
+const edge=readFileSync(resolve(root,'server/ready/index.ts'),'utf8'),admin=readFileSync(resolve(root,'ready/admin/app.js'),'utf8'),adminHtml=readFileSync(resolve(root,'ready/admin/index.html'),'utf8');
+assert.match(edge,/existingMode \? existingContext\.passage\.id : rows<string>\(await db\.rpc\("ready_create_passage_with_sentences"/,'Existing Passage finalization must reuse its passage_id instead of creating a passage.');
+assert.match(edge,/codeWorkbookForPassage\(passageResult\.data\)[\s\S]*ready_workbook_catalogs[\s\S]*ready_passage_sentences/,'Existing Passage preflight must reject static/factory duplicates before loading canonical rows.');
+assert.match(edge,/if \(!existingMode\) await db\.from\("ready_passages"\)\.delete/,'A failed existing catalog insert must never delete the existing passage.');
+assert.match(adminHtml,/existing_passage[\s\S]*factory-existing-passage/,'Admin must expose the existing Passage mode and selector.');
+assert.match(admin,/existing\?\{\}:\{sentenceRows:state\.factoryRows\}/,'Admin must not submit editable sentence rows in existing Passage mode.');
 console.log('READY Workbook Factory golden paths verified.');

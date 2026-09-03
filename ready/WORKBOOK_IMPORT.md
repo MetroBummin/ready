@@ -39,6 +39,18 @@ Admin Factory는 다음 입력을 같은 canonical sentence review 단계로 모
 - `English<TAB>Korean` 두 열 TSV
 - 영문만 있는 본문 텍스트(출판사 해석이 없음을 명시하고 review에서 멈춤)
 
+Factory에는 두 target mode가 있다.
+
+- `new_passage`: review에서 확정한 문장쌍으로 Passage와 sentence rows를 만든 뒤 catalog를 연결한다.
+- `existing_passage`: 관리자가 선택한 Passage의 `ready_passage_sentences`를 유일한 canonical
+  source로 사용하며, Passage/sentence/Question/Attempt/exam link를 생성하거나 수정하지 않는다.
+  PDF가 있으면 exercise와 Answer Key만 추출하고 PDF 본문은 canonical rows와의 일치 검사에만
+  사용한다. 기존 factory catalog 또는 code-backed workbook이 있으면 시작과 확정 시점 모두 막는다.
+
+`existing_passage` review의 문장쌍은 읽기 전용이다. Factory 시작 후 canonical rows가 바뀌면
+스냅샷 검증을 실패시키고 새 작업을 요구한다. 최종 validator를 통과한 catalog만 기존
+`passage_id`로 insert하며, `ready_workbook_catalogs.passage_id` 기본키가 동시 중복도 막는다.
+
 PDF는 PDF.js의 표준 Unicode text layer로 읽고 페이지 표지만 보존한다. 출판사명, 파일명,
 페이지 좌표, 폰트명 또는 임의 x 좌표로 열을 추측하지 않는다. 스캔 PDF나 손상된 문자맵은
 조용히 일부만 수용하지 않고 review/unsupported로 멈춘다.

@@ -1,16 +1,27 @@
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { localSavedMeaningResult, readerSentenceCacheKey, readerSentenceMarkup, readerSentenceTokens, shouldBecomeScroll } from '../ready/reader-inline-gloss.js';
+import { localSavedMeaningResult, READER_GESTURE_SLOP, READER_LONG_PRESS_MS, readerGestureDecision, readerSentenceCacheKey, readerSentenceMarkup, readerSentenceTokens, shouldBecomeScroll } from '../ready/reader-inline-gloss.js';
 
 const read=path=>readFileSync(path,'utf8');
 const markup=readerSentenceMarkup({id:'sentence-1',text:'The students had been waiting outside.'});
 assert.match(markup,/data-reader-gloss-source/,'Reader text must expose persistent inline word controls.');
 assert.doesNotMatch(markup,/word-popup|sentence-sheet/,'Initial Reader markup must not include floating learning UI.');
 assert.deepEqual(readerSentenceTokens('Take part in it.').map(item=>item.text),['Take','part','in','it']);
-assert.equal(shouldBecomeScroll({distance:15}),true,'A drag must become scroll.');
+assert.equal(READER_GESTURE_SLOP,10,'Reader gesture slop must match the proven Breeze ownership threshold.');
+assert.equal(READER_LONG_PRESS_MS,750,'Sentence long press must wait for an intentional hold.');
+assert.equal(shouldBecomeScroll({distance:10}),false,'Movement at the slop boundary remains undecided.');
+assert.equal(shouldBecomeScroll({distance:11}),true,'Movement beyond slop must become scroll.');
 assert.equal(shouldBecomeScroll({distance:0,scrollChanged:true}),true,'Native scroll movement must lock scroll ownership.');
 assert.equal(shouldBecomeScroll({distance:4}),false,'Small stationary movement remains undecided.');
 assert.equal(shouldBecomeScroll({distance:0,cancelled:true}),true,'A cancelled drag must stay cancelled even after returning to its origin.');
+assert.equal(readerGestureDecision({maxDistance:3,released:true}),'WORD','A clean short tap must resolve to one word action.');
+assert.equal(readerGestureDecision({maxDistance:11,released:true}),'SCROLL','A short drag must never resolve as a word tap.');
+assert.equal(readerGestureDecision({maxDistance:15,released:true}),'SCROLL','Maximum travel must keep scroll ownership even after the pointer returns near its origin.');
+assert.equal(readerGestureDecision({scrollChanged:true,released:true}),'SCROLL','Actual scrolling must win over release.');
+assert.equal(readerGestureDecision({heldMs:750}),'SENTENCE','A stationary 750ms hold must resolve to sentence translation.');
+assert.equal(readerGestureDecision({maxDistance:11,heldMs:750}),'SCROLL','Movement beyond slop must cancel a pending long press.');
+assert.equal(readerGestureDecision({heldMs:900,released:true}),'SENTENCE','A resolved sentence hold must not also become a word action on release.');
+assert.equal(readerGestureDecision({heldMs:900,released:true,sentenceEnabled:false}),'WORD','Question and Workbook surfaces must keep sentence long press disabled.');
 
 const saved={id:'saved-1',lemma:'subscribe',meaning:'구독하다',memoryLevel:2,senses:[{meaning:'가입하다',occurrenceKey:'reader:p:s:s:0:10:r'}]};
 assert.equal(localSavedMeaningResult({sentenceId:'s',start:0,end:10,sourceText:'subscribes',saved,occurrenceKey:'reader:p:s:s:0:10:r'}).meaning,'가입하다','Exact occurrence must reuse its prior saved sense.');
@@ -24,6 +35,11 @@ assert.match(app,/sentenceEnabled:root\.id==='student-reader'/,'Sentence long pr
 assert.match(module,/UNDECIDED[\s\S]*SENTENCE[\s\S]*SCROLL/,'Gesture ownership states must remain explicit.');
 assert.match(module,/pointer\.cancelled=true[\s\S]*owner='SCROLL'/,'Movement must permanently cancel the current gesture.');
 assert.match(module,/setSourceState\(button,'pending'\)/,'Orange word feedback must begin only after a confirmed tap.');
+assert.match(module,/maxDistance:0[\s\S]*READER_LONG_PRESS_MS/,'Pointer down must only initialize ownership state and the long-press decision timer.');
+assert.doesNotMatch(module,/onPointerDown[\s\S]{0,500}setSourceState/,'Pointer down must not paint word feedback before the gesture is decided.');
+assert.match(module,/if\(event\.detail!==0\)\{event\.preventDefault\(\);return;\}/,'Pointerup must own a pointer gesture and consume its trailing click without a second action.');
+assert.doesNotMatch(module,/ignoreNextClickUntil|clickBlockedUntil|Date\.now\(\)[\s\S]*click/,'Trailing click suppression must not rely on a timing window.');
+assert.match(css,/\.reader-inline-source\{[^}]*-webkit-tap-highlight-color:transparent/,'iOS must not paint a native button highlight during scroll start.');
 assert.doesNotMatch(css,/\.reader-inline-source:hover,\.reader-inline-source:focus-visible/,'Touch hover must not color a word before gesture ownership is decided.');
 assert.match(css,/@media \(hover:hover\) and \(pointer:fine\)\{\.reader-inline-source:hover/,'Hover feedback must be limited to real hover pointers.');
 assert.match(module,/reader-inline-replacement[\s\S]*reader-inline-english[\s\S]*reader-inline-meaning/,'Words must crossfade inside a persistent inline slot.');

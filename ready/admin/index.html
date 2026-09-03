@@ -26,7 +26,7 @@
     <link rel="stylesheet" href="../ready.css?v=ready-system-1" />
     <link rel="stylesheet" href="../design.css?v=ready-system-1" />
     <script defer src="../config.js"></script>
-    <script type="module" src="app.js?v=workbook-factory-1"></script>
+    <script type="module" src="app.js?v=workbook-factory-existing-1"></script>
   </head>
   <body data-ready-mode="admin">
     <div id="app">
@@ -214,9 +214,11 @@
           <div id="admin-students"></div>
         </section>
         <section class="view" id="v-factory">
-          <div class="page-head"><div><p class="eyebrow">WORKBOOK FACTORY</p><h1>새 Passage · 워크북</h1><p class="lead">본문은 문장쌍을 한 번 확정한 뒤 생성합니다. text-extractable PDF만 지원합니다.</p></div></div>
+          <div class="page-head"><div><p class="eyebrow">WORKBOOK FACTORY</p><h1>Passage · 워크북</h1><p class="lead">새 Passage를 만들거나, 기존 Passage는 그대로 둔 채 워크북만 추가합니다.</p></div></div>
           <form id="factory-start-form" class="card form-card">
-            <div class="form-grid">
+            <label><span>생성 방식</span><select name="factoryMode" id="factory-mode"><option value="new_passage">새 Passage + Workbook</option><option value="existing_passage">기존 Passage에 Workbook 추가</option></select></label>
+            <label id="factory-existing-field" hidden><span>기존 READY Passage</span><select name="existingPassageId" id="factory-existing-passage"><option value="">Passage를 선택하세요</option></select><small>기존 문장·문제·시험범위·풀이 기록은 변경하지 않습니다.</small></label>
+            <div class="form-grid" id="factory-new-fields">
               <label><span>지문 제목</span><input name="title" maxlength="120" required></label>
               <label><span>종류</span><select name="sourceType"><option value="TEXTBOOK">교과서</option><option value="MOCK_EXAM">모의고사</option></select></label>
               <label><span>학년</span><select name="grade" required><option>1학년</option><option>2학년</option><option>3학년</option></select></label>
@@ -224,7 +226,7 @@
               <label><span>연도 (모의고사)</span><input name="sourceYear" inputmode="numeric"></label>
               <label><span>월 (모의고사)</span><input name="sourceMonth" inputmode="numeric"></label>
             </div>
-            <label><span>PDF 업로드</span><input name="pdf" type="file" accept="application/pdf,.pdf"></label>
+            <label><span>PDF 업로드 <small id="factory-pdf-note">또는 아래에 본문을 붙여 넣으세요.</small></span><input name="pdf" type="file" accept="application/pdf,.pdf"></label>
             <label><span>또는 본문 붙여넣기</span><textarea name="sourceText" rows="10" placeholder="영문과 한글 해석이 줄별로 있으면 자동으로 대응합니다."></textarea></label>
             <button class="button primary" type="submit">분석 시작</button>
           </form>

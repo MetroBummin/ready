@@ -306,7 +306,7 @@ body[data-ready-mode="student"] .reader-prose p,
 body[data-ready-mode="student"] .reading-passage{margin:0;color:var(--ready-body);font-size:var(--ready-text-question);line-height:var(--ready-leading-question);letter-spacing:0}
 .sr-only{position:absolute!important;width:1px!important;height:1px!important;padding:0!important;margin:-1px!important;overflow:hidden!important;clip:rect(0,0,0,0)!important;white-space:nowrap!important;border:0!important}
 .reader-inline-sentence{display:inline}
-.reader-inline-source{position:relative;display:inline;margin:0;padding:0 .04em;border:0;border-radius:var(--ready-radius-xs);color:inherit;background:transparent;font:inherit;letter-spacing:inherit;line-height:inherit;text-align:inherit;cursor:pointer;text-decoration:none;box-decoration-break:clone;-webkit-box-decoration-break:clone;transition:color var(--ready-duration-fast) var(--ready-ease)}
+.reader-inline-source{position:relative;display:inline;margin:0;padding:0 .04em;border:0;border-radius:var(--ready-radius-xs);color:inherit;background:transparent;font:inherit;letter-spacing:inherit;line-height:inherit;text-align:inherit;cursor:pointer;text-decoration:none;box-decoration-break:clone;-webkit-box-decoration-break:clone;-webkit-appearance:none;appearance:none;-webkit-tap-highlight-color:transparent;transition:color var(--ready-duration-fast) var(--ready-ease)}
 .reader-inline-source:focus-visible{color:var(--ready-primary);outline:0}
 @media (hover:hover) and (pointer:fine){.reader-inline-source:hover{color:var(--ready-primary)}}
 .reader-inline-source.is-pending,.reader-inline-source.is-loading,.reader-inline-source.is-refreshing{color:var(--ready-primary)}

@@ -3,6 +3,20 @@
 // exercised as a normal Node golden-path test as well as in the Edge Function.
 
 const clean = (value, max = 6000) => String(value ?? '').replace(/\u0000|[\uD800-\uDFFF]/g, '').replace(/\u00a0/g, ' ').trim().slice(0, max);
+const canonicalText = value => clean(value).normalize('NFKC').replace(/[‘’]/g, "'").replace(/[“”]/g, '"').replace(/[‐‑‒–—]/g, '-').replace(/\s+/g, ' ').trim();
+
+export function compareCanonicalRows(existingRows, extractedRows) {
+  const existing = Array.isArray(existingRows) ? existingRows : [], extracted = Array.isArray(extractedRows) ? extractedRows : [];
+  if (!existing.length) return { consistent: false, reason: 'existing_canonical_missing', mismatches: [] };
+  if (!extracted.length) return { consistent: false, reason: 'pdf_canonical_missing', mismatches: [] };
+  if (existing.length !== extracted.length) return { consistent: false, reason: 'sentence_count_mismatch', expectedCount: existing.length, actualCount: extracted.length, mismatches: [] };
+  const mismatches = [];
+  existing.forEach((row, index) => {
+    const fields = ['text', 'translation'].filter(field => canonicalText(row?.[field]) !== canonicalText(extracted[index]?.[field]));
+    if (fields.length) mismatches.push({ sentenceIndex: index + 1, fields });
+  });
+  return { consistent: mismatches.length === 0, reason: mismatches.length ? 'canonical_text_mismatch' : '', expectedCount: existing.length, actualCount: extracted.length, mismatches: mismatches.slice(0, 8) };
+}
 const fold = value => clean(value).toLowerCase().replace(/[“”‘’]/g, "'").replace(/\s+/g, ' ');
 const comparableEnglish = value => fold(value)
   .replace(/\b(i)'m\b/g, '$1 am')
