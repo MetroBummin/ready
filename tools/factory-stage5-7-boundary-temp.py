@@ -15,8 +15,8 @@ path.write_text(text)
 # assert the literal label rather than requiring it to be static HTML.
 path = Path('tests/verify-ready-workbook-factory.mjs')
 text = path.read_text()
-old = "assert.match(adminSource,/>최종 확정</,'Complete Factory preview must expose an explicit final confirmation.');"
-new = "assert.match(adminSource,/'최종 확정'/,'Complete Factory preview must expose an explicit final confirmation.');"
+old = "assert.match(adminFactorySource,/>최종 확정</,'Complete Factory preview must expose an explicit final confirmation.');"
+new = "assert.match(adminFactorySource,/'최종 확정'/,'Complete Factory preview must expose an explicit final confirmation.');"
 if old not in text:
     raise SystemExit('final confirmation assertion marker missing')
 text = text.replace(old, new, 1)
