@@ -39,6 +39,9 @@ const catalog=generateWorkbookCatalog({title:'Golden',workbookKey:'golden',rows:
 assert.deepEqual(catalog.stages.map(stage=>stage.stage),[2,3,4,5,6,7,8,9]);
 assert.equal(catalog.stages.find(stage=>stage.stage===2).items[0].number,1);
 assert.equal(catalog.stages.find(stage=>stage.stage===9).items.length,3);
+assert.equal(catalog.stages.find(stage=>stage.stage===9).items[0].prompt,'______________','Generated Stage 9 must use the safe whole-sentence fallback');
+assert.deepEqual(catalog.stages.find(stage=>stage.stage===9).items[0].answers,[reviewed[0].text],'Stage 9 fallback must preserve punctuation, numbers, and the complete canonical sentence');
+assert.equal(Object.hasOwn(catalog.stages.find(stage=>stage.stage===9).items[0],'wordBank'),false,'Generated Stage 9 must not expose a full-answer word bank');
 assert.equal(catalog.stages.find(stage=>stage.stage===5).items.length,1);
 assert.equal(catalog.stages.find(stage=>stage.stage===6).items.length,1);
 assert.equal(catalog.stages.find(stage=>stage.stage===7).items.length,0,'Stage 7 must not generate one error per sentence.');
