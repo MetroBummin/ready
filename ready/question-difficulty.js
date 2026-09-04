@@ -13,6 +13,10 @@ export function questionDifficultyLabel(value) {
   return QUESTION_DIFFICULTIES.find(item => item.id === normalizeQuestionDifficulty(value))?.label || 'Unclassified';
 }
 
+export function questionDifficultyKoreanLabel(value) {
+  return ({1:'쉬움',2:'보통',3:'어려움'})[normalizeQuestionDifficulty(value)] || '미분류';
+}
+
 export function isQuestionQaScope(scope) {
   const school = String(scope?.school ?? '').trim().toLowerCase();
   const grade = String(scope?.grade ?? '').trim();
@@ -20,11 +24,16 @@ export function isQuestionQaScope(scope) {
 }
 
 export function isAiReferenceVariant(payload) {
-  return payload?.authoring?.method === 'ai_reference_variant';
+  return ['ai_reference_variant','ai_reference_variant_v2'].includes(payload?.authoring?.method);
+}
+
+export function isAiReferenceVariantV2(payload) {
+  return payload?.authoring?.method === 'ai_reference_variant_v2';
 }
 
 export function questionVisibleInScope(row, scope) {
-  return !isAiReferenceVariant(row?.payload) || isQuestionQaScope(scope);
+  if(isAiReferenceVariantV2(row?.payload))return String(scope?.school??'').trim().toLowerCase()==='test2'&&String(scope?.grade??'').trim()==='2학년';
+  return !isAiReferenceVariant(row?.payload)||isQuestionQaScope(scope);
 }
 
 export function questionFilterCounts(cells, difficulty = null, taxonomies = []) {

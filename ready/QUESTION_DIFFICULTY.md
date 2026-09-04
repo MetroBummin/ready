@@ -11,6 +11,10 @@
 ## Rules
 
 - Difficulty describes the work required by the Question, not the passage's general level.
+- Difficulty changes the burden of answering, not the truth being studied.
+- Never raise difficulty by summarizing, paraphrasing, simplifying, or making the canonical passage harder. The canonical source is the material the student must actually study.
+- Difficulty is evaluated through evidence distance, distractor discrimination, language burden of the prompt/choices, response burden, and reasoning/constraint burden.
+- Variants from one reference retain the same canonical passage, learning target, gold answer concept, and evidence.
 - Every `available` Question must have exactly one value: `1`, `2`, or `3`.
 - Draft/drop Questions may remain unclassified because they are not student-visible.
 - The Student UI always shows `Easy`, `Standard`, or `Hard`; it never derives difficulty from provider, taxonomy, or answer history.

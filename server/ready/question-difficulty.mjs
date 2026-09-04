@@ -16,9 +16,14 @@ export function isQuestionQaScope(scope) {
 }
 
 export function isAiReferenceVariant(payload) {
-  return payload?.authoring?.method === "ai_reference_variant";
+  return ["ai_reference_variant", "ai_reference_variant_v2"].includes(payload?.authoring?.method);
+}
+
+export function isAiReferenceVariantV2(payload) {
+  return payload?.authoring?.method === "ai_reference_variant_v2";
 }
 
 export function questionVisibleInScope(row, scope) {
+  if (isAiReferenceVariantV2(row?.payload)) return String(scope?.school ?? "").trim().toLowerCase() === "test2" && String(scope?.grade ?? "").trim() === "2학년";
   return !isAiReferenceVariant(row?.payload) || isQuestionQaScope(scope);
 }
