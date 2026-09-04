@@ -18,6 +18,7 @@ import { QUESTION_DIFFICULTIES, isQuestionQaScope, normalizeQuestionDifficulty, 
 import { compareCanonicalRows, extractSentenceRows, factoryFallbackTargets, generateWorkbookCatalog, inspectFullWorkbookText } from "./workbook-factory.mjs";
 import { gradeWorkbookCorrectionPairs } from "../../ready/deterministic-grading.js";
 import { repairAnswerKeyArtifacts, repairStageNineCatalog } from "./workbook-catalog-qa.mjs";
+import { attemptMetrics, groupAttemptCounts, learningPeriodStart } from "../../ready/admin/learning-progress.js";
 
 const CORS = { "Access-Control-Allow-Origin": "*", "Access-Control-Allow-Headers": "authorization, apikey, content-type, x-client-info", "Access-Control-Allow-Methods": "POST, OPTIONS" };
 const json = (body: unknown, status = 200) => new Response(JSON.stringify(body), { status, headers: { ...CORS, "Content-Type": "application/json", "Cache-Control": "no-store" } });
@@ -30,7 +31,7 @@ function supabaseAdminKey() {
   return Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "";
 }
 const db = createClient(Deno.env.get("SUPABASE_URL") ?? "", supabaseAdminKey(), { auth: { persistSession: false } });
-const adminOps = new Set(["teacher_bootstrap", "delete_impact", "assign_scope_passages", "set_scope_layout", "create_passage", "update_passage", "delete_passage", "create_student", "set_student_code", "delete_student", "import_questions", "import_explanations", "factory_start", "factory_confirm", "factory_regenerate"]);
+const adminOps = new Set(["teacher_bootstrap", "admin_learning_progress", "admin_learning_progress_detail", "admin_attempt_replay", "delete_impact", "assign_scope_passages", "set_scope_layout", "create_passage", "update_passage", "delete_passage", "create_student", "set_student_code", "delete_student", "import_questions", "import_explanations", "factory_start", "factory_confirm", "factory_regenerate"]);
 const studentOps = new Set(["student_bootstrap", "student_passage", "word_lookup_meaning", "save_reader_word", "remove_reader_word", "update_reader_word_meaning", "sentence_easy_translation", "sentence_structure", "student_questions", "student_question_filters", "student_question_queue", "student_review_questions", "student_review_export", "set_question_bookmark", "submit_attempt", "student_workbook", "workbook_assistance", "set_workbook_bookmark", "workbook_hint", "submit_workbook_attempt"]);
 const publicOps = new Set(["student_login", "admin_login"]);
 // Match Breeze's free Gemini dictionary defaults. The API key remains a
@@ -321,6 +322,80 @@ async function teacherBootstrap() {
   const catalogIds = new Set(rows<any[]>(factoryCatalogs).map(item => item.passage_id));
   const passageRows = rows<any[]>(passages).map(passage => ({ ...passage, has_workbook: !!codeWorkbookForPassage(passage) || catalogIds.has(passage.id), workbook_source: codeWorkbookForPassage(passage) ? "static" : catalogIds.has(passage.id) ? "factory" : "" }));
   return { students: rows(students), exams: rows(exams), passages: passageRows, examPassages: rows(examPassages) };
+}
+function adminProgressPeriod(body: any) {
+  const period = ["today", "7d", "30d"].includes(body.period) ? body.period : "7d";
+  return { period, since: learningPeriodStart(period).toISOString() };
+}
+async function adminLearningProgress(body: any) {
+  const { period, since } = adminProgressPeriod(body), school = clean(body.school, 80), grade = clean(body.grade, 40);
+  const result = await db.rpc("ready_admin_learning_progress", { p_since: since, p_school: school || null, p_grade: grade || null });
+  if (result.error) throw new ApiError(500, result.error.message);
+  return { period, since, students: rows<any[]>(result).map(item => ({
+    id: item.student_id, name: item.student_name, school: item.school, grade: item.grade, lastActivityAt: item.last_activity_at,
+    question: { total: Number(item.question_attempts) || 0, correct: Number(item.question_correct) || 0, wrong: Number(item.question_wrong) || 0 },
+    workbook: { total: Number(item.workbook_attempts) || 0, correct: Number(item.workbook_correct) || 0, wrong: Number(item.workbook_wrong) || 0 },
+  })) };
+}
+async function adminLearningProgressDetail(body: any) {
+  const studentId = required(body.studentId, "학생", 80), { period, since } = adminProgressPeriod(body);
+  const student = rows<any>(await db.from("ready_students").select("id,name,school,grade").eq("id", studentId).maybeSingle());
+  if (!student) throw new ApiError(404, "학생을 찾지 못했습니다.");
+  const [questionResult, workbookResult] = await Promise.all([
+    db.from("ready_attempts").select("id,question_id,response,correct,created_at").eq("student_id", studentId).gte("created_at", since).order("created_at", { ascending: false }),
+    db.from("ready_workbook_attempts").select("id,passage_id,workbook_key,item_key,stage,response,correct,hint_count,used_full_answer_hint,completed_after_hint,created_at").eq("student_id", studentId).gte("created_at", since).order("created_at", { ascending: false }),
+  ]);
+  const questionAttempts = rows<any[]>(questionResult), workbookAttempts = rows<any[]>(workbookResult);
+  const questionIds = [...new Set(questionAttempts.map(attempt => attempt.question_id))], passageIds = [...new Set(workbookAttempts.map(attempt => attempt.passage_id))];
+  const questionRows = questionIds.length ? rows<any[]>(await db.from("ready_questions").select("id,passage_id,type,difficulty,generation,payload").in("id", questionIds)) : [];
+  for (const question of questionRows) if (!passageIds.includes(question.passage_id)) passageIds.push(question.passage_id);
+  const passages = passageIds.length ? rows<any[]>(await db.from("ready_passages").select("id,title,source_type,source_label").in("id", passageIds)) : [];
+  const factoryCatalogs = passageIds.length ? rows<any[]>(await db.from("ready_workbook_catalogs").select("passage_id,workbook_key,catalog").in("passage_id", passageIds)) : [];
+  const questionById = new Map(questionRows.map(question => [question.id, question])), passageById = new Map(passages.map(passage => [passage.id, passage])), factoryByPassage = new Map(factoryCatalogs.map(row => [row.passage_id, row]));
+  const questionGroups = groupAttemptCounts(questionAttempts, attempt => attempt.question_id), workbookGroups = groupAttemptCounts(workbookAttempts, attempt => `${attempt.passage_id}:${attempt.workbook_key}:${attempt.item_key}`);
+  const wrongQuestions = questionAttempts.filter(attempt => attempt.correct === false).map(attempt => {
+    const question = questionById.get(attempt.question_id), payload = question?.payload || {}, group = questionGroups.get(attempt.question_id) || { attempts: 1, wrong: 1 };
+    return { id: attempt.id, questionId: attempt.question_id, passageTitle: passageById.get(question?.passage_id)?.title || "현재 지문 정보 없음", taxonomy: clean(payload.spec?.taxonomy || payload.taxonomy, 80), taxonomyLabel: publicTaxonomyLabel(clean(payload.spec?.taxonomy || payload.taxonomy, 80)), difficulty: normalizeQuestionDifficulty(question?.difficulty), referenceQuestionNo: Number(payload.authoring?.referenceQuestionNo) || null, generation: Number(question?.generation) || null, createdAt: attempt.created_at, attemptCount: group.attempts, wrongCount: group.wrong };
+  });
+  const wrongWorkbooks = workbookAttempts.filter(attempt => attempt.correct === false).map(attempt => {
+    const passage = passageById.get(attempt.passage_id), persisted = factoryByPassage.get(attempt.passage_id), catalog = codeWorkbookForPassage(passage) || persisted?.catalog || null, item = catalog?.workbookKey === attempt.workbook_key ? workbookItem(catalog, attempt.item_key) : null, group = workbookGroups.get(`${attempt.passage_id}:${attempt.workbook_key}:${attempt.item_key}`) || { attempts: 1, wrong: 1 };
+    return { id: attempt.id, passageTitle: passage?.title || "현재 지문 정보 없음", stage: Number(attempt.stage), itemKey: attempt.item_key, kind: item?.kind || "", number: item?.number || null, createdAt: attempt.created_at, attemptCount: group.attempts, wrongCount: group.wrong, replayAvailable: !!item };
+  });
+  return { period, since, student, question: attemptMetrics(questionAttempts), workbook: attemptMetrics(workbookAttempts), wrongQuestions, wrongWorkbooks };
+}
+async function adminQuestionAttemptReplay(attemptId: string) {
+  const attempt = rows<any>(await db.from("ready_attempts").select("id,student_id,question_id,exam_id,response,correct,elapsed_ms,created_at").eq("id", attemptId).maybeSingle());
+  if (!attempt) throw new ApiError(404, "Question attempt를 찾지 못했습니다.");
+  const question = rows<any>(await db.from("ready_questions").select("id,passage_id,type,difficulty,payload,status,generation,created_at,updated_at").eq("id", attempt.question_id).maybeSingle());
+  if (!question) return { kind: "question", replayable: false, message: "현재 Question을 찾을 수 없어 완전 재현할 수 없습니다.", attempt };
+  const [passage, sentenceResult] = await Promise.all([
+    db.from("ready_passages").select("id,title,source_type,source_label").eq("id", question.passage_id).maybeSingle(),
+    db.from("ready_passage_sentences").select("sentence_index,text").eq("passage_id", question.passage_id).order("sentence_index"),
+  ]);
+  if (passage.error) throw new ApiError(500, passage.error.message); const sentences = rows<any[]>(sentenceResult), passageText = sentences.map(sentence => sentence.text).join(" ");
+  try {
+    const spec = publicQuestion(question, passageText, { showReference: true }), answer = question.type === "written_response" ? (Array.isArray(question.payload?.accepted_answers) ? question.payload.accepted_answers : []) : deterministicGrade(question.payload, question.type, attempt.response).answer;
+    return { kind: "question", replayable: true, attempt, question: spec, passage: passage.data, response: attempt.response, answer, snapshot: { mode: "current_generation", currentGeneration: Number(question.generation) || 1, exactHistoricalPayload: false } };
+  } catch (error) {
+    return { kind: "question", replayable: false, message: "현재 Question 명세와 attempt를 안전하게 연결할 수 없어 완전 재현할 수 없습니다.", attempt, passage: passage.data, snapshot: { mode: "current_generation", currentGeneration: Number(question.generation) || 1, exactHistoricalPayload: false }, detail: error instanceof Error ? clean(error.message, 300) : "" };
+  }
+}
+async function adminWorkbookAttemptReplay(attemptId: string) {
+  const attempt = rows<any>(await db.from("ready_workbook_attempts").select("id,student_id,exam_id,passage_id,workbook_key,item_key,stage,response,correct,hint_count,used_full_answer_hint,completed_after_hint,created_at").eq("id", attemptId).maybeSingle());
+  if (!attempt) throw new ApiError(404, "Workbook attempt를 찾지 못했습니다.");
+  const passage = rows<any>(await db.from("ready_passages").select("id,title,source_type,source_label,updated_at").eq("id", attempt.passage_id).maybeSingle());
+  if (!passage) return { kind: "workbook", replayable: false, message: "현재 Passage를 찾을 수 없어 완전 재현할 수 없습니다.", attempt };
+  const catalog = await workbookForPassage(passage), item = catalog?.workbookKey === attempt.workbook_key ? workbookItem(catalog, attempt.item_key) : null;
+  if (!catalog || !item || Number(item.stage) !== Number(attempt.stage)) return { kind: "workbook", replayable: false, message: "현재 문항 버전과 일치하지 않아 완전 재현할 수 없습니다.", attempt, passage, snapshot: { exactHistoricalItem: false } };
+  const responses = Array.isArray(attempt.response?.responses) ? attempt.response.responses : [], answers = Array.isArray(item.answers) ? item.answers : [];
+  const slotResults = item.kind === "correction_pairs" ? gradeWorkbookCorrectionPairs(answers, responses).slotResults : responses.map((response: string, index: number) => normalizeWorkbookAnswer(response) === normalizeWorkbookAnswer(answers[index]));
+  return { kind: "workbook", replayable: true, attempt, passage, workbook: { title: catalog.title, workbookKey: catalog.workbookKey }, item: { key: item.key, stage: item.stage, number: item.number, kind: item.kind || "blank_input", subtype: clean(item.subtype, 40), source: item.source || "", prompt: item.prompt, groups: item.groups || [], pairCount: Number(item.pairCount) || 0, slotCount: answers.length }, response: responses, answers, slotResults, snapshot: { exactHistoricalItem: false, matchedCurrentCatalog: true } };
+}
+async function adminAttemptReplay(body: any) {
+  const attemptId = required(body.attemptId, "Attempt", 80), kind = clean(body.kind, 20);
+  if (kind === "question") return adminQuestionAttemptReplay(attemptId);
+  if (kind === "workbook") return adminWorkbookAttemptReplay(attemptId);
+  throw new ApiError(400, "Attempt 종류가 올바르지 않습니다.");
 }
 function ids(value: unknown) { return Array.isArray(value) ? [...new Set(value.map(item => clean(item, 80)).filter(Boolean))] : []; }
 async function setScopePassages(body: any, replace: boolean) {
@@ -1249,7 +1324,7 @@ async function personalLibrary(_body:any,session:ReadySession){const student=awa
 async function dispatch(op: string, body: any, session: ReadySession | null) {
   switch (op) {
     case "student_login": return studentLogin(body); case "admin_login": return adminLogin(body); case "logout": return revokeSession(session as ReadySession);
-    case "teacher_bootstrap": return teacherBootstrap(); case "delete_impact": return deleteImpact(body); case "create_student": return createStudent(body); case "set_student_code": return setStudentCode(body); case "delete_student": return deleteStudent(body);
+    case "teacher_bootstrap": return teacherBootstrap(); case "admin_learning_progress": return adminLearningProgress(body); case "admin_learning_progress_detail": return adminLearningProgressDetail(body); case "admin_attempt_replay": return adminAttemptReplay(body); case "delete_impact": return deleteImpact(body); case "create_student": return createStudent(body); case "set_student_code": return setStudentCode(body); case "delete_student": return deleteStudent(body);
     case "assign_scope_passages": return setScopePassages(body, false); case "set_scope_layout": return setScopeLayout(body); case "create_passage": return createPassage(body); case "update_passage": return updatePassage(body); case "delete_passage": return deletePassage(body); case "import_questions": return importQuestions(body); case "import_explanations": return importExplanations(body); case "factory_start": return factoryStart(body); case "factory_confirm": return factoryConfirm(body); case "factory_regenerate": return factoryRegenerate(body);
     case "student_bootstrap": return studentBootstrap(session as ReadySession); case "student_passage": return studentPassage(body, session as ReadySession); case "word_lookup_meaning": return readerInlineGloss(body, session as ReadySession); case "save_reader_word": return saveReaderWord(body, session as ReadySession); case "remove_reader_word": return removeReaderWord(body, session as ReadySession); case "update_reader_word_meaning": return updateReaderWordMeaning(body, session as ReadySession); case "sentence_easy_translation": return sentenceEasyTranslation(body, session as ReadySession); case "sentence_structure": return sentenceStructure(body, session as ReadySession); case "student_questions": return studentQuestions(body, session as ReadySession); case "student_question_filters": return studentQuestionFilters(body, session as ReadySession); case "student_question_queue": return studentQuestionQueue(body, session as ReadySession); case "student_review_questions": return studentReviewQuestions(body, session as ReadySession); case "student_review_export": return studentReviewExport(body, session as ReadySession); case "set_question_bookmark": return setQuestionBookmark(body, session as ReadySession); case "submit_attempt": return submitAttempt(body, session as ReadySession); case "student_workbook": return studentWorkbook(body, session as ReadySession); case "workbook_assistance": return workbookAssistance(body, session as ReadySession); case "set_workbook_bookmark": return setWorkbookBookmark(body, session as ReadySession); case "workbook_hint": return workbookHint(body, session as ReadySession); case "submit_workbook_attempt": return submitWorkbookAttempt(body, session as ReadySession);
     default: throw new ApiError(404, "알 수 없는 READY 작업입니다.");
