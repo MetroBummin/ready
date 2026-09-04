@@ -30,7 +30,7 @@ function supabaseAdminKey() {
 }
 const db = createClient(Deno.env.get("SUPABASE_URL") ?? "", supabaseAdminKey(), { auth: { persistSession: false } });
 const adminOps = new Set(["teacher_bootstrap", "delete_impact", "assign_scope_passages", "set_scope_layout", "create_passage", "update_passage", "delete_passage", "create_student", "set_student_code", "delete_student", "import_questions", "import_explanations", "factory_start", "factory_confirm", "factory_regenerate"]);
-const studentOps = new Set(["student_bootstrap", "student_passage", "word_lookup_meaning", "save_reader_word", "remove_reader_word", "update_reader_word_meaning", "sentence_easy_translation", "sentence_structure", "student_questions", "student_question_filters", "student_question_queue", "student_review_questions", "set_question_bookmark", "submit_attempt", "student_workbook", "workbook_assistance", "set_workbook_bookmark", "workbook_hint", "submit_workbook_attempt"]);
+const studentOps = new Set(["student_bootstrap", "student_passage", "word_lookup_meaning", "save_reader_word", "remove_reader_word", "update_reader_word_meaning", "sentence_easy_translation", "sentence_structure", "student_questions", "student_question_filters", "student_question_queue", "student_review_questions", "student_review_export", "set_question_bookmark", "submit_attempt", "student_workbook", "workbook_assistance", "set_workbook_bookmark", "workbook_hint", "submit_workbook_attempt"]);
 const publicOps = new Set(["student_login", "admin_login"]);
 // Match Breeze's free Gemini dictionary defaults. The API key remains a
 // Supabase Edge Function Secret and is never part of any public response.
@@ -882,6 +882,42 @@ async function studentReviewQuestions(body: any, session: ReadySession) {
   const [wordItems,workbookItems,sentenceResult]=await Promise.all([wordReviewItems(student.id,examId),workbookReviewItems(student.id,examId),db.from("ready_saved_sentences").select("id,source_text_snapshot,translation_snapshot,created_at,passage:ready_passages(title)").eq("student_id",student.id).eq("exam_id",examId).order("created_at",{ascending:false})]);if(sentenceResult.error)throw new ApiError(500,sentenceResult.error.message);
   return { items, wordItems, sentenceItems:rows<any[]>(sentenceResult), workbookItems, counts:{word:wordItems.length,sentence:(sentenceResult.data||[]).length,workbook:workbookItems.length,question:items.length} };
 }
+async function studentReviewExport(body: any, session: ReadySession) {
+  const student = await studentForSession(session), examId = required(body.examId, "Exam", 80);
+  const review = await studentReviewQuestions({ examId }, session);
+  const questionItems = review.items.filter((item: any) => item.question?.lastResult === false);
+  const questionIds = questionItems.map((item: any) => item.question.id);
+  const questionRows = questionIds.length ? rows<any[]>(await db.from("ready_questions").select("id,type,payload").in("id", questionIds).eq("status", "available")) : [];
+  const questionById = new Map(questionRows.map(row => [row.id, row]));
+  const questionAttempts = questionIds.length ? rows<any[]>(await db.from("ready_attempts").select("question_id,response,correct,created_at").eq("student_id", student.id).eq("exam_id", examId).in("question_id", questionIds).order("created_at", { ascending: false })) : [];
+  const latestQuestionAttempt = new Map<string, any>();
+  for (const attempt of questionAttempts) if (!latestQuestionAttempt.has(attempt.question_id)) latestQuestionAttempt.set(attempt.question_id, attempt);
+  const questions = questionItems.flatMap((entry: any) => {
+    const row = questionById.get(entry.question.id), attempt = latestQuestionAttempt.get(entry.question.id);
+    if (!row || !attempt || attempt.correct === true) return [];
+    const answer = row.type === "written_response"
+      ? (Array.isArray(row.payload?.accepted_answers) ? row.payload.accepted_answers : [])
+      : deterministicGrade(row.payload, row.type, attempt.response).answer;
+    return [{ question: entry.question, response: attempt.response, answer }];
+  });
+
+  const workbookItems = review.workbookItems.filter((item: any) => item.lastResult === false);
+  const workbookAttempts = workbookItems.length ? rows<any[]>(await db.from("ready_workbook_attempts").select("passage_id,item_key,response,correct,created_at").eq("student_id", student.id).eq("exam_id", examId).order("created_at", { ascending: false })) : [];
+  const latestWorkbookAttempt = new Map<string, any>();
+  for (const attempt of workbookAttempts) { const key = `${attempt.passage_id}:${attempt.item_key}`; if (!latestWorkbookAttempt.has(key)) latestWorkbookAttempt.set(key, attempt); }
+  const passageIds = [...new Set(workbookItems.map((item: any) => item.passageId))];
+  const passages = passageIds.length ? rows<any[]>(await db.from("ready_passages").select("id,title,source_type,source_label,updated_at").in("id", passageIds)) : [];
+  const passageById = new Map(passages.map(passage => [passage.id, passage]));
+  const workbooks:any[] = [];
+  for (const summary of workbookItems) {
+    const passage = passageById.get(summary.passageId), catalog = passage ? await workbookForPassage(passage) : null, item = workbookItem(catalog, summary.itemKey);
+    const attempt = latestWorkbookAttempt.get(`${summary.passageId}:${summary.itemKey}`);
+    if (!catalog || !item || !attempt || attempt.correct === true || catalog.workbookKey !== summary.workbookKey) continue;
+    workbooks.push({ ...summary, prompt: item.prompt, groups: item.groups || [], source: item.source || "", response: Array.isArray(attempt.response?.responses) ? attempt.response.responses : [], answers: item.answers || [] });
+  }
+  const scope = rows<any>(await db.from("ready_exams").select("title,school,grade").eq("id", examId).single());
+  return { meta: { title: scope.title, school: scope.school, grade: scope.grade, studentName: student.name }, words: review.wordItems, questions, workbooks, counts: { word: review.wordItems.length, question: questions.length, workbook: workbooks.length } };
+}
 async function setQuestionBookmark(body: any, session: ReadySession) {
   const student = await studentForSession(session), examId = required(body.examId, "Exam", 80), questionId = required(body.questionId, "문제", 80), bookmarked = body.bookmarked === true;
   await studentExamAccess(examId, student);
@@ -1207,7 +1243,7 @@ async function dispatch(op: string, body: any, session: ReadySession | null) {
     case "student_login": return studentLogin(body); case "admin_login": return adminLogin(body); case "logout": return revokeSession(session as ReadySession);
     case "teacher_bootstrap": return teacherBootstrap(); case "delete_impact": return deleteImpact(body); case "create_student": return createStudent(body); case "set_student_code": return setStudentCode(body); case "delete_student": return deleteStudent(body);
     case "assign_scope_passages": return setScopePassages(body, false); case "set_scope_layout": return setScopeLayout(body); case "create_passage": return createPassage(body); case "update_passage": return updatePassage(body); case "delete_passage": return deletePassage(body); case "import_questions": return importQuestions(body); case "import_explanations": return importExplanations(body); case "factory_start": return factoryStart(body); case "factory_confirm": return factoryConfirm(body); case "factory_regenerate": return factoryRegenerate(body);
-    case "student_bootstrap": return studentBootstrap(session as ReadySession); case "student_passage": return studentPassage(body, session as ReadySession); case "word_lookup_meaning": return readerInlineGloss(body, session as ReadySession); case "save_reader_word": return saveReaderWord(body, session as ReadySession); case "remove_reader_word": return removeReaderWord(body, session as ReadySession); case "update_reader_word_meaning": return updateReaderWordMeaning(body, session as ReadySession); case "sentence_easy_translation": return sentenceEasyTranslation(body, session as ReadySession); case "sentence_structure": return sentenceStructure(body, session as ReadySession); case "student_questions": return studentQuestions(body, session as ReadySession); case "student_question_filters": return studentQuestionFilters(body, session as ReadySession); case "student_question_queue": return studentQuestionQueue(body, session as ReadySession); case "student_review_questions": return studentReviewQuestions(body, session as ReadySession); case "set_question_bookmark": return setQuestionBookmark(body, session as ReadySession); case "submit_attempt": return submitAttempt(body, session as ReadySession); case "student_workbook": return studentWorkbook(body, session as ReadySession); case "workbook_assistance": return workbookAssistance(body, session as ReadySession); case "set_workbook_bookmark": return setWorkbookBookmark(body, session as ReadySession); case "workbook_hint": return workbookHint(body, session as ReadySession); case "submit_workbook_attempt": return submitWorkbookAttempt(body, session as ReadySession);
+    case "student_bootstrap": return studentBootstrap(session as ReadySession); case "student_passage": return studentPassage(body, session as ReadySession); case "word_lookup_meaning": return readerInlineGloss(body, session as ReadySession); case "save_reader_word": return saveReaderWord(body, session as ReadySession); case "remove_reader_word": return removeReaderWord(body, session as ReadySession); case "update_reader_word_meaning": return updateReaderWordMeaning(body, session as ReadySession); case "sentence_easy_translation": return sentenceEasyTranslation(body, session as ReadySession); case "sentence_structure": return sentenceStructure(body, session as ReadySession); case "student_questions": return studentQuestions(body, session as ReadySession); case "student_question_filters": return studentQuestionFilters(body, session as ReadySession); case "student_question_queue": return studentQuestionQueue(body, session as ReadySession); case "student_review_questions": return studentReviewQuestions(body, session as ReadySession); case "student_review_export": return studentReviewExport(body, session as ReadySession); case "set_question_bookmark": return setQuestionBookmark(body, session as ReadySession); case "submit_attempt": return submitAttempt(body, session as ReadySession); case "student_workbook": return studentWorkbook(body, session as ReadySession); case "workbook_assistance": return workbookAssistance(body, session as ReadySession); case "set_workbook_bookmark": return setWorkbookBookmark(body, session as ReadySession); case "workbook_hint": return workbookHint(body, session as ReadySession); case "submit_workbook_attempt": return submitWorkbookAttempt(body, session as ReadySession);
     default: throw new ApiError(404, "알 수 없는 READY 작업입니다.");
   }
 }
