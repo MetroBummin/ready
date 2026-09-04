@@ -9,6 +9,23 @@ export function repairAnswerKeyArtifacts(catalog){
   return {catalog:copy,repairs};
 }
 
+export function normalizeStageEightChips(catalog){
+  const copy=structuredClone(catalog),repairs=[];
+  for(const stage of list(copy?.stages)){
+    if(Number(stage.stage)!==8)continue;
+    for(const item of list(stage.items)){
+      if(item.kind!=='reorder_groups'||!Array.isArray(item.groups))continue;
+      item.groups=item.groups.map((group,groupIndex)=>list(group).flatMap(chip=>{
+        const words=String(chip??'').trim().split(/\s+/u).filter(Boolean);
+        if(words.length>1)repairs.push({itemKey:item.key,groupIndex,chip:String(chip),words});
+        return words;
+      }));
+      item.groupTokenCounts=item.groups.map(group=>group.map(()=>1));
+    }
+  }
+  return {catalog:copy,repairs};
+}
+
 export function normalizeCatalogText(value){
   return String(value??'').normalize('NFKC').toLowerCase()
     .replace(/[‐‑‒–—−]/g,'-')
@@ -129,6 +146,7 @@ export function auditWorkbookCatalog(catalog,canonicalRows=[]){
       if(Number(item.pairCount)*2!==answers.length)errors.push({stage:stage.stage,itemKey:item.key,issue:'correction_pair_count'});
       else if(!correctionRestoresCanonical(item.prompt,answers,canonicalRows))errors.push({stage:stage.stage,itemKey:item.key,issue:'stage7_canonical_round_trip'});
     }
+    if(item.kind==='reorder_groups')for(const group of list(item.groups))for(const chip of list(group))if(/\s/u.test(String(chip??'').trim()))errors.push({stage:stage.stage,itemKey:item.key,issue:'stage8_multiword_chip'});
     if(Number(stage.stage)===9)for(const issue of auditStageNineItem(item,canonicalRows).issues)errors.push({stage:9,itemKey:item.key,issue});
   }
   return errors;
