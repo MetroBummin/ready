@@ -12,7 +12,7 @@ import { DONGA_LEEBYEONGMIN_L4_WORKBOOK } from "./workbook-donga-l4.mjs";
 import { validateQuestionSpec } from "./question-spec.mjs";
 import { deterministicClientContract, deterministicGrade, publicInteractionContract } from "./interaction-contract.mjs";
 import { WORKBOOK_TRANSLATION_GRADING_POLICY, workbookTranslationPass } from "./workbook-grading-policy.mjs";
-import { normalizeWorkbookAnswer, publicWorkbookAssistance, stageNineHint, workbookAssistanceMode } from "./workbook-assistance.mjs";
+import { normalizeWorkbookAnswer, publicWorkbookAssistance, stageNineHint, workbookAssistanceMode, workbookRecallCue } from "./workbook-assistance.mjs";
 import { CURRENT_QUESTION_PUBLICATION_VERSION } from "./question-pipeline.mjs";
 import { QUESTION_DIFFICULTIES, isQuestionQaScope, normalizeQuestionDifficulty, questionVisibleInScope } from "./question-difficulty.mjs";
 import { compareCanonicalRows, extractSentenceRows, factoryFallbackTargets, generateWorkbookCatalog, inspectFullWorkbookText } from "./workbook-factory.mjs";
@@ -32,7 +32,7 @@ function supabaseAdminKey() {
 }
 const db = createClient(Deno.env.get("SUPABASE_URL") ?? "", supabaseAdminKey(), { auth: { persistSession: false } });
 const adminOps = new Set(["teacher_bootstrap", "admin_learning_progress", "admin_learning_progress_detail", "admin_attempt_replay", "delete_impact", "assign_scope_passages", "set_scope_layout", "create_passage", "update_passage", "delete_passage", "create_student", "set_student_code", "delete_student", "import_questions", "import_explanations", "factory_start", "factory_confirm", "factory_regenerate"]);
-const studentOps = new Set(["student_bootstrap", "student_passage", "word_lookup_meaning", "save_reader_word", "remove_reader_word", "update_reader_word_meaning", "sentence_easy_translation", "sentence_structure", "student_questions", "student_question_filters", "student_question_queue", "student_review_questions", "student_review_export", "set_question_bookmark", "submit_attempt", "student_workbook", "workbook_assistance", "set_workbook_bookmark", "workbook_hint", "submit_workbook_attempt"]);
+const studentOps = new Set(["student_bootstrap", "student_passage", "word_lookup_meaning", "save_reader_word", "remove_reader_word", "update_reader_word_meaning", "sentence_easy_translation", "sentence_structure", "student_questions", "student_question_filters", "student_question_queue", "student_review_questions", "student_review_export", "set_question_bookmark", "submit_attempt", "student_workbook", "workbook_assistance", "workbook_recall_unlock", "set_workbook_bookmark", "workbook_hint", "submit_workbook_attempt"]);
 const publicOps = new Set(["student_login", "admin_login"]);
 // Match Breeze's free Gemini dictionary defaults. The API key remains a
 // Supabase Edge Function Secret and is never part of any public response.
@@ -1132,7 +1132,7 @@ async function studentWorkbook(body: any, session: ReadySession) {
       wordBank: Array.isArray(item.wordBank) ? item.wordBank : [],
       pairCount: Number(item.pairCount) || 0, subtype: clean(item.subtype, 40),
       assistance: workbookAssistanceMode(item),
-      grading: item.kind === "translation_ai" ? { mode: "ai" } : item.kind === "correction_pairs" ? { mode: "server_deterministic" } : { mode: "deterministic", answers: item.answers },
+      grading: item.kind === "translation_ai" ? { mode: "ai" } : item.kind === "correction_pairs" || [2, 3, 9].includes(Number(item.stage)) ? { mode: "server_deterministic" } : { mode: "deterministic", answers: item.answers },
       completed: latest.get(item.key) === true, lastResult: latest.get(item.key) ?? null, bookmarked: bookmarks.has(item.key),
     })),
   }));
@@ -1145,6 +1145,15 @@ async function workbookAssistance(body: any, session: ReadySession) {
   const passage = await studentPassageAccess(examId, passageId, student), catalog = await workbookForPassage(passage), item = workbookItem(catalog, itemKey);
   if (!catalog || !item || !workbookAssistanceMode(item)) throw new ApiError(404, "현재 검증 계약이 필요하지 않은 문제입니다.");
   return { itemKey, assistance: await publicWorkbookAssistance(item, sha256Hex) };
+}
+
+async function workbookRecallUnlock(body: any, session: ReadySession) {
+  const student = await studentForSession(session), examId = required(body.examId, "Exam", 80), passageId = required(body.passageId, "지문", 80), itemKey = required(body.itemKey, "워크북 문제", 120), slot = Number(body.slot);
+  const passage = await studentPassageAccess(examId, passageId, student), catalog = await workbookForPassage(passage), item = workbookItem(catalog, itemKey), contract = workbookAssistanceMode(item);
+  if (!catalog || !item || ![2, 3].includes(Number(item.stage)) || contract?.mode !== "recall_unlock" || !Number.isInteger(slot) || slot < 0 || slot >= item.answers.length) throw new ApiError(404, "현재 자동 완성할 수 없는 빈칸입니다.");
+  const cue = workbookRecallCue(body.cue, contract.recallMode), expected = workbookRecallCue(item.answers[slot], contract.recallMode);
+  if (!cue || cue !== expected) throw new ApiError(400, "첫 글자를 다시 확인해 주세요.");
+  return { slot, answer: item.answers[slot] };
 }
 
 function hintReceiptSecret() { return `${supabaseAdminKey()}:ready-workbook-hint-v1`; }
@@ -1326,7 +1335,7 @@ async function dispatch(op: string, body: any, session: ReadySession | null) {
     case "student_login": return studentLogin(body); case "admin_login": return adminLogin(body); case "logout": return revokeSession(session as ReadySession);
     case "teacher_bootstrap": return teacherBootstrap(); case "admin_learning_progress": return adminLearningProgress(body); case "admin_learning_progress_detail": return adminLearningProgressDetail(body); case "admin_attempt_replay": return adminAttemptReplay(body); case "delete_impact": return deleteImpact(body); case "create_student": return createStudent(body); case "set_student_code": return setStudentCode(body); case "delete_student": return deleteStudent(body);
     case "assign_scope_passages": return setScopePassages(body, false); case "set_scope_layout": return setScopeLayout(body); case "create_passage": return createPassage(body); case "update_passage": return updatePassage(body); case "delete_passage": return deletePassage(body); case "import_questions": return importQuestions(body); case "import_explanations": return importExplanations(body); case "factory_start": return factoryStart(body); case "factory_confirm": return factoryConfirm(body); case "factory_regenerate": return factoryRegenerate(body);
-    case "student_bootstrap": return studentBootstrap(session as ReadySession); case "student_passage": return studentPassage(body, session as ReadySession); case "word_lookup_meaning": return readerInlineGloss(body, session as ReadySession); case "save_reader_word": return saveReaderWord(body, session as ReadySession); case "remove_reader_word": return removeReaderWord(body, session as ReadySession); case "update_reader_word_meaning": return updateReaderWordMeaning(body, session as ReadySession); case "sentence_easy_translation": return sentenceEasyTranslation(body, session as ReadySession); case "sentence_structure": return sentenceStructure(body, session as ReadySession); case "student_questions": return studentQuestions(body, session as ReadySession); case "student_question_filters": return studentQuestionFilters(body, session as ReadySession); case "student_question_queue": return studentQuestionQueue(body, session as ReadySession); case "student_review_questions": return studentReviewQuestions(body, session as ReadySession); case "student_review_export": return studentReviewExport(body, session as ReadySession); case "set_question_bookmark": return setQuestionBookmark(body, session as ReadySession); case "submit_attempt": return submitAttempt(body, session as ReadySession); case "student_workbook": return studentWorkbook(body, session as ReadySession); case "workbook_assistance": return workbookAssistance(body, session as ReadySession); case "set_workbook_bookmark": return setWorkbookBookmark(body, session as ReadySession); case "workbook_hint": return workbookHint(body, session as ReadySession); case "submit_workbook_attempt": return submitWorkbookAttempt(body, session as ReadySession);
+    case "student_bootstrap": return studentBootstrap(session as ReadySession); case "student_passage": return studentPassage(body, session as ReadySession); case "word_lookup_meaning": return readerInlineGloss(body, session as ReadySession); case "save_reader_word": return saveReaderWord(body, session as ReadySession); case "remove_reader_word": return removeReaderWord(body, session as ReadySession); case "update_reader_word_meaning": return updateReaderWordMeaning(body, session as ReadySession); case "sentence_easy_translation": return sentenceEasyTranslation(body, session as ReadySession); case "sentence_structure": return sentenceStructure(body, session as ReadySession); case "student_questions": return studentQuestions(body, session as ReadySession); case "student_question_filters": return studentQuestionFilters(body, session as ReadySession); case "student_question_queue": return studentQuestionQueue(body, session as ReadySession); case "student_review_questions": return studentReviewQuestions(body, session as ReadySession); case "student_review_export": return studentReviewExport(body, session as ReadySession); case "set_question_bookmark": return setQuestionBookmark(body, session as ReadySession); case "submit_attempt": return submitAttempt(body, session as ReadySession); case "student_workbook": return studentWorkbook(body, session as ReadySession); case "workbook_assistance": return workbookAssistance(body, session as ReadySession); case "workbook_recall_unlock": return workbookRecallUnlock(body, session as ReadySession); case "set_workbook_bookmark": return setWorkbookBookmark(body, session as ReadySession); case "workbook_hint": return workbookHint(body, session as ReadySession); case "submit_workbook_attempt": return submitWorkbookAttempt(body, session as ReadySession);
     default: throw new ApiError(404, "알 수 없는 READY 작업입니다.");
   }
 }
