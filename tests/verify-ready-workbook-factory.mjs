@@ -228,7 +228,7 @@ const generatedRangeItem=generatedRange.stages.find(stage=>stage.stage===7).item
 assert.deepEqual(generatedRangeItem.sentenceIndexes,[1,2,3,4,5,6],'Generated Stage 7 must cover a contiguous 5-8 sentence range.');
 assert.equal(generatedRangeItem.pairCount,2);
 const noDerivedGrammar=generateWorkbookCatalog({title:'No derived grammar',workbookKey:'no-derived-grammar',rows:qualityRows,allowDerivedFallback:true});
-assert.deepEqual([6,7].map(stage=>noDerivedGrammar.stages.find(stageData=>stageData.stage===stage).items.length),[0,0],'Factory must not derive Stage 6 choices or Stage 7 errors.');
+assert.deepEqual([5,6,7].map(stage=>noDerivedGrammar.stages.find(stageData=>stageData.stage===stage).items.length),[0,0,0],'Factory must not guess publisher Stage 5-7 exercises from canonical prose.');
 const shuffledA=generateWorkbookCatalog({title:'Order',workbookKey:'order-seed',rows:qualityRows}),shuffledB=generateWorkbookCatalog({title:'Order',workbookKey:'order-seed',rows:qualityRows});
 const orderA=shuffledA.stages.find(stage=>stage.stage===8).items[0],orderB=shuffledB.stages.find(stage=>stage.stage===8).items[0],canonicalOrder=qualityRows[0].text.match(/[A-Za-z]+/g);
 assert.deepEqual(orderA.groups,orderB.groups,'Factory Stage 8 order must be deterministic by item seed.');
@@ -238,9 +238,8 @@ assert.notDeepEqual(orderA.groups[0],[...canonicalOrder.slice(1),canonicalOrder[
 assert.ok(orderA.groups[0].filter((token,index)=>token!==canonicalOrder[index]).length>=Math.ceil(canonicalOrder.length/2));
 assert.ok(shuffledA.stages.find(stage=>stage.stage===9).items.every(item=>!Object.hasOwn(item,'wordBank')),'Factory Stage 9 must not expose an answer word bank.');
 
-const derivedVerb=generateWorkbookCatalog({title:'Derived verb',workbookKey:'derived-verb',rows:[{text:'Let’s find out whether you fall into any of the following categories.',translation:'다음 항목을 확인하자.'}],allowDerivedFallback:true});
-const derivedVerbItem=derivedVerb.stages.find(stage=>stage.stage===5).items[0];
-assert.deepEqual({answer:derivedVerbItem.answers[0],hint:derivedVerbItem.hints[0]},{answer:'following',hint:'follow'},'A missing Stage 5 item may be recovered only from a clear canonical inflection.');
+const derivedVerb=generateWorkbookCatalog({title:'No suffix guessing',workbookKey:'no-suffix-guessing',rows:[{text:'Let’s find out whether you fall into any of the following categories.',translation:'다음 항목을 확인하자.'}],allowDerivedFallback:true});
+assert.equal(derivedVerb.stages.find(stage=>stage.stage===5).items.length,0,'An inflected-looking token cannot prove the publisher authored a Stage 5 slot.');
 
 const edge=readFileSync(resolve(root,'server/ready/index.ts'),'utf8'),admin=readFileSync(resolve(root,'ready/admin/app.js'),'utf8'),adminHtml=readFileSync(resolve(root,'ready/admin/index.html'),'utf8');
 assert.match(edge,/existingMode \? existingContext\.passage\.id : rows<string>\(await db\.rpc\("ready_create_passage_with_sentences"/,'Existing Passage finalization must reuse its passage_id instead of creating a passage.');

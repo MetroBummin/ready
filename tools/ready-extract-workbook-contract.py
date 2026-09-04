@@ -36,14 +36,28 @@ def norm(value: str) -> str:
 
 def canonical_form(value: str) -> str:
     """Normalize only typography that publisher text extraction can vary."""
-    value = re.sub(r"\s+([,.;:!?])", r"\1", norm(value).lower())
+    value = norm(value).lower().translate(str.maketrans({"‐": "-", "‑": "-", "‒": "-", "–": "-", "—": "-"}))
+    value = re.sub(r"\s+([,.;:!?-])", r"\1", value)
+    value = re.sub(r"([.!?;-])\s+", r"\1 ", value)
     value = re.sub(r"([.!?])([\"'])", r"\2\1", value)
     value = re.sub(r"\b(i|you|we|they)'re\b", r"\1 are", value)
     value = re.sub(r"\b(i)'m\b", r"\1 am", value)
     value = re.sub(r"\b(i|you|we|they)'ve\b", r"\1 have", value)
     value = re.sub(r"\b(i|you|he|she|it|we|they)'ll\b", r"\1 will", value)
     value = re.sub(r"\b(he|she|it|that|there|what|who)'s\b", r"\1 is", value)
+    value = re.sub(r"\blet's\b", "let us", value)
     return value
+
+
+def same_canonical(left: str, right: str) -> bool:
+    """Compare one publisher row with its corresponding canonical sentence.
+
+    PDF extraction may join a heading to its sentence or add a space at that
+    boundary.  Index alignment plus compact equality proves the same source
+    row without searching the whole passage or guessing slot boundaries.
+    """
+    left_value, right_value = canonical_form(left), canonical_form(right)
+    return left_value == right_value or re.sub(r"\s+", "", left_value) == re.sub(r"\s+", "", right_value)
 
 
 def clean_page(value: str) -> str:
@@ -52,10 +66,31 @@ def clean_page(value: str) -> str:
     return value
 
 
+def clean_answer_page(value: str) -> str:
+    """Remove repeated page furniture without discarding cross-page answers."""
+    value = re.sub(r"Answer Key[^\n]*", " ", value)
+    value = re.sub(r"10단계\s*WORKBOOK\s*정답[^\n]*", " ", value)
+    value = re.sub(r"-\s*\d+\s*-", " ", value)
+    return value
+
+
+def page_texts(reader: PdfReader) -> list[str]:
+    """Extract each PDF page once for the lifetime of this import.
+
+    Workbook stages and answer-key readers revisit the same pages many times.
+    Re-running pypdf extraction for every stage made a single workbook import
+    CPU-bound for minutes and encouraged operators to bypass the audited path.
+    """
+    cached = getattr(reader, "_ready_page_texts", None)
+    if cached is None:
+        cached = [page.extract_text() or "" for page in reader.pages]
+        setattr(reader, "_ready_page_texts", cached)
+    return cached
+
+
 def stage_pages(reader: PdfReader, stage: int) -> list[int]:
     found = []
-    for index, page in enumerate(reader.pages):
-        value = page.extract_text() or ""
+    for index, value in enumerate(page_texts(reader)):
         if "Answer Key" in value or "본문 외 지문" in value:
             continue
         if re.search(rf"워크북\s*{stage}", value):
@@ -67,7 +102,8 @@ def rows(reader: PdfReader, stage: int) -> list[tuple[str, str]]:
     pages = stage_pages(reader, stage)
     if not pages:
         raise ValueError(f"stage {stage}: pages missing")
-    value = "\n".join(clean_page(reader.pages[index].extract_text() or "") for index in pages)
+    texts = page_texts(reader)
+    value = "\n".join(clean_page(texts[index]) for index in pages)
     output, cursor, number = [], 0, 1
     while True:
         start_match = re.search(rf"(?<!\d){number}\.\s*", value[cursor:])
@@ -94,11 +130,23 @@ def cloze(template: str, canonical: str) -> list[str]:
     parts = re.split(r"_{5,}", template)
     if len(parts) < 2:
         raise ValueError("no blank frame")
-    pattern = "^" + "(.+?)".join(re.escape(part).replace(r"\ ", r"\s+") for part in parts) + "$"
-    match = re.match(pattern, canonical, flags=re.I)
-    if not match:
+    if any(not part and index not in (0, len(parts) - 1) for index, part in enumerate(parts)):
+        raise ValueError("adjacent blanks have no fixed boundary")
+    folded, cursor, answers = canonical.casefold(), 0, []
+    if parts[0]:
+        if not folded.startswith(parts[0].casefold()):
+            raise ValueError(f"frame does not reproduce canonical sentence: {template!r}")
+        cursor = len(parts[0])
+    for index, tail in enumerate(parts[1:], 1):
+        if tail:
+            at = folded.find(tail.casefold(), cursor)
+            if at < cursor:
+                raise ValueError(f"frame does not reproduce canonical sentence: {template!r}")
+            answers.append(norm(canonical[cursor:at])); cursor = at + len(tail)
+        elif index == len(parts) - 1:
+            answers.append(norm(canonical[cursor:])); cursor = len(canonical)
+    if cursor != len(canonical):
         raise ValueError(f"frame does not reproduce canonical sentence: {template!r}")
-    answers = [norm(value) for value in match.groups()]
     if any(not answer for answer in answers):
         raise ValueError("empty reconstructed answer")
     return answers
@@ -128,10 +176,13 @@ def cloze_in_corpus(template: str, corpus: str) -> list[str]:
 def choice_answers(prompt: str, groups: list[list[str]], corpus: str) -> list[str]:
     """Select the sole publisher option combination present in the corpus."""
     candidates = []
+    canonical_corpus = canonical_form(corpus)
+    compact_corpus = re.sub(r"\s+", "", canonical_corpus)
     for combination in itertools.product(*groups):
         values = iter(combination)
         sentence = norm(re.sub(r"\[[^\[\]]+\]", lambda _match: next(values), prompt))
-        if sentence.lower() in corpus.lower():
+        candidate = canonical_form(sentence)
+        if candidate in canonical_corpus or re.sub(r"\s+", "", candidate) in compact_corpus:
             candidates.append(list(combination))
     unique = {tuple(candidate) for candidate in candidates}
     if len(unique) != 1:
@@ -166,7 +217,7 @@ def stage5_answer_items(reader: PdfReader, expected_count: int) -> list[list[str
     textbook section is the unique answer-key block whose numbered row count
     matches the Stage 5 exercise count extracted from the textbook pages.
     """
-    answer_text = "\n".join((page.extract_text() or "") for page in reader.pages if "Answer Key" in (page.extract_text() or ""))
+    answer_text = "\n".join(clean_answer_page(value) for value in page_texts(reader) if "Answer Key" in value)
     candidates: list[list[list[str]]] = []
     for marker in re.finditer(r"워크북\s*5\s*동사형\s*연습", answer_text):
         following = answer_text[marker.end():]
@@ -311,12 +362,12 @@ def reorder_contract(prompt: str, groups: list[list[str]], candidates: list[str]
 
 def stage7_prompt_items(reader: PdfReader) -> list[tuple[str, int, str]]:
     """Read stage 7 passages; vector underlines are not needed for the response contract."""
-    page_texts = []
+    stage_texts = []
     for index in stage_pages(reader, 7):
-        value = reader.pages[index].extract_text() or ""
+        value = page_texts(reader)[index]
         if "본문 외 지문" not in value:
-            page_texts.append(value)
-    value = " ".join(page_texts)
+            stage_texts.append(value)
+    value = " ".join(stage_texts)
     headings = list(re.finditer(r"(문맥상|어법상)\s*어색한 것 찾기", value))
     output = []
     for heading_index, heading in enumerate(headings):
@@ -331,7 +382,7 @@ def stage7_prompt_items(reader: PdfReader) -> list[tuple[str, int, str]]:
 
 
 def stage7_answer_items(reader: PdfReader) -> list[tuple[str, int, list[tuple[str, str]]]]:
-    value = " ".join((page.extract_text() or "") for page in reader.pages if "Answer Key" in (page.extract_text() or ""))
+    value = " ".join(clean_answer_page(text) for text in page_texts(reader) if "Answer Key" in text)
     output = []
     for marker in re.finditer(r"워크북\s*7\s*어색한 곳 찾기 연습", value):
         following = value[marker.end():]
@@ -356,6 +407,41 @@ def stage7_answer_items(reader: PdfReader) -> list[tuple[str, int, list[tuple[st
     return output
 
 
+def minimal_correction_pair(prompt: str, wrong: str, correct: str) -> tuple[str, str]:
+    """Reduce a publisher's underlined clause to the text the learner changes.
+
+    Answer keys often repeat the entire underlined clause even when one word is
+    wrong.  Stage 7 asks for the wrong expression and its replacement, so the
+    response slots should contain the smallest unambiguous changed span.
+    """
+    wrong_words, correct_words = norm(wrong).split(), norm(correct).split()
+    comparable = lambda value: canonical_form(value).strip(".,;:!?\"'")
+    prefix = 0
+    while prefix < min(len(wrong_words), len(correct_words)) and comparable(wrong_words[prefix]) == comparable(correct_words[prefix]):
+        prefix += 1
+    suffix = 0
+    while suffix < min(len(wrong_words) - prefix, len(correct_words) - prefix) and comparable(wrong_words[-1 - suffix]) == comparable(correct_words[-1 - suffix]):
+        suffix += 1
+    wrong_end = len(wrong_words) - suffix if suffix else len(wrong_words)
+    correct_end = len(correct_words) - suffix if suffix else len(correct_words)
+    short_wrong = wrong_words[prefix:wrong_end]
+    short_correct = correct_words[prefix:correct_end]
+    if not short_wrong or not short_correct:
+        if suffix:
+            wrong_end += 1
+            correct_end += 1
+            short_wrong = wrong_words[prefix:wrong_end]
+            short_correct = correct_words[prefix:correct_end]
+        elif prefix:
+            prefix -= 1
+            short_wrong = wrong_words[prefix:wrong_end]
+            short_correct = correct_words[prefix:correct_end]
+    candidate = (norm(" ".join(short_wrong)), norm(" ".join(short_correct)))
+    if not all(candidate):
+        return norm(wrong), norm(correct)
+    return candidate
+
+
 def stage7_items(reader: PdfReader, prefix: str) -> list[dict]:
     prompts, answers = stage7_prompt_items(reader), stage7_answer_items(reader)
     queues: dict[tuple[str, int], list[list[tuple[str, str]]]] = {}
@@ -366,11 +452,13 @@ def stage7_items(reader: PdfReader, prefix: str) -> list[dict]:
         candidates = queues.get((family, number), [])
         if not candidates:
             raise ValueError(f"stage 7 {family} item {number}: answer missing")
-        pairs = candidates.pop(0)
+        publisher_pairs = candidates.pop(0)
+        pairs = [minimal_correction_pair(prompt, wrong, correct) for wrong, correct in publisher_pairs]
         flat_answers = [value for pair in pairs for value in pair]
         items.append({"key": f"{prefix}-s7-{family}-{number:02d}", "stage": 7, "number": index,
                       "kind": "correction_pairs", "source": "", "prompt": prompt,
-                      "pairCount": len(pairs), "subtype": family, "answers": flat_answers})
+                      "pairCount": len(pairs), "subtype": family, "answers": flat_answers,
+                      "publisherAnswers": [value for pair in publisher_pairs for value in pair]})
     return items
 
 
@@ -409,8 +497,8 @@ def compile_catalog(pdf: Path, key: str, title: str, prefix: str) -> tuple[dict,
                     answers = stage5_answers[index]
                     if len(hints) != len(answers): raise ValueError("verb hints and publisher answer slots differ")
                     reconstructed = fill_frame(frame, answers)
-                    if canonical_corpus.count(canonical_form(reconstructed)) != 1:
-                        raise ValueError("publisher slot answers do not uniquely reconstruct a canonical sentence")
+                    if index >= len(english) or not same_canonical(reconstructed, english[index]):
+                        raise ValueError("publisher slot answers do not reconstruct the corresponding canonical sentence")
                     item = {"kind": "verb_form", "source": source, "prompt": frame, "hints": hints, "answers": answers}
                 elif stage == 6:
                     groups = [[norm(option) for option in value.split("/")] for value in re.findall(r"\[([^\[\]]+)\]", prompt)]

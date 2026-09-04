@@ -58,17 +58,17 @@ Factory에는 두 target mode가 있다.
 `passage_id`로 insert하며, `ready_workbook_catalogs.passage_id` 기본키가 동시 중복도 막는다.
 
 Factory Stage 5·6은 canonical 문장별 coverage를 계산하고, 출판사 source에서 검증된 문항이
-없는 sentence만 Gemini fallback 대상으로 보낸다. Stage 7의 출판사 passage/range 문항은
+없는 sentence만 Gemini fallback 대상으로 보낸다. PDF source의 5단계는 괄호별 hint와
+Answer Key의 slash별 answer를 source of truth로 사용하며, 페이지 경계를 넘어간 답도 이어서
+읽는다. 영어 표면형의 접미사만 보고 동사를 추측하는 fallback은 사용하지 않는다. Stage 7의 출판사 passage/range 문항은
 여러 correction pair를 하나의 exercise로 보존하며, source가 전혀 없을 때만 문장별 fallback을
 사용한다. 최종 5·6·7 coverage가 기대 수량보다 적으면 바로 게시하지 않고 Admin 확인을 요구한다.
 Stage 8의 generated order bank는 한 영어 단어당 chip 하나를 사용한다.
 
-Gemini fallback 뒤에도 6·7단계가 비면 검증된 5·6단계의 answer boundary에서 오답 선택지와
-correction pair를 결정론적으로 파생한다. 파생 문항도 정답을 대입했을 때 canonical English가
-정확히 복원되는 경우만 READY이며, metrics의 `derivedFallbackExercises`로 별도 집계한다.
-재생성은 기존 PDF/source exercise를 우선 재사용하고 AI 호출 없이 실행한다. 비어 있는
-5단계는 canonical English에서 일반 동사 활용 규칙으로 base form이 명확한 경우만
-결정론적으로 복구하며, 불확실하면 기존 catalog를 유지하고 재생성을 멈춘다.
+7단계 Answer Key가 밑줄 친 전체 절을 반복하더라도 학생 응답 contract에는 실제로 달라진
+최소 표현만 저장한다. 원문 왕복 검증에는 출판사 전체 표현 snapshot을 별도로 사용한다.
+Gemini fallback 뒤에도 5·6·7단계가 비면 추측 문항을 만들지 않고 불완전 상태로 보고한다.
+재생성은 기존 PDF/source exercise를 우선 재사용하고, 검증하지 못한 exercise는 INVALID로 남긴다.
 PDF에서 추출한 전체 `sourceExercises`는 Factory job에만 보존한다. catalog provenance에는
 문서 해시·파일명·추출 수량 등 재현에 필요한 요약만 남겨 원본을 중복 저장하지 않는다.
 Edge 재생성은 자원 한도 안에서 끝나도록 단계별 최대 6문장의 Gemini batch를 한 차례만

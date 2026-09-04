@@ -224,11 +224,16 @@ const adjacentStage8=NE_MINBYEONGCHEON_L2_WORKBOOK.stages.find(stage=>stage.stag
 assert.equal(adjacentStage8.groups.length,1,'Whitespace-only Stage 8 PDF splits must remain one sentence interaction');
 assert.deepEqual(adjacentStage8.answers,['the clues are used to find the person who committed the crime'],'Merged Stage 8 groups must preserve the publisher sentence');
 const importer=read('tools/ready-extract-workbook-contract.py');
+const mockWorkbookImporter=read('tools/ready-extract-mock-workbook-contract.py');
 assert.match(importer,/stage5_answer_items[\s\S]*value\.split\("\/"\)/,'Stage 5 answers must come from publisher Answer Key separators');
-assert.match(importer,/fill_frame\(frame, answers\)[\s\S]*canonical_corpus/,'Stage 5 publisher slots must round-trip to the canonical corpus');
+assert.match(importer,/fill_frame\(frame, answers\)[\s\S]*same_canonical\(reconstructed, english\[index\]\)/,'Stage 5 publisher slots must round-trip to the corresponding canonical sentence');
 assert.match(importer,/reorder_contract\(prompt, groups, reorder_corpus\)/,'Stage 8 answers must be recovered from fixed prompt boundaries against the publisher corpus');
 assert.match(importer,/merge_adjacent_reorder_groups\(prompt, groups\)/,'Stage 8 must merge whitespace-only PDF presentation splits');
 assert.match(importer,/reorder answers do not round-trip to canonical sentence/,'Stage 8 importer must fail closed when its reconstructed sentence drifts');
+assert.match(importer,/minimal_correction_pair[\s\S]*comparable/,'Stage 7 must localize publisher full-clause corrections despite terminal punctuation differences');
+assert.match(mockWorkbookImporter,/current_question[\s\S]*grouped\.setdefault\(current_question/,'Combined mock-exam continuation pages must stay attached to their current passage');
+assert.match(mockWorkbookImporter,/marker_paired_rows[\s\S]*answer_start[\s\S]*answer_end/,'Combined mock-exam Stage 5 must follow publisher answer ids instead of display numbering');
+assert.match(mockWorkbookImporter,/publisher_frame_not_safely_structured[\s\S]*derivedFallbacks/,'Unsafe mock-exam writing frames must remain explicit audited fallbacks');
 assert.match(app,/placeholder="\$\{esc\(hint\|\|'\'\)\}"/,'Stage 5 base verbs must be input placeholders, not exposed labels');
 assert.match(app,/reserved=recall\?item\.grading\?\.answers\?\.\[slot\]/,'Recall slots must reserve the completed answer width before reveal');
 assert.match(app,/function syncWorkbookSlotWidth\(input\)[^\n]*long-slot/,'Typed blank slots must grow and promote long responses to a wide field');

@@ -333,6 +333,16 @@ function correctionRoundTrip(prompt, flatAnswers, rows) {
   visit(clean(prompt, 6_000), 0);
   return matches.size === 1 ? matches.values().next().value : null;
 }
+function minimalCorrectionPair(wrong, correct) {
+  const left = clean(wrong).split(/\s+/), right = clean(correct).split(/\s+/), comparable = value => fold(value).replace(/^[^a-z0-9]+|[^a-z0-9]+$/g, '');
+  let prefix = 0, suffix = 0;
+  while (prefix < Math.min(left.length, right.length) && comparable(left[prefix]) === comparable(right[prefix])) prefix += 1;
+  while (suffix < Math.min(left.length - prefix, right.length - prefix) && comparable(left[left.length - 1 - suffix]) === comparable(right[right.length - 1 - suffix])) suffix += 1;
+  let leftEnd = suffix ? left.length - suffix : left.length, rightEnd = suffix ? right.length - suffix : right.length;
+  if (prefix === leftEnd || prefix === rightEnd) { if (suffix) { leftEnd += 1; rightEnd += 1; } else if (prefix) prefix -= 1; }
+  const localized = [clean(left.slice(prefix, leftEnd).join(' ')), clean(right.slice(prefix, rightEnd).join(' '))];
+  return localized.every(Boolean) ? localized : [clean(wrong), clean(correct)];
+}
 function publisherStage7Exercises(text, rows) {
   const prompts = stage7PromptItems(text), answers = stage7AnswerItems(text), resolved = new Map(), selectedSections = new Set();
   for (let promptIndex = 0; promptIndex < prompts.length; promptIndex += 1) {
@@ -355,8 +365,8 @@ function publisherStage7Exercises(text, rows) {
       exercises.push({ type: 'error_correction', number, sourceNumber, subtype: promptItem.family, prompt: promptItem.prompt, answers: [], answer: '', canonicalStart: null, canonicalEnd: null, page: null, label: '워크북 7 어색한 곳 찾기 연습', provenance: { origin: 'publisher_prompt' } });
       continue;
     }
-    const flat = match.answerItem.pairs.flat();
-    exercises.push({ type: 'error_correction', number, sourceNumber, subtype: promptItem.family, prompt: promptItem.prompt, answers: flat, answer: match.answerItem.pairs.map(pair => `${pair[0]} → ${pair[1]}`).join(' / '), canonicalStart: match.restored.span.start, canonicalEnd: match.restored.span.end, page: null, label: '워크북 7 어색한 곳 찾기 연습', provenance: { origin: 'publisher_answer_key' } });
+    const publisherPairs = match.answerItem.pairs, localized = publisherPairs.map(pair => minimalCorrectionPair(...pair));
+    exercises.push({ type: 'error_correction', number, sourceNumber, subtype: promptItem.family, prompt: promptItem.prompt, answers: localized.flat(), answer: localized.map(pair => `${pair[0]} → ${pair[1]}`).join(' / '), publisherAnswers: publisherPairs.flat(), canonicalStart: match.restored.span.start, canonicalEnd: match.restored.span.end, page: null, label: '워크북 7 어색한 곳 찾기 연습', provenance: { origin: 'publisher_answer_key' } });
   }
   return exercises;
 }
@@ -469,8 +479,8 @@ function fullWorkbookItems(sourceExercises, rows, prefix) {
       }
     }
     if (stage === 7) {
-      const pairs = sourceCorrections(source), pairCount = pairs.length / 2, restored = correctionRoundTrip(prompt, pairs, rows);
-      if (pairCount >= 2 && pairCount <= 4 && restored) byStage.get(7).push(item(7, number, key, { kind: 'correction_pairs', source: '', prompt, pairCount, subtype: stage7Subtype || 'passage', answers: pairs, canonicalStart: restored.span.start, canonicalEnd: restored.span.end, provenance: source.provenance }));
+      const pairs = sourceCorrections(source), publisherAnswers = Array.isArray(source?.publisherAnswers) ? source.publisherAnswers.map(value => clean(value, 300)).filter(Boolean) : pairs, pairCount = pairs.length / 2, restored = publisherAnswers.length === pairs.length ? correctionRoundTrip(prompt, publisherAnswers, rows) : null;
+      if (pairCount >= 2 && pairCount <= 4 && restored) byStage.get(7).push(item(7, number, key, { kind: 'correction_pairs', source: '', prompt, pairCount, subtype: stage7Subtype || 'passage', answers: pairs, publisherAnswers, canonicalStart: restored.span.start, canonicalEnd: restored.span.end, provenance: source.provenance }));
     }
   }
   return byStage;
@@ -499,8 +509,8 @@ function normalizeAiItem(stage, raw, rows, prefix, number) {
 
 function validateItem(stage, candidate, rowByNumber, canonicalRows) {
   if (stage === 7) {
-    const sourceBacked = !!candidate.provenance, maxPairs = sourceBacked ? 4 : 3, restored = correctionRoundTrip(candidate.prompt, candidate.answers || [], canonicalRows);
-    return candidate.kind === 'correction_pairs' && candidate.pairCount >= 2 && candidate.pairCount <= maxPairs && candidate.answers?.length === candidate.pairCount * 2 && restored ? '' : 'stage7_round_trip';
+    const sourceBacked = !!candidate.provenance, maxPairs = sourceBacked ? 4 : 3, validationAnswers = candidate.publisherAnswers || candidate.answers || [], restored = correctionRoundTrip(candidate.prompt, validationAnswers, canonicalRows);
+    return candidate.kind === 'correction_pairs' && candidate.pairCount >= 2 && candidate.pairCount <= maxPairs && candidate.answers?.length === candidate.pairCount * 2 && validationAnswers.length === candidate.answers.length && restored ? '' : 'stage7_round_trip';
   }
   const row = rowByNumber.get(candidate.number); if (!row && stage !== 6) return 'missing_canonical_sentence';
   const en = clean(row?.text), ko = clean(row?.translation);
@@ -517,34 +527,6 @@ function validateItem(stage, candidate, rowByNumber, canonicalRows) {
   if (stage === 8) return candidate.kind === 'reorder_groups' && candidate.answers?.[0] && fold(candidate.answers[0]) === fold(words(en).join(' ')) ? '' : 'stage8_round_trip';
   if (stage === 9) return candidate.kind === 'blank_input' && fold(candidate.answers?.join(' ')) === fold(words(en).join(' ')) ? '' : 'stage9_reference';
   return 'unsupported_stage';
-}
-
-function simpleVerbHint(answer) {
-  const value = clean(answer, 160), lower = value.toLowerCase();
-  const irregular = { am: 'be', is: 'be', are: 'be', was: 'be', were: 'be', has: 'have', had: 'have', does: 'do', did: 'do' };
-  if (irregular[lower]) return irregular[lower];
-  if (!/^[A-Za-z]+$/.test(value)) return '';
-  if (lower.endsWith('ying') && value.length > 5) return `${value.slice(0, -4)}ie`;
-  if (lower.endsWith('ing') && value.length > 5) {
-    let root = value.slice(0, -3);
-    if (/([b-df-hj-np-tv-z])\1$/i.test(root)) root = root.slice(0, -1);
-    return root;
-  }
-  if (lower.endsWith('ied') && value.length > 4) return `${value.slice(0, -3)}y`;
-  if (lower.endsWith('ed') && value.length > 4) return value.slice(0, -2);
-  if (lower.endsWith('ies') && value.length > 4) return `${value.slice(0, -3)}y`;
-  if (lower.endsWith('s') && !lower.endsWith('ss') && value.length > 3) return value.slice(0, -1);
-  return '';
-}
-function addDerivedVerbFallback(generated, canonical, prefix) {
-  const stageFiveNumbers = new Set((generated.get(5) || []).map(candidate => candidate.number));
-  for (const row of canonical) {
-    if (stageFiveNumbers.has(row.index)) continue;
-    const answer = words(row.text).find(value => simpleVerbHint(value));
-    const hint = simpleVerbHint(answer), prompt = answer ? replaceOne(row.text, answer) : '';
-    const candidate = item(5, row.index, factoryKey(prefix, 5, row.index), { kind: 'verb_form', source: row.translation, prompt, hints: [hint], answers: [answer], derivation: 'deterministic_verb_form' });
-    if (answer && hint && !validateItem(5, candidate, new Map([[row.index, row]]), canonical)) { generated.get(5).push(candidate); stageFiveNumbers.add(row.index); }
-  }
 }
 
 export function factoryFallbackTargets(catalog, rows, sourceExercises = []) {
@@ -569,7 +551,8 @@ export function generateWorkbookCatalog({ title, workbookKey, rows, ai = {}, sou
   });
   }
   const publisherCounts = Object.fromEntries([5, 6, 7].map(stage => [stage, sourceExercises.filter(source => sourceStage(source?.type) === stage && clean(source?.prompt) && (stage === 7 || clean(source?.answer) || (Array.isArray(source?.answers) && source.answers.length))).length]));
-  if (allowDerivedFallback) addDerivedVerbFallback(generated, canonical, prefix);
+  // Stage 5 remains source-backed. Surface suffixes cannot establish that a
+  // token was a publisher-authored verb blank, so missing rows stay private.
   const stages = FACTORY_STAGES.map(stage => {
     const valid = [];
     for (const candidate of generated.get(stage) || []) { const reason = validateItem(stage, candidate, rowByNumber, canonical); if (reason) drops.push({ stage, number: candidate.number, reason }); else valid.push(candidate); }
