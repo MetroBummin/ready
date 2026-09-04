@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { compareCanonicalRows, extractSentenceRows, factoryFallbackTargets, generateWorkbookCatalog, inspectFullWorkbookText, semanticWorkbookType } from '../server/ready/workbook-factory.mjs';
+import { compareCanonicalRows, extractSentenceRows, factoryFallbackTargets, generateWorkbookCatalog, inspectFullWorkbookText, readyStageForSemanticType, semanticWorkbookType } from '../server/ready/workbook-factory.mjs';
 
 const root=resolve(dirname(fileURLToPath(import.meta.url)),'..');
 const fixture=name=>readFileSync(resolve(root,'tests/fixtures',name),'utf8');
@@ -23,6 +23,8 @@ const mock=inspectFullWorkbookText(fixture('workbook-factory-mock.txt'));
 assert.equal(mock.fullWorkbook,true);
 assert.equal(semanticWorkbookType('Paragraph ordering'),'paragraph_ordering');
 assert.equal(semanticWorkbookType('Writing'),'writing');
+assert.equal(readyStageForSemanticType('paragraph_ordering'),0,'A publisher Workbook 9 paragraph-order section must not become READY Stage 9.');
+assert.equal(readyStageForSemanticType('writing'),9,'Semantic writing maps to READY Stage 9 even when the publisher prints Workbook 10.');
 
 // Case C: passage-only starts with reviewable rows; edits, deletion, insertion and
 // re-numbering are all represented by the final row order passed to generation.
@@ -38,16 +40,23 @@ const reviewed=[{text:'Humans excel at visual imagery.',translation:'인간은 �
 const catalog=generateWorkbookCatalog({title:'Golden',workbookKey:'golden',rows:reviewed,ai:{5:[{sentenceIndex:1,prompt:'Humans excel at visual ____________.',hint:'image',answer:'imagery'}],6:[{sentenceIndex:2,prompt:'They improve when they reflect on ____________.',wrong:'feedforward',answer:'feedback'}]}});
 assert.deepEqual(catalog.stages.map(stage=>stage.stage),[2,3,4,5,6,7,8,9]);
 assert.equal(catalog.stages.find(stage=>stage.stage===2).items[0].number,1);
-assert.equal(catalog.stages.find(stage=>stage.stage===9).items.length,3);
-assert.equal(catalog.stages.find(stage=>stage.stage===9).items[0].prompt,'______________','Generated Stage 9 must use the safe whole-sentence fallback');
-assert.deepEqual(catalog.stages.find(stage=>stage.stage===9).items[0].answers,[reviewed[0].text],'Stage 9 fallback must preserve punctuation, numbers, and the complete canonical sentence');
-assert.equal(Object.hasOwn(catalog.stages.find(stage=>stage.stage===9).items[0],'wordBank'),false,'Generated Stage 9 must not expose a full-answer word bank');
+assert.equal(catalog.stages.find(stage=>stage.stage===9).items.length,0,'Factory must not invent whole-sentence writing when no publisher writing exercise exists.');
 assert.equal(catalog.stages.find(stage=>stage.stage===5).items.length,1);
 assert.equal(catalog.stages.find(stage=>stage.stage===6).items.length,1);
 assert.equal(catalog.stages.find(stage=>stage.stage===7).items.length,0,'Stage 7 must not generate one error per sentence.');
 assert.equal(catalog.metrics.validatorDrop,0);
 assert.ok(catalog.stages.find(stage=>stage.stage===8).items[0].groups[0].every(token=>!token.includes(' ')),'Factory Stage 8 must render one English word per chip.');
 assert.deepEqual(catalog.metrics.stageCoverage[8],{ready:3,expected:3});
+assert.deepEqual(catalog.metrics.stageCoverage[9],{ready:0,expected:0},'Absent publisher writing is unsupported, not a synthetic sentence-count target.');
+
+const semanticWriting=generateWorkbookCatalog({title:'Semantic writing',workbookKey:'semantic-writing',rows:canonical,sourceExercises:[
+  {type:'paragraph_ordering',number:1,prompt:'Second / First',answer:'First / Second',provenance:{sourceWorkbookStage:9}},
+  {type:'writing',number:1,prompt:'Humans ____________.',answers:['excel at visual imagery'],source:'인간은 시각적 심상에 뛰어나다.',wordBank:['excel','visual imagery'],canonicalStart:1,canonicalEnd:1,provenance:{sourceWorkbookStage:10}},
+]});
+const semanticWritingItems=semanticWriting.stages.find(stage=>stage.stage===9).items;
+assert.equal(semanticWritingItems.length,1);
+assert.equal(semanticWritingItems[0].provenance.sourceWorkbookStage,10,'The semantic writing source is preserved even when its printed number is 10.');
+assert.equal(semanticWritingItems[0].prompt,'Humans ____________.');
 
 const qualityRows=[
   {text:'They have probably heard the news.',translation:'그들은 아마 그 소식을 들었을 것이다.'},
@@ -239,7 +248,7 @@ assert.ok(orderA.groups[0].every(token=>!token.includes(' ')),'Factory Stage 8 c
 assert.notDeepEqual(orderA.groups[0],canonicalOrder,'Factory Stage 8 must not start canonical.');
 assert.notDeepEqual(orderA.groups[0],[...canonicalOrder.slice(1),canonicalOrder[0]],'Factory Stage 8 must not use one-step rotation.');
 assert.ok(orderA.groups[0].filter((token,index)=>token!==canonicalOrder[index]).length>=Math.ceil(canonicalOrder.length/2));
-assert.ok(shuffledA.stages.find(stage=>stage.stage===9).items.every(item=>!Object.hasOwn(item,'wordBank')),'Factory Stage 9 must not expose an answer word bank.');
+assert.equal(shuffledA.stages.find(stage=>stage.stage===9).items.length,0,'Passage-only generation must keep Stage 9 private without a publisher writing frame.');
 
 const derivedVerb=generateWorkbookCatalog({title:'No suffix guessing',workbookKey:'no-suffix-guessing',rows:[{text:'Let’s find out whether you fall into any of the following categories.',translation:'다음 항목을 확인하자.'}],allowDerivedFallback:true});
 assert.equal(derivedVerb.stages.find(stage=>stage.stage===5).items.length,0,'An inflected-looking token cannot prove the publisher authored a Stage 5 slot.');

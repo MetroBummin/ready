@@ -80,19 +80,13 @@ export function auditStageNineItem(item,canonicalRows=[]){
   const span=englishMatches.length===1?englishMatches[0]:sourceMatches.length===1?sourceMatches[0]:suffixSpan;
   const issues=[];
   if(!span)issues.push('canonical_unmapped');
-  else if(span.rows.length>1)issues.push('multiple_canonical_sentences');
-  else if(normalizeCatalogText(reconstructed)!==normalizeCatalogText(span.rows[0].text)){
-    const expected=normalizeCatalogText(span.rows[0].text);
+  else if(normalizeCatalogText(reconstructed)!==normalizeCatalogText(span.rows.map(row=>row.text).join(' '))){
+    const expected=normalizeCatalogText(span.rows.map(row=>row.text).join(' '));
     issues.push(actual&&expected&&(actual.includes(expected)||expected.includes(actual))?'partial_answer':'canonical_mismatch');
   }
   if(joinedWithoutWhitespace(reconstructed))issues.push('sentence_joined_without_whitespace');
   if(leaksFullAnswer(item))issues.push('word_bank_leaks_answer');
   return {itemKey:item.key,reconstructed,span,issues:[...new Set(issues)]};
-}
-
-function fallbackItem(item,row,key,reason){
-  return {...item,key,source:String(row.translation||''),prompt:'______________',answers:[String(row.text||'')],wordBank:[],
-    provenance:{...(item.provenance||{}),qaRepair:'stage9_whole_sentence_v1',qaReason:reason,canonicalSentenceIndex:row.sentence_index}};
 }
 
 export function repairStageNineCatalog(catalog,canonicalRows=[]){
@@ -103,11 +97,10 @@ export function repairStageNineCatalog(catalog,canonicalRows=[]){
     const audit=auditStageNineItem(item,canonicalRows);
     if(!audit.issues.length){next.push(item);continue;}
     if(!audit.span){unresolved.push(audit);next.push(item);continue;}
-    const structural=audit.issues.some(issue=>['multiple_canonical_sentences','partial_answer','canonical_mismatch','sentence_joined_without_whitespace'].includes(issue));
-    if(structural){
-      audit.span.rows.forEach((row,index)=>next.push(fallbackItem(item,row,index===0?item.key:`${item.key}-part-${index+1}`,audit.issues.join(','))));
-    }else next.push({...item,wordBank:[],provenance:{...(item.provenance||{}),qaRepair:'stage9_word_bank_removed_v1',qaReason:audit.issues.join(',')}});
-    repairs.push({...audit,replacementCount:structural?audit.span.rows.length:1});
+    const structural=audit.issues.some(issue=>['partial_answer','canonical_mismatch','sentence_joined_without_whitespace'].includes(issue));
+    if(structural){unresolved.push(audit);next.push(item);continue;}
+    next.push({...item,wordBank:[],provenance:{...(item.provenance||{}),qaRepair:'stage9_word_bank_removed_v1',qaReason:audit.issues.join(',')}});
+    repairs.push({...audit,replacementCount:1});
   }
   stage.items=next.map((item,index)=>({...item,number:index+1}));
   return {catalog:copy,repairs,unresolved};

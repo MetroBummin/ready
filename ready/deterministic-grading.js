@@ -39,21 +39,25 @@ export function gradeLocalWorkbook(contract={},responses=[],{usedFullAnswerHint=
   return {valid:true,correct,completedAfterHint:completed&&usedFullAnswerHint,answers:correct?[]:answers,slotResults,needsServer:false};
 }
 
-export function gradeWorkbookCorrectionPairs(answers=[],responses=[]){
+export function gradeWorkbookCorrectionPairs(answers=[],responses=[],{allowIncomplete=false}={}){
   const expected=list(answers),values=list(responses);
-  if(!expected.length||expected.length%2!==0||values.length!==expected.length||values.some(value=>!String(value??'').trim()))return {valid:false,correct:false,slotResults:[]};
+  if(!expected.length||expected.length%2!==0||values.length!==expected.length||(!allowIncomplete&&values.some(value=>!String(value??'').trim())))return {valid:false,correct:false,slotResults:[],alignedAnswers:[]};
   const pairKey=(left,right)=>`${normalizeDeterministicAnswer(left)}\u0000${normalizeDeterministicAnswer(right)}`;
-  const remaining=new Map();
+  const remaining=new Map(),expectedPairs=[];
   for(let index=0;index<expected.length;index+=2){
     const key=pairKey(expected[index],expected[index+1]);
-    remaining.set(key,(remaining.get(key)||0)+1);
+    expectedPairs.push({key,answers:[expected[index],expected[index+1]],used:false});
+    const indexes=remaining.get(key)||[];indexes.push(expectedPairs.length-1);remaining.set(key,indexes);
   }
-  const slotResults=Array(values.length).fill(false);
+  const slotResults=Array(values.length).fill(false),matchedPairIndexes=Array(values.length/2).fill(-1);
   for(let index=0;index<values.length;index+=2){
-    const key=pairKey(values[index],values[index+1]),count=remaining.get(key)||0;
-    if(count>0){slotResults[index]=slotResults[index+1]=true;remaining.set(key,count-1);}
+    if(!String(values[index]??'').trim()||!String(values[index+1]??'').trim())continue;
+    const key=pairKey(values[index],values[index+1]),indexes=remaining.get(key)||[],matched=indexes.find(pairIndex=>!expectedPairs[pairIndex].used);
+    if(matched!==undefined){expectedPairs[matched].used=true;matchedPairIndexes[index/2]=matched;slotResults[index]=slotResults[index+1]=true;}
   }
-  return {valid:true,correct:slotResults.every(Boolean),slotResults};
+  const unmatched=expectedPairs.map((pair,index)=>pair.used?-1:index).filter(index=>index>=0),alignedAnswers=[];
+  matchedPairIndexes.forEach(pairIndex=>{const resolved=pairIndex>=0?pairIndex:unmatched.shift();alignedAnswers.push(...(expectedPairs[resolved]?.answers||['','']));});
+  return {valid:true,correct:slotResults.every(Boolean),slotResults,alignedAnswers};
 }
 
 export function revealLocalWorkbook(contract={},responses=[]){

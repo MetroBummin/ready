@@ -383,13 +383,13 @@ export function inspectFullWorkbookText(text, expectedRows = null) {
   const stageFourPairs = candidate.filter(item => isEnglish(item.prompt) && isKorean(item.answer)).map(item => ({ text: item.prompt, translation: item.answer }));
   const prose = clean(text, 80_000).split(/\r?\n/).filter(line => !/^\s*\d+[.)]/.test(line) && semanticWorkbookType(line) === 'unknown' && !/answer\s*key|정답\s*(및|표|해설)?/i.test(line)).join('\n');
   const extracted = extractSentenceRows(prose), canonicalSelection = chooseCanonicalWorkbookRows(text, expectedRows), canonicalRows = canonicalSelection.rows, rows = canonicalRows.length ? canonicalRows : stageFourPairs.length ? stageFourPairs : extracted.rows;
-  const inlineExercises = blocks.flatMap(block => numberedPairs(block.body).map(item => ({ ...item, type: semanticWorkbookType(block.title), page: block.page, label: block.title }))), publisherExercises = canonicalRows.length ? [...publisherGrammarExercises(text, rows), ...publisherStage7Exercises(text, rows)] : [], publisherStages = new Set(publisherExercises.map(item => sourceStage(item.type)).filter(Boolean)), exercises = [...publisherExercises, ...inlineExercises.filter(item => !publisherStages.has(sourceStage(item.type)))], answeredExercises = exercises.filter(item => clean(item.answer) || (Array.isArray(item.answers) && item.answers.length));
+  const inlineExercises = blocks.flatMap(block => numberedPairs(block.body).map(item => ({ ...item, type: semanticWorkbookType(block.title), page: block.page, label: block.title }))), publisherExercises = canonicalRows.length ? [...publisherGrammarExercises(text, rows), ...publisherStage7Exercises(text, rows)] : [], publisherStages = new Set(publisherExercises.map(item => readyStageForSemanticType(item.type)).filter(Boolean)), exercises = [...publisherExercises, ...inlineExercises.filter(item => !publisherStages.has(readyStageForSemanticType(item.type)))], answeredExercises = exercises.filter(item => clean(item.answer) || (Array.isArray(item.answers) && item.answers.length));
   const sectionAmbiguous = !Array.isArray(expectedRows) && canonicalSelection.candidateCount > 1;
-  const confident = fullWorkbook && !sectionAmbiguous && rows.length >= 2 && (canonicalRows.length === rows.length || stageFourPairs.length === rows.length) && [5, 6, 7].every(stage => answeredExercises.some(item => sourceStage(item.type) === stage));
+  const confident = fullWorkbook && !sectionAmbiguous && rows.length >= 2 && (canonicalRows.length === rows.length || stageFourPairs.length === rows.length) && [5, 6, 7].every(stage => answeredExercises.some(item => readyStageForSemanticType(item.type) === stage));
   return {
     fullWorkbook, reviewRequired: !confident, rows, headings,
     exercises,
-    incompleteStages: [5, 6, 7].filter(stage => !answeredExercises.some(item => sourceStage(item.type) === stage)),
+    incompleteStages: [5, 6, 7].filter(stage => !answeredExercises.some(item => readyStageForSemanticType(item.type) === stage)),
     reason: confident ? 'numbered bilingual source and answer-key evidence agree' : sectionAmbiguous ? 'human review required: multiple workbook passage sections found' : 'human review required: canonical pairs or publisher answer links are incomplete',
     pairing: canonicalRows.length ? (canonicalSelection.candidateCount > 1 ? 'publisher_section_match' : 'publisher_numbered') : extracted.pairing,
   };
@@ -423,12 +423,14 @@ function deterministicItems(rows, prefix) {
         byStage.get(8).push(item(8, number, factoryKey(prefix, 8, number), { kind: 'reorder_groups', source: ko, prompt: '⟦ORDER:0⟧.', groups: [shuffled], answers: [ordered.join(' ').toLowerCase()] }));
       }
     }
-    if (en) byStage.get(9).push(item(9, number, factoryKey(prefix, 9, number), { kind: 'blank_input', source: ko, prompt: '______________', answers: [en], provenance: { derivedFallback: true, reason: 'whole_canonical_sentence' } }));
   });
   return byStage;
 }
 
-function sourceStage(type) { return ({ korean_blank: 2, english_blank: 3, translation: 4, verb_form: 5, grammar_vocab_choice: 6, error_correction: 7, sentence_ordering: 8, writing: 9 })[type] || 0; }
+// READY stages are semantic contracts, not the publisher's printed workbook
+// numbers. For example, a publisher may label paragraph ordering as Workbook
+// 9 and writing as Workbook 10; only the writing section maps to READY 9.
+export function readyStageForSemanticType(type) { return ({ korean_blank: 2, english_blank: 3, translation: 4, verb_form: 5, grammar_vocab_choice: 6, error_correction: 7, sentence_ordering: 8, writing: 9 })[type] || 0; }
 function sourceChoice(prompt, answer) {
   const match = clean(prompt).match(/(?:\[([^\[\]]{3,240})\]|\(([^()]{3,240})\))/); if (!match) return null;
   const options = clean(match[1] || match[2]).split(/\s*(?:\/|\|)\s*/).map(value => clean(value)).filter(Boolean);
@@ -459,10 +461,10 @@ function sourceSpan(source, rebuilt, rows) {
   return uniqueCanonicalSpan(rebuilt, rows);
 }
 function fullWorkbookItems(sourceExercises, rows, prefix) {
-  const byStage = new Map([5, 6, 7].map(stage => [stage, []]));
+  const byStage = new Map([5, 6, 7, 9].map(stage => [stage, []]));
   for (const source of Array.isArray(sourceExercises) ? sourceExercises : []) {
-    const stage = sourceStage(source?.type), number = Number(source?.number), row = rows[number - 1], prompt = clean(source?.prompt, 6_000), answer = clean(source?.answer, 2_000), answers = Array.isArray(source?.answers) ? source.answers.map(value => clean(value, 300)).filter(Boolean) : answer.split('/').map(value => clean(value, 300)).filter(Boolean);
-    if (![5, 6, 7].includes(stage) || !number || !prompt || (!answers.length && stage !== 7) || (!row && stage === 5)) continue;
+    const stage = readyStageForSemanticType(source?.type), number = Number(source?.number), row = rows[number - 1], prompt = clean(source?.prompt, 6_000), answer = clean(source?.answer, 2_000), answers = Array.isArray(source?.answers) ? source.answers.map(value => clean(value, 300)).filter(Boolean) : answer.split('/').map(value => clean(value, 300)).filter(Boolean);
+    if (![5, 6, 7, 9].includes(stage) || !number || !prompt || (!answers.length && stage !== 7) || (!row && stage === 5)) continue;
     const stage7Subtype = clean(source?.subtype, 40), sourceNumber = Number(source?.sourceNumber) || number, key = stage === 7 && stage7Subtype ? `${prefix}-s7-${stage7Subtype}-${String(sourceNumber).padStart(2, '0')}` : factoryKey(prefix, stage, number), en = clean(row?.text), ko = clean(row?.translation);
     if (stage === 5 && sameEnglish(restoreBlanks(prompt, answers), en)) { const hints = Array.isArray(source?.hints) && source.hints.length === answers.length ? source.hints.map(value => clean(value, 120)) : answers; byStage.get(5).push(item(5, number, key, { kind: 'verb_form', source: ko, prompt, hints, answers, provenance: source.provenance })); }
     if (stage === 6) {
@@ -480,6 +482,13 @@ function fullWorkbookItems(sourceExercises, rows, prefix) {
     if (stage === 7) {
       const pairs = sourceCorrections(source), publisherAnswers = Array.isArray(source?.publisherAnswers) ? source.publisherAnswers.map(value => clean(value, 300)).filter(Boolean) : pairs, pairCount = pairs.length / 2, restored = publisherAnswers.length === pairs.length ? correctionRoundTrip(prompt, publisherAnswers, rows) : null;
       if (pairCount >= 2 && pairCount <= 4 && restored) byStage.get(7).push(item(7, number, key, { kind: 'correction_pairs', source: '', prompt, pairCount, subtype: stage7Subtype || 'passage', answers: pairs, publisherAnswers, canonicalStart: restored.span.start, canonicalEnd: restored.span.end, provenance: source.provenance }));
+    }
+    if (stage === 9) {
+      const blankCount = (prompt.match(/_{5,}/g) || []).length, rebuilt = restoreBlanks(prompt, answers), span = blankCount === answers.length ? sourceSpan(source, rebuilt, rows) : null;
+      if (span) {
+        const wordBank = Array.isArray(source?.wordBank) ? source.wordBank.map(value => clean(value, 160)).filter(Boolean) : [];
+        byStage.get(9).push(item(9, number, key, { kind: 'blank_input', source: clean(source?.source, 6_000) || spanText(rows, span, 'translation'), prompt, answers, wordBank, canonicalStart: span.start, canonicalEnd: span.end, provenance: source.provenance }));
+      }
     }
   }
   return byStage;
@@ -524,13 +533,16 @@ function validateItem(stage, candidate, rowByNumber, canonicalRows) {
     return candidate.kind === 'choice_groups' && answers.length >= 1 && groups.length === answers.length && groups.every((group, index) => group.length >= 2 && group.some(option => sameOption(option, answers[index])) && group.every(option => !/,/.test(option))) && canonical && sameEnglish(rebuilt, canonical) ? '' : 'stage6_round_trip';
   }
   if (stage === 8) return candidate.kind === 'reorder_groups' && candidate.answers?.[0] && fold(candidate.answers[0]) === fold(words(en).join(' ')) ? '' : 'stage8_round_trip';
-  if (stage === 9) return candidate.kind === 'blank_input' && candidate.prompt === '______________' && candidate.answers?.length === 1 && canonicalText(candidate.answers[0]) === canonicalText(en) && (!candidate.wordBank || candidate.wordBank.length === 0) ? '' : 'stage9_reference';
+  if (stage === 9) {
+    const answers = candidate.answers || [], blankCount = (clean(candidate.prompt).match(/_{5,}/g) || []).length, span = candidate.canonicalStart ? { start: Number(candidate.canonicalStart), end: Number(candidate.canonicalEnd) } : null, canonical = spanText(canonicalRows, span);
+    return candidate.kind === 'blank_input' && answers.length >= 1 && blankCount === answers.length && canonical && sameEnglish(restoreBlanks(candidate.prompt, answers), canonical) && !(candidate.wordBank || []).some(value => answers.some(answer => sameEnglish(value, answer))) ? '' : 'stage9_reference';
+  }
   return 'unsupported_stage';
 }
 
 export function factoryFallbackTargets(catalog, rows, sourceExercises = []) {
   const allNumbers = (Array.isArray(rows) ? rows : []).map((_row, index) => index + 1), stageItems = stage => catalog?.stages?.find(entry => entry.stage === stage)?.items || [];
-  const publisherStage = stage => (Array.isArray(sourceExercises) ? sourceExercises : []).some(source => sourceStage(source?.type) === stage && clean(source?.prompt) && (stage === 7 || clean(source?.answer) || (Array.isArray(source?.answers) && source.answers.length)));
+  const publisherStage = stage => (Array.isArray(sourceExercises) ? sourceExercises : []).some(source => readyStageForSemanticType(source?.type) === stage && clean(source?.prompt) && (stage === 7 || clean(source?.answer) || (Array.isArray(source?.answers) && source.answers.length)));
   return {
     5: allNumbers.filter(number => !stageItems(5).some(item => item.number === number)),
     6: publisherStage(6) ? [] : allNumbers.filter(number => !stageItems(6).some(item => item.number === number)),
@@ -544,12 +556,12 @@ export function generateWorkbookCatalog({ title, workbookKey, rows, ai = {}, sou
   const prefix = clean(workbookKey, 100).replace(/[^a-z0-9-]/gi, '-').toLowerCase() || 'factory';
   const generated = deterministicItems(canonical, prefix), rowByNumber = new Map(canonical.map(row => [row.index, row])), drops = [];
   const sourceItems = fullWorkbookItems(sourceExercises, canonical, prefix);
-  for (const stage of [5, 6, 7]) generated.set(stage, [...sourceItems.get(stage)]);
+  for (const stage of [5, 6, 7, 9]) generated.set(stage, [...sourceItems.get(stage)]);
   for (const stage of [5, 6, 7]) { const acceptedNumbers = new Set(sourceItems.get(stage).map(candidate => candidate.number)); (Array.isArray(ai[stage]) ? ai[stage] : []).forEach((raw, index) => {
     const candidate = normalizeAiItem(stage, raw, canonical, prefix, index + 1); if (candidate && !acceptedNumbers.has(candidate.number)) { generated.get(stage).push(candidate); acceptedNumbers.add(candidate.number); } else if (!candidate) drops.push({ stage, number: Number(raw?.sentenceIndex) || index + 1, reason: `stage${stage}_round_trip` });
   });
   }
-  const publisherCounts = Object.fromEntries([5, 6, 7].map(stage => [stage, sourceExercises.filter(source => sourceStage(source?.type) === stage && clean(source?.prompt) && (stage === 7 || clean(source?.answer) || (Array.isArray(source?.answers) && source.answers.length))).length]));
+  const publisherCounts = Object.fromEntries([5, 6, 7, 9].map(stage => [stage, sourceExercises.filter(source => readyStageForSemanticType(source?.type) === stage && clean(source?.prompt) && (stage === 7 || clean(source?.answer) || (Array.isArray(source?.answers) && source.answers.length))).length]));
   // Stage 5 remains source-backed. Surface suffixes cannot establish that a
   // token was a publisher-authored verb blank, so missing rows stay private.
   const stages = FACTORY_STAGES.map(stage => {
@@ -558,10 +570,10 @@ export function generateWorkbookCatalog({ title, workbookKey, rows, ai = {}, sou
     const [stageTitle, instruction] = stageMeta[stage]; return { stage, title: stageTitle, instruction, items: valid };
   });
   const count = stage => stages.find(item => item.stage === stage)?.items.length || 0;
-  const sourceReusedExercises = [5, 6, 7].reduce((sum, stage) => sum + stages.find(item => item.stage === stage).items.filter(candidate => candidate.provenance).length, 0);
+  const sourceReusedExercises = [5, 6, 7, 9].reduce((sum, stage) => sum + stages.find(item => item.stage === stage).items.filter(candidate => candidate.provenance).length, 0);
   const generatedStageSevenExpected = canonical.length >= 5 ? Math.floor(canonical.length / 6) : 0;
-  const stageCoverage = Object.fromEntries(FACTORY_STAGES.map(stage => [stage, { ready: count(stage), expected: stage === 7 ? publisherCounts[7] || generatedStageSevenExpected : stage === 6 && publisherCounts[6] ? publisherCounts[6] : canonical.length }]));
-  const incompleteStages = [5, 6, 7].filter(stage => stageCoverage[stage].ready < stageCoverage[stage].expected);
-  const metrics = { elapsedMs: Date.now() - started, sentenceCount: canonical.length, stageCoverage, incompleteStages, pdfExtractedExercises: Number(provenance.pdfExtractedExercises) || 0, sourceReusedExercises, deterministicGeneratedExercises: [2, 3, 4, 8, 9].reduce((sum, stage) => sum + count(stage), 0), derivedFallbackExercises: [5, 6, 7].reduce((sum, stage) => sum + stages.find(item => item.stage === stage).items.filter(candidate => candidate.derivation).length, 0), geminiGeneratedExercises: [5, 6, 7].reduce((sum, stage) => sum + stages.find(item => item.stage === stage).items.filter(candidate => !candidate.provenance && !candidate.derivation).length, 0), geminiCallCount: Number(provenance.geminiCallCount) || 0, geminiTokenUsage: Number(provenance.geminiTokenUsage) || 0, validatorPass: stages.reduce((sum, stage) => sum + stage.items.length, 0), validatorDrop: drops.length, dropReasons: drops.reduce((all, drop) => ({ ...all, [drop.reason]: (all[drop.reason] || 0) + 1 }), {}) };
+  const stageCoverage = Object.fromEntries(FACTORY_STAGES.map(stage => [stage, { ready: count(stage), expected: stage === 7 ? publisherCounts[7] || generatedStageSevenExpected : stage === 6 && publisherCounts[6] ? publisherCounts[6] : stage === 9 ? publisherCounts[9] : canonical.length }]));
+  const incompleteStages = [5, 6, 7, 9].filter(stage => stageCoverage[stage].ready < stageCoverage[stage].expected);
+  const metrics = { elapsedMs: Date.now() - started, sentenceCount: canonical.length, stageCoverage, incompleteStages, pdfExtractedExercises: Number(provenance.pdfExtractedExercises) || 0, sourceReusedExercises, deterministicGeneratedExercises: [2, 3, 4, 8].reduce((sum, stage) => sum + count(stage), 0), derivedFallbackExercises: [5, 6, 7].reduce((sum, stage) => sum + stages.find(item => item.stage === stage).items.filter(candidate => candidate.derivation).length, 0), geminiGeneratedExercises: [5, 6, 7].reduce((sum, stage) => sum + stages.find(item => item.stage === stage).items.filter(candidate => !candidate.provenance && !candidate.derivation).length, 0), geminiCallCount: Number(provenance.geminiCallCount) || 0, geminiTokenUsage: Number(provenance.geminiTokenUsage) || 0, validatorPass: stages.reduce((sum, stage) => sum + stage.items.length, 0), validatorDrop: drops.length, dropReasons: drops.reduce((all, drop) => ({ ...all, [drop.reason]: (all[drop.reason] || 0) + 1 }), {}) };
   return { workbookKey: prefix, title: clean(title, 120) || 'READY Workbook', source: provenance, importReport: { factory: true, metrics, drops }, stages, metrics };
 }

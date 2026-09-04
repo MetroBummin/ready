@@ -26,10 +26,17 @@ Workbook PDF는 보존되는 원본 패키지다. 공개 판정은 파일이 아
 - `UNSUPPORTED`: 원문과 provenance는 유지하지만 현재 interaction이 없어 숨긴다.
 - `INVALID`: 해당 exercise의 frame/정답 연결을 증명하지 못해 숨긴다.
 
+단계 번호는 READY의 학습 의미 계약이다. 출판사 PDF에 인쇄된 번호를 그대로 복사하지 않는다.
+예를 들어 PDF의 `Workbook 9`가 문단 배열이고 `Workbook 10`이 영작이면, 의미상 영작인
+`Workbook 10`을 READY 9단계로 가져온다. 문단 배열은 현재 READY 9로 변환하지 않고
+`UNSUPPORTED`로 원본만 보존한다.
+
 현재 학생 학습 범위는 2~9단계다. 2·3·5·6·8단계는 결정론적으로 채점하고, 4단계 해석은
 출판사 해석을 semantic reference로 삼아 AI가 채점한다. 7단계는 출판사 정답표의
-오류/교정 쌍을 명시적으로 입력받아 결정론적으로 채점한다. 9단계는 PDF의 부분 문장
-frame을 그대로 유지하고 실제 빈칸만 결정론적으로 채점한다. 1단계 읽기 원본과 10단계
+오류/교정 쌍을 명시적으로 입력받아 결정론적으로 채점한다. 9단계는 PDF의 의미상 영작
+section에서 부분 문장 frame과 출판사 정답을 가져와 실제 빈칸만 결정론적으로 채점한다.
+영작 section을 구조화하지 못했을 때 canonical 문장 전체를 임의의 한 칸 영작으로 만들지
+않는다. 해당 exercise는 `UNSUPPORTED` 또는 `INVALID`로 비공개 유지한다. 1단계 읽기 원본과
 mixed Check는 현재 학습 범위 밖으로 원본만 보존한다.
 
 ## Runtime contract

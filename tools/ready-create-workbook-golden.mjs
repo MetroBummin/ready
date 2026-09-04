@@ -36,9 +36,14 @@ function itemFixture(item,redact){
   const copy={key:item.key,number:item.number,stage:item.stage,kind:item.kind};
   for(const field of ['source','prompt'])if(item[field]!=null)copy[field]=redact(item[field]);
   for(const field of ['answers','publisherAnswers','hints','wordBank'])if(Array.isArray(item[field]))copy[field]=item[field].map(redact);
-  if(Array.isArray(item.groups))copy.groups=item.groups.map(group=>group.map(redact));
+  if(Array.isArray(item.groups)){
+    copy.groups=item.groups.map(group=>group.map(redact));
+    copy.groupTokenCounts=item.groups.map(group=>group.map(chip=>String(chip).trim().split(/\s+/u).filter(Boolean).length));
+  }
   if(item.pairCount!=null)copy.pairCount=item.pairCount;
   if(item.subtype!=null)copy.subtype=item.subtype;
+  if(item.provenance)copy.provenance=Object.fromEntries(['origin','sourceWorkbookStage','semanticType','mappedReadyStage','qaRepair'].filter(field=>item.provenance[field]!=null).map(field=>[field,item.provenance[field]]));
+  if(item.qaRepair!=null)copy.qaRepair=item.qaRepair;
   return copy;
 }
 
