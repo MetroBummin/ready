@@ -313,7 +313,7 @@ async function deleteStudent(body: any) {
 
 async function teacherBootstrap() {
   const [students, exams, passages, examPassages, factoryCatalogs] = await Promise.all([
-    db.from("ready_students").select("id,name,school,grade,created_at").order("school").order("grade").order("name"), db.from("ready_exams").select("id,school,grade,title,is_current").eq("is_current", true).order("school").order("grade"), db.from("ready_passages").select("id,title,source_type,grade,source_year,source_month,source_label,created_at,updated_at").order("display_order").order("created_at"), db.from("ready_exam_passages").select("exam_id,passage_id,position,group_key,group_label").order("position"), db.from("ready_workbook_catalogs").select("passage_id"),
+    db.from("ready_students").select("id,name,school,grade,created_at").order("school").order("grade").order("name"), db.from("ready_exams").select("id,school,grade,title,is_current,empty_passage_groups").eq("is_current", true).order("school").order("grade"), db.from("ready_passages").select("id,title,source_type,grade,source_year,source_month,source_label,created_at,updated_at").order("display_order").order("created_at"), db.from("ready_exam_passages").select("exam_id,passage_id,position,group_key,group_label").order("position"), db.from("ready_workbook_catalogs").select("passage_id"),
   ]);
   const catalogIds = new Set(rows<any[]>(factoryCatalogs).map(item => item.passage_id));
   const passageRows = rows<any[]>(passages).map(passage => ({ ...passage, has_workbook: !!codeWorkbookForPassage(passage) || catalogIds.has(passage.id), workbook_source: codeWorkbookForPassage(passage) ? "static" : catalogIds.has(passage.id) ? "factory" : "" }));
@@ -333,7 +333,9 @@ async function setScopeLayout(body: any) {
   if(body.layout.length>500)throw new ApiError(400,"시험범위 Passage가 너무 많습니다.");
   const layout=body.layout.map((item:any)=>({passageId:required(item?.passageId,"Passage",80),groupKey:item?.groupKey==null?null:required(item.groupKey,"묶음 key",80),groupLabel:item?.groupLabel==null?null:required(item.groupLabel,"묶음 이름",120)}));
   if(layout.some((item:any)=>(item.groupKey===null)!==(item.groupLabel===null)))throw new ApiError(400,"묶음 key와 이름은 함께 지정해야 합니다.");
-  const result=await db.rpc("ready_set_scope_definition",{p_exam_id:examId,p_layout:layout});
+  const emptyGroups=(Array.isArray(body.emptyGroups)?body.emptyGroups:[]).map((item:any)=>({key:required(item?.key,"빈 묶음 key",80),label:required(item?.label,"빈 묶음 이름",120),index:Number(item?.index)}));
+  if(emptyGroups.length>100||emptyGroups.some((item:any)=>!Number.isInteger(item.index)||item.index<0||item.index>500))throw new ApiError(400,"빈 묶음 정보가 올바르지 않습니다.");
+  const result=await db.rpc("ready_set_scope_definition",{p_exam_id:examId,p_layout:{items:layout,emptyGroups}});
   if(result.error)throw new ApiError(400,result.error.message);
   return {examId,passageCount:layout.length};
 }
