@@ -582,6 +582,7 @@ body[data-ready-mode] .workbook-choice{display:flex;min-height:36px;align-items:
 .workbook-choice:hover{border-color:var(--ready-ink)}.workbook-choice.selected{border-color:var(--ready-action);color:var(--ready-on-action);background:var(--ready-action)}
 .workbook-choice-group.correct{border-color:var(--ready-success)}.workbook-choice-group.wrong{border-color:var(--ready-error)}
 .workbook-choice-group>small{grid-column:1/-1;color:var(--ready-error);font-size:11px}
+.workbook-correction-instruction{margin:0 0 var(--ready-space-2);color:var(--ready-muted);font-size:13px}
 .workbook-correction-list{display:grid;gap:var(--ready-space-2)}
 .workbook-correction-row{display:grid;grid-template-columns:28px minmax(0,1fr) 24px minmax(0,1fr);gap:var(--ready-space-2);align-items:end;padding:var(--ready-space-3);border-bottom:1px solid var(--ready-hairline)}
 body[data-ready-mode] .workbook-correction-row input{min-height:36px;height:36px;padding:4px 7px}

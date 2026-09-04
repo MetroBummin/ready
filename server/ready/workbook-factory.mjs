@@ -423,8 +423,7 @@ function deterministicItems(rows, prefix) {
         byStage.get(8).push(item(8, number, factoryKey(prefix, 8, number), { kind: 'reorder_groups', source: ko, prompt: '⟦ORDER:0⟧.', groups: [shuffled], answers: [ordered.join(' ').toLowerCase()] }));
       }
     }
-    const writingWords = words(en);
-    if (writingWords.length) byStage.get(9).push(item(9, number, factoryKey(prefix, 9, number), { kind: 'blank_input', source: ko, prompt: writingWords.map(() => '______________').join(' '), answers: writingWords }));
+    if (en) byStage.get(9).push(item(9, number, factoryKey(prefix, 9, number), { kind: 'blank_input', source: ko, prompt: '______________', answers: [en], provenance: { derivedFallback: true, reason: 'whole_canonical_sentence' } }));
   });
   return byStage;
 }
@@ -525,7 +524,7 @@ function validateItem(stage, candidate, rowByNumber, canonicalRows) {
     return candidate.kind === 'choice_groups' && answers.length >= 1 && groups.length === answers.length && groups.every((group, index) => group.length >= 2 && group.some(option => sameOption(option, answers[index])) && group.every(option => !/,/.test(option))) && canonical && sameEnglish(rebuilt, canonical) ? '' : 'stage6_round_trip';
   }
   if (stage === 8) return candidate.kind === 'reorder_groups' && candidate.answers?.[0] && fold(candidate.answers[0]) === fold(words(en).join(' ')) ? '' : 'stage8_round_trip';
-  if (stage === 9) return candidate.kind === 'blank_input' && fold(candidate.answers?.join(' ')) === fold(words(en).join(' ')) ? '' : 'stage9_reference';
+  if (stage === 9) return candidate.kind === 'blank_input' && candidate.prompt === '______________' && candidate.answers?.length === 1 && canonicalText(candidate.answers[0]) === canonicalText(en) && (!candidate.wordBank || candidate.wordBank.length === 0) ? '' : 'stage9_reference';
   return 'unsupported_stage';
 }
 

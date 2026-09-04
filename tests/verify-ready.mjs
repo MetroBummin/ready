@@ -10,7 +10,8 @@ import { contractChoiceCopyHtml, contractPassageHtml, contractRenderCounts, cont
 import { WORKBOOK_TRANSLATION_GRADING_POLICY, workbookTranslationPass } from '../server/ready/workbook-grading-policy.mjs';
 import { normalizeWorkbookAnswer as normalizeWorkbookAnswerClient, livePrefixState, workbookRecallCue as workbookRecallCueClient, workbookSlotCh } from '../ready/workbook-assistance.js';
 import { normalizeWorkbookAnswer as normalizeWorkbookAnswerServer, publicWorkbookAssistance, stageNineHint, workbookAssistanceMode, workbookRecallCue as workbookRecallCueServer } from '../server/ready/workbook-assistance.mjs';
-import { gradeLocalQuestion, gradeLocalWorkbook, normalizeDeterministicAnswer, revealLocalWorkbook } from '../ready/deterministic-grading.js';
+import { gradeLocalQuestion, gradeLocalWorkbook, gradeWorkbookCorrectionPairs, normalizeDeterministicAnswer, revealLocalWorkbook } from '../ready/deterministic-grading.js';
+import { auditStageNineItem, auditWorkbookCatalog, repairAnswerKeyArtifacts, repairStageNineCatalog } from '../server/ready/workbook-catalog-qa.mjs';
 import { CURRENT_QUESTION_PUBLICATION_VERSION, questionPublicationStatus } from '../server/ready/question-pipeline.mjs';
 
 const root=resolve(dirname(fileURLToPath(import.meta.url)),'..');
@@ -49,6 +50,35 @@ assert.equal(stageNineHint('provocative false stories'),'p… f… s…');
 assert.equal(stageNineHint('While scrolling'),'W… s…');
 assert.equal(stageNineHint('provocative'),'p…');
 
+const correctionAnswers=['moving','to move','has','have'];
+assert.deepEqual(gradeWorkbookCorrectionPairs(correctionAnswers,['moving','to move','has','have']).slotResults,[true,true,true,true]);
+assert.equal(gradeWorkbookCorrectionPairs(correctionAnswers,['has','have','moving','to move']).correct,true,'Stage 7 correction pair order must not matter');
+assert.equal(gradeWorkbookCorrectionPairs(correctionAnswers,['moving','have','has','to move']).correct,false,'Stage 7 must keep each wrong and correct value paired');
+assert.equal(gradeWorkbookCorrectionPairs(correctionAnswers,['moving','to move','moving','to move']).correct,false,'Stage 7 duplicate plus missing pair must fail');
+
+const canonicalStageNine=[
+  {sentence_index:0,text:'Dear students,',translation:'학생 여러분께,'},
+  {sentence_index:1,text:'The fair begins today.',translation:'박람회가 오늘 시작합니다.'},
+  {sentence_index:2,text:'Please join us.',translation:'참여해 주세요.'},
+];
+const joinedStageNine={key:'s9-1',stage:9,kind:'blank_input',source:'학생 여러분께, 박람회가 오늘 시작합니다.',prompt:'______________',answers:['Dear students,The fair begins today.'],wordBank:['Dear students,The fair begins today.']};
+const joinedAudit=auditStageNineItem(joinedStageNine,canonicalStageNine);
+assert(joinedAudit.issues.includes('multiple_canonical_sentences'));
+assert(joinedAudit.issues.includes('sentence_joined_without_whitespace'));
+assert(joinedAudit.issues.includes('word_bank_leaks_answer'));
+const repairedStageNine=repairStageNineCatalog({stages:[{stage:9,items:[joinedStageNine]}]},canonicalStageNine);
+assert.equal(repairedStageNine.unresolved.length,0);
+assert.deepEqual(repairedStageNine.catalog.stages[0].items.map(item=>item.answers),[['Dear students,'],['The fair begins today.']]);
+assert(repairedStageNine.catalog.stages[0].items.every(item=>item.wordBank.length===0),'Unsafe Stage 9 word banks must be removed');
+assert.equal(auditWorkbookCatalog(repairedStageNine.catalog,canonicalStageNine).length,0,'Repaired Stage 9 items must independently round-trip to canonical sentences');
+const headingStageNine={key:'s9-heading',stage:9,kind:'blank_input',source:'안내 참여해 주세요.',prompt:'Notice ______________',answers:['Please join us.'],wordBank:[]};
+assert(auditStageNineItem(headingStageNine,canonicalStageNine).issues.includes('partial_answer'),'A source heading attached to one canonical sentence must fall back safely');
+assert.equal(repairStageNineCatalog({stages:[{stage:9,items:[headingStageNine]}]},canonicalStageNine).catalog.stages[0].items[0].answers[0],'Please join us.');
+const artifactCatalog={stages:[{stage:7,items:[{key:'s7-artifact',stage:7,kind:'correction_pairs',pairCount:2,prompt:'People moves. It fail.',answers:['moves','move Answer KeyLesson2 영어II YBM(박준언) - 89 -','fail','fails']}]}]};
+const artifactRepair=repairAnswerKeyArtifacts(artifactCatalog);
+assert.equal(artifactRepair.repairs.length,1);
+assert.equal(artifactRepair.catalog.stages[0].items[0].answers[1],'move','PDF page headers must never become part of a Stage 7 answer');
+
 const studentHtml=read('ready/index.html'),studentApp=read('ready/app.js'),adminApp=read('ready/admin/app.js'),edgeLoginSource=read('server/ready/index.ts'),codeMigration=read('supabase/migrations/20260902110000_ready_student_login_codes.sql');
 assert.match(studentHtml,/id="student-code-form"/);
 assert.doesNotMatch(studentHtml,/student-list|pin-form|pin-login/,'student identity list and PIN step must not be public');
@@ -56,6 +86,13 @@ assert.doesNotMatch(studentApp,/list_students|set_student_pin|selectedStudent/);
 assert.match(adminApp,/set_student_code/);
 assert.match(edgeLoginSource,/ready_verify_student_code/);
 assert.match(edgeLoginSource,/READY_STUDENT_CODE_PEPPER/,'student code lookup fingerprint must use a dedicated deployment secret');
+assert.match(edgeLoginSource,/item\.kind === "correction_pairs" \? \{ mode: "server_deterministic" \}/,'Stage 7 answers must not be included in the pre-grade public contract');
+assert.match(edgeLoginSource,/gradeWorkbookCorrectionPairs\(item\.answers,responses\)/,'Stage 7 server grading must compare correction pairs as a multiset');
+assert.match(edgeLoginSource,/Subscription Economy[\s\S]*YBM_PARKJUNEON_L2_WORKBOOK/,'Legacy code workbooks must match their actual passage identity, not every same-publisher lesson number');
+assert.doesNotMatch(edgeLoginSource,/lesson===2\?YBM_PARKJUNEON_L2_WORKBOOK/,'A mislabeled YBM lesson must not receive an unrelated static workbook');
+assert.match(studentApp,/workbookCurrent\(\)\.item\?\.key===item\.key\)renderWorkbook\(\)/,'An older persistence response must not redraw and blur the next workbook item');
+assert.match(studentApp,/item\.subtype==='grammar'\?'어법상 어색한 표현/);
+assert.match(studentApp,/item\.subtype==='context'\?'문맥상 어색한 표현/);
 assert.doesNotMatch(edgeLoginSource,/case "list_students"/);
 assert.match(codeMigration,/create unique index[\s\S]*login_code_fingerprint/i,'student code uniqueness must be a DB invariant');
 assert.match(codeMigration,/extensions\.crypt\(p_code/,'plaintext student codes must use the existing bcrypt verifier');
@@ -260,7 +297,7 @@ assert.match(edge,/callGeminiGrade\(question, spec, responses\)[\s\S]*grade\.cor
 assert.match(edge,/rubricSnapshot[\s\S]*publisherReferenceTranslation[\s\S]*gradingPolicy[\s\S]*passScore/);
 assert.match(edge,/ready_workbook_ai_grading_requests[\s\S]*status: "pending"[\s\S]*callGeminiTranslationGrade/,'Workbook translations must be persisted before AI inference');
 assert.match(edge,/ai_grading_request_id: aiRequestId/,'Workbook attempt must link to the AI grading request');
-assert.match(edge,/grading: item\.kind === "translation_ai" \? \{ mode: "ai" \} : \{ mode: "deterministic", answers: item\.answers \}/,'Deterministic Workbook items must carry their current-item answer contract');
+assert.match(edge,/item\.kind === "correction_pairs" \? \{ mode: "server_deterministic" \} : \{ mode: "deterministic", answers: item\.answers \}/,'Only locally graded Workbook items may carry their current-item answer contract');
 assert.match(app,/item\.assistance\.mode==='recall_local'/,'Stage 2 and 3 recall must bypass assistance network loading');
 assert.doesNotMatch(app,/readyApi\('unlock_workbook_recall'/,'Stage 2 and 3 must not unlock each slot over the network');
 assert.match(edge,/usedFullAnswerHint[\s\S]*correct = false/,'A full-answer hint must force the current Stage 9 attempt to wrong');

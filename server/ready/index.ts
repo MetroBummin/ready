@@ -15,6 +15,8 @@ import { WORKBOOK_TRANSLATION_GRADING_POLICY, workbookTranslationPass } from "./
 import { normalizeWorkbookAnswer, publicWorkbookAssistance, stageNineHint, workbookAssistanceMode } from "./workbook-assistance.mjs";
 import { CURRENT_QUESTION_PUBLICATION_VERSION } from "./question-pipeline.mjs";
 import { compareCanonicalRows, extractSentenceRows, factoryFallbackTargets, generateWorkbookCatalog, inspectFullWorkbookText } from "./workbook-factory.mjs";
+import { gradeWorkbookCorrectionPairs } from "../../ready/deterministic-grading.js";
+import { repairAnswerKeyArtifacts, repairStageNineCatalog } from "./workbook-catalog-qa.mjs";
 
 const CORS = { "Access-Control-Allow-Origin": "*", "Access-Control-Allow-Headers": "authorization, apikey, content-type, x-client-info", "Access-Control-Allow-Methods": "POST, OPTIONS" };
 const json = (body: unknown, status = 200) => new Response(JSON.stringify(body), { status, headers: { ...CORS, "Content-Type": "application/json", "Cache-Control": "no-store" } });
@@ -947,14 +949,21 @@ async function submitAttempt(body: any, session: ReadySession) {
 
 function codeWorkbookForPassage(passage: any) {
   const identity = [passage?.title, passage?.source_label].map(value => clean(value, 300)).join(" ");
-  const lesson = /(?:Lesson|레슨|제)\s*4|4\s*과/i.test(identity) ? 4 : /(?:Lesson|레슨|제)\s*2|2\s*과/i.test(identity) ? 2 : /(?:Lesson|레슨|제)\s*1|1\s*과/i.test(identity) ? 1 : 0;
-  if(/(?:민병천|NE\s*능률|NE\s*\()/i.test(identity))return lesson===2?NE_MINBYEONGCHEON_L2_WORKBOOK:lesson===1?NE_MINBYEONGCHEON_L1_WORKBOOK:null;
-  if(/(?:박준언|YBM)/i.test(identity))return lesson===2?YBM_PARKJUNEON_L2_WORKBOOK:lesson===1?YBM_PARKJUNEON_L1_WORKBOOK:null;
-  if(/(?:동아|이병민)/i.test(identity))return lesson===4?DONGA_LEEBYEONGMIN_L4_WORKBOOK:null;
+  if(/(?:민병천|NE\s*능률|NE\s*\()/i.test(identity)&&/2\s*과/i.test(identity))return NE_MINBYEONGCHEON_L2_WORKBOOK;
+  if(/(?:민병천|NE\s*능률|NE\s*\()/i.test(identity)&&/1\s*과/i.test(identity))return NE_MINBYEONGCHEON_L1_WORKBOOK;
+  if(/(?:박준언|YBM)/i.test(identity)&&/Subscription Economy/i.test(identity))return YBM_PARKJUNEON_L2_WORKBOOK;
+  if(/(?:박준언|YBM)/i.test(identity)&&/(?:Lesson|레슨)\s*1/i.test(identity))return YBM_PARKJUNEON_L1_WORKBOOK;
+  if(/(?:동아|이병민)/i.test(identity)&&/4\s*과/i.test(identity))return DONGA_LEEBYEONGMIN_L4_WORKBOOK;
   return null;
 }
 async function workbookForPassage(passage: any) {
-  const codeCatalog = codeWorkbookForPassage(passage); if (codeCatalog) return codeCatalog;
+  const codeCatalog = codeWorkbookForPassage(passage);
+  if(codeCatalog){
+    const canonical=rows<any[]>(await db.from("ready_passage_sentences").select("sentence_index,text,translation").eq("passage_id",passage.id).order("sentence_index"));
+    const sanitized=repairAnswerKeyArtifacts(codeCatalog),prepared=repairStageNineCatalog(sanitized.catalog,canonical),invalid=new Set(prepared.unresolved.map((item:any)=>item.itemKey));
+    if(invalid.size){const stage=prepared.catalog.stages.find((candidate:any)=>Number(candidate.stage)===9);if(stage)stage.items=stage.items.filter((item:any)=>!invalid.has(item.key));}
+    return prepared.catalog;
+  }
   if (!clean(passage?.id, 80)) return null;
   const result = await db.from("ready_workbook_catalogs").select("catalog").eq("passage_id", passage.id).maybeSingle();
   if (result.error) throw new ApiError(500, result.error.message);
@@ -1004,7 +1013,7 @@ async function studentWorkbook(body: any, session: ReadySession) {
       wordBank: Array.isArray(item.wordBank) ? item.wordBank : [],
       pairCount: Number(item.pairCount) || 0, subtype: clean(item.subtype, 40),
       assistance: workbookAssistanceMode(item),
-      grading: item.kind === "translation_ai" ? { mode: "ai" } : { mode: "deterministic", answers: item.answers },
+      grading: item.kind === "translation_ai" ? { mode: "ai" } : item.kind === "correction_pairs" ? { mode: "server_deterministic" } : { mode: "deterministic", answers: item.answers },
       completed: latest.get(item.key) === true, lastResult: latest.get(item.key) ?? null, bookmarked: bookmarks.has(item.key),
     })),
   }));
@@ -1061,6 +1070,7 @@ async function submitWorkbookAttempt(body: any, session: ReadySession) {
   const responses = revealedAnswer ? Array.from({ length: item.answers.length }, (_, index) => clean(rawResponses[index], 1_000)) : cleanList(rawResponses, 80, 1_000);
   if (!revealedAnswer && responses.length !== item.answers.length) throw new ApiError(400, "모든 빈칸을 입력해 주세요.");
   let slotResults = responses.map((response, index) => !!response && normalizeWorkbookAnswer(response) === normalizeWorkbookAnswer(item.answers[index])), correct = !revealedAnswer && slotResults.every(Boolean), aiFeedback = "", aiFeedbackLines: string[] = [], aiScore: number | null = null, gradingPolicy: string | null = null, aiRequestId: string | null = null;
+  if(item.kind==="correction_pairs"&&!revealedAnswer){const pairGrade=gradeWorkbookCorrectionPairs(item.answers,responses);if(!pairGrade.valid)throw new ApiError(400,"모든 고침 쌍을 입력해 주세요.");slotResults=pairGrade.slotResults;correct=pairGrade.correct;}
   let hintCount = 0, usedFullAnswerHint = false, completedAfterHint = false;
   if (Number(item.stage) === 9 && body.hintReceipt) {
     const hintState = await verifyHintReceipt(body.hintReceipt, { studentId: student.id, examId, passageId, itemKey });

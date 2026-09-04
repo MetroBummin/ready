@@ -39,6 +39,23 @@ export function gradeLocalWorkbook(contract={},responses=[],{usedFullAnswerHint=
   return {valid:true,correct,completedAfterHint:completed&&usedFullAnswerHint,answers:correct?[]:answers,slotResults,needsServer:false};
 }
 
+export function gradeWorkbookCorrectionPairs(answers=[],responses=[]){
+  const expected=list(answers),values=list(responses);
+  if(!expected.length||expected.length%2!==0||values.length!==expected.length||values.some(value=>!String(value??'').trim()))return {valid:false,correct:false,slotResults:[]};
+  const pairKey=(left,right)=>`${normalizeDeterministicAnswer(left)}\u0000${normalizeDeterministicAnswer(right)}`;
+  const remaining=new Map();
+  for(let index=0;index<expected.length;index+=2){
+    const key=pairKey(expected[index],expected[index+1]);
+    remaining.set(key,(remaining.get(key)||0)+1);
+  }
+  const slotResults=Array(values.length).fill(false);
+  for(let index=0;index<values.length;index+=2){
+    const key=pairKey(values[index],values[index+1]),count=remaining.get(key)||0;
+    if(count>0){slotResults[index]=slotResults[index+1]=true;remaining.set(key,count-1);}
+  }
+  return {valid:true,correct:slotResults.every(Boolean),slotResults};
+}
+
 export function revealLocalWorkbook(contract={},responses=[]){
   if(contract.mode!=='deterministic')return {valid:false,needsServer:true};
   const answers=list(contract.answers),values=list(responses);
