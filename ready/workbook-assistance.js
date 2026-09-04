@@ -10,6 +10,16 @@ export function workbookRecallCue(value,mode){
   return text.match(/[A-Za-z]/)?.[0]?.toLowerCase()||'';
 }
 
+export function workbookAssistanceMode(item){
+  if(item?.semanticType==='korean_blank')return {mode:'recall_unlock',recallMode:'korean_syllable'};
+  if(item?.semanticType==='english_blank')return {mode:'recall_unlock',recallMode:'english_initial'};
+  if(item?.semanticType==='writing')return {mode:'prefix_typing'};
+  if(Number(item?.stage)===2)return {mode:'recall_unlock',recallMode:'korean_syllable'};
+  if(Number(item?.stage)===3)return {mode:'recall_unlock',recallMode:'english_initial'};
+  if(Number(item?.stage)===9)return {mode:'prefix_typing'};
+  return null;
+}
+
 export function workbookSlotCh(value){
   const width=[...String(value??'').normalize('NFKC')].reduce((sum,character)=>sum+(/[\u1100-\u11ff\u2e80-\u9fff\uac00-\ud7af\uff01-\uff60\uffe0-\uffe6]/u.test(character)?2:character===' '?.65:1),0);
   return Math.min(72,Math.max(4,Math.ceil(width)));

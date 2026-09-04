@@ -87,3 +87,19 @@ PDF는 PDF.js의 표준 Unicode text layer로 읽고 페이지 표지만 보존�
 Factory는 문장쌍이나 정답 연결이 불완전한 상태에서 일부 catalog를 publish하지 않는다.
 각 exercise validator 실패만 INVALID로 남기며, 기존 학생 Attempt/Review 데이터는 append-only
 정책을 그대로 따른다.
+# Deterministic semantic import
+
+The only publication path is:
+
+`original PDF + Answer Key + canonical passage -> deterministic classifier -> semantic validator -> atomic catalog replacement`
+
+Classification priority is explicit heading/instruction, local exercise
+structure, Answer Key structure, then canonical alignment. A printed Workbook
+number never determines a READY stage. Unknown or ambiguous source remains
+private. No canonical-derived filler and no Gemini fallback are allowed.
+
+Before replacing an active production catalog, all 13 production sources must
+be present, dry-run diffs must be reviewed, semantic validation and golden
+regression must pass, and unresolved must equal zero. Missing source blocks the
+entire replacement. Passage/sentence identity, Questions, exam links, attempts,
+bookmarks and history are never rewritten by catalog regeneration.

@@ -17,6 +17,7 @@
     "structure:written": "node tools/ready-structure-written-with-codex.mjs",
     "validate:pipeline": "node tools/ready-validate-pipeline.mjs",
     "audit:questions": "node tools/ready-audit-question-publication.mjs",
+    "audit:workbooks:semantic": "node tools/ready-audit-semantic-workbooks.mjs",
     "structure:objective-fallback": "node tools/ready-structure-objective-fallback-with-codex.mjs",
     "import": "node tools/ready-import-questions.mjs",
     "deploy:api": "npx supabase functions deploy ready --no-verify-jwt --project-ref fqvhlyocdkwiyioiokte"

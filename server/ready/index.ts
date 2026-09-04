@@ -11,11 +11,10 @@ import { YBM_PARKJUNEON_L2_WORKBOOK } from "./workbook-ybm-l2.mjs";
 import { DONGA_LEEBYEONGMIN_L4_WORKBOOK } from "./workbook-donga-l4.mjs";
 import { validateQuestionSpec } from "./question-spec.mjs";
 import { deterministicClientContract, deterministicGrade, publicInteractionContract } from "./interaction-contract.mjs";
-import { WORKBOOK_TRANSLATION_GRADING_POLICY, workbookTranslationPass } from "./workbook-grading-policy.mjs";
-import { normalizeWorkbookAnswer, publicWorkbookAssistance, stageNineHint, workbookAssistanceMode, workbookRecallCue } from "./workbook-assistance.mjs";
+import { normalizeWorkbookAnswer, publicWorkbookAssistance, workbookAssistanceMode, workbookRecallCue } from "./workbook-assistance.mjs";
 import { CURRENT_QUESTION_PUBLICATION_VERSION } from "./question-pipeline.mjs";
 import { QUESTION_DIFFICULTIES, isQuestionQaScope, normalizeQuestionDifficulty, questionVisibleInScope } from "./question-difficulty.mjs";
-import { compareCanonicalRows, extractSentenceRows, factoryFallbackTargets, generateWorkbookCatalog, inspectFullWorkbookText } from "./workbook-factory.mjs";
+import { compareCanonicalRows, extractSentenceRows, generateWorkbookCatalog, inspectFullWorkbookText, SEMANTIC_WORKBOOK_CONTRACT } from "./workbook-factory.mjs";
 import { gradeWorkbookCorrectionPairs } from "../../ready/deterministic-grading.js";
 import { normalizeStageEightChips, repairAnswerKeyArtifacts, repairStageNineCatalog } from "./workbook-catalog-qa.mjs";
 import { attemptMetrics, groupAttemptCounts, learningPeriodStart } from "../../ready/admin/learning-progress.js";
@@ -160,52 +159,6 @@ async function callGeminiGrade(question: any, spec: any, responses: string[]) {
   }
   console.error("READY AI grading failed:", lastError);
   throw new ApiError(502, "AI 채점을 잠시 사용할 수 없습니다. 잠시 후 다시 제출해 주세요.");
-}
-
-function workbookTranslationPrompt(item: any, response: string) {
-  return `다음 워크북 번역 답안을 출판사 원문과 출판사 해석에만 근거해 100점 만점으로 평가하세요.
-
-영문 원문: ${clean(item.source, 2_000)}
-출판사 해석: ${clean(item.answers?.[0], 2_000)}
-학생 해석: ${clean(response, 2_000)}
-채점 정책: ${WORKBOOK_TRANSLATION_GRADING_POLICY.version}
-배점: 핵심 의미 60점, 주체·행동·대상·부정·인과 등 핵심 관계 30점, 자연스러운 한국어 10점
-
-원칙:
-- 출판사 해석은 의미의 기준이며 외워야 하는 고정 문자열이 아닙니다.
-- 동의어, 자연스러운 의역, 어순·조사·존댓말 차이는 의미가 같으면 감점하지 않습니다.
-- 정도 부사의 작은 생략은 핵심 의미를 바꾸지 않으면 경미하게만 봅니다. 예: "아주 작은"을 "작은"으로 쓴 경우.
-- critical_errors에는 주체·행동·대상·부정·수치·인과를 뒤집거나 핵심 절을 빠뜨린 중대한 오류만 넣습니다.
-- feedback_lines는 학생이 바로 고칠 수 있는 한국어 문장 1~3개입니다.
-- 틀린 부분이 있으면 "의미를 잘 파악하지 못했습니다"처럼 뭉뚱그리지 말고, 형용사절·부사절·주절의 동사·주어/목적어·부정·인과 중 실제로 잘못 해석한 단위를 정확히 지목하세요.
-- 통과 답안도 단순 칭찬만 하지 말고, 정확히 보존된 핵심 절이나 관계를 한 가지 짚으세요.
-- 문법 용어만 나열하지 말고 학생 답안의 어떤 표현을 어떻게 고치면 되는지 짧게 설명하세요.
-- 정답/오답 boolean은 반환하지 마세요. 통과 여부는 서버가 점수와 critical_errors로 결정합니다.
-
-{"score":0,"critical_errors":[],"feedback_lines":[""],"error_tags":[]}`;
-}
-
-async function callGeminiTranslationGrade(item: any, response: string) {
-  const provider = (Deno.env.get("AI_PROVIDER") ?? "").trim().toLowerCase(), key = Deno.env.get("GEMINI_API_KEY");
-  if (provider !== "gemini" || !key) throw new ApiError(503, "AI 채점이 아직 연결되지 않았습니다.");
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${key}`;
-  const base = { maxOutputTokens: 650, temperature: 0, responseMimeType: "application/json" }, configs = [{ ...base, thinkingConfig: { thinkingBudget: 0 } }, base];
-  let lastError = "";
-  for (const generationConfig of configs) {
-    const responseResult = await fetch(url, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ system_instruction: { parts: [{ text: GEMINI_GRADING_SYSTEM }] }, contents: [{ role: "user", parts: [{ text: workbookTranslationPrompt(item, response) }] }], generationConfig }) });
-    if (responseResult.ok) {
-      const payload = await responseResult.json(), answerText = (payload?.candidates?.[0]?.content?.parts || []).map((part: { text?: string }) => part?.text || "").join("").trim(), parsed = parseJson(answerText);
-      if (!parsed || !Number.isFinite(Number(parsed.score)) || !Array.isArray(parsed.critical_errors) || !Array.isArray(parsed.feedback_lines) || !Array.isArray(parsed.error_tags)) throw new ApiError(502, "AI 번역 채점 결과 형식이 올바르지 않습니다.");
-      const score = Math.max(0, Math.min(100, Math.round(Number(parsed.score))));
-      const criticalErrors = cleanList(parsed.critical_errors, 8, 160), feedbackLines = cleanList(parsed.feedback_lines, 3, 160), errorTags = cleanList(parsed.error_tags, 8, 40);
-      if (!feedbackLines.length) feedbackLines.push(score >= WORKBOOK_TRANSLATION_GRADING_POLICY.passScore && !criticalErrors.length ? "핵심 의미를 잘 전달했습니다." : "핵심 의미와 문장 관계를 다시 확인해 보세요.");
-      return { score, criticalErrors, feedbackLines, errorTags };
-    }
-    lastError = (await responseResult.text()).slice(0, 300);
-    if (responseResult.status !== 400) break;
-  }
-  console.error("READY workbook translation grading failed:", lastError);
-  throw new ApiError(502, "AI 번역 채점을 잠시 사용할 수 없습니다. 잠시 후 다시 제출해 주세요.");
 }
 
 async function studentForSession(session: ReadySession): Promise<Student> {
@@ -453,51 +406,7 @@ async function existingFactoryPassage(passageIdValue: unknown, allowFactoryCatal
   const sentenceRows = rows<any[]>(sentenceResult);
   return { passage: passageResult.data, sentenceRows, canonicalRows: factoryRows(sentenceRows), catalog: catalogResult.data };
 }
-async function factoryGemini(prompt: string, maxOutputTokens: number) {
-  const provider = (Deno.env.get("AI_PROVIDER") ?? "").trim().toLowerCase(), key = Deno.env.get("GEMINI_API_KEY");
-  if (provider !== "gemini" || !key) throw new ApiError(503, "Workbook Factory Gemini가 아직 연결되지 않았습니다.");
-  const base = { maxOutputTokens: Math.min(8_192, Math.max(256, maxOutputTokens)), temperature: 0.1, responseMimeType: "application/json" }, configs = [{ ...base, thinkingConfig: { thinkingBudget: 0 } }, base];
-  let lastStatus = 0, lastError = "";
-  for (const model of geminiModels()) for (const generationConfig of configs) {
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${key}`;
-    const response = await fetch(url, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ system_instruction: { parts: [{ text: "You create structured, source-grounded English workbook data. Return only JSON. Every correct answer must be an exact span from the supplied canonical sentence. You may create an intentionally wrong option or faulty exercise prompt only when requested, and replacing it with the correct answer must restore the unchanged canonical sentence exactly." }] }, contents: [{ role: "user", parts: [{ text: prompt }] }], generationConfig }) });
-    if (response.ok) { const payload = await response.json(), parsed = parseJson((payload?.candidates?.[0]?.content?.parts || []).map((part: any) => part?.text || "").join("")); if (!parsed) throw new ApiError(502, "Workbook Factory Gemini 결과 형식이 올바르지 않습니다."); return { parsed, tokenUsage: Number(payload?.usageMetadata?.totalTokenCount) || 0 }; }
-    lastStatus = response.status; lastError = (await response.text()).slice(0, 300); if (response.status === 400) continue; if (response.status === 429) break; throw new ApiError(502, `Workbook Factory Gemini 요청이 실패했습니다 (${response.status}).`);
-  }
-  console.error("READY Workbook Factory Gemini failed:", lastStatus, lastError);
-  throw new ApiError(lastStatus === 429 ? 429 : 502, `Workbook Factory Gemini 요청이 실패했습니다 (${lastStatus || "network"}).`);
-}
-async function factoryTranslate(rows: any[]) {
-  const result = await factoryGemini(`Translate each canonical English sentence into natural Korean. Preserve order; do not add meaning. Return {"translations":["..."]} with exactly ${rows.length} entries.\n${JSON.stringify(rows.map(row => row.text))}`, Math.min(8_192, 120 * rows.length + 400));
-  const translations = Array.isArray(result.parsed?.translations) ? result.parsed.translations.map((value: unknown) => clean(value, 5000)) : [];
-  if (translations.length !== rows.length || translations.some((value: string) => !value)) throw new ApiError(502, "문장별 한국어 해석을 검증하지 못했습니다.");
-  return { rows: rows.map((row, index) => ({ ...row, translation: translations[index] })), tokenUsage: result.tokenUsage };
-}
-async function factoryExercises(rows: any[], requestedTargets: Record<number, number[]>) {
-  const targets = Object.fromEntries([5, 6, 7].map(stage => [stage, [...new Set((requestedTargets?.[stage] || []).map(Number).filter(number => Number.isInteger(number) && number >= 1 && number <= rows.length))].slice(0, 6)]));
-  const stages = [5, 6, 7].filter(stage => targets[stage].length);
-  const generated: Record<number, any[]> = { 5: [], 6: [], 7: [] }, errors: string[] = [];
-  let tokenUsage = 0, callCount = 0, quotaStopped = false;
-  for (const stage of stages) for (let offset = 0; offset < targets[stage].length && !quotaStopped; offset += 6) {
-    const batch = targets[stage].slice(offset, offset + 6);
-    const ranges = stage === 7 ? batch.map(start => { const sentenceIndexes = rows.slice(start - 1, start + 5).map((_row, index) => start + index); return { sentenceIndexes, sentences: sentenceIndexes.map(sentenceIndex => ({ sentenceIndex, text: rows[sentenceIndex - 1].text, translation: rows[sentenceIndex - 1].translation })) }; }) : [];
-    const source = stage === 7 ? ranges : batch.map(sentenceIndex => ({ sentenceIndex, text: rows[sentenceIndex - 1].text, translation: rows[sentenceIndex - 1].translation }));
-    const fields = stage === 5 ? "sentenceIndex, prompt, hint, answer. prompt must equal canonical English with the exact answer replaced by 12 underscores; hint is the base verb" : stage === 6 ? "sentenceIndex, prompt, wrong, answer. prompt must equal canonical English with answer replaced by 12 underscores" : "sentenceIndexes, prompt, corrections:[{wrong,correct}]. Each item covers the supplied contiguous 5-8 sentence range and has exactly 2-3 correction pairs";
-    const scope = stage === 7 ? `Eligible ranges: ${JSON.stringify(ranges.map(range => range.sentenceIndexes))}. Return at most one item per eligible range; omit a range if two natural, exact corrections are not available.` : `Eligible sentence indexes: ${JSON.stringify(batch)}. Return exactly one item for every eligible sentence index.`;
-    const prompt = `Create only source-grounded READY Stage ${stage} exercises for the supplied canonical sentence pairs. Return exactly {"${stage}":[...]} and no other key. Item fields: ${fields}. ${scope} Preserve canonical text byte-for-byte except for the requested blank or substitutions. The wrong value is an intentional student-facing distractor, not a change to the canonical answer. For Stage 6, make one local span choice only; never use a comma-separated lemma list as an option. For Stage 7, each correction must restore the unchanged full canonical range exactly. Never create a new canonical answer.\n${JSON.stringify(source)}`;
-    callCount += 1;
-    try {
-      const result = await factoryGemini(prompt, Math.min(8_192, 220 * batch.length + 500)); tokenUsage += result.tokenUsage;
-      const accepted = (Array.isArray(result.parsed?.[stage]) ? result.parsed[stage] : []).filter((item: any) => stage === 7 ? ranges.some(range => JSON.stringify(range.sentenceIndexes) === JSON.stringify(item?.sentenceIndexes)) : batch.includes(Number(item?.sentenceIndex)));
-      generated[stage].push(...accepted);
-    } catch (error) {
-      errors.push(`stage${stage}:${error instanceof Error ? clean(error.message, 240) : "factory_ai_batch_failed"}`);
-      quotaStopped = error instanceof ApiError && (error.status === 429 || error.status === 503);
-    }
-  }
-  return { stages: generated, tokenUsage, callCount, errors };
-}
-async function finalizeFactoryJob(job: any, confirmedRows?: unknown, allowIncomplete = false, replaceExistingCatalog = false, useAiFallback = true, previewOnly = false) {
+async function finalizeFactoryJob(job: any, confirmedRows?: unknown, _allowIncomplete = false, replaceExistingCatalog = false, _useAiFallback = false, previewOnly = false) {
   const metadata = job.source_metadata || {}, existingMode = metadata.factoryMode === "existing_passage";
   const existingContext = existingMode ? await existingFactoryPassage(metadata.existingPassageId, replaceExistingCatalog) : null;
   const rowsForCatalog = existingMode ? existingContext.canonicalRows : factoryRows(confirmedRows ?? job.extracted_rows);
@@ -509,43 +418,26 @@ async function finalizeFactoryJob(job: any, confirmedRows?: unknown, allowIncomp
   const sourceType = existingMode ? existingContext.passage.source_type : metadata.sourceType === "MOCK_EXAM" ? "MOCK_EXAM" : "TEXTBOOK", title = existingMode ? existingContext.passage.title : required(job.title, "지문 제목", 120), grade = existingMode ? existingContext.passage.grade : required(metadata.grade, "학년", 40), sourceYear = existingMode ? existingContext.passage.source_year : metadata.sourceYear ? Math.round(Number(metadata.sourceYear)) : null, sourceMonth = existingMode ? existingContext.passage.source_month : metadata.sourceMonth ? Math.round(Number(metadata.sourceMonth)) : null;
   if (sourceType === "MOCK_EXAM" && (!sourceYear || !sourceMonth)) throw new ApiError(400, "모의고사는 연도와 월이 필요합니다.");
   const sourceExercises = Array.isArray(job.extraction?.sourceExercises) ? job.extraction.sourceExercises : [], previewKey = `factory-preview-${existingMode ? existingContext.passage.id : job.id}`;
-  let previewCatalog = generateWorkbookCatalog({ title: `${title} · READY 워크북`, workbookKey: previewKey, rows: rowsForCatalog, sourceExercises, provenance: { pdfExtractedExercises: Number(job.extraction?.exerciseCount) || 0 } });
-  const cachedPreview: any = !previewOnly && !replaceExistingCatalog && job.extraction?.previewAi && typeof job.extraction.previewAi === "object" ? job.extraction.previewAi : null;
-  let ai: { stages: Record<number, any[]>; tokenUsage: number; callCount: number; errors: string[] } = cachedPreview
-    ? { stages: { 5: Array.isArray(cachedPreview.stages?.[5]) ? cachedPreview.stages[5] : [], 6: Array.isArray(cachedPreview.stages?.[6]) ? cachedPreview.stages[6] : [], 7: Array.isArray(cachedPreview.stages?.[7]) ? cachedPreview.stages[7] : [] }, tokenUsage: Math.max(0, Math.round(Number(cachedPreview.tokenUsage)) || 0), callCount: Math.max(0, Math.round(Number(cachedPreview.callCount)) || 0), errors: Array.isArray(cachedPreview.errors) ? cachedPreview.errors.map(error => clean(error, 240)).filter(Boolean) : [] }
-    : { stages: { 5: [], 6: [], 7: [] }, tokenUsage: 0, callCount: 0, errors: [] };
-  // Keep the Edge request bounded: one source-grounded AI pass is followed by
-  // the validated deterministic fallback for any remaining Stage 6/7 gaps.
-  // Final confirmation reuses the already validated preview supplement.
-  for (let round = 0; !cachedPreview && useAiFallback && round < 1; round += 1) {
-    const fallbackTargets = factoryFallbackTargets(previewCatalog, rowsForCatalog, sourceExercises);
-    if (![5, 6, 7].some(stage => fallbackTargets[stage].length)) break;
-    const next = await factoryExercises(rowsForCatalog, fallbackTargets);
-    for (const stage of [5, 6, 7]) ai.stages[stage].push(...next.stages[stage]);
-    ai.tokenUsage += next.tokenUsage; ai.callCount += next.callCount; ai.errors.push(...next.errors);
-    previewCatalog = generateWorkbookCatalog({ title: `${title} · READY 워크북`, workbookKey: previewKey, rows: rowsForCatalog, ai: ai.stages, sourceExercises, provenance: { pdfExtractedExercises: Number(job.extraction?.exerciseCount) || 0 } });
-    if (next.errors.some(error => /한도|연결되지/.test(error))) break;
-  }
-  const provenance = { factoryMode: existingMode ? "existing_passage" : "new_passage", canonicalSource: existingMode ? "ready_passage_sentences" : "factory_review", sourceKind: job.source_kind, documentSha256: clean(metadata.documentSha256, 128), documentName: clean(metadata.documentName, 240), extractionPairing: clean(job.extraction?.pairing, 40), fullWorkbook: job.extraction?.fullWorkbook === true, sourceExerciseCount: sourceExercises.length, geminiCallCount: ai.callCount, geminiTokenUsage: ai.tokenUsage, pdfExtractedExercises: Number(job.extraction?.exerciseCount) || 0, ...(ai.errors.length ? { fallbackError: clean(ai.errors.join(" | "), 500) } : {}) };
-  previewCatalog = generateWorkbookCatalog({ title: `${title} · READY 워크북`, workbookKey: previewKey, rows: rowsForCatalog, ai: ai.stages, sourceExercises, provenance, allowDerivedFallback: true });
+  const provenance = { factoryMode: existingMode ? "existing_passage" : "new_passage", canonicalSource: existingMode ? "ready_passage_sentences" : "factory_review", sourceKind: job.source_kind, documentSha256: clean(metadata.documentSha256, 128), documentName: clean(metadata.documentName, 240), extractionPairing: clean(job.extraction?.pairing, 40), fullWorkbook: job.extraction?.fullWorkbook === true, sourceExerciseCount: sourceExercises.length, semanticContract: SEMANTIC_WORKBOOK_CONTRACT, geminiCallCount: 0, geminiTokenUsage: 0, pdfExtractedExercises: Number(job.extraction?.exerciseCount) || 0 };
+  let previewCatalog = generateWorkbookCatalog({ title: `${title} · READY 워크북`, workbookKey: previewKey, rows: rowsForCatalog, sourceExercises, provenance });
   if (previewOnly) {
     if (!replaceExistingCatalog) {
-      const previewExtraction = { ...(job.extraction || {}), previewAi: { stages: ai.stages, tokenUsage: ai.tokenUsage, callCount: ai.callCount, errors: ai.errors } };
+      const previewExtraction = { ...(job.extraction || {}) }; delete previewExtraction.previewAi;
       const reviewed = await db.from("ready_workbook_factory_jobs").update({ status: "review_required", extracted_rows: rowsForCatalog, extraction: previewExtraction, metrics: previewCatalog.metrics, failure_reason: "" }).eq("id", job.id);
       if (reviewed.error) throw new ApiError(500, reviewed.error.message);
     }
-    return { confirmationRequired: true, incompleteReview: previewCatalog.metrics.incompleteStages.length > 0, metrics: previewCatalog.metrics };
+    return { confirmationRequired: true, incompleteReview: previewCatalog.metrics.unresolved > 0, metrics: previewCatalog.metrics };
   }
-  if (previewCatalog.metrics.incompleteStages.length && !allowIncomplete) {
+  if (previewCatalog.metrics.unresolved > 0) {
     if (!replaceExistingCatalog) {
       const reviewed = await db.from("ready_workbook_factory_jobs").update({ status: "review_required", metrics: previewCatalog.metrics, failure_reason: "" }).eq("id", job.id);
       if (reviewed.error) throw new ApiError(500, reviewed.error.message);
     }
-    return { incompleteReview: true, metrics: previewCatalog.metrics, message: "5·6·7단계 중 생성되지 않은 문제가 있습니다. 단계별 수량을 확인해 주세요." };
+    return { incompleteReview: true, metrics: previewCatalog.metrics, message: "원본 source와 Answer Key로 검증되지 않은 문제가 있습니다. semantic-v2는 unresolved=0일 때만 게시할 수 있습니다." };
   }
   const passageId = existingMode ? existingContext.passage.id : rows<string>(await db.rpc("ready_create_passage_with_sentences", { p_title: title, p_source_type: sourceType, p_grade: grade, p_source_year: sourceYear, p_source_month: sourceMonth, p_source_label: clean(metadata.sourceLabel, 120), p_rows: rowsForCatalog }));
   const workbookKey = `factory-${passageId}`;
-  const catalog = generateWorkbookCatalog({ title: `${title} · READY 워크북`, workbookKey, rows: rowsForCatalog, ai: ai.stages, sourceExercises, provenance, allowDerivedFallback: true });
+  const catalog = generateWorkbookCatalog({ title: `${title} · READY 워크북`, workbookKey, rows: rowsForCatalog, sourceExercises, provenance });
   const catalogRow = { passage_id: passageId, workbook_key: catalog.workbookKey, catalog, provenance, metrics: catalog.metrics, factory_job_id: job.id, updated_at: new Date().toISOString() };
   const saved = replaceExistingCatalog
     ? await db.from("ready_workbook_catalogs").update(catalogRow).eq("passage_id", passageId).eq("factory_job_id", job.id).select("passage_id").maybeSingle()
@@ -570,18 +462,18 @@ async function factoryStart(body: any) {
   }
   if (!sourceText && (!existingMode || sourceKind === "pdf")) throw new ApiError(400, sourceKind === "pdf" ? "텍스트를 추출할 수 없는 PDF입니다. OCR PDF는 지원하지 않습니다." : "본문을 입력해 주세요.");
   const inspected: any = sourceKind === "pdf" ? inspectFullWorkbookText(sourceText, existingMode ? existingContext.canonicalRows : null) : sourceText ? { fullWorkbook: false, reviewRequired: true, ...extractSentenceRows(sourceText), exercises: [], headings: [], reason: "passage input requires review" } : { fullWorkbook: false, reviewRequired: true, rows: [], exercises: [], headings: [], reason: "기존 canonical 문장을 사용합니다." };
-  let rowsForReview = existingMode ? existingContext.canonicalRows : inspected.rows || [], translationTokens = 0;
+  const rowsForReview = existingMode ? existingContext.canonicalRows : inspected.rows || [];
   if (existingMode && sourceKind === "pdf") {
     const consistency = compareCanonicalRows(existingContext.canonicalRows, inspected.rows || []);
     if (!consistency.consistent) throw new ApiError(400, "업로드한 PDF 본문이 선택한 Passage의 canonical 문장과 일치하지 않습니다.", consistency);
     inspected.canonicalConsistency = consistency;
     inspected.reviewRequired = true;
   }
-  if (!existingMode && rowsForReview.length && rowsForReview.some((row: any) => !clean(row.translation))) { const translated = await factoryTranslate(rowsForReview); rowsForReview = translated.rows; translationTokens = translated.tokenUsage; inspected.reviewRequired = true; }
+  if (!existingMode && rowsForReview.some((row: any) => !clean(row.translation))) throw new ApiError(400, "Workbook Factory는 AI 번역을 만들지 않습니다. 원본 출판사 해석이 포함된 PDF 또는 영문/한글 문장쌍을 사용해 주세요.");
   if (!rowsForReview.length) throw new ApiError(400, "영문 문장 경계를 확정하지 못했습니다. 줄바꿈된 영문/한글 문장을 붙여 넣어 주세요.");
   const metadata = { factoryMode: existingMode ? "existing_passage" : "new_passage", existingPassageId: existingMode ? existingContext.passage.id : "", sourceType: existingMode ? existingContext.passage.source_type : body.sourceType, grade: existingMode ? existingContext.passage.grade : body.grade, sourceYear: existingMode ? existingContext.passage.source_year : body.sourceYear, sourceMonth: existingMode ? existingContext.passage.source_month : body.sourceMonth, sourceLabel: existingMode ? existingContext.passage.source_label : body.sourceLabel, documentName: clean(body.documentName, 240), documentSha256: sourceKind === "pdf" ? await sha256Hex(clean(body.pdfBase64, 20_000_000).replace(/^data:application\/pdf;base64,/i, "")) : "" };
-  const extraction = { fullWorkbook: !!inspected.fullWorkbook, reviewRequired: existingMode ? true : !!inspected.reviewRequired, reason: existingMode ? "기존 ready_passage_sentences를 canonical source로 사용합니다." : clean(inspected.reason, 500), canonicalConsistency: inspected.canonicalConsistency || null, headings: inspected.headings || [], exerciseCount: (inspected.exercises || []).length, incompleteStages: inspected.incompleteStages || [], sourceExercises: (inspected.exercises || []).map((exercise: any) => ({ ...exercise, provenance: { page: Number(exercise.page) || null, semanticType: clean(exercise.type, 80), sourceExerciseNumber: Number(exercise.number) || null } })), pairing: inspected.pairing || (existingMode ? "existing_canonical" : "pdf") };
-  const created = rows<any>(await db.from("ready_workbook_factory_jobs").insert({ status: "review_required", source_kind: sourceKind, title, source_metadata: metadata, extracted_rows: rowsForReview, extraction, metrics: { sentenceCount: rowsForReview.length, geminiCallCount: translationTokens ? 1 : 0, geminiTokenUsage: translationTokens } }).select().single());
+  const extraction = { fullWorkbook: !!inspected.fullWorkbook, reviewRequired: existingMode ? true : !!inspected.reviewRequired, reason: existingMode ? "기존 ready_passage_sentences를 canonical source로 사용합니다." : clean(inspected.reason, 500), canonicalConsistency: inspected.canonicalConsistency || null, headings: inspected.headings || [], exerciseCount: (inspected.exercises || []).length, incompleteStages: inspected.incompleteStages || [], sourceExercises: (inspected.exercises || []).map((exercise: any) => ({ ...exercise, provenance: { ...(exercise.provenance || {}), page: Number(exercise.page || exercise.provenance?.page) || null, semanticType: clean(exercise.type, 80), sourceExerciseNumber: Number(exercise.number) || null } })), pairing: inspected.pairing || (existingMode ? "existing_canonical" : "pdf") };
+  const created = rows<any>(await db.from("ready_workbook_factory_jobs").insert({ status: "review_required", source_kind: sourceKind, title, source_metadata: metadata, extracted_rows: rowsForReview, extraction, metrics: { sentenceCount: rowsForReview.length, semanticContract: SEMANTIC_WORKBOOK_CONTRACT, geminiCallCount: 0, geminiTokenUsage: 0 } }).select().single());
   // Even a fully verified publisher workbook waits for an explicit admin
   // confirmation before creating a Passage or publishing a catalog.
   return { job: created, autoCompleted: false, reviewRequired: true };
@@ -1118,26 +1010,27 @@ async function studentWorkbook(body: any, session: ReadySession) {
   const bookmarkRows = rows<any[]>(await db.from("ready_workbook_bookmarks").select("item_key").eq("student_id", student.id).eq("exam_id", examId).eq("passage_id", passageId).eq("workbook_key", catalog.workbookKey)), bookmarks = new Set(bookmarkRows.map(row => row.item_key));
   const latest = new Map<string, boolean>();
   for (const attempt of attempts) if (!latest.has(attempt.item_key)) latest.set(attempt.item_key, attempt.correct === true);
-  const stages = catalog.stages.map((stage: any) => ({
+  const semanticCatalog = catalog.contractVersion === SEMANTIC_WORKBOOK_CONTRACT;
+  const stages = catalog.stages.filter((stage: any) => !semanticCatalog || stage.items.length > 0).map((stage: any) => ({
     stage: stage.stage, title: stage.title, instruction: stage.instruction,
     locked: false, lockReason: "",
     total: stage.items.length,
     attempted: stage.items.filter((item: any) => latest.has(item.key)).length,
     completed: stage.items.filter((item: any) => latest.get(item.key) === true).length,
     items: stage.items.map((item: any) => ({
-      key: item.key, stage: item.stage, number: item.number, kind: item.kind || "blank_input",
+      key: item.key, stage: item.stage, semanticType: clean(item.semanticType, 40), number: item.number, kind: item.kind || "blank_input",
       source: item.source, prompt: item.prompt, slotCount: item.answers.length,
       hints: Array.isArray(item.hints) ? item.hints : [],
       groups: Array.isArray(item.groups) ? item.groups : [],
       wordBank: Array.isArray(item.wordBank) ? item.wordBank : [],
       pairCount: Number(item.pairCount) || 0, subtype: clean(item.subtype, 40),
       assistance: workbookAssistanceMode(item),
-      grading: item.kind === "translation_ai" ? { mode: "ai" } : item.kind === "correction_pairs" || [2, 3, 9].includes(Number(item.stage)) ? { mode: "server_deterministic" } : { mode: "deterministic", answers: item.answers },
+      grading: semanticCatalog && ['korean_blank','english_blank','translation','writing'].includes(item.semanticType) ? { mode: "server_deterministic" } : item.kind === "translation_ai" ? { mode: "ai" } : item.kind === "correction_pairs" || [2, 3, 9].includes(Number(item.stage)) ? { mode: "server_deterministic" } : { mode: "deterministic", answers: item.answers },
       completed: latest.get(item.key) === true, lastResult: latest.get(item.key) ?? null, bookmarked: bookmarks.has(item.key),
     })),
   }));
   const savedWords=await savedWordList(student.id,examId);
-  return { workbookKey: catalog.workbookKey, title: catalog.title, passage: { id: passage.id, title: passage.title, updated_at: passage.updated_at }, savedWords, stages };
+  return { contractVersion: catalog.contractVersion || 'legacy-v1', workbookKey: catalog.workbookKey, title: catalog.title, passage: { id: passage.id, title: passage.title, updated_at: passage.updated_at }, savedWords, stages };
 }
 
 async function workbookAssistance(body: any, session: ReadySession) {
@@ -1150,7 +1043,7 @@ async function workbookAssistance(body: any, session: ReadySession) {
 async function workbookRecallUnlock(body: any, session: ReadySession) {
   const student = await studentForSession(session), examId = required(body.examId, "Exam", 80), passageId = required(body.passageId, "지문", 80), itemKey = required(body.itemKey, "워크북 문제", 120), slot = Number(body.slot);
   const passage = await studentPassageAccess(examId, passageId, student), catalog = await workbookForPassage(passage), item = workbookItem(catalog, itemKey), contract = workbookAssistanceMode(item);
-  if (!catalog || !item || ![2, 3].includes(Number(item.stage)) || contract?.mode !== "recall_unlock" || !Number.isInteger(slot) || slot < 0 || slot >= item.answers.length) throw new ApiError(404, "현재 자동 완성할 수 없는 빈칸입니다.");
+  if (!catalog || !item || contract?.mode !== "recall_unlock" || !Number.isInteger(slot) || slot < 0 || slot >= item.answers.length) throw new ApiError(404, "현재 자동 완성할 수 없는 빈칸입니다.");
   const cue = workbookRecallCue(body.cue, contract.recallMode), expected = workbookRecallCue(item.answers[slot], contract.recallMode);
   if (!cue || cue !== expected) throw new ApiError(400, "첫 글자를 다시 확인해 주세요.");
   return { slot, answer: item.answers[slot] };
@@ -1169,20 +1062,19 @@ async function verifyHintReceipt(token: unknown, expected: any) {
 async function workbookHint(body: any, session: ReadySession) {
   const student = await studentForSession(session), examId = required(body.examId, "Exam", 80), passageId = required(body.passageId, "지문", 80), itemKey = required(body.itemKey, "워크북 문제", 120);
   const passage = await studentPassageAccess(examId, passageId, student), catalog = await workbookForPassage(passage), item = workbookItem(catalog, itemKey);
-  const requestedSlots:number[] = [...new Set<number>((Array.isArray(body.slots) ? body.slots : [body.slot]).map((value:unknown)=>Number(value)).filter((slot:number) => Number.isInteger(slot) && slot >= 0 && slot < (item?.answers?.length || 0)))];
-  if (!catalog || !item || Number(item.stage) !== 9 || !requestedSlots.length) throw new ApiError(404, "현재 힌트를 제공할 수 없는 빈칸입니다.");
+  if (!catalog || !item || item.semanticType !== 'writing' || item.kind !== 'full_sentence_input') throw new ApiError(404, "현재 힌트를 제공할 수 없는 문제입니다.");
   const identity = { studentId: student.id, examId, passageId, itemKey }, prior = body.hintReceipt ? await verifyHintReceipt(body.hintReceipt, identity) : null;
   if (body.hintReceipt && !prior) throw new ApiError(400, "힌트 상태를 다시 시작해 주세요.");
-  const hintCount = 1, usedFullAnswerHint = false;
+  const hintCount = 1, usedFullAnswerHint = true;
   const hintReceipt = await signHintReceipt({ ...identity, hintCount, usedFullAnswerHint, issuedAt: new Date().toISOString() });
-  return { fragments: requestedSlots.map(slot => ({ slot, fragment: stageNineHint(item.answers[slot]) })), hintCount, usedFullAnswerHint, hintReceipt };
+  return { answer: item.answers[0], visibleForMs: 5000, hintCount, usedFullAnswerHint, hintReceipt };
 }
 async function setWorkbookBookmark(body: any, session: ReadySession) {
   const student = await studentForSession(session), examId = required(body.examId, "Exam", 80), passageId = required(body.passageId, "지문", 80), itemKey = required(body.itemKey, "워크북 문제", 120), bookmarked = body.bookmarked === true;
   const passage = await studentPassageAccess(examId, passageId, student), catalog = await workbookForPassage(passage), item = workbookItem(catalog, itemKey);
   if (!catalog || !item) throw new ApiError(404, "현재 저장할 수 없는 워크북 문제입니다.");
   if (bookmarked) {
-    const saved = await db.from("ready_workbook_bookmarks").upsert({ student_id: student.id, exam_id: examId, passage_id: passageId, workbook_key: catalog.workbookKey, item_key: item.key, item_type: item.kind, source: "manual", updated_at: new Date().toISOString() }, { onConflict: "student_id,exam_id,passage_id,workbook_key,item_key" });
+    const saved = await db.from("ready_workbook_bookmarks").upsert({ student_id: student.id, exam_id: examId, passage_id: passageId, workbook_key: catalog.workbookKey, item_key: item.key, item_type: item.kind, stage_contract_version: catalog.contractVersion || "legacy-v1", semantic_type: item.semanticType || null, source: "manual", updated_at: new Date().toISOString() }, { onConflict: "student_id,exam_id,passage_id,workbook_key,item_key" });
     if (saved.error) throw new ApiError(500, saved.error.message);
   } else {
     const removed = await db.from("ready_workbook_bookmarks").delete().eq("student_id", student.id).eq("exam_id", examId).eq("passage_id", passageId).eq("workbook_key", catalog.workbookKey).eq("item_key", item.key);
@@ -1208,31 +1100,13 @@ async function submitWorkbookAttempt(body: any, session: ReadySession) {
     completedAfterHint = correct && usedFullAnswerHint;
     if (usedFullAnswerHint) correct = false;
   }
-  if(item.kind==="translation_ai"&&!revealedAnswer){
-    const today = new Date(); today.setHours(0, 0, 0, 0);
-    const used = await db.from("ready_workbook_ai_grading_requests").select("id", { count: "exact", head: true }).eq("student_id", student.id).gte("created_at", today.toISOString());
-    if (used.error) throw new ApiError(500, used.error.message);
-    if ((used.count || 0) >= AI_GRADING_DAILY_LIMIT) throw new ApiError(429, `오늘 AI 채점 ${AI_GRADING_DAILY_LIMIT}회를 모두 사용했습니다.`);
-    const rubricSnapshot = { sourceEnglish: item.source, publisherReferenceTranslation: item.answers[0], graderModel: GEMINI_MODEL, gradingPolicy: WORKBOOK_TRANSLATION_GRADING_POLICY.version, passScore: WORKBOOK_TRANSLATION_GRADING_POLICY.passScore, rubric: WORKBOOK_TRANSLATION_GRADING_POLICY.rubric };
-    const pending = rows<any>(await db.from("ready_workbook_ai_grading_requests").insert({ student_id: student.id, exam_id: examId, passage_id: passageId, workbook_key: catalog.workbookKey, item_key: item.key, response: { responses }, rubric_snapshot: rubricSnapshot, status: "pending" }).select("id").single());
-    aiRequestId = pending.id;
-    try {
-      const grade=await callGeminiTranslationGrade(item,responses[0]);
-      aiScore=grade.score;gradingPolicy=WORKBOOK_TRANSLATION_GRADING_POLICY.version;correct=workbookTranslationPass(grade.score,grade.criticalErrors);slotResults=[correct];aiFeedbackLines=grade.feedbackLines;aiFeedback=grade.feedbackLines.join(" ");
-      const completed = await db.from("ready_workbook_ai_grading_requests").update({ status: "completed", result: { score: grade.score, correct, critical_errors: grade.criticalErrors, feedback_lines: grade.feedbackLines, error_tags: grade.errorTags, grader_model: GEMINI_MODEL, grading_policy: WORKBOOK_TRANSLATION_GRADING_POLICY.version, pass_score: WORKBOOK_TRANSLATION_GRADING_POLICY.passScore }, completed_at: new Date().toISOString() }).eq("id", aiRequestId).eq("status", "pending");
-      if (completed.error) throw new ApiError(500, completed.error.message);
-    } catch (error) {
-      await db.from("ready_workbook_ai_grading_requests").update({ status: "failed", error_code: error instanceof ApiError ? `http_${error.status}` : "unknown", completed_at: new Date().toISOString() }).eq("id", aiRequestId).eq("status", "pending");
-      throw error;
-    }
-  }
   const inserted = rows<any>(await db.from("ready_workbook_attempts").insert({
     student_id: student.id, exam_id: examId, passage_id: passageId, workbook_key: catalog.workbookKey,
-    item_key: item.key, stage: item.stage, response: { responses, revealedAnswer }, correct, ai_grading_request_id: aiRequestId,
+    item_key: item.key, stage: item.stage, stage_contract_version: catalog.contractVersion || "legacy-v1", semantic_type: item.semanticType || null, response: { responses, revealedAnswer }, correct, ai_grading_request_id: aiRequestId,
     hint_count: hintCount, used_full_answer_hint: usedFullAnswerHint, completed_after_hint: completedAfterHint,
   }).select("id,correct,created_at").single());
   if (!correct) {
-    const saved = await db.from("ready_workbook_bookmarks").upsert({ student_id: student.id, exam_id: examId, passage_id: passageId, workbook_key: catalog.workbookKey, item_key: item.key, item_type: item.kind, source: "wrong_answer", updated_at: new Date().toISOString() }, { onConflict: "student_id,exam_id,passage_id,workbook_key,item_key", ignoreDuplicates: true });
+    const saved = await db.from("ready_workbook_bookmarks").upsert({ student_id: student.id, exam_id: examId, passage_id: passageId, workbook_key: catalog.workbookKey, item_key: item.key, item_type: item.kind, stage_contract_version: catalog.contractVersion || "legacy-v1", semantic_type: item.semanticType || null, source: "wrong_answer", updated_at: new Date().toISOString() }, { onConflict: "student_id,exam_id,passage_id,workbook_key,item_key", ignoreDuplicates: true });
     if (saved.error) throw new ApiError(500, saved.error.message);
   } else {
     const resolved = await db.from("ready_workbook_bookmarks").delete().eq("student_id", student.id).eq("exam_id", examId).eq("passage_id", passageId).eq("workbook_key", catalog.workbookKey).eq("item_key", item.key).eq("source", "wrong_answer");

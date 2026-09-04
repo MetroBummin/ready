@@ -8,6 +8,8 @@ const read=path=>readFileSync(resolve(root,path),'utf8');
 const admin=read('ready/admin/app.js');
 const student=read('ready/app.js');
 const edge=read('server/ready/index.ts');
+assert.match(edge,/previewCatalog\.metrics\.unresolved > 0/,'semantic-v2 publication must fail closed whenever any source item is unresolved.');
+assert.doesNotMatch(edge,/incompleteStages\.length && !allowIncomplete/,'allowIncomplete must not bypass semantic-v2 source validation.');
 const types=read('ready/QUESTION_TYPES.md');
 const importing=read('ready/QUESTION_IMPORT.md');
 const inventory=read('ready/inventory/2026-06-busan-18-28.md');
@@ -63,8 +65,8 @@ assert.match(edge,/requestedDifficulty[\s\S]*taxonomySet/,'Server-side difficult
 assert.match(edge,/questionVisibleInScope[\s\S]*isQuestionQaScope/,'AI reference variants need an exact QA-scope visibility gate');
 assert.match(edge,/has_workbook:\s*!!codeWorkbookForPassage\(passage\)\s*\|\|\s*factoryPassageIds\.has\(passage\.id\)/,'Student bootstrap must expose static and Factory workbook availability from the server catalog');
 assert.match(edge,/factory_start[\s\S]*factory_confirm[\s\S]*ready_workbook_catalogs/,'Workbook Factory admin operations or persisted catalog are missing');
-assert.match(edge,/factoryFallbackTargets\(previewCatalog, rowsForCatalog, sourceExercises\)[\s\S]*some\(stage => fallbackTargets\[stage\]\.length\)/,'Full Workbook source reuse must ask Gemini only for missing validated coverage');
-assert.match(edge,/Math\.min\(8_192[\s\S]*geminiModels\(\)[\s\S]*response\.status === 429/,'Factory Gemini calls need a bounded output and quota-aware model fallback');
+assert.doesNotMatch(edge,/factoryGemini|factoryExercises|factoryTranslate/,'Workbook Factory must have no Gemini generation or translation path.');
+assert.match(edge,/semanticContract: SEMANTIC_WORKBOOK_CONTRACT[\s\S]*geminiCallCount: 0/,'Factory provenance must record semantic-v2 and zero model calls.');
 assert.match(student,/function hasWorkbook\(passage\)\{return passage\?\.has_workbook===true;\}/,'Student home must use the server workbook flag instead of a textbook allowlist');
 assert.match(edge,/configs = \[\{ \.\.\.base, thinkingConfig[\s\S]*response\.status !== 400/,'AI grading lacks the model compatibility fallback used by dictionary calls');
 

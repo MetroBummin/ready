@@ -18,14 +18,15 @@ assert.equal(audit.reviewRequired, false, 'A real workbook with exact Stage 5-7 
 assert.equal(audit.rows.length, 41, 'The publisher Stage 2/3 source must produce 41 exact bilingual canonical rows.');
 assert.equal(audit.exercises.filter(item => item.type === 'verb_form' && item.provenance?.origin === 'publisher_answer_key').length, 41, 'Stage 5 must be linked to all publisher answer-key rows.');
 assert.equal(audit.exercises.filter(item => item.type === 'grammar_vocab_choice' && item.provenance?.origin === 'publisher_answer_key').length, 41, 'Stage 6 must be linked to all publisher answer-key rows.');
-assert.equal(audit.exercises.filter(item => item.type === 'error_correction' && item.provenance?.origin === 'publisher_answer_key').length, 8, 'Stage 7 must preserve all publisher context and grammar range exercises rather than sentence count.');
+assert.equal(audit.exercises.filter(item => item.type === 'error_correction').length, 0, 'Legacy correction must not enter the semantic source set.');
 assert.deepEqual(audit.incompleteStages, []);
 const catalog = generateWorkbookCatalog({ title: 'Real PDF audit', workbookKey: 'real-pdf-audit', rows: audit.rows, sourceExercises: audit.exercises });
-for (const stage of [2, 3, 4, 5, 6, 8]) assert.equal(catalog.stages.find(entry => entry.stage === stage).items.length, 41, `Stage ${stage} must retain every canonical sentence.`);
-assert.equal(catalog.stages.find(entry => entry.stage === 9).items.length, 0, 'An unstructured writing section must stay private instead of becoming 41 synthetic whole-sentence prompts.');
-assert.deepEqual(catalog.metrics.stageCoverage[9], { ready: 0, expected: 0 });
-assert.equal(catalog.stages.find(entry => entry.stage === 7).items.length, 8, 'Publisher Stage 7 must remain eight passage/range exercises, not 41 sentence exercises.');
-assert.deepEqual(catalog.metrics.stageCoverage[7], { ready: 8, expected: 8 });
+assert.deepEqual(catalog.stages.map(stage=>stage.stage),[1,2,3,4,5,6,7]);
+assert.equal(catalog.stages.find(entry => entry.stage === 4).items.length,41);
+assert.equal(catalog.stages.find(entry => entry.stage === 5).items.length,41);
+assert.equal(catalog.stages.find(entry => entry.stage === 7).items.length,0,'A writing section without an unambiguous one-sentence canonical link stays private.');
+assert.ok(catalog.metrics.unresolved>0,'Unresolved semantic source must block publication instead of being synthesized.');
+assert.equal(catalog.metrics.geminiCallCount,0);
 assert.equal(catalog.metrics.validatorDrop, 0, 'Punctuation must not cause deterministic exercise drops.');
 
 console.log('READY PDF Unicode extraction checks passed.');

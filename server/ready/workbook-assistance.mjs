@@ -11,6 +11,9 @@ export function workbookRecallCue(value, mode) {
 }
 
 export function workbookAssistanceMode(item) {
+  if (item?.semanticType === 'korean_blank') return { mode: 'recall_unlock', recallMode: 'korean_syllable' };
+  if (item?.semanticType === 'english_blank') return { mode: 'recall_unlock', recallMode: 'english_initial' };
+  if (item?.semanticType === 'writing') return { mode: 'prefix_typing' };
   if (Number(item.stage) === 2) return { mode: 'recall_unlock', recallMode: 'korean_syllable' };
   if (Number(item.stage) === 3) return { mode: 'recall_unlock', recallMode: 'english_initial' };
   if (Number(item.stage) === 9) return { mode: 'prefix_typing' };
@@ -20,7 +23,7 @@ export function workbookAssistanceMode(item) {
 export async function publicWorkbookAssistance(item, sha256Hex, cryptoImpl = globalThis.crypto) {
   const modeContract = workbookAssistanceMode(item);
   if (!modeContract) return null;
-  if (Number(item.stage) === 2 || Number(item.stage) === 3) {
+  if (modeContract.mode === 'recall_unlock') {
     const mode = modeContract.recallMode;
     const slots = await Promise.all(item.answers.map(async answer => {
       const salt = cryptoImpl.randomUUID();
