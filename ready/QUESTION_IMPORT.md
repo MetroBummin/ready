@@ -79,6 +79,8 @@ PDF
 
 학생 풀이와 출제의 최소 단위는 언제나 개별 Question이다. `source.set_id`는 같은 PDF 묶음에서 왔다는 출처 추적값일 뿐, 화면 묶음·풀이 순서·상태 공유의 기준으로 사용하지 않는다. 각 Question은 같은 canonical Passage를 참조할 수 있지만, 학생 화면에는 현재 Question의 `set_text` 또는 최소 장치만 적용한다. 따라서 다른 Question의 빈칸, ⓐ~ⓔ, (A)~(E)가 현재 지문에 섞여서는 안 된다.
 
+Reference Bank도 이 원자성을 바꾸지 않는다. 여러 source Question을 근거로 새 문항 하나를 만들 수는 있지만, 서로 독립적인 두 발문을 한 payload에 합치지 않는다. 반대로 하나의 발문이 복수 선택이나 여러 correction slot을 명시적으로 요구하면 같은 Question의 단일 answer contract로 유지한다.
+
 ## Validation
 
 1. canonical Passage ID가 명시적 `source.passage_no`와 맞는지 확인한다.

@@ -2,8 +2,9 @@ import { sourceContractErrors } from "./source-contract.mjs";
 import { interactionContractErrors, publisherRoundTripErrors } from "./interaction-contract.mjs";
 
 // AI-authored Questions must first follow ready/QUESTION_AUTHORING.md and pass
-// question-authoring-quality.mjs against the canonical passage. This renderer
-// validation is necessary but cannot by itself prove source fidelity.
+// question-authoring-quality.mjs or question-reference-bank.mjs against the
+// canonical passage. This renderer validation is necessary but cannot by
+// itself prove source fidelity.
 
 export const READY_RENDERERS = Object.freeze([
   "standard_mcq",

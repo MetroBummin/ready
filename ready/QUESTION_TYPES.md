@@ -161,6 +161,8 @@ Passage와의 영어 bigram 일치를 하위 호환 검증으로 사용한다.
 
 학생 문제 풀이는 한 화면에 한 문제만 보여 주는 Shorts 방식이다. 모바일은 세로 스와이프, 데스크톱은 휠·트랙패드, 키보드는 위·아래 방향키로 이동한다. 긴 문제는 화면 내부를 끝까지 읽은 뒤 추가 동작이 있어야 다음 문제로 넘어간다.
 
+기본 저장 계약은 **1 READY card = 1 independently answerable Question**이다. 같은 canonical Passage에서 요지·어법·빈칸·내용·영작을 각각 출제하면 다섯 개의 독립 `ready_questions`와 다섯 개 Shorts card로 저장한다. 중복 표시를 피하려고 canonical을 축약하지 않는다. 하나의 발문이 복수 정답이나 여러 답칸을 요구할 때만 한 Question 안에 유지하며, 서로 독립된 발문을 한 card에 합치지 않는다.
+
 Home의 `문제풀기`는 먼저 source와 taxonomy 필터를 보여 준다. source는 `전체`,
 `exam4you`, `nernter` 중 하나를 선택하고 taxonomy는 여러 개를 동시에 선택할 수 있다.
 필터는 READY이면서 아직 제출하지 않은 Question ID로 queue를 만들 뿐 Question contract를
