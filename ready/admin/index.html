@@ -24,9 +24,9 @@
     <link rel="stylesheet" href="../../styles/base.css" />
     <link rel="stylesheet" href="../../design-tokens.css?v=ready-system-1" />
     <link rel="stylesheet" href="../ready.css?v=ready-system-1" />
-    <link rel="stylesheet" href="../design.css?v=ready-system-1-scope-groups-2" />
+    <link rel="stylesheet" href="../design.css?v=ready-system-1-scope-groups-2-admin-learning-progress-1" />
     <script defer src="../config.js"></script>
-    <script type="module" src="app.js?v=workbook-factory-pdf-input-1-scope-groups-2"></script>
+    <script type="module" src="app.js?v=workbook-factory-pdf-input-1-scope-groups-2-admin-learning-progress-1"></script>
   </head>
   <body data-ready-mode="admin">
     <div id="app">
@@ -42,6 +42,8 @@
         <nav id="admin-nav" hidden>
           <button class="navbtn on" type="button" data-route="students">
             Students</button
+          ><button class="navbtn" type="button" data-route="progress">
+            학습 현황</button
           ><button class="navbtn" type="button" data-route="passages">
             Passages</button
           ><button class="navbtn" type="button" data-route="factory">
@@ -216,6 +218,28 @@
             >
           </div>
           <div id="admin-students"></div>
+        </section>
+        <section class="view" id="v-progress">
+          <div class="page-head">
+            <div>
+              <p class="eyebrow">LEARNING PROGRESS</p>
+              <h1>학생 학습 현황</h1>
+              <p class="lead">실제 제출된 Question·Workbook attempt만 집계합니다.</p>
+            </div>
+            <button id="refresh-progress" class="button quiet" type="button">새로고침</button>
+          </div>
+          <div class="learning-toolbar">
+            <div class="learning-periods" role="group" aria-label="학습 기간">
+              <button type="button" data-learning-period="today">오늘</button>
+              <button class="active" type="button" data-learning-period="7d">최근 7일</button>
+              <button type="button" data-learning-period="30d">최근 30일</button>
+            </div>
+            <label>학교<select id="learning-school-filter"><option value="">전체 학교</option></select></label>
+            <label>학년<select id="learning-grade-filter"><option value="">전체 학년</option></select></label>
+            <label>정렬<select id="learning-sort"><option value="oldest">오래된 순</option><option value="recent">최근 학습순</option></select></label>
+          </div>
+          <div id="learning-progress-summary"><div class="empty">학습 현황을 불러오는 중입니다.</div></div>
+          <div id="learning-progress-detail" hidden></div>
         </section>
         <section class="view" id="v-factory">
           <div class="page-head"><div><p class="eyebrow">WORKBOOK FACTORY</p><h1>Passage · 워크북</h1><p class="lead">새 Passage를 만들거나, 기존 Passage는 그대로 둔 채 워크북만 추가합니다.</p></div></div>

@@ -212,14 +212,16 @@ assert(interactionContractErrors(staleSlots,'written_response').some(error=>erro
 assert.equal(validateQuestionSpec(staleSlots,'written_response','available').ready,false);
 
 const app=read('ready/app.js');
+const questionRenderer=read('ready/question-renderer.js');
 const edge=read('server/ready/index.ts');
 const runtime=read('ready/interaction-runtime.js');
 const css=read('ready/ready.css');
 for(const removed of ['inferredChoiceParts','CHOICE_PART_REPAIRS','WRITING_GUIDE_REPAIRS','SUMMARY_REPAIRS','TARGET_RANGE_REPAIRS','canonicalOption','questionBasePassage','slots.length>1']){
   assert.doesNotMatch(`${app}\n${edge}`,new RegExp(removed.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')),`Runtime inference remains: ${removed}`);
 }
-assert.match(app,/contractPassageHtml[\s\S]*contractChoiceCopyHtml[\s\S]*contractResponseComplete/);
-assert.match(app,/response\.layout==='sentence_cloze'[\s\S]*cloze-frame[\s\S]*cloze-slot-list/,'Partial guided writing must separate its sentence frame from numbered inputs');
+assert.match(questionRenderer,/contractChoiceCopyHtml[\s\S]*contractPassageHtml[\s\S]*contractResponseControlHtml/);
+assert.match(app,/contractResponseComplete/);
+assert.match(questionRenderer,/response\.layout==='sentence_cloze'[\s\S]*cloze-frame[\s\S]*cloze-slot-list/,'Partial guided writing must separate its sentence frame from numbered inputs');
 assert.match(app,/workbook-choice-or[\s\S]*또는/,'Workbook grammar choices must render as an explicit either-or control');
 assert.doesNotMatch(app,/workbookChoiceHtml[^\n]*join\('<i>\/<\/i>'\)/,'Workbook grammar choices must not fall back to slash-separated text');
 assert.match(edge,/publicInteractionContract[\s\S]*deterministicGrade/);
