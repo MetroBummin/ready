@@ -47,7 +47,7 @@ button{touch-action:manipulation}
 
 /* Student lists and focused study shell */
 .student-grid{display:grid}.passage-list{display:grid}.passage-row{display:flex}.passage-open{display:flex}.passage-actions{display:flex}
-.question-filter-form{display:grid}.question-source-grid,.question-type-grid{display:grid}.question-filter-option{position:relative;display:block}
+.question-filter-form{display:grid}.question-difficulty-grid,.question-type-grid{display:grid}.question-filter-option{position:relative;display:block}
 .question-filter-option input{position:absolute;opacity:0;pointer-events:none}
 body.study-mode #topbar{display:none}
 .study-back{position:fixed;z-index:80}
