@@ -1,6 +1,6 @@
 export const UNGROUPED = '';
 
-export function createScopeLayout(links = []) {
+export function createScopeLayout(links = [], emptyGroups = []) {
   const groups = [];
   const byKey = new Map();
   const ungrouped = [];
@@ -14,6 +14,13 @@ export function createScopeLayout(links = []) {
     }
     group.passageIds.push(passageId);
   }
+  for (const saved of [...emptyGroups].sort((a, b) => Number(a.index) - Number(b.index))) {
+    const key=String(saved?.key||''),label=String(saved?.label||'').trim();
+    if (!key || !label || byKey.has(key)) continue;
+    const group={key,label,passageIds:[]};
+    groups.splice(Math.max(0,Math.min(Number(saved.index)||0,groups.length)),0,group);
+    byKey.set(key,group);
+  }
   return { groups, ungrouped };
 }
 
@@ -22,6 +29,10 @@ export function flattenScopeLayout(layout) {
     ...layout.groups.flatMap(group => group.passageIds.map(passageId => ({ passageId, groupKey: group.key, groupLabel: group.label.trim() }))),
     ...layout.ungrouped.map(passageId => ({ passageId, groupKey: null, groupLabel: null })),
   ];
+}
+
+export function emptyGroupDefinitions(layout) {
+  return layout.groups.flatMap((group,index)=>group.passageIds.length?[]:[{key:group.key,label:group.label.trim(),index}]);
 }
 
 export function uniqueGroupKey(layout) {
