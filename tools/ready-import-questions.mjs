@@ -1,6 +1,7 @@
 import { readFile } from 'node:fs/promises';
 import { validateQuestionSpec } from '../server/ready/question-spec.mjs';
 import { CURRENT_QUESTION_PUBLICATION_VERSION } from '../server/ready/question-pipeline.mjs';
+import { questionRepresentationPayloadErrors } from '../server/ready/question-representation.mjs';
 
 function usage() {
   console.error('Usage: node tools/ready-import-questions.mjs <bundle.json> [--apply] [--allow-legacy]');
@@ -38,7 +39,10 @@ for(const [index,item] of questions.entries()){
   if(item.type==='multiple_choice'&&(!Array.isArray(item.payload.choices)||item.payload.choices.length<2||!Array.isArray(item.payload.answer)||!item.payload.answer.length))throw new Error(`Row ${index+1}: multiple-choice contract is incomplete.`);
   if(item.type==='written_response'&&(!Array.isArray(item.payload.accepted_answers)||!item.payload.accepted_answers.length))throw new Error(`Row ${index+1}: written-response accepted_answers are required.`);
   if(!item.payload.spec&&!allowLegacy)throw new Error(`Row ${index+1}: explicit payload.spec is required (use --allow-legacy only for old verified bundles).`);
-  if(!allowLegacy&&Number(item.payload?.pipeline_contract?.version)!==2)throw new Error(`Row ${index+1}: block-first pipeline contract v2 is required.`);
+  if(!allowLegacy){
+    const representationErrors=questionRepresentationPayloadErrors(item.payload);
+    if(representationErrors.length)throw new Error(`Row ${index+1}: invalid semantic representation: ${representationErrors.join(', ')}.`);
+  }
   if(!allowLegacy&&Number(item.payload?.publication_version)!==CURRENT_QUESTION_PUBLICATION_VERSION)throw new Error(`Row ${index+1}: publication pipeline v${CURRENT_QUESTION_PUBLICATION_VERSION} is required.`);
   const validation=validateQuestionSpec(item.payload,item.type,item.status||'draft');
   if(validation.errors.length)throw new Error(`Row ${index+1}: invalid render spec: ${validation.errors.join(', ')}.`);

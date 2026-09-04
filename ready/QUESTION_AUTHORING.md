@@ -1,6 +1,6 @@
 # READY Question authoring
 
-Read this contract before generating, importing, reviewing, or publishing any Question.
+Read this contract before generating, reviewing, or publishing a newly authored Question. Original publisher PDF import follows `QUESTION_REPRESENTATION.md` and `QUESTION_IMPORT.md`; Reference Bank generation must not be mixed into publisher extraction.
 
 1. **Canonical source is truth.**
 2. **Reference questions are examples, not templates.**

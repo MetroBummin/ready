@@ -2,6 +2,8 @@
 
 ## Render specification
 
+The renderer contract is a projection of the validated semantic contract in `QUESTION_REPRESENTATION.md`. Taxonomy and renderer do not define the publisher Question and must not be used to reconstruct missing source blocks, pointers, responses, or answers.
+
 데이터의 문제 유형은 세밀하게 분류하되 학생 화면은 `standard_mcq`, `annotated_passage_mcq`, `structural`, `summary`, `written_input` 다섯 renderer만 사용한다.
 
 renderer는 taxonomy 이름이나 한국어 발문을 보고 화면을 추측하지 않는다. 새 Question은 `payload.taxonomy`, `payload.import_status`, `payload.spec`으로 본문 출처, 허용 annotation/block, 응답 방식과 채점 방식을 완전히 선언한다. 명세에 없는 요소는 처음부터 렌더하지 않는다.

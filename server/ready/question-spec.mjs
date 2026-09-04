@@ -1,5 +1,6 @@
 import { sourceContractErrors } from "./source-contract.mjs";
 import { interactionContractErrors, publisherRoundTripErrors } from "./interaction-contract.mjs";
+import { questionRepresentationPayloadErrors } from "./question-representation.mjs";
 
 // AI-authored Questions must first follow ready/QUESTION_AUTHORING.md and pass
 // question-authoring-quality.mjs or question-reference-bank.mjs against the
@@ -138,7 +139,7 @@ export function questionSpecErrors(spec, payload = {}, type = "multiple_choice")
     if (["sentence", "sentence_cloze", "sentence-cloze", "arrangement"].includes(kind) && /우리말/.test(text(payload.prompt)) && !text(guide?.task_text)) errors.push("written Korean target is missing");
     for (const [index, slot] of slots.entries()) {
       const variants = Array.isArray(accepted[index]) ? accepted[index] : [accepted[index]];
-      const counts = new Set(variants.map(value => (text(value).match(/[A-Za-z]+(?:['’][A-Za-z]+)?|\d+(?:,\d{3})*(?:\.\d+)?/g) || []).length));
+      const counts = new Set(variants.map(value => (text(value).match(/[A-Za-z]+(?:['’][A-Za-z]+)?|[가-힣]+|\d+(?:,\d{3})*(?:\.\d+)?/g) || []).length));
       if (!variants.length || counts.has(0)) errors.push(`written slot ${index + 1} has no lexical publisher answer`);
       if (!Number.isInteger(Number(slot?.word_count)) || Number(slot?.word_count) < 1 || !counts.has(Number(slot.word_count))) errors.push(`written slot ${index + 1} word count mismatch`);
     }
@@ -150,6 +151,7 @@ export function questionSpecErrors(spec, payload = {}, type = "multiple_choice")
     if (!annotation || !text(annotation.kind) || (!text(annotation.text) && !text(annotation.label))) errors.push(`annotation ${index + 1} is incomplete`);
   }
   if (Number(payload?.pipeline_contract?.version) === 2) errors.push(...sourceContractErrors(payload, spec));
+  if (payload?.representation) errors.push(...questionRepresentationPayloadErrors(payload));
   errors.push(...interactionContractErrors(payload, type));
   if (spec?.importStatus === "ready") errors.push(...publisherRoundTripErrors(payload, type));
   return errors;
