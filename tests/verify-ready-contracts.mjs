@@ -53,8 +53,14 @@ const migrations=readdirSync(resolve(root,'supabase/migrations')).filter(name=>n
 assert.ok(migrations.includes('20260828150000_ready_question_first.sql'),'Question-first migration is missing');
 assert.doesNotMatch(student+admin,/SUPABASE_SERVICE_ROLE_KEY|READY_ADMIN_PASSWORD|GEMINI_API_KEY/,'A server secret name leaked into frontend code');
 assert.doesNotMatch(student,/reader-token|learning-sheet|data-save-sentence/,'Student frontend still exposes lexical study controls');
-assert.match(student,/student_question_filters[\s\S]*question-source[\s\S]*question-type[\s\S]*student_question_queue/,'Source and multi-select taxonomy queue UI is missing');
-assert.match(edge,/studentQuestionPool[\s\S]*providerSet[\s\S]*taxonomySet[\s\S]*publicQuestion/,'Server-side source and taxonomy filtering is missing');
+assert.match(student,/student_question_filters/,'Question filter operation is missing');
+assert.match(student,/question-difficulty/,'Difficulty queue UI is missing');
+assert.match(student,/question-type/,'Multi-select taxonomy queue UI is missing');
+assert.match(student,/student_question_queue/,'Question queue operation is missing');
+assert.doesNotMatch(student,/name="question-source"/,'Student Question source filter must be removed');
+assert.match(edge,/studentQuestionPool/,'Student Question pool is missing');
+assert.match(edge,/requestedDifficulty[\s\S]*taxonomySet/,'Server-side difficulty and taxonomy filtering is missing');
+assert.match(edge,/questionVisibleInScope[\s\S]*isQuestionQaScope/,'AI reference variants need an exact QA-scope visibility gate');
 assert.match(edge,/has_workbook:\s*!!codeWorkbookForPassage\(passage\)\s*\|\|\s*factoryPassageIds\.has\(passage\.id\)/,'Student bootstrap must expose static and Factory workbook availability from the server catalog');
 assert.match(edge,/factory_start[\s\S]*factory_confirm[\s\S]*ready_workbook_catalogs/,'Workbook Factory admin operations or persisted catalog are missing');
 assert.match(edge,/factoryFallbackTargets\(previewCatalog, rowsForCatalog, sourceExercises\)[\s\S]*some\(stage => fallbackTargets\[stage\]\.length\)/,'Full Workbook source reuse must ask Gemini only for missing validated coverage');
