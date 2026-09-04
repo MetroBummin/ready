@@ -24,15 +24,19 @@ export function isQuestionQaScope(scope) {
 }
 
 export function isAiReferenceVariant(payload) {
-  return ['ai_reference_variant','ai_reference_variant_v2'].includes(payload?.authoring?.method);
+  return ['ai_reference_variant','ai_reference_variant_v2','ai_reference_bank'].includes(payload?.authoring?.method);
 }
 
 export function isAiReferenceVariantV2(payload) {
   return payload?.authoring?.method === 'ai_reference_variant_v2';
 }
 
+export function isAiReferenceBank(payload) {
+  return payload?.authoring?.method === 'ai_reference_bank';
+}
+
 export function questionVisibleInScope(row, scope) {
-  if(isAiReferenceVariantV2(row?.payload))return String(scope?.school??'').trim().toLowerCase()==='test2'&&String(scope?.grade??'').trim()==='2학년';
+  if(isAiReferenceVariantV2(row?.payload)||isAiReferenceBank(row?.payload))return String(scope?.school??'').trim().toLowerCase()==='test2'&&String(scope?.grade??'').trim()==='2학년';
   return !isAiReferenceVariant(row?.payload)||isQuestionQaScope(scope);
 }
 
