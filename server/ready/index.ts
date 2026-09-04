@@ -14,6 +14,7 @@ import { deterministicClientContract, deterministicGrade, publicInteractionContr
 import { WORKBOOK_TRANSLATION_GRADING_POLICY, workbookTranslationPass } from "./workbook-grading-policy.mjs";
 import { normalizeWorkbookAnswer, publicWorkbookAssistance, stageNineHint, workbookAssistanceMode } from "./workbook-assistance.mjs";
 import { CURRENT_QUESTION_PUBLICATION_VERSION } from "./question-pipeline.mjs";
+import { QUESTION_DIFFICULTIES, isQuestionQaScope, normalizeQuestionDifficulty, questionVisibleInScope } from "./question-difficulty.mjs";
 import { compareCanonicalRows, extractSentenceRows, factoryFallbackTargets, generateWorkbookCatalog, inspectFullWorkbookText } from "./workbook-factory.mjs";
 import { gradeWorkbookCorrectionPairs } from "../../ready/deterministic-grading.js";
 import { repairAnswerKeyArtifacts, repairStageNineCatalog } from "./workbook-catalog-qa.mjs";
@@ -620,7 +621,7 @@ async function attemptedQuestionIds(studentId: string, examId: string) {
   const attempts = rows<any[]>(await db.from("ready_attempts").select("question_id").eq("student_id", studentId).eq("exam_id", examId));
   return new Set(attempts.map(attempt => attempt.question_id));
 }
-async function scopePassages(examId: string, studentId: string) {
+async function scopePassages(examId: string, studentId: string, scope: any) {
   const links = rows<any[]>(await db.from("ready_exam_passages").select("passage_id,position,group_key,group_label").eq("exam_id", examId).order("position"));
   const linkedIds = links.map(item => item.passage_id);
   const sourcePassages = linkedIds.length ? rows<any[]>(await db.from("ready_passages").select("id,title,source_type,source_label").in("id", linkedIds)) : [];
@@ -633,7 +634,7 @@ async function scopePassages(examId: string, studentId: string) {
   const byId = new Map(sourcePassages.map(item => [item.id, item]));
   const passageText = new Map(linkedIds.map(id => [id, sentenceRows.filter(sentence => sentence.passage_id === id).map(sentence => sentence.text).join(" ")]));
   const normalizedQuestions = linkedIds.flatMap(passageId => normalizeMainTextQuestionRows(availableQuestions.filter(question => question.passage_id === passageId), byId.get(passageId), passageText.get(passageId) || ""));
-  normalizedQuestions.forEach(question => {
+  normalizedQuestions.filter(question => questionVisibleInScope(question, scope)).forEach(question => {
     const passage = byId.get(question.passage_id);
     if (!attempted.has(question.id) && isReadyQuestion(question) && isMainTextQuestion(question, passage, passageText.get(question.passage_id) || "")) questionCounts.set(question.passage_id, (questionCounts.get(question.passage_id) || 0) + 1);
   });
@@ -645,7 +646,7 @@ async function scopePassages(examId: string, studentId: string) {
 }
 async function studentBootstrap(session: ReadySession) {
   const student = await studentForSession(session), scope = rows<any>(await db.from("ready_exams").select("id,school,grade").eq("school", student.school).eq("grade", student.grade).eq("is_current", true).maybeSingle());
-  const passages = scope ? await scopePassages(scope.id, student.id) : [];
+  const passages = scope ? await scopePassages(scope.id, student.id, scope) : [];
   let reviewCount=0,savedWords:any[]=[];if(scope){const [wordRows,sentenceCount]=await Promise.all([savedWordList(student.id,scope.id),db.from("ready_saved_sentences").select("id",{count:"exact",head:true}).eq("student_id",student.id).eq("exam_id",scope.id)]);if(sentenceCount.error)throw new ApiError(500,sentenceCount.error.message);savedWords=wordRows;reviewCount=(await eligibleReviewQuestionIds(student.id,scope.id)).length+await workbookReviewCount(student.id,scope.id)+savedWords.length+(sentenceCount.count||0);}
   return { student: { id: student.id, school: student.school, grade: student.grade }, scope, passages, savedWords, reviewCount };
 }
@@ -739,7 +740,7 @@ function publicTaxonomyLabel(taxonomy: string) {
   };
   return labels[taxonomy] || taxonomy.replaceAll("_", " ");
 }
-function publicQuestion(row: any, passageText = "", studentState: { bookmarked?: boolean; lastResult?: boolean | null } = {}) {
+function publicQuestion(row: any, passageText = "", studentState: { bookmarked?: boolean; lastResult?: boolean | null; showReference?: boolean } = {}) {
   const payload = row.payload || {}, type = clean(row.type, 40), sourceQuestionNo = Number(payload.source?.source_question_no) || null;
   const specValidation = validateQuestionSpec(payload, type, row.status || "available"), renderSpec = specValidation.spec;
   if (!specValidation.ready) throw new ApiError(409, `검수가 끝나지 않은 문제입니다: ${specValidation.errors.join(", ")}`);
@@ -753,7 +754,7 @@ function publicQuestion(row: any, passageText = "", studentState: { bookmarked?:
   const targetRanges = interactionContract.passage.segments.filter((segment: any) => segment.kind === "annotation").map((segment: any) => ({ label: segment.label, text: segment.text, canonicalText: segment.text }));
   const summaryText = renderSpec.extras.includes("summary") ? clean(payload.summary_text, 10_000) : "";
   return {
-    id: row.id, passageId: row.passage_id, type, family: clean(payload.family, 40) || (type === "written_response" ? "written" : "standard"), skill: publicSkill(renderSpec.taxonomy),
+    id: row.id, passageId: row.passage_id, type, difficulty: normalizeQuestionDifficulty(row.difficulty), referenceQuestionNo: studentState.showReference ? Number(payload.authoring?.referenceQuestionNo) || null : null, family: clean(payload.family, 40) || (type === "written_response" ? "written" : "standard"), skill: publicSkill(renderSpec.taxonomy),
     taxonomy: renderSpec.taxonomy, renderer: renderSpec.renderer, renderSpec, importStatus: renderSpec.importStatus,
     prompt: clean(payload.prompt, 1_000), choices, choiceParts, multiSelect: interactionContract.selection === "multi", responseType: type === "written_response" ? "written" : "choice", responseSlots, writingGuide,
     grading: deterministicClientContract(payload, type), explanation: clean(payload.explanation, 4_000),
@@ -771,7 +772,7 @@ async function studentQuestionPool(student: Student, examId: string) {
   if (!passageIds.length) return [];
   const passageRows = rows<any[]>(await db.from("ready_passages").select("id,title,source_type,source_label").in("id", passageIds));
   const sentenceRows = rows<any[]>(await db.from("ready_passage_sentences").select("passage_id,sentence_index,text").in("passage_id", passageIds).order("sentence_index"));
-  const questionRows = rows<any[]>(await db.from("ready_questions").select("id,passage_id,type,payload,status,created_at").in("passage_id", passageIds).in("type", ["multiple_choice", "written_response"]).eq("status", "available"));
+  const questionRows = rows<any[]>(await db.from("ready_questions").select("id,passage_id,type,payload,status,difficulty,created_at").in("passage_id", passageIds).in("type", ["multiple_choice", "written_response"]).eq("status", "available"));
   const attempted = await attemptedQuestionIds(student.id, examId);
   const bookmarkRows = rows<any[]>(await db.from("ready_question_bookmarks").select("question_id").eq("student_id", student.id).eq("exam_id", examId));
   const bookmarks = new Set(bookmarkRows.map(item => item.question_id));
@@ -779,12 +780,14 @@ async function studentQuestionPool(student: Student, examId: string) {
   const passageText = new Map(passageIds.map(id => [id, sentenceRows.filter(sentence => sentence.passage_id === id).map(sentence => sentence.text).join(" ")]));
   const linkPosition = new Map(links.map(link => [link.passage_id, Number(link.position) || 0]));
   return passageIds.flatMap(passageId => normalizeMainTextQuestionRows(questionRows.filter(row => row.passage_id === passageId), passages.get(passageId), passageText.get(passageId) || ""))
-    .filter(row => !attempted.has(row.id) && isReadyQuestion(row) && isMainTextQuestion(row, passages.get(row.passage_id), passageText.get(row.passage_id) || ""))
+    .filter(row => !attempted.has(row.id) && questionVisibleInScope(row, student) && isReadyQuestion(row) && isMainTextQuestion(row, passages.get(row.passage_id), passageText.get(row.passage_id) || ""))
     .map(row => ({ row, passageText: passageText.get(row.passage_id) || "", bookmarked: bookmarks.has(row.id), passagePosition: linkPosition.get(row.passage_id) || 0 }))
     .sort((a, b) => a.passagePosition - b.passagePosition || (Number(a.row.payload?.position) || 0) - (Number(b.row.payload?.position) || 0));
 }
 async function studentQuestionFilters(body: any, session: ReadySession) {
   const student = await studentForSession(session), examId = required(body.examId, "Exam", 80), pool = await studentQuestionPool(student, examId);
+  // Deprecated response field kept for one deployment cycle so the currently
+  // published pre-difficulty client can still render while Pages awaits merge.
   const sources = [
     { id: "exam4you", label: "Exam4you", count: pool.filter(item => item.row.payload?.source?.provider === "exam4you").length },
     { id: "nernter", label: "너른터", count: pool.filter(item => item.row.payload?.source?.provider === "nernter").length },
@@ -792,28 +795,31 @@ async function studentQuestionFilters(body: any, session: ReadySession) {
   const typeCounts = new Map<string, number>();
   for (const item of pool) { const taxonomy = clean(item.row.payload?.spec?.taxonomy || item.row.payload?.taxonomy, 60); if (taxonomy) typeCounts.set(taxonomy, (typeCounts.get(taxonomy) || 0) + 1); }
   const types = [...typeCounts.entries()].map(([id, count]) => ({ id, label: publicTaxonomyLabel(id), count })).sort((a, b) => a.label.localeCompare(b.label, "ko"));
-  return { total: pool.length, sources, types };
+  const cells = pool.map(item => ({ difficulty: normalizeQuestionDifficulty(item.row.difficulty), taxonomy: clean(item.row.payload?.spec?.taxonomy || item.row.payload?.taxonomy, 60) })).filter(item => item.difficulty && item.taxonomy);
+  const difficulties = QUESTION_DIFFICULTIES.map(item => ({ ...item, count: cells.filter(cell => cell.difficulty === item.id).length }));
+  return { total: cells.length, difficulties, types, cells, sources };
 }
 async function studentQuestionQueue(body: any, session: ReadySession) {
   const student = await studentForSession(session), examId = required(body.examId, "Exam", 80), pool = await studentQuestionPool(student, examId);
-  const providers = cleanList(body.providers, 2, 30), taxonomies = cleanList(body.taxonomies, 60, 60);
-  if (providers.some(provider => !["exam4you", "nernter"].includes(provider))) throw new ApiError(400, "지원하지 않는 문제 출처입니다.");
-  const providerSet = new Set(providers), taxonomySet = new Set(taxonomies);
-  const selected = pool.filter(item => (!providerSet.size || providerSet.has(clean(item.row.payload?.source?.provider, 30))) && (!taxonomySet.size || taxonomySet.has(clean(item.row.payload?.spec?.taxonomy || item.row.payload?.taxonomy, 60))));
+  const requestedDifficulty = body.difficulty === null || body.difficulty === undefined || body.difficulty === "" ? null : normalizeQuestionDifficulty(body.difficulty), taxonomies = cleanList(body.taxonomies, 60, 60), legacyProviders = cleanList(body.providers, 2, 30);
+  if (body.difficulty !== null && body.difficulty !== undefined && body.difficulty !== "" && !requestedDifficulty) throw new ApiError(400, "지원하지 않는 문제 난이도입니다.");
+  if (legacyProviders.some(provider => !["exam4you", "nernter"].includes(provider))) throw new ApiError(400, "지원하지 않는 문제 출처입니다.");
+  const taxonomySet = new Set(taxonomies), legacyProviderSet = new Set(legacyProviders);
+  const selected = pool.filter(item => (!requestedDifficulty || normalizeQuestionDifficulty(item.row.difficulty) === requestedDifficulty) && (!taxonomySet.size || taxonomySet.has(clean(item.row.payload?.spec?.taxonomy || item.row.payload?.taxonomy, 60))) && (!legacyProviderSet.size || legacyProviderSet.has(clean(item.row.payload?.source?.provider, 30))));
   const savedWords=await savedWordList(student.id,examId);
-  return { items: selected.map(item => publicQuestion(item.row, item.passageText, { bookmarked: item.bookmarked })), savedWords };
+  return { items: selected.map(item => publicQuestion(item.row, item.passageText, { bookmarked: item.bookmarked, showReference: isQuestionQaScope(student) })), savedWords };
 }
 async function studentQuestions(body: any, session: ReadySession) {
   const student = await studentForSession(session), examId = required(body.examId, "Exam", 80);
   const study = await studentPassage(body, session), passageId = study.passage.id;
-  const questionRows = rows<any[]>(await db.from("ready_questions").select("id,passage_id,type,payload,status,created_at").eq("passage_id", passageId).in("type", ["multiple_choice", "written_response"]).eq("status", "available").order("created_at"));
+  const questionRows = rows<any[]>(await db.from("ready_questions").select("id,passage_id,type,payload,status,difficulty,created_at").eq("passage_id", passageId).in("type", ["multiple_choice", "written_response"]).eq("status", "available").order("created_at"));
   questionRows.sort((a, b) => (Number(a.payload?.position) || 0) - (Number(b.payload?.position) || 0));
   const passageText = study.sentences.map((sentence: any) => sentence.text).join(" ");
   const attempted = await attemptedQuestionIds(student.id, examId);
   const bookmarks = rows<any[]>(await db.from("ready_question_bookmarks").select("question_id").eq("student_id", student.id).eq("exam_id", examId));
   const bookmarkIds = new Set(bookmarks.map(item => item.question_id));
   const normalizedQuestions = normalizeMainTextQuestionRows(questionRows, study.passage, passageText);
-  return { ...study, questions: normalizedQuestions.filter(row => !attempted.has(row.id) && isReadyQuestion(row) && isMainTextQuestion(row, study.passage, passageText)).map(row => publicQuestion(row, passageText, { bookmarked: bookmarkIds.has(row.id) })) };
+  return { ...study, questions: normalizedQuestions.filter(row => !attempted.has(row.id) && questionVisibleInScope(row, student) && isReadyQuestion(row) && isMainTextQuestion(row, study.passage, passageText)).map(row => publicQuestion(row, passageText, { bookmarked: bookmarkIds.has(row.id), showReference: isQuestionQaScope(student) })) };
 }
 async function unresolvedQuestionIds(studentId: string, examId: string) {
   const attempts = rows<any[]>(await db.from("ready_attempts").select("question_id,correct,created_at").eq("student_id", studentId).eq("exam_id", examId).order("created_at", { ascending: false }));
@@ -865,10 +871,10 @@ async function studentReviewQuestions(body: any, session: ReadySession) {
   const questionIds = await eligibleReviewQuestionIds(student.id, examId);
   let items: any[] = [];
   if (questionIds.length) {
-    const unresolvedRows = rows<any[]>(await db.from("ready_questions").select("id,passage_id,type,payload,status,created_at").in("id", questionIds).in("type", ["multiple_choice", "written_response"]).eq("status", "available"));
+    const unresolvedRows = rows<any[]>(await db.from("ready_questions").select("id,passage_id,type,payload,status,difficulty,created_at").in("id", questionIds).in("type", ["multiple_choice", "written_response"]).eq("status", "available"));
     const passageIds = [...new Set(unresolvedRows.map(question => question.passage_id))];
     if (passageIds.length) {
-      const questionRows = rows<any[]>(await db.from("ready_questions").select("id,passage_id,type,payload,status,created_at").in("passage_id", passageIds).in("type", ["multiple_choice", "written_response"]).eq("status", "available"));
+      const questionRows = rows<any[]>(await db.from("ready_questions").select("id,passage_id,type,payload,status,difficulty,created_at").in("passage_id", passageIds).in("type", ["multiple_choice", "written_response"]).eq("status", "available"));
       const sentenceRows = rows<any[]>(await db.from("ready_passage_sentences").select("passage_id,sentence_index,text").in("passage_id", passageIds).order("sentence_index"));
       const passageRows = rows<any[]>(await db.from("ready_passages").select("id,title,source_type,source_label").in("id", passageIds));
       const passages = new Map(passageRows.map(passage => [passage.id, passage])), passageText = new Map<string, string>();
@@ -876,7 +882,7 @@ async function studentReviewQuestions(body: any, session: ReadySession) {
       const review = new Set(questionIds), latest = await latestAttemptResults(student.id, examId), bookmarkRows = rows<any[]>(await db.from("ready_question_bookmarks").select("question_id").eq("student_id", student.id).eq("exam_id", examId)), bookmarks = new Set(bookmarkRows.map(item => item.question_id));
       const normalizedQuestions = passageIds.flatMap(passageId => normalizeMainTextQuestionRows(questionRows.filter(row => row.passage_id === passageId), passages.get(passageId), passageText.get(passageId) || ""));
       normalizedQuestions.sort((a, b) => (Number(a.payload?.source?.passage_no) || 0) - (Number(b.payload?.source?.passage_no) || 0) || (Number(a.payload?.position) || 0) - (Number(b.payload?.position) || 0));
-      items = normalizedQuestions.filter(row => review.has(row.id) && isReadyQuestion(row) && isMainTextQuestion(row, passages.get(row.passage_id), passageText.get(row.passage_id) || "")).map(row => ({ question: publicQuestion(row, passageText.get(row.passage_id) || "", { bookmarked: bookmarks.has(row.id), lastResult: latest.get(row.id) }) }));
+      items = normalizedQuestions.filter(row => review.has(row.id) && questionVisibleInScope(row, student) && isReadyQuestion(row) && isMainTextQuestion(row, passages.get(row.passage_id), passageText.get(row.passage_id) || "")).map(row => ({ question: publicQuestion(row, passageText.get(row.passage_id) || "", { bookmarked: bookmarks.has(row.id), lastResult: latest.get(row.id), showReference: isQuestionQaScope(student) }) }));
     }
   }
   const [wordItems,workbookItems,sentenceResult]=await Promise.all([wordReviewItems(student.id,examId),workbookReviewItems(student.id,examId),db.from("ready_saved_sentences").select("id,source_text_snapshot,translation_snapshot,created_at,passage:ready_passages(title)").eq("student_id",student.id).eq("exam_id",examId).order("created_at",{ascending:false})]);if(sentenceResult.error)throw new ApiError(500,sentenceResult.error.message);
@@ -923,6 +929,7 @@ async function setQuestionBookmark(body: any, session: ReadySession) {
   await studentExamAccess(examId, student);
   const question = rows<any>(await db.from("ready_questions").select("id,passage_id,payload,status").eq("id", questionId).eq("status", "available").maybeSingle());
   if (!question || !isReadyQuestion(question)) throw new ApiError(404, "현재 저장할 수 없는 문제입니다.");
+  if (!questionVisibleInScope(question, student)) throw new ApiError(404, "현재 저장할 수 없는 문제입니다.");
   await studentPassageAccess(examId, question.passage_id, student);
   if (bookmarked) {
     const saved = await db.from("ready_question_bookmarks").upsert({ student_id: student.id, exam_id: examId, question_id: questionId, source: "manual", updated_at: new Date().toISOString() }, { onConflict: "student_id,exam_id,question_id" });
@@ -938,6 +945,7 @@ async function submitAttempt(body: any, session: ReadySession) {
   const question = rows<any>(await db.from("ready_questions").select("id,passage_id,type,payload,status").eq("id", questionId).in("type", ["multiple_choice", "written_response"]).eq("status", "available").maybeSingle());
   if (!question) throw new ApiError(404, "현재 풀 수 없는 문제입니다.");
   if (!isReadyQuestion(question)) throw new ApiError(409, "검수가 끝나지 않은 문제입니다.");
+  if (!questionVisibleInScope(question, student)) throw new ApiError(404, "현재 풀 수 없는 문제입니다.");
   await studentPassageAccess(examId, question.passage_id, student);
   const spec = publicQuestion(question); let response: any, answer: any, correct = false, aiFeedback = "", aiRequestId: string | null = null;
   if (question.type === "multiple_choice") {

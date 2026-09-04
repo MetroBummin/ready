@@ -13,6 +13,8 @@ import { normalizeWorkbookAnswer as normalizeWorkbookAnswerServer, publicWorkboo
 import { gradeLocalQuestion, gradeLocalWorkbook, gradeWorkbookCorrectionPairs, normalizeDeterministicAnswer, revealLocalWorkbook } from '../ready/deterministic-grading.js';
 import { auditStageNineItem, auditWorkbookCatalog, repairAnswerKeyArtifacts, repairStageNineCatalog } from '../server/ready/workbook-catalog-qa.mjs';
 import { CURRENT_QUESTION_PUBLICATION_VERSION, questionPublicationStatus } from '../server/ready/question-pipeline.mjs';
+import { QUESTION_DIFFICULTIES, isQuestionQaScope, questionVisibleInScope } from '../server/ready/question-difficulty.mjs';
+import { questionDifficultyLabel, questionFilterCounts } from '../ready/question-difficulty.js';
 
 const root=resolve(dirname(fileURLToPath(import.meta.url)),'..');
 const read=path=>readFileSync(resolve(root,path),'utf8');
@@ -24,6 +26,19 @@ assert.equal(validPin('123'),false);
 assert.equal(CURRENT_QUESTION_PUBLICATION_VERSION,3);
 assert.equal(questionPublicationStatus({publication_version:3}),'CURRENT');
 assert.equal(questionPublicationStatus({publication_version:2}),'STALE');
+assert.deepEqual(QUESTION_DIFFICULTIES.map(item=>item.label),['Easy','Standard','Hard']);
+assert.equal(questionDifficultyLabel(2),'Standard');
+assert.equal(isQuestionQaScope({school:'test',grade:'1학년'}),true);
+assert.equal(isQuestionQaScope({school:'test2',grade:'2학년'}),true);
+assert.equal(isQuestionQaScope({school:'한빛고',grade:'2학년'}),false);
+const aiVariant={payload:{authoring:{method:'ai_reference_variant'}}};
+assert.equal(questionVisibleInScope(aiVariant,{school:'test2',grade:'2학년'}),true);
+assert.equal(questionVisibleInScope(aiVariant,{school:'한빛고',grade:'2학년'}),false);
+const filterCounts=questionFilterCounts([{difficulty:1,taxonomy:'topic'},{difficulty:2,taxonomy:'topic'},{difficulty:2,taxonomy:'grammar_ab'},{difficulty:3,taxonomy:'grammar_ab'}],2,['topic']);
+assert.equal(filterCounts.total,1);
+assert.equal(filterCounts.difficultyCounts.get(1),1);
+assert.equal(filterCounts.difficultyCounts.get(2),1);
+assert.equal(filterCounts.taxonomyCounts.get('topic'),1);
 const token=randomSessionToken();
 assert.match(token,/^[A-Za-z0-9_-]{43}$/);
 assert.equal(bearerToken(`Bearer ${token}`),token);
