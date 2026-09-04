@@ -2,7 +2,7 @@ import {normalizeDeterministicAnswer as normalize} from '../../ready/determinist
 
 const text=value=>typeof value==='string'?value.trim():'';
 const list=value=>Array.isArray(value)?value:[];
-const wordCount=value=>(String(value||'').match(/[A-Za-z]+(?:['’][A-Za-z]+)?|\d+(?:,\d{3})*(?:\.\d+)?/g)||[]).length;
+const wordCount=value=>(String(value||'').match(/[A-Za-z]+(?:['’][A-Za-z]+)?|[가-힣]+|\d+(?:,\d{3})*(?:\.\d+)?/g)||[]).length;
 const INTERACTION_KINDS=new Set(['choice_list','choice_matrix','inline_options','position_choice','written_response']);
 const SEGMENT_KINDS=new Set(['text','annotation','blank','inline_options','inline_options_display','position']);
 const WRITTEN_LAYOUTS=new Set(['sentence','sentence_cloze','sentence_parts','short_answers','arrangement','correction','multi_correction','summary']);

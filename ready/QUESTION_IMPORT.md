@@ -1,5 +1,7 @@
 # READY Question Import Workflow
 
+The active import target is `QUESTION_REPRESENTATION.md`: `source_blocks + prompt + pointers + response + answer/explanation`. The renderer spec below is a compatibility projection, not the semantic source of truth. `QUESTION_AUTHORING.md` governs newly authored AI Questions and must not supply facts, answers, or rewritten prompts during publisher import.
+
 새 bundle은 명시적인 render spec을 반드시 포함한다. importer는 누락되거나 서로 모순되는 명세를 기본적으로 거부한다. `--allow-legacy`는 이미 검수된 과거 bundle에만 사용하고 새 PDF에는 사용하지 않는다.
 
 ```json
@@ -19,7 +21,7 @@
 }
 ```
 
-깨끗한 본문 출처나 정확한 target을 확정할 수 없으면 `DROP`으로 기록하고 import bundle에서 제거한다. 공개한 뒤 프런트엔드에서 PDF 장치를 지우는 방식은 허용하지 않는다.
+Clean canonical alignment failure alone is not a DROP reason. Preserve a large or ambiguous publisher transformation as `publisher_text`. Pointer uncertainty becomes an `unresolved` pointer QA issue when the source, prompt, response, and answer linkage remain sound. DROP only when the Question boundary, prompt, answer linkage, content isolation, or equivalent student task cannot be recovered.
 
 이 문서는 PDF를 private structured Question bundle로 바꾸고 READY에 원자적으로 반영하는 절차다. 콘텐츠 추출은 teacher-side에서 수행하며 READY 학생/Admin UI에 PDF parser나 AI pipeline을 넣지 않는다.
 
@@ -30,10 +32,12 @@ PDF
 → source exam / Section / source question number 확인
 → source passage number 확인
 → READY canonical Passage ID 연결
-→ Question family 분류
-→ canonical / variant 결정
-→ prompt / choices 또는 response slots 추출
+→ semantic source_blocks 및 canonical/publisher_text alignment
+→ publisher prompt와 pointer 추출
+→ response/constraints 추출
 → 뒤쪽 정답·해설과 대조
+→ representation validator
+→ renderer compatibility projection
 → private JSON bundle dry-run
 → atomic import
 → student solve / Attempt / Review E2E
@@ -73,7 +77,7 @@ PDF
 }
 ```
 
-`passage_id + exam + passage_no + source_question_no + section`이 import identity다. 같은 identity를 다시 import하면 새 Question을 중복 생성하지 않고 기존 row를 갱신한다.
+`passage_id + exam + passage_no + source_question_no + section`이 import identity다. 같은 identity를 다시 import하면 새 Question을 중복 생성하지 않고 기존 row를 갱신한다. New non-legacy bundles must also include `payload.representation.version = 1` and pass the semantic representation validator before renderer validation.
 
 `source.provider`는 `exam4you` 또는 `nernter` 중 하나를 import 시점에 반드시 명시한다. 이 값은 문제의 의미·렌더링·채점에 관여하지 않고 학생 Shorts queue를 만드는 필터 metadata로만 사용한다. 기존 운영 문제는 모두 `exam4you`, 너른터 PDF에서 새로 통과한 문제는 `nernter`다.
 
