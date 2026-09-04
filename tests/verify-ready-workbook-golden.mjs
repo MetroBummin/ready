@@ -1,6 +1,11 @@
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
-import {auditWorkbookCatalog,repairStageNineCatalog} from '../server/ready/workbook-catalog-qa.mjs';
+import {auditWorkbookCatalog,normalizeStageEightChips,repairStageNineCatalog} from '../server/ready/workbook-catalog-qa.mjs';
+import {NE_MINBYEONGCHEON_L1_WORKBOOK} from '../server/ready/workbook-ne-l1.mjs';
+import {NE_MINBYEONGCHEON_L2_WORKBOOK} from '../server/ready/workbook-ne-l2.mjs';
+import {YBM_PARKJUNEON_L1_WORKBOOK} from '../server/ready/workbook-ybm-l1.mjs';
+import {YBM_PARKJUNEON_L2_WORKBOOK} from '../server/ready/workbook-ybm-l2.mjs';
+import {DONGA_LEEBYEONGMIN_L4_WORKBOOK} from '../server/ready/workbook-donga-l4.mjs';
 
 const fixture=JSON.parse(readFileSync(new URL('./fixtures/workbook-production-golden.json',import.meta.url),'utf8'));
 assert.equal(fixture.version,'production_workbook_golden_v1');
@@ -41,6 +46,11 @@ for(const row of fixture.catalogs){
   }
 }
 assert.equal(stageNineItems,257,'The source-audited semantic Stage 9 baseline must stay fully represented.');
+for(const catalog of [NE_MINBYEONGCHEON_L1_WORKBOOK,NE_MINBYEONGCHEON_L2_WORKBOOK,YBM_PARKJUNEON_L1_WORKBOOK,YBM_PARKJUNEON_L2_WORKBOOK,DONGA_LEEBYEONGMIN_L4_WORKBOOK]){
+  const normalized=normalizeStageEightChips(catalog).catalog,stage=normalized.stages.find(candidate=>Number(candidate.stage)===8);
+  assert.ok(stage?.items?.length,`${catalog.workbookKey} must retain Stage 8 exercises.`);
+  for(const item of stage.items)for(const group of item.groups||[])for(const chip of group)assert.ok(!/\s/u.test(String(chip).trim()),`${item.key} must expose one word per Stage 8 chip.`);
+}
 assert.deepEqual(Object.fromEntries(Object.entries(fixture.relationships).map(([key,value])=>[key,value.count])),{questions:130,examPassages:17,workbookAttempts:20},'Workbook repair must retain the audited relationship baseline.');
 for(const relation of Object.values(fixture.relationships))assert.match(relation.sha256,/^[a-f0-9]{64}$/,'Relationship baseline must include a stable digest.');
 

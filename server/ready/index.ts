@@ -17,7 +17,7 @@ import { CURRENT_QUESTION_PUBLICATION_VERSION } from "./question-pipeline.mjs";
 import { QUESTION_DIFFICULTIES, isQuestionQaScope, normalizeQuestionDifficulty, questionVisibleInScope } from "./question-difficulty.mjs";
 import { compareCanonicalRows, extractSentenceRows, factoryFallbackTargets, generateWorkbookCatalog, inspectFullWorkbookText } from "./workbook-factory.mjs";
 import { gradeWorkbookCorrectionPairs } from "../../ready/deterministic-grading.js";
-import { repairAnswerKeyArtifacts, repairStageNineCatalog } from "./workbook-catalog-qa.mjs";
+import { normalizeStageEightChips, repairAnswerKeyArtifacts, repairStageNineCatalog } from "./workbook-catalog-qa.mjs";
 import { attemptMetrics, groupAttemptCounts, learningPeriodStart } from "../../ready/admin/learning-progress.js";
 
 const CORS = { "Access-Control-Allow-Origin": "*", "Access-Control-Allow-Headers": "authorization, apikey, content-type, x-client-info", "Access-Control-Allow-Methods": "POST, OPTIONS" };
@@ -1079,14 +1079,14 @@ async function workbookForPassage(passage: any) {
   const codeCatalog = codeWorkbookForPassage(passage);
   if(codeCatalog){
     const canonical=rows<any[]>(await db.from("ready_passage_sentences").select("sentence_index,text,translation").eq("passage_id",passage.id).order("sentence_index"));
-    const sanitized=repairAnswerKeyArtifacts(codeCatalog),prepared=repairStageNineCatalog(sanitized.catalog,canonical),invalid=new Set(prepared.unresolved.map((item:any)=>item.itemKey));
+    const sanitized=repairAnswerKeyArtifacts(codeCatalog),ordered=normalizeStageEightChips(sanitized.catalog),prepared=repairStageNineCatalog(ordered.catalog,canonical),invalid=new Set(prepared.unresolved.map((item:any)=>item.itemKey));
     if(invalid.size){const stage=prepared.catalog.stages.find((candidate:any)=>Number(candidate.stage)===9);if(stage)stage.items=stage.items.filter((item:any)=>!invalid.has(item.key));}
     return prepared.catalog;
   }
   if (!clean(passage?.id, 80)) return null;
   const result = await db.from("ready_workbook_catalogs").select("catalog").eq("passage_id", passage.id).maybeSingle();
   if (result.error) throw new ApiError(500, result.error.message);
-  return result.data?.catalog || null;
+  return result.data?.catalog ? normalizeStageEightChips(result.data.catalog).catalog : null;
 }
 function workbookItem(catalog: any, itemKey: string) {
   return catalog?.stages?.flatMap((stage: any) => stage.items || []).find((item: any) => item.key === itemKey) || null;
