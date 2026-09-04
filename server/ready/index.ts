@@ -27,7 +27,7 @@ function supabaseAdminKey() {
   return Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "";
 }
 const db = createClient(Deno.env.get("SUPABASE_URL") ?? "", supabaseAdminKey(), { auth: { persistSession: false } });
-const adminOps = new Set(["teacher_bootstrap", "delete_impact", "assign_scope_passages", "set_scope_passages", "create_passage", "update_passage", "delete_passage", "create_student", "set_student_code", "delete_student", "import_questions", "import_explanations", "factory_start", "factory_confirm", "factory_regenerate"]);
+const adminOps = new Set(["teacher_bootstrap", "delete_impact", "assign_scope_passages", "set_scope_layout", "create_passage", "update_passage", "delete_passage", "create_student", "set_student_code", "delete_student", "import_questions", "import_explanations", "factory_start", "factory_confirm", "factory_regenerate"]);
 const studentOps = new Set(["student_bootstrap", "student_passage", "word_lookup_meaning", "save_reader_word", "remove_reader_word", "update_reader_word_meaning", "sentence_easy_translation", "sentence_structure", "student_questions", "student_question_filters", "student_question_queue", "student_review_questions", "set_question_bookmark", "submit_attempt", "student_workbook", "workbook_assistance", "set_workbook_bookmark", "workbook_hint", "submit_workbook_attempt"]);
 const publicOps = new Set(["student_login", "admin_login"]);
 // Match Breeze's free Gemini dictionary defaults. The API key remains a
@@ -266,6 +266,7 @@ async function adminLogin(body: any) {
 }
 async function createStudent(body: any) {
   const name=required(body.name,"학생 이름",40),school=required(body.school,"학교",80),grade=required(body.grade,"학년",40),code=clean(body.code,10);
+  if((school==='test'&&grade!=='1학년')||(school==='test2'&&grade!=='2학년'))throw new ApiError(400,"QA 학교와 학년 조합을 확인해 주세요.");
   if(!validStudentCode(code))throw new ApiError(400,"학생 코드는 숫자 6자리여야 합니다.");
   const result=await db.rpc("ready_create_student_with_code",{p_name:name,p_school:school,p_grade:grade,p_code:code,p_code_fingerprint:await studentCodeFingerprint(code),p_sort_order:0});
   codeRpcError(result.error);
@@ -312,7 +313,7 @@ async function deleteStudent(body: any) {
 
 async function teacherBootstrap() {
   const [students, exams, passages, examPassages, factoryCatalogs] = await Promise.all([
-    db.from("ready_students").select("id,name,school,grade,created_at").order("school").order("grade").order("name"), db.from("ready_exams").select("id,school,grade,title,is_current").eq("is_current", true).order("school").order("grade"), db.from("ready_passages").select("id,title,source_type,grade,source_year,source_month,source_label,created_at,updated_at").order("display_order").order("created_at"), db.from("ready_exam_passages").select("exam_id,passage_id,position").order("position"), db.from("ready_workbook_catalogs").select("passage_id"),
+    db.from("ready_students").select("id,name,school,grade,created_at").order("school").order("grade").order("name"), db.from("ready_exams").select("id,school,grade,title,is_current").eq("is_current", true).order("school").order("grade"), db.from("ready_passages").select("id,title,source_type,grade,source_year,source_month,source_label,created_at,updated_at").order("display_order").order("created_at"), db.from("ready_exam_passages").select("exam_id,passage_id,position,group_key,group_label").order("position"), db.from("ready_workbook_catalogs").select("passage_id"),
   ]);
   const catalogIds = new Set(rows<any[]>(factoryCatalogs).map(item => item.passage_id));
   const passageRows = rows<any[]>(passages).map(passage => ({ ...passage, has_workbook: !!codeWorkbookForPassage(passage) || catalogIds.has(passage.id), workbook_source: codeWorkbookForPassage(passage) ? "static" : catalogIds.has(passage.id) ? "factory" : "" }));
@@ -324,9 +325,17 @@ async function setScopePassages(body: any, replace: boolean) {
   if (!replace && !passageIds.length) throw new ApiError(400, "배정할 지문을 하나 이상 선택해 주세요.");
   const result = await db.rpc("ready_set_current_scope_passages", { p_school: school, p_grade: grade, p_passage_ids: passageIds, p_replace: replace });
   if (result.error) throw new ApiError(400, result.error.message);
-  const relink = await db.rpc("ready_relink_ne_minbyeongcheon_lessons");
-  if (relink.error) throw new ApiError(500, relink.error.message);
   return { scopeId: result.data as string };
+}
+async function setScopeLayout(body: any) {
+  const examId=required(body.examId,"시험범위",80);
+  if(!Array.isArray(body.layout))throw new ApiError(400,"시험범위 layout은 배열이어야 합니다.");
+  if(body.layout.length>500)throw new ApiError(400,"시험범위 Passage가 너무 많습니다.");
+  const layout=body.layout.map((item:any)=>({passageId:required(item?.passageId,"Passage",80),groupKey:item?.groupKey==null?null:required(item.groupKey,"묶음 key",80),groupLabel:item?.groupLabel==null?null:required(item.groupLabel,"묶음 이름",120)}));
+  if(layout.some((item:any)=>(item.groupKey===null)!==(item.groupLabel===null)))throw new ApiError(400,"묶음 key와 이름은 함께 지정해야 합니다.");
+  const result=await db.rpc("ready_set_scope_definition",{p_exam_id:examId,p_layout:layout});
+  if(result.error)throw new ApiError(400,result.error.message);
+  return {examId,passageCount:layout.length};
 }
 async function createPassage(body: any) {
   if (!Array.isArray(body.sentenceRows)) throw new ApiError(400, "영어와 한국어 2열 rows가 필요합니다.");
@@ -608,7 +617,7 @@ async function attemptedQuestionIds(studentId: string, examId: string) {
   return new Set(attempts.map(attempt => attempt.question_id));
 }
 async function scopePassages(examId: string, studentId: string) {
-  const links = rows<any[]>(await db.from("ready_exam_passages").select("passage_id,position").eq("exam_id", examId).order("position"));
+  const links = rows<any[]>(await db.from("ready_exam_passages").select("passage_id,position,group_key,group_label").eq("exam_id", examId).order("position"));
   const linkedIds = links.map(item => item.passage_id);
   const sourcePassages = linkedIds.length ? rows<any[]>(await db.from("ready_passages").select("id,title,source_type,source_label").in("id", linkedIds)) : [];
   const sentenceRows = linkedIds.length ? rows<any[]>(await db.from("ready_passage_sentences").select("passage_id,sentence_index,text").in("passage_id", linkedIds).order("sentence_index")) : [];
@@ -626,7 +635,7 @@ async function scopePassages(examId: string, studentId: string) {
   });
   const passages = links.map(link => {
     const passage = byId.get(link.passage_id);
-    return passage ? { ...passage, position: link.position, question_count: questionCounts.get(link.passage_id) || 0, has_workbook: !!codeWorkbookForPassage(passage) || factoryPassageIds.has(passage.id) } : null;
+    return passage ? { ...passage, position: link.position, groupKey: link.group_key, groupLabel: link.group_label, question_count: questionCounts.get(link.passage_id) || 0, has_workbook: !!codeWorkbookForPassage(passage) || factoryPassageIds.has(passage.id) } : null;
   }).filter(Boolean);
   return passages;
 }
@@ -1185,7 +1194,7 @@ async function dispatch(op: string, body: any, session: ReadySession | null) {
   switch (op) {
     case "student_login": return studentLogin(body); case "admin_login": return adminLogin(body); case "logout": return revokeSession(session as ReadySession);
     case "teacher_bootstrap": return teacherBootstrap(); case "delete_impact": return deleteImpact(body); case "create_student": return createStudent(body); case "set_student_code": return setStudentCode(body); case "delete_student": return deleteStudent(body);
-    case "assign_scope_passages": return setScopePassages(body, false); case "set_scope_passages": return setScopePassages(body, true); case "create_passage": return createPassage(body); case "update_passage": return updatePassage(body); case "delete_passage": return deletePassage(body); case "import_questions": return importQuestions(body); case "import_explanations": return importExplanations(body); case "factory_start": return factoryStart(body); case "factory_confirm": return factoryConfirm(body); case "factory_regenerate": return factoryRegenerate(body);
+    case "assign_scope_passages": return setScopePassages(body, false); case "set_scope_layout": return setScopeLayout(body); case "create_passage": return createPassage(body); case "update_passage": return updatePassage(body); case "delete_passage": return deletePassage(body); case "import_questions": return importQuestions(body); case "import_explanations": return importExplanations(body); case "factory_start": return factoryStart(body); case "factory_confirm": return factoryConfirm(body); case "factory_regenerate": return factoryRegenerate(body);
     case "student_bootstrap": return studentBootstrap(session as ReadySession); case "student_passage": return studentPassage(body, session as ReadySession); case "word_lookup_meaning": return readerInlineGloss(body, session as ReadySession); case "save_reader_word": return saveReaderWord(body, session as ReadySession); case "remove_reader_word": return removeReaderWord(body, session as ReadySession); case "update_reader_word_meaning": return updateReaderWordMeaning(body, session as ReadySession); case "sentence_easy_translation": return sentenceEasyTranslation(body, session as ReadySession); case "sentence_structure": return sentenceStructure(body, session as ReadySession); case "student_questions": return studentQuestions(body, session as ReadySession); case "student_question_filters": return studentQuestionFilters(body, session as ReadySession); case "student_question_queue": return studentQuestionQueue(body, session as ReadySession); case "student_review_questions": return studentReviewQuestions(body, session as ReadySession); case "set_question_bookmark": return setQuestionBookmark(body, session as ReadySession); case "submit_attempt": return submitAttempt(body, session as ReadySession); case "student_workbook": return studentWorkbook(body, session as ReadySession); case "workbook_assistance": return workbookAssistance(body, session as ReadySession); case "set_workbook_bookmark": return setWorkbookBookmark(body, session as ReadySession); case "workbook_hint": return workbookHint(body, session as ReadySession); case "submit_workbook_attempt": return submitWorkbookAttempt(body, session as ReadySession);
     default: throw new ApiError(404, "알 수 없는 READY 작업입니다.");
   }

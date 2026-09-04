@@ -238,6 +238,12 @@ body[data-ready-mode="student"] .start-study strong{font-size:18px;font-weight:7
 body[data-ready-mode="student"] .start-study small{opacity:.84;font-size:13px;line-height:1.45}
 body[data-ready-mode="student"] .start-study b{font-size:24px;font-weight:450}
 body[data-ready-mode="student"] .passage-list{display:grid;gap:0;margin-top:var(--ready-space-4);border-top:1px solid var(--ready-hairline)}
+body[data-ready-mode="student"] .scope-passage-layout{display:grid;gap:var(--ready-space-7)}
+body[data-ready-mode="student"] .scope-passage-layout>.passage-list{margin-top:0}
+body[data-ready-mode="student"] .student-scope-group>header{display:flex;align-items:baseline;justify-content:space-between;gap:var(--ready-space-3);padding-bottom:var(--ready-space-2);border-bottom:1px solid var(--ready-ink)}
+body[data-ready-mode="student"] .student-scope-group>header strong{font-size:16px;font-weight:750}
+body[data-ready-mode="student"] .student-scope-group>header small{color:var(--ready-muted);font-size:11px;font-weight:700}
+body[data-ready-mode="student"] .student-scope-group .passage-list{margin-top:0;border-top:0}
 body[data-ready-mode="student"] .passage-row{display:flex;align-items:center;gap:var(--ready-space-3);min-height:58px;border-bottom:1px solid var(--ready-hairline);background:transparent}
 body[data-ready-mode="student"] .passage-open{display:flex;min-width:0;flex:1;align-items:center;justify-content:space-between;gap:var(--ready-space-4);padding:var(--ready-space-3) var(--ready-space-2);border:0;color:var(--ready-ink);background:transparent;text-align:left;cursor:pointer}
 body[data-ready-mode="student"] .passage-open:hover{color:var(--ready-primary)}
@@ -694,6 +700,28 @@ body[data-ready-mode="admin"] .recent-row{display:flex;justify-content:space-bet
 body[data-ready-mode="admin"] .scope-detail-form{display:grid;gap:var(--ready-space-4)}
 body[data-ready-mode="admin"] .scope-detail-toolbar{position:sticky;top:72px;z-index:20;display:flex;align-items:center;justify-content:space-between;gap:var(--ready-space-4);padding:var(--ready-space-3) var(--ready-space-4);border:1px solid var(--ready-hairline);border-radius:var(--ready-radius-xs);background:var(--ready-surface);box-shadow:none}
 body[data-ready-mode="admin"] .scope-actions{display:flex;gap:var(--ready-space-2);margin:0}
+body[data-ready-mode="admin"] .scope-layout{display:grid;gap:var(--ready-space-4)}
+body[data-ready-mode="admin"] .scope-layout-group{overflow:hidden;border:1px solid var(--ready-hairline);border-radius:var(--ready-radius-xs);background:var(--ready-surface)}
+body[data-ready-mode="admin"] .scope-layout-group[draggable="true"]>header{cursor:grab}
+body[data-ready-mode="admin"] .scope-layout-group[draggable="true"]>header:active{cursor:grabbing}
+body[data-ready-mode="admin"] .scope-layout-group>header{display:flex;align-items:center;gap:var(--ready-space-2);min-height:58px;padding:var(--ready-space-3);border-bottom:1px solid var(--ready-hairline);background:var(--ready-canvas-quiet)}
+body[data-ready-mode="admin"] .scope-layout-group>header>input{min-width:0;flex:1;border:0;border-bottom:1px solid transparent;border-radius:0;background:transparent;font-size:16px;font-weight:750}
+body[data-ready-mode="admin"] .scope-layout-group>header>input:focus{border-bottom-color:var(--ready-ink);outline:0}
+body[data-ready-mode="admin"] .scope-layout-ungrouped>header>div{display:grid;gap:2px}
+body[data-ready-mode="admin"] .scope-layout-ungrouped>header small{color:var(--ready-muted);font-size:11px}
+body[data-ready-mode="admin"] .drag-handle{flex:none;color:var(--ready-muted);font-size:22px;line-height:1;cursor:grab;touch-action:none}
+body[data-ready-mode="admin"] .scope-layout-list{min-height:58px}
+body[data-ready-mode="admin"] .scope-layout-passage{display:flex;align-items:center;gap:var(--ready-space-3);min-height:62px;padding:var(--ready-space-2) var(--ready-space-3);border-bottom:1px solid var(--ready-hairline);background:transparent;cursor:grab}
+body[data-ready-mode="admin"] .scope-layout-passage:last-child{border-bottom:0}
+body[data-ready-mode="admin"] .scope-layout-passage-copy{display:grid;min-width:0;flex:1;gap:3px}
+body[data-ready-mode="admin"] .scope-layout-passage-copy strong{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:13px}
+body[data-ready-mode="admin"] .scope-layout-passage-copy small{color:var(--ready-muted);font-size:10px}
+body[data-ready-mode="admin"] .scope-layout-passage select{width:min(170px,25vw);min-height:34px;font-size:11px}
+body[data-ready-mode="admin"] .scope-order-buttons{display:flex;flex:none;gap:3px}
+body[data-ready-mode="admin"] .scope-order-buttons .icon-button{width:32px;height:32px;min-height:32px}
+body[data-ready-mode="admin"] .scope-layout-empty{margin:0;padding:var(--ready-space-4);color:var(--ready-muted);font-size:12px;text-align:center}
+body[data-ready-mode="admin"] .scope-membership{border-top:1px solid var(--ready-hairline)}
+body[data-ready-mode="admin"] .scope-membership summary{padding:var(--ready-space-3) 0;font-size:13px;font-weight:700;cursor:pointer}
 body[data-ready-mode="admin"] .scope-passage-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0;border-top:1px solid var(--ready-hairline)}
 body[data-ready-mode="admin"] .scope-passage-row{display:flex;min-height:62px;align-items:flex-start;gap:var(--ready-space-3);padding:var(--ready-space-3);border:0;border-bottom:1px solid var(--ready-hairline);border-radius:0;color:var(--ready-body);background:transparent;cursor:pointer}
 body[data-ready-mode="admin"] .scope-passage-row:has(input:checked){color:var(--ready-ink);background:var(--ready-canvas-quiet);box-shadow:inset 3px 0 var(--ready-ink)}
@@ -771,6 +799,11 @@ body[data-ready-mode] #toast.on{opacity:1;transform:translate(-50%,0)}
   body[data-ready-mode="admin"] .filter-toolbar label{min-width:0}
   body[data-ready-mode="admin"] .scope-detail-toolbar{position:static;align-items:stretch;flex-direction:column}
   body[data-ready-mode="admin"] .scope-actions{display:grid;grid-template-columns:1fr 1fr}
+  body[data-ready-mode="admin"] .scope-layout-group>header{align-items:flex-start;flex-wrap:wrap}
+  body[data-ready-mode="admin"] .scope-layout-group>header>input{flex-basis:calc(100% - 38px)}
+  body[data-ready-mode="admin"] .scope-layout-passage{align-items:flex-start;flex-wrap:wrap}
+  body[data-ready-mode="admin"] .scope-layout-passage-copy{flex-basis:calc(100% - 40px)}
+  body[data-ready-mode="admin"] .scope-layout-passage select{width:100%;flex:1}
   body[data-ready-mode] .sheet{top:auto;bottom:0;width:100%;height:min(92vh,900px)}
 }
 
