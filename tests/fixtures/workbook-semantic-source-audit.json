@@ -1,0 +1,19 @@
+{
+  "version": "semantic_workbook_source_audit_v1",
+  "publishGate": { "ready": false, "requiredUnresolved": 0, "reason": "All 13 original PDFs and Answer Keys must be verified before atomic replacement." },
+  "catalogs": [
+    {"workbookKey":"sol-direct-05fc12fd-3956-4db8-925d-32475a7e8b1e","sourceStatus":"candidate_pdf_requires_canonical_match"},
+    {"workbookKey":"sol-direct-2026-06-21","sourceStatus":"candidate_pdf_requires_canonical_match"},
+    {"workbookKey":"sol-direct-2026-06-18","sourceStatus":"candidate_pdf_requires_canonical_match"},
+    {"workbookKey":"sol-direct-2026-06-26","sourceStatus":"candidate_pdf_requires_canonical_match"},
+    {"workbookKey":"sol-direct-2026-06-20","sourceStatus":"candidate_pdf_requires_canonical_match"},
+    {"workbookKey":"factory-741d6581-1f4c-4e1d-823c-6be85c62bf52","sourceStatus":"missing_original_pdf"},
+    {"workbookKey":"sol-direct-2026-06-23","sourceStatus":"candidate_pdf_requires_canonical_match"},
+    {"workbookKey":"sol-direct-2026-06-24","sourceStatus":"candidate_pdf_requires_canonical_match"},
+    {"workbookKey":"sol-direct-a1335d49-5dc5-4e42-9f81-9f340648ff95","sourceStatus":"candidate_pdf_requires_canonical_match"},
+    {"workbookKey":"sol-direct-2026-06-19","sourceStatus":"candidate_pdf_requires_canonical_match"},
+    {"workbookKey":"factory-c2135f14-420a-4b08-a0a2-466b1a3aa8ff","sourceStatus":"missing_original_pdf"},
+    {"workbookKey":"factory-f0577279-29fe-4923-bdca-ab5bccc64fca","sourceStatus":"missing_original_pdf"},
+    {"workbookKey":"sol-direct-2026-06-22","sourceStatus":"candidate_pdf_requires_canonical_match"}
+  ]
+}

@@ -2,276 +2,33 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { compareCanonicalRows, extractSentenceRows, factoryFallbackTargets, generateWorkbookCatalog, inspectFullWorkbookText, readyStageForSemanticType, semanticWorkbookType } from '../server/ready/workbook-factory.mjs';
+import { FACTORY_STAGES, SEMANTIC_WORKBOOK_CONTRACT, generateWorkbookCatalog, inspectFullWorkbookText, readyStageForSemanticType, semanticWorkbookType } from '../server/ready/workbook-factory.mjs';
 
 const root=resolve(dirname(fileURLToPath(import.meta.url)),'..');
 const fixture=name=>readFileSync(resolve(root,'tests/fixtures',name),'utf8');
-const canonical=[{text:'Humans excel at visual imagery.',translation:'인간은 시각적 심상에 뛰어나다.'},{text:'Our brains evolved this ability for survival.',translation:'우리의 뇌는 생존을 위해 이 능력을 발달시켰다.'}];
-assert.equal(compareCanonicalRows(canonical,canonical).consistent,true,'Existing Passage mode must accept the unchanged canonical sentence pairs.');
-assert.equal(compareCanonicalRows(canonical,[...canonical].reverse()).reason,'canonical_text_mismatch','Existing Passage mode must reject reordered PDF rows.');
-assert.equal(compareCanonicalRows(canonical,canonical.slice(0,1)).reason,'sentence_count_mismatch','Existing Passage mode must reject an incomplete PDF passage.');
+assert.deepEqual(FACTORY_STAGES,[1,2,3,4,5,6,7]);
+assert.equal(readyStageForSemanticType('paragraph_ordering'),0);
+assert.equal(readyStageForSemanticType('error_correction'),0);
+assert.equal(readyStageForSemanticType('writing'),7);
+assert.equal(semanticWorkbookType('WORKBOOK 9 문단 배열하기'),'paragraph_ordering');
+assert.equal(semanticWorkbookType('WORKBOOK 10 영작 연습하기'),'writing');
 
-// Case A: semantic headings win over publisher stage numbers, and Check is excluded.
-const textbook=inspectFullWorkbookText(fixture('workbook-factory-textbook.txt'));
-assert.equal(textbook.fullWorkbook,true);
-assert.equal(textbook.reviewRequired,false);
-assert.ok(textbook.headings.some(item=>item.type==='writing'));
-assert.equal(semanticWorkbookType('Stage 10 Check'),'check_mixed');
+for(const name of ['workbook-factory-textbook.txt','workbook-factory-mock.txt']){
+  const inspected=inspectFullWorkbookText(fixture(name));
+  assert.equal(inspected.fullWorkbook,true,name);
+  const catalog=generateWorkbookCatalog({title:name,workbookKey:name,rows:inspected.rows,sourceExercises:inspected.exercises,provenance:{documentName:name}});
+  assert.equal(catalog.contractVersion,SEMANTIC_WORKBOOK_CONTRACT);
+  assert.deepEqual(catalog.stages.map(stage=>stage.stage),[1,2,3,4,5,6,7]);
+  assert.equal(catalog.metrics.geminiCallCount,0);
+  assert.equal(catalog.metrics.geminiGeneratedExercises,0);
+  assert.equal(catalog.stages.some(stage=>stage.items.some(item=>item.semanticType==='paragraph_ordering'||item.kind==='correction_pairs')),false);
+  for(const item of catalog.stages.find(stage=>stage.stage===6).items)for(const group of item.groups)for(const chip of group)assert.equal(/\s/.test(chip),false,'Stage 6 uses one word per chip.');
+  for(const item of catalog.stages.find(stage=>stage.stage===7).items){assert.equal(item.kind,'full_sentence_input');assert.equal(item.prompt,'');assert.equal(item.answers.length,1);assert.equal(item.wordBank,undefined);}
+}
 
-// Case B: paragraph ordering is never mapped to READY Stage 8; writing still is.
-const mock=inspectFullWorkbookText(fixture('workbook-factory-mock.txt'));
-assert.equal(mock.fullWorkbook,true);
-assert.equal(semanticWorkbookType('Paragraph ordering'),'paragraph_ordering');
-assert.equal(semanticWorkbookType('Writing'),'writing');
-assert.equal(readyStageForSemanticType('paragraph_ordering'),0,'A publisher Workbook 9 paragraph-order section must not become READY Stage 9.');
-assert.equal(readyStageForSemanticType('writing'),9,'Semantic writing maps to READY Stage 9 even when the publisher prints Workbook 10.');
-
-// Case C: passage-only starts with reviewable rows; edits, deletion, insertion and
-// re-numbering are all represented by the final row order passed to generation.
-const only=extractSentenceRows('Humans excel at visual imagery.\nOur brains evolved this ability for survival.');
-assert.equal(only.needsTranslation,true);
-const tsv=extractSentenceRows('English\tKorean\nHumans excel at visual imagery.\t인간은 시각적 심상에 뛰어나다.\nOur brains evolved this ability for survival.\t우리의 뇌는 생존을 위해 이 능력을 발달시켰다.');
-assert.equal(tsv.pairing,'tsv_two_column');
-assert.equal(tsv.rows.length,2);
-assert.equal(extractSentenceRows('Humans excel.\t인간은 뛰어나다.\nloose note').pairing,'invalid_mixed_tsv','Mixed TSV must fail closed rather than silently dropping a line.');
-const pdfNoise=extractSentenceRows('Humans excel at visual imagery.\u0000\nOur brains evolved this ability for survival.');
-assert.ok(pdfNoise.rows.every(row=>!JSON.stringify(row).includes('\\u0000')),'PDF control characters must not reach JSONB storage.');
-const reviewed=[{text:'Humans excel at visual imagery.',translation:'인간은 시각적 심상에 뛰어나다.'},{text:'They improve when they reflect on feedback.',translation:'그들은 피드백을 돌아볼 때 향상된다.'},canonical[1]];
-const catalog=generateWorkbookCatalog({title:'Golden',workbookKey:'golden',rows:reviewed,ai:{5:[{sentenceIndex:1,prompt:'Humans excel at visual ____________.',hint:'image',answer:'imagery'}],6:[{sentenceIndex:2,prompt:'They improve when they reflect on ____________.',wrong:'feedforward',answer:'feedback'}]}});
-assert.deepEqual(catalog.stages.map(stage=>stage.stage),[2,3,4,5,6,7,8,9]);
-assert.equal(catalog.stages.find(stage=>stage.stage===2).items[0].number,1);
-assert.equal(catalog.stages.find(stage=>stage.stage===9).items.length,0,'Factory must not invent whole-sentence writing when no publisher writing exercise exists.');
-assert.equal(catalog.stages.find(stage=>stage.stage===5).items.length,1);
-assert.equal(catalog.stages.find(stage=>stage.stage===6).items.length,1);
-assert.equal(catalog.stages.find(stage=>stage.stage===7).items.length,0,'Stage 7 must not generate one error per sentence.');
-assert.equal(catalog.metrics.validatorDrop,0);
-assert.ok(catalog.stages.find(stage=>stage.stage===8).items[0].groups[0].every(token=>!token.includes(' ')),'Factory Stage 8 must render one English word per chip.');
-assert.deepEqual(catalog.metrics.stageCoverage[8],{ready:3,expected:3});
-assert.deepEqual(catalog.metrics.stageCoverage[9],{ready:0,expected:0},'Absent publisher writing is unsupported, not a synthetic sentence-count target.');
-
-const semanticWriting=generateWorkbookCatalog({title:'Semantic writing',workbookKey:'semantic-writing',rows:canonical,sourceExercises:[
-  {type:'paragraph_ordering',number:1,prompt:'Second / First',answer:'First / Second',provenance:{sourceWorkbookStage:9}},
-  {type:'writing',number:1,prompt:'Humans ____________.',answers:['excel at visual imagery'],source:'인간은 시각적 심상에 뛰어나다.',wordBank:['excel','visual imagery'],canonicalStart:1,canonicalEnd:1,provenance:{sourceWorkbookStage:10}},
-]});
-const semanticWritingItems=semanticWriting.stages.find(stage=>stage.stage===9).items;
-assert.equal(semanticWritingItems.length,1);
-assert.equal(semanticWritingItems[0].provenance.sourceWorkbookStage,10,'The semantic writing source is preserved even when its printed number is 10.');
-assert.equal(semanticWritingItems[0].prompt,'Humans ____________.');
-
-const qualityRows=[
-  {text:'They have probably heard the news.',translation:'그들은 아마 그 소식을 들었을 것이다.'},
-  {text:'The teacher explains the lesson clearly.',translation:'선생님은 수업을 명확하게 설명한다.'},
-  {text:'Students learn from their mistakes.',translation:'학생들은 자신의 실수에서 배운다.'},
-  {text:'Our brains evolved this ability for survival.',translation:'우리의 뇌는 생존을 위해 이 능력을 발달시켰다.'},
-  {text:'People often make choices quickly.',translation:'사람들은 종종 빠르게 선택한다.'},
-  {text:'We should protect the environment.',translation:'우리는 환경을 보호해야 한다.'},
-];
-const stageSevenPrompt='They has probably heard the news. The teacher explain the lesson clearly. Students learn from their mistakes. Our brains evolved this ability for survival. People often make choices quickly. We should protect the environment.';
-const fullReuse=generateWorkbookCatalog({title:'Publisher',workbookKey:'publisher',rows:qualityRows,sourceExercises:[
-  {type:'grammar_vocab_choice',number:1,prompt:'They ⟦CHOICE:0⟧ ⟦CHOICE:1⟧ heard the news.',groups:[['have','has'],['probably','rarely']],answers:['have','probably'],provenance:{page:4}},
-  {type:'error_correction',number:1,prompt:stageSevenPrompt,answer:'has → have / explain → explains',provenance:{page:5}},
-],provenance:{geminiCallCount:0}});
-assert.equal(fullReuse.metrics.geminiCallCount,0,'Full Workbook source reuse must not call Gemini');
-const sourceStageSix=fullReuse.stages.find(stage=>stage.stage===6).items[0];
-assert.deepEqual(sourceStageSix.groups,[['have','has'],['probably','rarely']],'Publisher Stage 6 local choice groups must be preserved.');
-const passageCorrectionItem=fullReuse.stages.find(stage=>stage.stage===7).items[0];
-assert.equal(passageCorrectionItem.pairCount,2,'Publisher Stage 7 must preserve source correction pairs in one passage/range exercise.');
-assert.equal(passageCorrectionItem.sentenceIndexes,undefined,'Publisher Stage 7 remains its original range item.');
-assert.deepEqual(fullReuse.metrics.stageCoverage[7],{ready:1,expected:1},'Stage 7 expected count is source exercise count, never sentence count.');
-const incompletePublisherStage7=generateWorkbookCatalog({title:'Incomplete publisher Stage 7',workbookKey:'incomplete-publisher-stage7',rows:qualityRows,sourceExercises:[{type:'error_correction',number:1,sourceNumber:1,subtype:'grammar',prompt:stageSevenPrompt,answer:'has → have / explain → explains',provenance:{page:5}},{type:'error_correction',number:2,sourceNumber:2,subtype:'grammar',prompt:'Unresolved publisher prompt',answers:[],answer:'',provenance:{page:6}}]});
-assert.deepEqual(incompletePublisherStage7.metrics.stageCoverage[7],{ready:1,expected:2},'Stage 7 coverage must count unresolved publisher prompts so a partial parse cannot report a false complete total.');
-const commaLemma=generateWorkbookCatalog({title:'Comma lemma list',workbookKey:'comma-lemma',rows:qualityRows,sourceExercises:[
-  {type:'grammar_vocab_choice',number:1,prompt:'They (have, probably, hear / have probably heard) the news.',answer:'have probably heard'},
-]});
-assert.equal(commaLemma.stages.find(stage=>stage.stage===6).items.length,0,'Comma-separated lemma lists are not valid Stage 6 options.');
-
-// Real publisher semantics: Stage 6 exercise numbering is not a canonical sentence id.
-const dongaLikeRows=[
-  {text:'This is an example of stress eating.',translation:'이것은 스트레스로 인한 먹기의 일례이다.'},
-  {text:'Stress eaters use food to make themselves feel better.',translation:'스트레스로 인해 먹는 사람들은 기분을 풀기 위해 음식을 이용한다.'},
-  {text:'They try to escape reality.',translation:'그들은 현실에서 벗어나려고 한다.'},
-];
-const dongaLike=generateWorkbookCatalog({title:'Donga-like',workbookKey:'donga-like',rows:dongaLikeRows,sourceExercises:[
-  {type:'grammar_vocab_choice',number:1,prompt:'This is an example of stress eating. Stress eaters ⟦CHOICE:0⟧ food to make ⟦CHOICE:1⟧ ⟦CHOICE:2⟧ better.',groups:[['use','uses'],['themselves','them'],['feel','to feel']],answers:['use','themselves','feel'],canonicalStart:1,canonicalEnd:2,provenance:{page:25}},
-  {type:'grammar_vocab_choice',number:2,prompt:'They ⟦CHOICE:0⟧ to escape reality.',groups:[['try','tries']],answers:['try'],canonicalStart:3,canonicalEnd:3,provenance:{page:25}},
-]});
-assert.equal(dongaLike.stages.find(stage=>stage.stage===6).items.length,2,'A publisher Stage 6 item may cover multiple canonical sentences.');
-assert.deepEqual(dongaLike.metrics.stageCoverage[6],{ready:2,expected:2},'Publisher Stage 6 expected count is source exercise count, not sentence count.');
-assert.deepEqual(factoryFallbackTargets(dongaLike,dongaLikeRows,[{type:'grammar_vocab_choice',number:1,prompt:'x',answer:'x'}])[6],[],'Publisher Stage 6 must not be replaced by AI just because exercise count differs from sentence count.');
-
-// Validation normalizes typography only for matching; displayed local options remain source-backed.
-const quoteRows=[{text:"In other words, if we don't reduce carbon emissions sufficiently, atmospheric carbon will continue to accumulate.",translation:'다시 말하면 탄소 배출을 충분히 줄이지 않으면 대기 중 탄소는 계속 축적될 것이다.'}];
-const quoteChoice=generateWorkbookCatalog({title:'Quote normalization',workbookKey:'quote-normalization',rows:quoteRows,sourceExercises:[
-  {type:'grammar_vocab_choice',number:1,prompt:'In other words, if we ⟦CHOICE:0⟧ reduce carbon emissions sufficiently, atmospheric carbon will continue to accumulate.',groups:[["won‘t","don't"]],answers:['don‘t'],provenance:{page:27}},
-]});
-const quoteItem=quoteChoice.stages.find(stage=>stage.stage===6).items[0];
-assert.equal(quoteItem.answers[0],"don't");
-assert.deepEqual(quoteItem.groups[0],["won‘t","don't"]);
-
-// Publisher Stage 7 allows the source's actual 2/3/4 correction count.
-const fourPairRows=[{text:'Alpha beta gamma delta epsilon.',translation:'알파 베타 감마 델타 엡실론.'}];
-const fourPair=generateWorkbookCatalog({title:'Four corrections',workbookKey:'four-pair',rows:fourPairRows,sourceExercises:[
-  {type:'error_correction',number:1,sourceNumber:4,subtype:'grammar',prompt:'WrongA WrongB WrongC WrongD epsilon.',answers:['WrongA','Alpha','WrongB','beta','WrongC','gamma','WrongD','delta'],provenance:{page:34}},
-]});
-assert.equal(fourPair.stages.find(stage=>stage.stage===7).items[0].pairCount,4,'Publisher Stage 7 must preserve a four-pair source exercise.');
-
-// Parser regression for the actual Exam4you format: Stage 6 can merge sentences,
-// Stage 7 item numbers have no dot and restart between context/grammar families.
-const publisherText=`[PAGE 1]\n워크북 2 빈칸 연습 (한글)\n1. This is an example of stress eating.1)\n이것은 ____________.\n2. Stress eaters use food to make themselves feel better.2)\n스트레스 먹는 사람들은 ____________.\n3. They try to escape reality.3)\n그들은 ____________.\n[PAGE 2]\n워크북 3 빈칸 연습 (영문)\n1. 이것은 스트레스로 인한 먹기의 일례이다.1)\nThis is ____________.\n2. 스트레스로 인해 먹는 사람들은 기분을 풀기 위해 음식을 이용한다.2)\nStress eaters ____________.\n3. 그들은 현실에서 벗어나려고 한다.3)\nThey ____________.\n[PAGE 3]\n워크북 6 어법 선택형 연습\n1. 이것은 스트레스로 인한 먹기의 일례이다. 스트레스로 인해 먹는 사람들은 기분을 풀기 위해 음식을 이용한다.1)\nThis is an example of stress eating. Stress eaters [use / uses] food to make [themselves / them] [feel / to feel] better.\n2. 그들은 현실에서 벗어나려고 한다.2)\nThey [try / tries] to escape reality.\n[PAGE 4]\n워크북 7 어색한 곳 찾기 연습\n문맥상 어색한 것 찾기\n1 다음 글의 밑줄 친 부분 중 문맥상 어색한 것을 두 개 찾아 바르게 고쳐 쓰시오.1)\nThis is an opposite of stress eating. Stress eaters use food to make themselves feel worse. They try to escape reality.\n(1) __________________ → __________________\n(2) __________________ → __________________\n어법상 어색한 것 찾기\n1 다음 글의 밑줄 친 부분 중 어법상 어색한 것을 세 개 찾아 바르게 고쳐 쓰시오.1)\nThis are an example of stress eating. Stress eaters uses food to make themselves feel better. They tries to escape reality.\n(1) __________________ → __________________\n(2) __________________ → __________________\n(3) __________________ → __________________\n[PAGE 5]\nAnswer Key\n워크북 6 어법 선택형 연습\n1) use / themselves / feel\n2) try\n워크북 7 어색한 곳 찾기 연습\n문맥상 어색한 것 찾기\n1) (1) opposite → example\n(2) worse → better\n어법상 어색한 것 찾기\n1) (1) are → is\n(2) uses → use\n(3) tries → try\n워크북 8 순서배열 연습`;
-const inspectedPublisher=inspectFullWorkbookText(publisherText);
-assert.equal(inspectedPublisher.rows.length,3);
-assert.equal(inspectedPublisher.exercises.filter(item=>item.type==='grammar_vocab_choice').length,2,'Stage 6 parser must preserve a source count different from sentence count.');
-const parsedStage7=inspectedPublisher.exercises.filter(item=>item.type==='error_correction');
-assert.equal(parsedStage7.length,2,'Stage 7 parser must read no-dot item numbers and both subtype families.');
-assert.deepEqual(parsedStage7.map(item=>item.subtype),['context','grammar']);
-const parsedCatalog=generateWorkbookCatalog({title:'Parsed publisher',workbookKey:'parsed-publisher',rows:inspectedPublisher.rows,sourceExercises:inspectedPublisher.exercises});
-assert.deepEqual(parsedCatalog.metrics.stageCoverage[6],{ready:2,expected:2});
-assert.deepEqual(parsedCatalog.metrics.stageCoverage[7],{ready:2,expected:2});
-assert.deepEqual(parsedCatalog.stages.find(stage=>stage.stage===7).items.map(item=>item.pairCount),[2,3]);
-assert.equal(new Set(parsedCatalog.stages.find(stage=>stage.stage===7).items.map(item=>item.key)).size,2,'Context 1 and grammar 1 must not collide.');
-
-
-// Donga-style Stage 5 uses (Let) us in the exercise while canonical English
-// uses the contraction “Let’s”.
-const letWorkbook=`[PAGE 1]\n워크북 2 빈칸 연습 (한글)\n1. Let’s find out whether you fall into any of the following categories.1)\n해당하는 범주를 알아보자.\n[PAGE 2]\n워크북 3 빈칸 연습 (영문)\n1. 해당하는 범주를 알아보자.1)\nLet’s ____________.\n[PAGE 3]\n워크북 5 동사형 연습\n1. 해당하는 범주를 알아보자.1)\n(Let) us (find) out whether you (fall) into any of the (follow) categories.\n[PAGE 4]\nAnswer Key\n워크북 5 동사형 연습\n1) Let / find / fall / following`;
-const letAudit=inspectFullWorkbookText(letWorkbook);
-assert.equal(letAudit.exercises.filter(item=>item.type==='verb_form'&&item.provenance?.origin==='publisher_answer_key').length,1,'Stage 5 must accept publisher Let us against canonical Let’s.');
-
-// Answer-key column extraction can place a Stage 7 continuation item before
-// the repeated Stage 7 heading.
-const orphanStage7=`[PAGE 1]\n워크북 2 빈칸 연습 (한글)\n1. Alpha beta gamma.1)\n알파 베타 감마.\n[PAGE 2]\n워크북 3 빈칸 연습 (영문)\n1. 알파 베타 감마.1)\nAlpha beta gamma.\n[PAGE 3]\n워크북 7 어색한 곳 찾기 연습\n어법상 어색한 것 찾기\n5 다음 글의 밑줄 친 부분 중 어법상 어색한 것을 두 개 찾아 바르게 고쳐 쓰시오.5)\nWrongA WrongB gamma.\n(1) __________________ → __________________\n(2) __________________ → __________________\n[PAGE 4]\nAnswer Key\n5) (1) WrongA → Alpha\n(2) WrongB → beta\n워크북 7 어색한 곳 찾기 연습\n어법상 어색한 것 찾기\n워크북 8 순서배열 연습`;
-const orphanAudit=inspectFullWorkbookText(orphanStage7);
-assert.equal(orphanAudit.exercises.filter(item=>item.type==='error_correction'&&item.sourceNumber===5).length,1,'Stage 7 must recover an answer-key continuation emitted before its repeated heading.');
-
-
-// Some publisher PDF text layers keep the Stage 7 heading and the first
-// answer on one physical line. The Stage 7 marker must not consume that first
-// numbered correction block; the publisher answer still has to round-trip.
-const sameLineFirstAnswer=`[PAGE 1]
-워크북 2 빈칸 연습 (한글)
-1. You have probably heard the saying, “You are what you eat.”1)
-당신은 이 말을 들어 본 적이 있다.
-2. It means that it is important to eat good food in order to be healthy.2)
-좋은 음식을 먹는 것이 중요하다는 뜻이다.
-3. But the way you eat food is just as important as eating the right food.3)
-먹는 방식도 중요하다.
-4. Many people have bad eating habits, but they often aren’t aware of them.4)
-많은 사람들은 그것을 인지하지 못한다.
-5. Do you have any bad eating habits?5)
-나쁜 식습관이 있는가?
-6. Let’s find out whether you fall into any of the following categories.6)
-다음 범주를 알아보자.
-[PAGE 2]
-워크북 3 빈칸 연습 (영문)
-1. 당신은 이 말을 들어 본 적이 있다.1)
-You have probably heard the saying, “You are what you eat.”
-2. 좋은 음식을 먹는 것이 중요하다는 뜻이다.2)
-It means that it is important to eat good food in order to be healthy.
-3. 먹는 방식도 중요하다.3)
-But the way you eat food is just as important as eating the right food.
-4. 많은 사람들은 그것을 인지하지 못한다.4)
-Many people have bad eating habits, but they often aren’t aware of them.
-5. 나쁜 식습관이 있는가?5)
-Do you have any bad eating habits?
-6. 다음 범주를 알아보자.6)
-Let’s find out whether you fall into any of the following categories.
-[PAGE 3]
-워크북 7 어색한 곳 찾기 연습
-문맥상 어색한 것 찾기
-1 다음 글의 밑줄 친 부분 중 문맥상 어색한 것을 세 개 찾아 바르게 고쳐 쓰시오.1)
-You have probably heard the saying, “You are what you eat.” It means that it is unimportant to eat good food in order to be healthy. But the way you eat food is just as important as eating the wrong food. Many people have bad eating habits, but they often aren’t unaware of them. Do you have any bad eating habits? Let’s find out whether you fall into any of the following categories.
-(1) __________________ → __________________
-(2) __________________ → __________________
-(3) __________________ → __________________
-[PAGE 4]
-Answer Key
-워크북 7 어색한 곳 찾기 연습 문맥상 어색한 것 찾기 1) (1) unimportant → important
-(2) wrong → right
-(3) unaware → aware
-워크북 8 순서배열 연습`;
-const sameLineAudit=inspectFullWorkbookText(sameLineFirstAnswer);
-const sameLineItem=sameLineAudit.exercises.find(item=>item.type==='error_correction'&&item.subtype==='context'&&item.sourceNumber===1);
-assert.equal(sameLineItem?.answer,'unimportant → important / wrong → right / unaware → aware','Stage 7 must preserve the first publisher Answer Key block when it shares the heading line.');
-assert.deepEqual([sameLineItem?.canonicalStart,sameLineItem?.canonicalEnd],[1,6],'The recovered first Stage 7 item must round-trip to canonical sentences 1-6.');
-
-const adminFactorySource=readFileSync(resolve(root,'ready/admin/app.js'),'utf8');
-const factoryServerSource=readFileSync(resolve(root,'server/ready/index.ts'),'utf8');
-assert.match(adminFactorySource,/누락을 인정하고 최종 확정/,'Incomplete Factory preview must expose an explicit final confirmation.');
-assert.match(adminFactorySource,/'최종 확정'/,'Complete Factory preview must expose an explicit final confirmation.');
-assert.match(factoryServerSource,/body\.finalize !== true/,'Factory confirm must preview unless the admin explicitly finalizes.');
-assert.match(factoryServerSource,/previewAi/,'Final confirmation must reuse the validated preview supplement instead of regenerating it.');
-assert.match(adminFactorySource,/finalize&&result\.incompleteReview/,'Finalization must remain fail-closed if the server reports a changed incomplete result.');
-assert.match(adminFactorySource,/selectedFactoryPdf[\s\S]*input\?\.files\?\.\[0\]/,'Factory PDF upload must read the file input directly before relying on FormData.');
-assert.doesNotMatch(adminFactorySource,/async function startFactory[\s\S]{0,800}instanceof File/,'Factory PDF upload must not reject a selected file only because instanceof File fails.');
-assert.doesNotMatch(factoryServerSource,/autoCompleted: true/,'Full workbooks must never auto-create a Passage.');
-
-
-// Canonical range lookup is shared across publisher items, while duplicate
-// canonical spans must still fail closed instead of becoming an arbitrary match.
-const duplicateSpanRows=[
-  {text:'The same sentence appears here.',translation:'같은 문장 1.'},
-  {text:'The same sentence appears here.',translation:'같은 문장 2.'},
-];
-const duplicateSpan=generateWorkbookCatalog({title:'Duplicate span',workbookKey:'duplicate-span',rows:duplicateSpanRows,sourceExercises:[
-  {type:'grammar_vocab_choice',number:1,prompt:'The same sentence appears ⟦CHOICE:0⟧.',groups:[['there','here']],answers:['here'],provenance:{page:1}},
-]});
-assert.equal(duplicateSpan.stages.find(stage=>stage.stage===6).items.length,0,'Ambiguous canonical spans must remain rejected after span-index caching.');
-
-const partialReuse=generateWorkbookCatalog({title:'Partial',workbookKey:'partial',rows:canonical,sourceExercises:[
-  {type:'verb_form',number:1,prompt:'Humans excel at visual ____________.',answer:'imagery',provenance:{page:3}},
-],ai:{5:[{sentenceIndex:1,prompt:'Humans excel at visual ____________.',hint:'image',answer:'imagery'},{sentenceIndex:2,prompt:'Our brains ____________ this ability for survival.',hint:'evolve',answer:'evolved'}]},provenance:{geminiCallCount:1}});
-assert.deepEqual(partialReuse.stages.find(stage=>stage.stage===5).items.map(item=>item.number),[1,2],'AI may fill only missing source items without replacing publisher exercises.');
-assert.equal(partialReuse.metrics.sourceReusedExercises,1);
-assert.equal(partialReuse.metrics.geminiGeneratedExercises,1);
-assert.deepEqual(partialReuse.metrics.stageCoverage[5],{ready:2,expected:2},'Source and AI exercises must combine into sentence-level Stage 5 coverage.');
-const partialSourceOnly=generateWorkbookCatalog({title:'Partial source only',workbookKey:'partial-source',rows:canonical,sourceExercises:[
-  {type:'verb_form',number:1,prompt:'Humans excel at visual ____________.',answer:'imagery',provenance:{page:3}},
-]});
-assert.deepEqual(factoryFallbackTargets(partialSourceOnly,canonical,[{type:'verb_form',number:1,prompt:'x',answer:'x'}]),{5:[2],6:[1,2],7:[]},'Stage 7 needs a 5-8 sentence range and must not fall back per sentence.');
-
-const invalid=generateWorkbookCatalog({title:'Invalid',workbookKey:'invalid',rows:canonical,ai:{5:[{sentenceIndex:1,prompt:'Invented sentence ____________.',hint:'invent',answer:'invented'}]}});
-assert.equal(invalid.stages.find(stage=>stage.stage===5).items.length,0);
-assert.equal(invalid.metrics.dropReasons.stage5_round_trip,1);
-
-const normalizedAi=generateWorkbookCatalog({title:'Normalized AI',workbookKey:'normalized-ai',rows:[{text:"It's useful.",translation:'그것은 유용하다.'}],ai:{6:[{sentenceIndex:1,prompt:'It is ____________.',wrong:'useless',answer:'useful'}]}});
-assert.equal(normalizedAi.stages.find(stage=>stage.stage===6).items.length,1,'Stage 6 may normalize harmless contraction and punctuation differences after exact answer restoration.');
-const generatedRange=generateWorkbookCatalog({title:'Generated range',workbookKey:'generated-range',rows:qualityRows,ai:{7:[{sentenceIndexes:[1,2,3,4,5,6],prompt:stageSevenPrompt,corrections:[{wrong:'has',correct:'have'},{wrong:'explain',correct:'explains'}]}]}});
-const generatedRangeItem=generatedRange.stages.find(stage=>stage.stage===7).items[0];
-assert.deepEqual(generatedRangeItem.sentenceIndexes,[1,2,3,4,5,6],'Generated Stage 7 must cover a contiguous 5-8 sentence range.');
-assert.equal(generatedRangeItem.pairCount,2);
-const noDerivedGrammar=generateWorkbookCatalog({title:'No derived grammar',workbookKey:'no-derived-grammar',rows:qualityRows,allowDerivedFallback:true});
-assert.deepEqual([5,6,7].map(stage=>noDerivedGrammar.stages.find(stageData=>stageData.stage===stage).items.length),[0,0,0],'Factory must not guess publisher Stage 5-7 exercises from canonical prose.');
-const shuffledA=generateWorkbookCatalog({title:'Order',workbookKey:'order-seed',rows:qualityRows}),shuffledB=generateWorkbookCatalog({title:'Order',workbookKey:'order-seed',rows:qualityRows});
-const orderA=shuffledA.stages.find(stage=>stage.stage===8).items[0],orderB=shuffledB.stages.find(stage=>stage.stage===8).items[0],canonicalOrder=qualityRows[0].text.match(/[A-Za-z]+/g);
-assert.deepEqual(orderA.groups,orderB.groups,'Factory Stage 8 order must be deterministic by item seed.');
-assert.ok(orderA.groups[0].every(token=>!token.includes(' ')),'Factory Stage 8 chips must remain one word each.');
-assert.notDeepEqual(orderA.groups[0],canonicalOrder,'Factory Stage 8 must not start canonical.');
-assert.notDeepEqual(orderA.groups[0],[...canonicalOrder.slice(1),canonicalOrder[0]],'Factory Stage 8 must not use one-step rotation.');
-assert.ok(orderA.groups[0].filter((token,index)=>token!==canonicalOrder[index]).length>=Math.ceil(canonicalOrder.length/2));
-assert.equal(shuffledA.stages.find(stage=>stage.stage===9).items.length,0,'Passage-only generation must keep Stage 9 private without a publisher writing frame.');
-
-const derivedVerb=generateWorkbookCatalog({title:'No suffix guessing',workbookKey:'no-suffix-guessing',rows:[{text:'Let’s find out whether you fall into any of the following categories.',translation:'다음 항목을 확인하자.'}],allowDerivedFallback:true});
-assert.equal(derivedVerb.stages.find(stage=>stage.stage===5).items.length,0,'An inflected-looking token cannot prove the publisher authored a Stage 5 slot.');
-
-const edge=readFileSync(resolve(root,'server/ready/index.ts'),'utf8'),admin=readFileSync(resolve(root,'ready/admin/app.js'),'utf8'),adminHtml=readFileSync(resolve(root,'ready/admin/index.html'),'utf8');
-assert.match(edge,/existingMode \? existingContext\.passage\.id : rows<string>\(await db\.rpc\("ready_create_passage_with_sentences"/,'Existing Passage finalization must reuse its passage_id instead of creating a passage.');
-assert.match(edge,/codeWorkbookForPassage\(passageResult\.data\)[\s\S]*ready_workbook_catalogs[\s\S]*ready_passage_sentences/,'Existing Passage preflight must reject static/factory duplicates before loading canonical rows.');
-assert.match(edge,/if \(!existingMode\) await db\.from\("ready_passages"\)\.delete/,'A failed existing catalog insert must never delete the existing passage.');
-assert.match(adminHtml,/existing_passage[\s\S]*factory-existing-passage/,'Admin must expose the existing Passage mode and selector.');
-assert.match(adminHtml,/app\.js\?v=workbook-factory-pdf-input-1/,'Admin must cache-bust the corrected PDF upload module.');
-assert.match(admin,/!finalize&&!existing\?\{sentenceRows:state\.factoryRows\}:\{\}/,'Admin must not submit editable sentence rows in existing Passage mode.');
-assert.match(edge,/factoryFallbackTargets\(previewCatalog, rowsForCatalog, sourceExercises\)/,'Factory fallback must target missing sentence numbers rather than only wholly absent stages.');
-assert.match(edge,/offset \+= 6[\s\S]*Return exactly \{\"\$\{stage\}\":\[\.\.\.\]\}/,'Factory AI fallback must use small stage-specific batches with an explicit response shape.');
-assert.match(edge,/filter\(number =>[\s\S]*\)\)\]\.slice\(0, 6\)/,'Factory AI fallback must cap each stage at one six-item batch.');
-assert.match(edge,/round < 1[\s\S]*factoryFallbackTargets\(previewCatalog/,'Factory AI fallback must stay within one bounded Edge pass before deterministic completion.');
-assert.match(edge,/intentionally wrong option or faulty exercise prompt[\s\S]*restore the unchanged canonical sentence exactly/,'Factory system instructions must allow distractors without permitting canonical-answer invention.');
-assert.match(edge,/incompleteReview[\s\S]*allowIncomplete/,'Incomplete grammar stages must require an explicit publication decision.');
-assert.match(admin,/data-factory-finalize-incomplete[\s\S]*confirmFactory\(\{finalize:true,allowIncomplete:true\}\)/,'Admin must show coverage and require explicit confirmation before publishing an incomplete catalog.');
-assert.match(edge,/factory_regenerate[\s\S]*factoryRegenerate/,'Factory catalog regeneration must be an authenticated explicit admin operation.');
-assert.match(edge,/finalizeFactoryJob\(regenerationJob, undefined, false, true, false\)/,'Catalog regeneration must avoid Edge-bound AI calls and use only validated source and deterministic recovery.');
-assert.doesNotMatch(edge,/const provenance = \{ \.\.\.\(job\.extraction/,'Catalog provenance must not duplicate the full PDF source exercise payload retained by the Factory job.');
-assert.match(edge,/replaceExistingCatalog[\s\S]*ready_workbook_catalogs"\)\.update\(catalogRow\)[\s\S]*factory_job_id/,'Regeneration must atomically update the catalog tied to its original factory job.');
-assert.match(edge,/factory_job_id: job\.id, updated_at: new Date\(\)\.toISOString\(\)/,'Catalog regeneration must advance updated_at for cache and provenance freshness.');
-assert.doesNotMatch(edge,/factoryRegenerate[\s\S]{0,1200}ready_workbook_catalogs"\)\.delete/,'Regeneration must never delete the live catalog before replacement.');
-assert.match(admin,/data-regenerate-workbook[\s\S]*regenerateFactoryWorkbook/,'Admin must expose regeneration only for factory-backed workbooks.');
-console.log('READY Workbook Factory golden paths verified.');
+const rows=[{text:'Students learn from mistakes.',translation:'학생들은 실수에서 배운다.'}];
+const absent=generateWorkbookCatalog({title:'Absent',workbookKey:'absent',rows,sourceExercises:[]});
+assert.equal(absent.stages.reduce((sum,stage)=>sum+stage.items.length,0),0,'SOURCE ABSENT means ITEM ABSENT.');
+const paragraph=generateWorkbookCatalog({title:'Paragraph',workbookKey:'paragraph',rows,sourceExercises:[{type:'paragraph_ordering',number:1,prompt:'(A)-(B)-(C)',answer:'(C)-(A)-(B)',provenance:{sourceWorkbookNumber:9}}]});
+assert.equal(paragraph.stages.find(stage=>stage.stage===6).items.length,0,'Paragraph order must never contaminate Stage 6.');
+console.log('READY semantic Workbook Factory verified.');

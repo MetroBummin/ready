@@ -60,3 +60,22 @@ mixed Check는 현재 학습 범위 밖으로 원본만 보존한다.
 일반 추출기는 `tools/ready-extract-workbook-contract.py`다. 카탈로그마다 원본 파일명과
 SHA-256, 단계별 `source / ready / invalid` 수를 남긴다. 7단계도 교재별 예외 없이 같은
 추출기와 answer-key-backed contract를 사용한다.
+# READY Workbook semantic contract (v2)
+
+READY Workbook has exactly seven active semantic stages:
+
+1. `korean_blank` — Korean blank recall
+2. `english_blank` — English blank recall
+3. `translation` — full Korean translation
+4. `verb_form` — publisher verb-form slots
+5. `grammar_choice` — publisher grammar/vocabulary choices
+6. `word_order` — sentence-level, one English word per chip
+7. `writing` — Korean meaning to the whole canonical English sentence
+
+Source workbook numbers are provenance only. Paragraph ordering, correction,
+reading-only and ambiguous mixed exercises are unsupported. Workbook AI
+generation and grading are disabled. Missing source is never synthesized.
+
+Every active catalog declares `contractVersion: semantic-v2`; every stage and
+item declares its `semanticType`. Historical attempts remain `legacy-v1`, so an
+old correction stored as stage 7 can never be interpreted as new writing.

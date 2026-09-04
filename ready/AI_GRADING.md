@@ -28,3 +28,8 @@ Workbook에서는 `translation_ai`만 AI 채점이며 빈칸, 동사형, 어법 
 - 성공한 attempt의 `ai_grading_request_id`로 당시 평가 결과를 다시 조회할 수 있다.
 
 Question 서술형은 기존 `correct` 기반 semantics를 유지하며 이 점수 정책을 공유하지 않는다.
+# Workbook boundary
+
+Workbook semantic-v2 makes zero model calls during import, generation, runtime
+or grading. Translation uses the publisher/canonical Korean reference and
+deterministic normalization. Question and Reader AI policies are unchanged.
