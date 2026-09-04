@@ -1,0 +1,24 @@
+export const QUESTION_DIFFICULTIES = Object.freeze([
+  Object.freeze({ id: 1, label: "Easy" }),
+  Object.freeze({ id: 2, label: "Standard" }),
+  Object.freeze({ id: 3, label: "Hard" }),
+]);
+
+export function normalizeQuestionDifficulty(value) {
+  const difficulty = Number(value);
+  return QUESTION_DIFFICULTIES.some(item => item.id === difficulty) ? difficulty : null;
+}
+
+export function isQuestionQaScope(scope) {
+  const school = String(scope?.school ?? "").trim().toLowerCase();
+  const grade = String(scope?.grade ?? "").trim();
+  return (school === "test" && grade === "1학년") || (school === "test2" && grade === "2학년");
+}
+
+export function isAiReferenceVariant(payload) {
+  return payload?.authoring?.method === "ai_reference_variant";
+}
+
+export function questionVisibleInScope(row, scope) {
+  return !isAiReferenceVariant(row?.payload) || isQuestionQaScope(scope);
+}
