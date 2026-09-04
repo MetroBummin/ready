@@ -11,6 +11,7 @@ import { YBM_PARKJUNEON_L2_WORKBOOK } from "./workbook-ybm-l2.mjs";
 import { DONGA_LEEBYEONGMIN_L4_WORKBOOK } from "./workbook-donga-l4.mjs";
 import { validateQuestionSpec } from "./question-spec.mjs";
 import { deterministicClientContract, deterministicGrade, publicInteractionContract } from "./interaction-contract.mjs";
+import { WORKBOOK_TRANSLATION_GRADING_POLICY, workbookTranslationPass } from "./workbook-grading-policy.mjs";
 import { normalizeWorkbookAnswer, publicWorkbookAssistance, workbookAssistanceMode, workbookRecallCue } from "./workbook-assistance.mjs";
 import { CURRENT_QUESTION_PUBLICATION_VERSION } from "./question-pipeline.mjs";
 import { QUESTION_DIFFICULTIES, isQuestionQaScope, normalizeQuestionDifficulty, questionVisibleInScope } from "./question-difficulty.mjs";
@@ -159,6 +160,50 @@ async function callGeminiGrade(question: any, spec: any, responses: string[]) {
   }
   console.error("READY AI grading failed:", lastError);
   throw new ApiError(502, "AI 채점을 잠시 사용할 수 없습니다. 잠시 후 다시 제출해 주세요.");
+}
+
+function legacyWorkbookTranslationPrompt(item: any, response: string) {
+  return `다음 워크북 번역 답안을 출판사 원문과 출판사 해석에만 근거해 100점 만점으로 평가하세요.
+
+영문 원문: ${clean(item.source, 2_000)}
+출판사 해석: ${clean(item.answers?.[0], 2_000)}
+학생 해석: ${clean(response, 2_000)}
+채점 정책: ${WORKBOOK_TRANSLATION_GRADING_POLICY.version}
+배점: 핵심 의미 60점, 주체·행동·대상·부정·인과 등 핵심 관계 30점, 자연스러운 한국어 10점
+
+원칙:
+- 출판사 해석은 의미의 기준이며 외워야 하는 고정 문자열이 아닙니다.
+- 동의어, 자연스러운 의역, 어순·조사·존댓말 차이는 의미가 같으면 감점하지 않습니다.
+- 정도 부사의 작은 생략은 핵심 의미를 바꾸지 않으면 경미하게만 봅니다.
+- critical_errors에는 주체·행동·대상·부정·수치·인과를 뒤집거나 핵심 절을 빠뜨린 중대한 오류만 넣습니다.
+- feedback_lines는 학생이 바로 고칠 수 있는 한국어 문장 1~3개입니다.
+- 틀린 부분이 있으면 형용사절·부사절·주절 동사·주어/목적어·부정·인과 중 실제로 잘못 해석한 단위를 정확히 지목하세요.
+- 정답/오답 boolean은 반환하지 마세요. 통과 여부는 서버가 점수와 critical_errors로 결정합니다.
+
+{"score":0,"critical_errors":[],"feedback_lines":[""],"error_tags":[]}`;
+}
+
+async function callLegacyWorkbookTranslationGrade(item: any, response: string) {
+  const provider = (Deno.env.get("AI_PROVIDER") ?? "").trim().toLowerCase(), key = Deno.env.get("GEMINI_API_KEY");
+  if (provider !== "gemini" || !key) throw new ApiError(503, "AI 채점이 아직 연결되지 않았습니다.");
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${key}`;
+  const base = { maxOutputTokens: 650, temperature: 0, responseMimeType: "application/json" }, configs = [{ ...base, thinkingConfig: { thinkingBudget: 0 } }, base];
+  let lastError = "";
+  for (const generationConfig of configs) {
+    const responseResult = await fetch(url, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ system_instruction: { parts: [{ text: GEMINI_GRADING_SYSTEM }] }, contents: [{ role: "user", parts: [{ text: legacyWorkbookTranslationPrompt(item, response) }] }], generationConfig }) });
+    if (responseResult.ok) {
+      const payload = await responseResult.json(), answerText = (payload?.candidates?.[0]?.content?.parts || []).map((part: { text?: string }) => part?.text || "").join("").trim(), parsed = parseJson(answerText);
+      if (!parsed || !Number.isFinite(Number(parsed.score)) || !Array.isArray(parsed.critical_errors) || !Array.isArray(parsed.feedback_lines) || !Array.isArray(parsed.error_tags)) throw new ApiError(502, "AI 번역 채점 결과 형식이 올바르지 않습니다.");
+      const score = Math.max(0, Math.min(100, Math.round(Number(parsed.score))));
+      const criticalErrors = cleanList(parsed.critical_errors, 8, 160), feedbackLines = cleanList(parsed.feedback_lines, 3, 160), errorTags = cleanList(parsed.error_tags, 8, 40);
+      if (!feedbackLines.length) feedbackLines.push(score >= WORKBOOK_TRANSLATION_GRADING_POLICY.passScore && !criticalErrors.length ? "핵심 의미를 잘 전달했습니다." : "핵심 의미와 문장 관계를 다시 확인해 보세요.");
+      return { score, criticalErrors, feedbackLines, errorTags };
+    }
+    lastError = (await responseResult.text()).slice(0, 300);
+    if (responseResult.status !== 400) break;
+  }
+  console.error("READY legacy workbook translation grading failed:", lastError);
+  throw new ApiError(502, "AI 번역 채점을 잠시 사용할 수 없습니다. 잠시 후 다시 제출해 주세요.");
 }
 
 async function studentForSession(session: ReadySession): Promise<Student> {
@@ -1099,6 +1144,24 @@ async function submitWorkbookAttempt(body: any, session: ReadySession) {
     usedFullAnswerHint = revealedAnswer || hintState.usedFullAnswerHint === true || hintCount >= 2;
     completedAfterHint = correct && usedFullAnswerHint;
     if (usedFullAnswerHint) correct = false;
+  }
+  if (catalog.contractVersion !== SEMANTIC_WORKBOOK_CONTRACT && item.kind === "translation_ai" && !revealedAnswer) {
+    const today = new Date(); today.setHours(0, 0, 0, 0);
+    const used = await db.from("ready_workbook_ai_grading_requests").select("id", { count: "exact", head: true }).eq("student_id", student.id).gte("created_at", today.toISOString());
+    if (used.error) throw new ApiError(500, used.error.message);
+    if ((used.count || 0) >= AI_GRADING_DAILY_LIMIT) throw new ApiError(429, `오늘 AI 채점 ${AI_GRADING_DAILY_LIMIT}회를 모두 사용했습니다.`);
+    const rubricSnapshot = { sourceEnglish: item.source, publisherReferenceTranslation: item.answers[0], graderModel: GEMINI_MODEL, gradingPolicy: WORKBOOK_TRANSLATION_GRADING_POLICY.version, passScore: WORKBOOK_TRANSLATION_GRADING_POLICY.passScore, rubric: WORKBOOK_TRANSLATION_GRADING_POLICY.rubric, stageContractVersion: catalog.contractVersion || "legacy-v1" };
+    const pending = rows<any>(await db.from("ready_workbook_ai_grading_requests").insert({ student_id: student.id, exam_id: examId, passage_id: passageId, workbook_key: catalog.workbookKey, item_key: item.key, response: { responses }, rubric_snapshot: rubricSnapshot, status: "pending" }).select("id").single());
+    aiRequestId = pending.id;
+    try {
+      const grade = await callLegacyWorkbookTranslationGrade(item, responses[0]);
+      aiScore = grade.score; gradingPolicy = WORKBOOK_TRANSLATION_GRADING_POLICY.version; correct = workbookTranslationPass(grade.score, grade.criticalErrors); slotResults = [correct]; aiFeedbackLines = grade.feedbackLines; aiFeedback = grade.feedbackLines.join(" ");
+      const completed = await db.from("ready_workbook_ai_grading_requests").update({ status: "completed", result: { score: grade.score, correct, critical_errors: grade.criticalErrors, feedback_lines: grade.feedbackLines, error_tags: grade.errorTags, grader_model: GEMINI_MODEL, grading_policy: WORKBOOK_TRANSLATION_GRADING_POLICY.version, pass_score: WORKBOOK_TRANSLATION_GRADING_POLICY.passScore }, completed_at: new Date().toISOString() }).eq("id", aiRequestId).eq("status", "pending");
+      if (completed.error) throw new ApiError(500, completed.error.message);
+    } catch (error) {
+      await db.from("ready_workbook_ai_grading_requests").update({ status: "failed", error_code: error instanceof ApiError ? `http_${error.status}` : "unknown", completed_at: new Date().toISOString() }).eq("id", aiRequestId).eq("status", "pending");
+      throw error;
+    }
   }
   const inserted = rows<any>(await db.from("ready_workbook_attempts").insert({
     student_id: student.id, exam_id: examId, passage_id: passageId, workbook_key: catalog.workbookKey,

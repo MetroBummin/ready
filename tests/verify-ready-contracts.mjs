@@ -10,6 +10,7 @@ const student=read('ready/app.js');
 const edge=read('server/ready/index.ts');
 assert.match(edge,/previewCatalog\.metrics\.unresolved > 0/,'semantic-v2 publication must fail closed whenever any source item is unresolved.');
 assert.doesNotMatch(edge,/incompleteStages\.length && !allowIncomplete/,'allowIncomplete must not bypass semantic-v2 source validation.');
+assert.match(edge,/catalog\.contractVersion !== SEMANTIC_WORKBOOK_CONTRACT && item\.kind === "translation_ai"/,'legacy translation grading must remain available until production catalogs migrate.');
 const types=read('ready/QUESTION_TYPES.md');
 const importing=read('ready/QUESTION_IMPORT.md');
 const inventory=read('ready/inventory/2026-06-busan-18-28.md');
