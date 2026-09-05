@@ -401,6 +401,17 @@ body[data-ready-mode="student"] .question-passage{
   text-align:left;
   user-select:text;
 }
+body[data-ready-mode="student"] .question-passage-pane{
+  max-height:min(55svh,40rem);
+  overflow-y:auto;
+  padding:var(--ready-space-3) var(--ready-space-4);
+  border-radius:var(--ready-radius-xs);
+  background:color-mix(in srgb,var(--ready-canvas-quiet) 58%,transparent);
+  scrollbar-width:thin;
+  scrollbar-color:var(--ready-hairline-strong) transparent;
+  touch-action:pan-y;
+  -webkit-overflow-scrolling:touch;
+}
 body[data-ready-mode="student"] .question-passage .reading-sentence{display:inline;padding:0;border:0;border-radius:0;color:inherit;background:transparent;box-shadow:none;font:inherit;cursor:default}
 .question-stimulus,
 .question-summary,
@@ -794,6 +805,7 @@ body[data-ready-mode] #toast.on{opacity:1;transform:translate(-50%,0)}
   body.question-study-mode main{padding-top:env(safe-area-inset-top)}
   .study-back{top:calc(10px + env(safe-area-inset-top));left:var(--ready-space-3);width:40px;height:40px}
   body[data-ready-mode="student"] .question-passage{padding:var(--ready-space-1) 0 var(--ready-space-3);font-size:16px;line-height:1.66}
+  body[data-ready-mode="student"] .question-passage-pane{max-height:48svh;padding:var(--ready-space-3)}
   .question-choice{min-height:52px;grid-template-columns:28px minmax(0,1fr);padding:var(--ready-space-3)}
   .question-choice-copy{font-size:14px;line-height:1.55}
   .choice-matrix .question-choice-copy{grid-template-columns:1fr;gap:var(--ready-space-2)}
