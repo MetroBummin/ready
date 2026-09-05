@@ -1,5 +1,7 @@
 # READY Question authoring
 
+> **Status: DORMANT — preserved for future use.** Question authoring is not part of the active Student/Admin product surface. Keep this contract and its validators intact until an explicit reactivation project.
+
 Read this contract before generating, reviewing, or publishing a newly authored Question. Original publisher PDF import follows `QUESTION_REPRESENTATION.md` and `QUESTION_IMPORT.md`; Reference Bank generation must not be mixed into publisher extraction.
 
 1. **Canonical source is truth.**

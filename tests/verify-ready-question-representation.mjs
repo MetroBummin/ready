@@ -4,7 +4,7 @@ import {dirname,resolve} from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {alignPublisherText,classifyBodyQuestion,projectQuestionRepresentation,publicQuestionRepresentation,questionRepresentationErrors,questionRepresentationPayloadErrors} from '../server/ready/question-representation.mjs';
 import {validateQuestionSpec} from '../server/ready/question-spec.mjs';
-import {questionPassageHtml,questionSummaryHtml} from '../ready/question-renderer.js';
+import {questionPassageHtml,questionSummaryHtml} from '../ready/dormant/questions/question-renderer.js';
 import {applyPublisherUnderlineGeometry} from '../server/ready/pointer-geometry.mjs';
 import {BANK_CANONICAL_PASSAGE,TARGET_PASSAGE_ID} from './fixtures/question-reference-bank.mjs';
 import {CALIBRATION_BODY_PROBES} from './fixtures/question-representation-calibration.mjs';

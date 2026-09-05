@@ -47,36 +47,9 @@ button{touch-action:manipulation}
 
 /* Student lists and focused study shell */
 .student-grid{display:grid}.passage-list{display:grid}.passage-row{display:flex}.passage-open{display:flex}.passage-actions{display:flex}
-.question-filter-form{display:grid}.question-difficulty-grid,.question-type-grid{display:grid}.question-filter-option{position:relative;display:block}
-.question-filter-option input{position:absolute;opacity:0;pointer-events:none}
 body.study-mode #topbar{display:none}
 .study-back{position:fixed;z-index:80}
 .reader-shell{margin-inline:auto}.reader-prose{display:grid}.reading-passage{user-select:text}
-
-/* Question/Interaction Contract layout hooks */
-.question-layout{margin-inline:auto}
-.question-answer-area{display:grid}
-.question-choice{display:grid;width:100%;transform:translateX(var(--choice-drag,0));touch-action:pan-y;will-change:transform}
-.question-choice.swiping{transition:none!important}
-.question-choice[data-swipe-direction="left"]{box-shadow:inset 5px 0 color-mix(in srgb,var(--ready-muted) 55%,transparent)}
-.question-choice[data-swipe-direction="right"]{box-shadow:inset -5px 0 color-mix(in srgb,var(--ready-primary) 65%,transparent)}
-.choice-matrix .question-choice-copy{display:grid}.choice-matrix .choice-cell{display:grid;min-width:0}
-.question-layout[data-question-phase="solving"] .question-choice-copy .reader-token,
-.question-layout[data-question-phase="submitted"] .question-choice-copy .reader-token{cursor:pointer}
-.question-submit-row{min-height:48px}.question-submit{width:100%}
-.feedback-actions{display:flex;flex-wrap:wrap}
-.question-block{display:block;white-space:pre-wrap}.question-block.bullet{display:list-item}
-.question-segment.emphasis{text-decoration:underline;text-decoration-thickness:2px;text-underline-offset:3px}
-.question-segment.label::before{content:attr(data-label);margin-right:4px;font-weight:800}
-.question-segment.blank{display:inline-block;min-width:88px;border-bottom:2px solid currentColor;text-align:center}
-.question-footnote{display:block}.question-image{text-align:center}.question-image img{max-width:100%;height:auto}.question-image figcaption{margin-top:7px}
-.passage-pointer,.question-segment.underline{box-decoration-break:clone;-webkit-box-decoration-break:clone}
-.passage-blank{display:inline-flex;max-width:100%;vertical-align:baseline;white-space:nowrap}.passage-blank b{flex:none}.passage-blank i{flex:1}
-.written-response{display:grid;gap:10px;margin:18px 0}.written-response label{display:grid;grid-template-columns:minmax(72px,auto) minmax(0,1fr);align-items:center;gap:12px}
-.written-workspace{display:grid}.written-workspace.correction{display:grid}.correction-answer{grid-column:1/-1}
-.writing-target,.writing-conditions{display:grid}.writing-bank{display:grid}.writing-bank>div{display:flex;flex-wrap:wrap}
-.written-slot-list,.correction-reference{display:grid}.sentence-answer{display:grid}
-.inline-option-group,.inline-answer{display:inline-flex}.inline-option-group{flex-wrap:wrap}.inline-answer{vertical-align:baseline}
 
 /* Workbook interaction layout hooks */
 .workbook-layout{margin-inline:auto}.workbook-tabs{display:flex}.workbook-card{min-width:0}.workbook-meta{display:flex;justify-content:space-between}
@@ -86,19 +59,16 @@ body.study-mode #topbar{display:none}
 
 /* Admin data layouts */
 .table-wrap{overflow:auto}table{width:100%;border-collapse:collapse}th,td{text-align:left;white-space:nowrap}
-.question-import-form{display:flex;align-items:end;flex-wrap:wrap}.scope-school{display:block}.scope-card-button{width:100%;text-align:left;cursor:pointer}
+.scope-school{display:block}.scope-card-button{width:100%;text-align:left;cursor:pointer}
 .recent-row{display:flex;justify-content:space-between}.scope-detail-toolbar{position:sticky;z-index:20}
 
 @media(max-width:768px){
   html,body,#app{max-width:100%;overflow-x:clip;-webkit-text-size-adjust:100%;text-size-adjust:100%}
-  input,textarea,select,.written-response input{font-size:16px!important}
+  input,textarea,select{font-size:16px!important}
   .student-create-school,.scope-assign,.scope-grid,.scope-passage-grid{grid-template-columns:1fr}
   .scope-detail-toolbar{position:static;align-items:stretch;flex-direction:column}
   .scope-actions{display:grid;grid-template-columns:1fr 1fr}
   .sheet{top:auto;bottom:0;width:100%;height:min(92vh,900px)}
-  .written-response label{grid-template-columns:1fr;gap:5px}
-  .written-workspace.correction{grid-template-columns:1fr}
-  .choice-matrix .question-choice-copy{grid-template-columns:1fr}
   .workbook-tabs{overflow-x:auto}.workbook-correction-row{grid-template-columns:24px minmax(0,1fr)}
   .workbook-order-group{display:flex;width:100%;max-width:100%;flex-direction:column}
 }

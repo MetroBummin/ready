@@ -21,7 +21,7 @@
     </div>
   </main>
   <script type="module">
-    import { contractChoiceCopyHtml, contractPassageHtml, contractResponseControlHtml } from '/ready/interaction-runtime.js';
+    import { contractChoiceCopyHtml, contractPassageHtml, contractResponseControlHtml } from '/ready/dormant/questions/interaction-runtime.js';
     const escape=value=>String(value??'').replace(/[&<>"']/g,character=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[character]));
     const matrix={kind:'choice_matrix',selection:'single',passage:{visible:true,segments:[{kind:'text',text:'The system was '},{kind:'blank',id:'(A)',label:'(A)',text:''},{kind:'text',text:' and the field kept '},{kind:'blank',id:'(B)',label:'(B)',text:''},{kind:'text',text:'.'}]},choices:{columns:['(A)','(B)'],rows:[{cells:['investigated','developing']},{cells:['tested','growing']},{cells:['ignored','shrinking']}]},response:{layout:'',slots:[]}};
     const written={kind:'written_response',selection:'none',passage:{visible:false,segments:[{kind:'text',text:'Publisher answer remains private.'}]},choices:{columns:[],rows:[]},response:{layout:'sentence_parts',slots:[{id:'slot-1',label:'(1)',control:'text',placeholder:'답을 입력하세요'},{id:'slot-2',label:'(2)',control:'text',placeholder:'답을 입력하세요'}]}};

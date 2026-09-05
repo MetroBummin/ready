@@ -1,5 +1,7 @@
 # READY Question Type Contract
 
+> **Status: DORMANT — preserved for future use.** Types, render contracts, and historical data remain intact while Question is absent from active Student/Admin flows.
+
 ## Render specification
 
 The renderer contract is a projection of the validated semantic contract in `QUESTION_REPRESENTATION.md`. Taxonomy and renderer do not define the publisher Question and must not be used to reconstruct missing source blocks, pointers, responses, or answers.

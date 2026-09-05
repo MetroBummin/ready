@@ -1,5 +1,7 @@
 # READY Question difficulty
 
+> **Status: DORMANT — preserved for future use.** Difficulty data and rules remain valid for stored Questions, but active READY does not expose Question filtering or badges.
+
 `ready_questions.difficulty` is the single persisted difficulty value used by Student Question filtering and badges.
 
 | Value | Label | Authoring rubric |

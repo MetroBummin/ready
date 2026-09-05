@@ -6,15 +6,16 @@ import { bearerToken, randomSessionToken, secureEqual, sha256Hex, validPin } fro
 import { deterministicClientContract, deterministicGrade, interactionContractErrors, publisherRoundTripErrors } from '../server/ready/interaction-contract.mjs';
 import { validateQuestionSpec } from '../server/ready/question-spec.mjs';
 import { compileAndValidateInteraction, compileInteractionContract } from '../tools/ready-interaction-contract.mjs';
-import { contractChoiceCopyHtml, contractPassageHtml, contractRenderCounts, contractResponseComplete } from '../ready/interaction-runtime.js';
+import { contractChoiceCopyHtml, contractPassageHtml, contractRenderCounts, contractResponseComplete } from '../ready/dormant/questions/interaction-runtime.js';
 import { WORKBOOK_TRANSLATION_GRADING_POLICY, workbookTranslationPass } from '../server/ready/workbook-grading-policy.mjs';
 import { normalizeWorkbookAnswer as normalizeWorkbookAnswerClient, livePrefixState, workbookRecallCue as workbookRecallCueClient, workbookSlotCh } from '../ready/workbook-assistance.js';
 import { normalizeWorkbookAnswer as normalizeWorkbookAnswerServer, publicWorkbookAssistance, stageNineHint, workbookAssistanceMode, workbookRecallCue as workbookRecallCueServer } from '../server/ready/workbook-assistance.mjs';
-import { gradeLocalQuestion, gradeLocalWorkbook, gradeWorkbookCorrectionPairs, normalizeDeterministicAnswer, revealLocalWorkbook } from '../ready/deterministic-grading.js';
+import { gradeLocalWorkbook, gradeWorkbookCorrectionPairs, normalizeDeterministicAnswer, revealLocalWorkbook } from '../ready/deterministic-grading.js';
+import { gradeLocalQuestion } from '../ready/dormant/questions/question-grading.js';
 import { auditStageNineItem, auditWorkbookCatalog, repairAnswerKeyArtifacts, repairStageNineCatalog } from '../server/ready/workbook-catalog-qa.mjs';
 import { CURRENT_QUESTION_PUBLICATION_VERSION, questionPublicationStatus } from '../server/ready/question-pipeline.mjs';
 import { QUESTION_DIFFICULTIES, isQuestionQaScope, questionVisibleInScope } from '../server/ready/question-difficulty.mjs';
-import { questionDifficultyLabel, questionFilterCounts } from '../ready/question-difficulty.js';
+import { questionDifficultyLabel, questionFilterCounts } from '../ready/dormant/questions/question-difficulty.js';
 
 const root=resolve(dirname(fileURLToPath(import.meta.url)),'..');
 const read=path=>readFileSync(resolve(root,path),'utf8');
@@ -214,15 +215,16 @@ assert(interactionContractErrors(staleSlots,'written_response').some(error=>erro
 assert.equal(validateQuestionSpec(staleSlots,'written_response','available').ready,false);
 
 const app=read('ready/app.js');
-const questionRenderer=read('ready/question-renderer.js');
+const dormantApp=read('ready/dormant/questions/student-runtime.js');
+const questionRenderer=read('ready/dormant/questions/question-renderer.js');
 const edge=read('server/ready/index.ts');
-const runtime=read('ready/interaction-runtime.js');
-const css=read('ready/ready.css');
+const runtime=read('ready/dormant/questions/interaction-runtime.js');
+const css=read('ready/dormant/questions/legacy-design.css');
 for(const removed of ['inferredChoiceParts','CHOICE_PART_REPAIRS','WRITING_GUIDE_REPAIRS','SUMMARY_REPAIRS','TARGET_RANGE_REPAIRS','canonicalOption','questionBasePassage','slots.length>1']){
-  assert.doesNotMatch(`${app}\n${edge}`,new RegExp(removed.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')),`Runtime inference remains: ${removed}`);
+  assert.doesNotMatch(`${dormantApp}\n${edge}`,new RegExp(removed.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')),`Runtime inference remains: ${removed}`);
 }
 assert.match(questionRenderer,/contractChoiceCopyHtml[\s\S]*contractPassageHtml[\s\S]*contractResponseControlHtml/);
-assert.match(app,/contractResponseComplete/);
+assert.match(dormantApp,/contractResponseComplete/);
 assert.match(questionRenderer,/\['sentence_cloze','summary'\][\s\S]*contractInteractiveTemplateHtml/,'Summary and guided writing frames must own their interactive blanks without duplicate slot lists');
 assert.match(app,/workbook-choice-or[\s\S]*또는/,'Workbook grammar choices must render as an explicit either-or control');
 assert.doesNotMatch(app,/workbookChoiceHtml[^\n]*join\('<i>\/<\/i>'\)/,'Workbook grammar choices must not fall back to slash-separated text');
@@ -318,6 +320,6 @@ assert.match(app,/item\.semanticType==='writing'[\s\S]*data-workbook-hint>힌트
 assert.match(app,/data-workbook-reveal[\s\S]*revealWorkbookAnswer/,'Workbook answer reveal must be owned by the focused toolbar action');
 assert.doesNotMatch(app,/workbook-hint-actions/,'Stage 9 hint controls must not remain below the prompt');
 assert.match(edge,/revealedAnswer = body\.revealAnswer === true[\s\S]*correct = !revealedAnswer/,'Answer reveal must be persisted as an explicit wrong attempt');
-assert.match(app,/bookmark-star[\s\S]*★[\s\S]*☆/,'Question and Workbook bookmarks must share star language');
+assert.match(dormantApp,/bookmark-star[\s\S]*★[\s\S]*☆/,'Dormant Question bookmark language must remain preserved');
 
 console.log('READY executable Question contract checks passed');

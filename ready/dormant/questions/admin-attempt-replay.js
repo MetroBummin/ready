@@ -1,4 +1,26 @@
-const list=value=>Array.isArray(value)?value:[ ];
+import { questionPassageHtml, questionResponseAreaHtml, questionSummaryHtml } from './question-renderer.js';
+
+const list=value=>Array.isArray(value)?value:[];
+const marks=['①','②','③','④','⑤','⑥','⑦','⑧'];
+
+function flatAnswers(value){return list(value).flatMap(item=>Array.isArray(item)?item:[item]).map(item=>String(item??'').trim()).filter(Boolean);}
+
+function questionAnswerLines(question,values){
+  if(question.responseType==='written')return flatAnswers(values);
+  if(question.interaction==='inline_options')return list(values).map((value,index)=>`${index+1}. ${question.inlineGroups?.[index]?.options?.[Number(value)]||'—'}`);
+  return list(values).map(value=>`${marks[Number(value)]||Number(value)+1} ${question.choices?.[Number(value)]||''}`.trim());
+}
+
+function replayComparison(label,values,escape){
+  return `<div><strong>${escape(label)}</strong>${values.length?values.map(value=>`<span>${escape(value)}</span>`).join(''):'<span>응답 없음</span>'}</div>`;
+}
+
+export function questionAttemptReplayHtml(data,escape){
+  if(!data?.replayable)return `<div class="learning-replay-fallback"><strong>완전 재현 불가</strong><p>${escape(data?.message||'현재 Question과 attempt를 연결할 수 없습니다.')}</p>${data?.attempt?.response?`<pre>${escape(JSON.stringify(data.attempt.response,null,2))}</pre>`:''}</div>`;
+  const question=data.question,response=data.response||{},selected=question.responseType==='written'?list(response.responses):list(response.selected),inlineSelected=list(response.inlineSelected),result={correct:data.attempt.correct===true,answer:list(data.answer)},extras=new Set(question.renderSpec?.extras||[]),displayPrompt=question.writingGuide?.title||question.prompt;
+  const studentLines=questionAnswerLines(question,question.responseType==='written'?response.responses:question.interaction==='inline_options'?response.inlineSelected:response.selected),answerLines=questionAnswerLines(question,data.answer);
+  return `<article class="learning-question-replay question-layout" data-question-phase="submitted"><div class="reader-shell"><div class="question-topline"><span class="question-progress">${escape(data.passage?.title||'Question attempt')}</span><span class="learning-replay-readonly">READ ONLY</span></div><p class="eyebrow">PASSAGE · ${escape((question.renderer||question.family||'standard').toUpperCase())}</p>${question.stimulus&&extras.has('stimulus')?`<section class="question-stimulus"><strong>주어진 문장</strong>${escape(question.stimulus)}</section>`:''}${question.interactionContract?.passage?.visible?`<article class="reading-passage question-passage">${questionPassageHtml(question,result,selected,inlineSelected,{escape})}</article>`:''}<h1 class="question-prompt">${escape(displayPrompt)}</h1>${question.summaryText&&extras.has('summary')?`<section class="question-summary">${questionSummaryHtml(question,{escape})}</section>`:''}${questionResponseAreaHtml(question,result,selected,[],{escape})}<section class="learning-answer-compare">${replayComparison('학생 제출',studentLines,escape)}${replayComparison('정답',answerLines,escape)}</section>${question.explanation?`<div class="question-feedback wrong"><strong>해설</strong><p class="explanation-reveal">${escape(question.explanation)}</p></div>`:''}<p class="learning-snapshot-note">이 attempt에는 당시 Question payload snapshot이 없어 현재 generation ${Number(data.snapshot?.currentGeneration)||1} 기준으로 재현했습니다.</p></div></article>`;
+}
 
 function workbookBlankReplay(item,values,answers,slotResults,escape){
   let slot=0;

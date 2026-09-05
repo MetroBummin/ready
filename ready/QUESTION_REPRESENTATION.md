@@ -1,5 +1,7 @@
 # READY Question Representation
 
+> **Status: DORMANT — preserved for future use.** This contract still governs stored and future-reactivated Questions; active READY does not render the subsystem.
+
 This is the active semantic contract for importing an original publisher Question. It is separate from AI Question authoring.
 
 > A READY Question is the relationship between what the student sees, what they are asked, what the prompt points to, how they respond, and how that response is graded.

@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import { normalizeReviewExportOptions, reviewExportDocumentHtml } from '../ready/review-export.js';
+import { normalizeReviewExportOptions as normalizeDormantOptions, reviewExportDocumentHtml as dormantReviewExportDocumentHtml } from '../ready/dormant/questions/review-export.js';
 
 const data={
   meta:{title:'2학기 중간고사',school:'신흥고',grade:'2학년',studentName:'테스트'},
@@ -9,16 +10,15 @@ const data={
   workbooks:[{title:'문장 완성',passageTitle:'Lesson 1',stage:4,number:1,prompt:'I _____ ready.',response:['am'],answers:['was']}],
 };
 
-assert.deepEqual(normalizeReviewExportOptions(data,{}),{answerMode:'appendix',kinds:['word','question','workbook']});
+assert.deepEqual(normalizeReviewExportOptions(data,{}),{answerMode:'appendix',kinds:['word','workbook']});
 const appendix=reviewExportDocumentHtml(data,{answerMode:'appendix',kinds:['word','question','workbook']});
 assert.match(appendix,/정답/);
-assert.match(appendix,/Q1/);
 assert.match(appendix,/W1/);
 assert.doesNotMatch(appendix,/내 답/);
-assert.match(appendix,/A &lt; B/);
+assert.doesNotMatch(appendix,/Q1|A &lt; B/,'Active Review export must not render dormant Questions');
 assert.match(appendix,/Review the passage\. &amp; retry\./);
 
-const included=reviewExportDocumentHtml(data,{answerMode:'included',kinds:['question']});
+const included=dormantReviewExportDocumentHtml(data,{answerMode:'included',kinds:['question']});
 assert.match(included,/내 답/);
 assert.match(included,/1\. 첫째/);
 assert.match(included,/2\. 둘째/);
@@ -30,10 +30,13 @@ assert.doesNotMatch(excluded,/내 답/);
 assert.match(excluded,/I ________ ready\./);
 
 const server=fs.readFileSync(new URL('../server/ready/index.ts',import.meta.url),'utf8');
-assert.match(server,/student_review_export/);
+assert.match(server,/student_review_export_active/);
+assert.match(server,/student_review_export/,'Dormant Question export API must remain available');
+assert.match(server,/async function studentReviewExportActive/);
 assert.match(server,/async function studentReviewExport/);
 assert.match(server,/lastResult === false/);
 assert.match(server,/ready_attempts/);
 assert.match(server,/ready_workbook_attempts/);
+assert.deepEqual(normalizeDormantOptions(data,{}),{answerMode:'appendix',kinds:['word','question','workbook']});
 
 console.log('READY Review PDF export checks passed.');

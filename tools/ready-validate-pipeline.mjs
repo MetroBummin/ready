@@ -5,7 +5,7 @@ import { validateQuestionSpec } from '../server/ready/question-spec.mjs';
 import { buildObjectiveSourceContract } from './ready-source-contract.mjs';
 import { applyAnswerKeyWordCounts } from './ready-written-contract.mjs';
 import { compileAndValidateInteraction } from './ready-interaction-contract.mjs';
-import { contractChoiceCopyHtml, contractPassageHtml, contractRenderCounts, contractResponseControlHtml } from '../ready/interaction-runtime.js';
+import { contractChoiceCopyHtml, contractPassageHtml, contractRenderCounts, contractResponseControlHtml } from '../ready/dormant/questions/interaction-runtime.js';
 import { CURRENT_QUESTION_PUBLICATION_VERSION } from '../server/ready/question-pipeline.mjs';
 
 const args=process.argv.slice(2),value=name=>{const index=args.indexOf(name);return index>=0?args[index+1]:'';};

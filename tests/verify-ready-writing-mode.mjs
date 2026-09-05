@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import { QUESTION_REFERENCE_MANIFEST } from './fixtures/question-reference-bank.mjs';
-import { questionResponseAreaHtml, questionWritingReference, questionWritingSupportHtml } from '../ready/question-renderer.js';
+import { questionResponseAreaHtml, questionWritingReference, questionWritingSupportHtml } from '../ready/dormant/questions/question-renderer.js';
 
 const escape=value=>String(value??'').replace(/[&<>']/g,char=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;'}[char]));
 const cases=[
@@ -47,8 +47,8 @@ const objectiveHtml=questionResponseAreaHtml(objective,null,[],[],{escape});
 assert.match(objectiveHtml,/question-answer-area/);
 assert.doesNotMatch(objectiveHtml,/writing-|written-/,'Objective response markup must remain outside Writing Mode');
 
-const app=fs.readFileSync(new URL('../ready/app.js',import.meta.url),'utf8');
-const css=fs.readFileSync(new URL('../ready/design.css',import.meta.url),'utf8');
+const app=fs.readFileSync(new URL('../ready/dormant/questions/student-runtime.js',import.meta.url),'utf8');
+const css=fs.readFileSync(new URL('../ready/dormant/questions/legacy-design.css',import.meta.url),'utf8');
 assert.match(app,/visualViewport\?\.addEventListener\('resize',syncWritingViewport\)/,'Keyboard geometry uses one Visual Viewport resize owner');
 assert.match(app,/focusin[\s\S]*setQuestionSheetState\('expanded'\)/,'Focusing an answer enters Writing Mode');
 assert.match(app,/autoGrowWrittenTextarea/,'Sentence textareas auto-grow without rerendering the Question');
