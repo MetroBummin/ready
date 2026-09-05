@@ -1,9 +1,9 @@
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
-import { QUESTION_PAGE_SWIPE_MIN, QUESTION_PAGE_SWIPE_RATIO, questionPageDirection } from '../ready/question-paging.js';
+import { QUESTION_PAGE_SWIPE_MIN, QUESTION_PAGE_SWIPE_RATIO, questionPageDirection } from '../ready/dormant/questions/question-paging.js';
 
-const app=fs.readFileSync(new URL('../ready/app.js',import.meta.url),'utf8');
-const css=fs.readFileSync(new URL('../ready/design.css',import.meta.url),'utf8');
+const app=fs.readFileSync(new URL('../ready/dormant/questions/student-runtime.js',import.meta.url),'utf8');
+const css=fs.readFileSync(new URL('../ready/dormant/questions/legacy-design.css',import.meta.url),'utf8');
 const baseCss=fs.readFileSync(new URL('../ready/ready.css',import.meta.url),'utf8');
 
 assert.equal(QUESTION_PAGE_SWIPE_MIN,72);

@@ -31,8 +31,8 @@ function supabaseAdminKey() {
   return Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "";
 }
 const db = createClient(Deno.env.get("SUPABASE_URL") ?? "", supabaseAdminKey(), { auth: { persistSession: false } });
-const adminOps = new Set(["teacher_bootstrap", "admin_learning_progress", "admin_learning_progress_detail", "admin_attempt_replay", "delete_impact", "assign_scope_passages", "set_scope_layout", "create_passage", "update_passage", "delete_passage", "create_student", "set_student_code", "delete_student", "import_questions", "import_explanations", "factory_start", "factory_confirm", "factory_regenerate"]);
-const studentOps = new Set(["student_bootstrap", "student_passage", "word_lookup_meaning", "save_reader_word", "remove_reader_word", "update_reader_word_meaning", "sentence_easy_translation", "sentence_structure", "student_questions", "student_question_filters", "student_question_queue", "student_review_questions", "student_review_export", "set_question_bookmark", "submit_attempt", "student_workbook", "workbook_assistance", "workbook_recall_unlock", "set_workbook_bookmark", "workbook_hint", "submit_workbook_attempt"]);
+const adminOps = new Set(["teacher_bootstrap", "admin_workbook_progress", "admin_workbook_progress_detail", "admin_workbook_attempt_replay", "admin_learning_progress", "admin_learning_progress_detail", "admin_attempt_replay", "delete_impact", "assign_scope_passages", "set_scope_layout", "create_passage", "update_passage", "delete_passage", "create_student", "set_student_code", "delete_student", "import_questions", "import_explanations", "factory_start", "factory_confirm", "factory_regenerate"]);
+const studentOps = new Set(["student_bootstrap_active", "student_bootstrap", "student_passage", "word_lookup_meaning", "save_reader_word", "remove_reader_word", "update_reader_word_meaning", "sentence_easy_translation", "sentence_structure", "student_review", "student_review_export_active", "student_questions", "student_question_filters", "student_question_queue", "student_review_questions", "student_review_export", "set_question_bookmark", "submit_attempt", "student_workbook", "workbook_assistance", "workbook_recall_unlock", "set_workbook_bookmark", "workbook_hint", "submit_workbook_attempt"]);
 const publicOps = new Set(["student_login", "admin_login"]);
 // Match Breeze's free Gemini dictionary defaults. The API key remains a
 // Supabase Edge Function Secret and is never part of any public response.
@@ -361,6 +361,34 @@ async function adminLearningProgressDetail(body: any) {
   });
   return { period, since, student, question: attemptMetrics(questionAttempts), workbook: attemptMetrics(workbookAttempts), wrongQuestions, wrongWorkbooks };
 }
+async function adminWorkbookProgress(body: any) {
+  const { period, since } = adminProgressPeriod(body), school = clean(body.school, 80), grade = clean(body.grade, 40);
+  let studentQuery = db.from("ready_students").select("id,name,school,grade");
+  if (school) studentQuery = studentQuery.eq("school", school);
+  if (grade) studentQuery = studentQuery.eq("grade", grade);
+  const students = rows<any[]>(await studentQuery.order("name"));
+  if (!students.length) return { period, since, students: [] };
+  const attempts = rows<any[]>(await db.from("ready_workbook_attempts").select("student_id,correct,created_at").in("student_id", students.map(student => student.id)).gte("created_at", since).order("created_at", { ascending: false }));
+  const byStudent = new Map<string, any[]>();
+  for (const attempt of attempts) { const list = byStudent.get(attempt.student_id) || []; list.push(attempt); byStudent.set(attempt.student_id, list); }
+  return { period, since, students: students.map(student => { const items = byStudent.get(student.id) || []; return { ...student, lastActivityAt: items[0]?.created_at || null, workbook: attemptMetrics(items) }; }) };
+}
+async function adminWorkbookProgressDetail(body: any) {
+  const studentId = required(body.studentId, "학생", 80), { period, since } = adminProgressPeriod(body);
+  const student = rows<any>(await db.from("ready_students").select("id,name,school,grade").eq("id", studentId).maybeSingle());
+  if (!student) throw new ApiError(404, "학생을 찾지 못했습니다.");
+  const workbookAttempts = rows<any[]>(await db.from("ready_workbook_attempts").select("id,passage_id,workbook_key,item_key,stage,response,correct,hint_count,used_full_answer_hint,completed_after_hint,created_at").eq("student_id", studentId).gte("created_at", since).order("created_at", { ascending: false }));
+  const passageIds = [...new Set(workbookAttempts.map(attempt => attempt.passage_id))];
+  const passages = passageIds.length ? rows<any[]>(await db.from("ready_passages").select("id,title,source_type,source_label").in("id", passageIds)) : [];
+  const factoryCatalogs = passageIds.length ? rows<any[]>(await db.from("ready_workbook_catalogs").select("passage_id,workbook_key,catalog").in("passage_id", passageIds)) : [];
+  const passageById = new Map(passages.map(passage => [passage.id, passage])), factoryByPassage = new Map(factoryCatalogs.map(row => [row.passage_id, row]));
+  const workbookGroups = groupAttemptCounts(workbookAttempts, attempt => `${attempt.passage_id}:${attempt.workbook_key}:${attempt.item_key}`);
+  const wrongWorkbooks = workbookAttempts.filter(attempt => attempt.correct === false).map(attempt => {
+    const passage = passageById.get(attempt.passage_id), persisted = factoryByPassage.get(attempt.passage_id), catalog = codeWorkbookForPassage(passage) || persisted?.catalog || null, item = catalog?.workbookKey === attempt.workbook_key ? workbookItem(catalog, attempt.item_key) : null, group = workbookGroups.get(`${attempt.passage_id}:${attempt.workbook_key}:${attempt.item_key}`) || { attempts: 1, wrong: 1 };
+    return { id: attempt.id, passageTitle: passage?.title || "현재 지문 정보 없음", stage: Number(attempt.stage), itemKey: attempt.item_key, kind: item?.kind || "", number: item?.number || null, createdAt: attempt.created_at, attemptCount: group.attempts, wrongCount: group.wrong, replayAvailable: !!item };
+  });
+  return { period, since, student, workbook: attemptMetrics(workbookAttempts), wrongWorkbooks };
+}
 async function adminQuestionAttemptReplay(attemptId: string) {
   const attempt = rows<any>(await db.from("ready_attempts").select("id,student_id,question_id,exam_id,response,correct,elapsed_ms,created_at").eq("id", attemptId).maybeSingle());
   if (!attempt) throw new ApiError(404, "Question attempt를 찾지 못했습니다.");
@@ -662,6 +690,36 @@ async function studentBootstrap(session: ReadySession) {
   let reviewCount=0,savedWords:any[]=[];if(scope){const [wordRows,sentenceCount]=await Promise.all([savedWordList(student.id,scope.id),db.from("ready_saved_sentences").select("id",{count:"exact",head:true}).eq("student_id",student.id).eq("exam_id",scope.id)]);if(sentenceCount.error)throw new ApiError(500,sentenceCount.error.message);savedWords=wordRows;reviewCount=(await eligibleReviewQuestionIds(student.id,scope.id)).length+await workbookReviewCount(student.id,scope.id)+savedWords.length+(sentenceCount.count||0);}
   return { student: { id: student.id, school: student.school, grade: student.grade }, scope, passages, savedWords, reviewCount };
 }
+async function activeScopePassages(examId: string) {
+  const links = rows<any[]>(await db.from("ready_exam_passages").select("passage_id,position,group_key,group_label").eq("exam_id", examId).order("position"));
+  const linkedIds = links.map(item => item.passage_id);
+  let sourcePassages: any[] = [], factoryCatalogs: any[] = [];
+  if (linkedIds.length) {
+    const [sourceResult, catalogResult] = await Promise.all([
+      db.from("ready_passages").select("id,title,source_type,source_label").in("id", linkedIds),
+      db.from("ready_workbook_catalogs").select("passage_id").in("passage_id", linkedIds),
+    ]);
+    sourcePassages = rows<any[]>(sourceResult);
+    factoryCatalogs = rows<any[]>(catalogResult);
+  }
+  const factoryPassageIds = new Set(factoryCatalogs.map(row => row.passage_id)), byId = new Map(sourcePassages.map(item => [item.id, item]));
+  return links.map(link => { const passage = byId.get(link.passage_id); return passage ? { ...passage, position: link.position, groupKey: link.group_key, groupLabel: link.group_label, has_workbook: !!codeWorkbookForPassage(passage) || factoryPassageIds.has(passage.id) } : null; }).filter(Boolean);
+}
+async function studentBootstrapActive(session: ReadySession) {
+  const student = await studentForSession(session), scope = rows<any>(await db.from("ready_exams").select("id,school,grade").eq("school", student.school).eq("grade", student.grade).eq("is_current", true).maybeSingle());
+  const passages = scope ? await activeScopePassages(scope.id) : [];
+  let reviewCount = 0, savedWords: any[] = [];
+  if (scope) {
+    const [wordRows, sentenceCount, workbookCount] = await Promise.all([
+      savedWordList(student.id, scope.id),
+      db.from("ready_saved_sentences").select("id", { count: "exact", head: true }).eq("student_id", student.id).eq("exam_id", scope.id),
+      workbookReviewCount(student.id, scope.id),
+    ]);
+    if (sentenceCount.error) throw new ApiError(500, sentenceCount.error.message);
+    savedWords = wordRows; reviewCount = workbookCount + savedWords.length + (sentenceCount.count || 0);
+  }
+  return { student: { id: student.id, school: student.school, grade: student.grade }, scope, passages, savedWords, reviewCount };
+}
 async function studentPassageAccess(examId: string, passageId: string, student: Student) { await studentExamAccess(examId, student); const linked = await db.from("ready_exam_passages").select("passage_id").eq("exam_id", examId).eq("passage_id", passageId).maybeSingle(); if (linked.error) throw new ApiError(500, linked.error.message); if (!linked.data) throw new ApiError(404, "현재 시험범위에 없는 지문입니다."); return rows<any>(await db.from("ready_passages").select("id,title,source_type,source_label,updated_at").eq("id", passageId).single()); }
 async function savedWordList(studentId:string,examId:string){
   const parents=await db.from("ready_saved_words").select("id,normalized_word,meaning_snapshot,memory_level,created_at").eq("student_id",studentId).eq("exam_id",examId).order("updated_at",{ascending:false});if(parents.error)throw new ApiError(500,parents.error.message);const rowsSaved=rows<any[]>(parents);if(!rowsSaved.length)return [];
@@ -900,6 +958,17 @@ async function studentReviewQuestions(body: any, session: ReadySession) {
   const [wordItems,workbookItems,sentenceResult]=await Promise.all([wordReviewItems(student.id,examId),workbookReviewItems(student.id,examId),db.from("ready_saved_sentences").select("id,source_text_snapshot,translation_snapshot,created_at,passage:ready_passages(title)").eq("student_id",student.id).eq("exam_id",examId).order("created_at",{ascending:false})]);if(sentenceResult.error)throw new ApiError(500,sentenceResult.error.message);
   return { items, wordItems, sentenceItems:rows<any[]>(sentenceResult), workbookItems, counts:{word:wordItems.length,sentence:(sentenceResult.data||[]).length,workbook:workbookItems.length,question:items.length} };
 }
+async function studentReview(body: any, session: ReadySession) {
+  const student = await studentForSession(session), examId = required(body.examId, "Exam", 80);
+  await studentExamAccess(examId, student);
+  const [wordItems, workbookItems, sentenceResult] = await Promise.all([
+    wordReviewItems(student.id, examId),
+    workbookReviewItems(student.id, examId),
+    db.from("ready_saved_sentences").select("id,source_text_snapshot,translation_snapshot,created_at,passage:ready_passages(title)").eq("student_id", student.id).eq("exam_id", examId).order("created_at", { ascending: false }),
+  ]);
+  if (sentenceResult.error) throw new ApiError(500, sentenceResult.error.message);
+  return { wordItems, sentenceItems: rows<any[]>(sentenceResult), workbookItems, counts: { word: wordItems.length, sentence: (sentenceResult.data || []).length, workbook: workbookItems.length } };
+}
 async function studentReviewExport(body: any, session: ReadySession) {
   const student = await studentForSession(session), examId = required(body.examId, "Exam", 80);
   const review = await studentReviewQuestions({ examId }, session);
@@ -935,6 +1004,23 @@ async function studentReviewExport(body: any, session: ReadySession) {
   }
   const scope = rows<any>(await db.from("ready_exams").select("title,school,grade").eq("id", examId).single());
   return { meta: { title: scope.title, school: scope.school, grade: scope.grade, studentName: student.name }, words: review.wordItems, questions, workbooks, counts: { word: review.wordItems.length, question: questions.length, workbook: workbooks.length } };
+}
+async function studentReviewExportActive(body: any, session: ReadySession) {
+  const student = await studentForSession(session), examId = required(body.examId, "Exam", 80), review = await studentReview({ examId }, session);
+  const workbookItems = review.workbookItems.filter((item: any) => item.lastResult === false);
+  const workbookAttempts = workbookItems.length ? rows<any[]>(await db.from("ready_workbook_attempts").select("passage_id,item_key,response,correct,created_at").eq("student_id", student.id).eq("exam_id", examId).order("created_at", { ascending: false })) : [];
+  const latestWorkbookAttempt = new Map<string, any>();
+  for (const attempt of workbookAttempts) { const key = `${attempt.passage_id}:${attempt.item_key}`; if (!latestWorkbookAttempt.has(key)) latestWorkbookAttempt.set(key, attempt); }
+  const passageIds = [...new Set(workbookItems.map((item: any) => item.passageId))];
+  const passages = passageIds.length ? rows<any[]>(await db.from("ready_passages").select("id,title,source_type,source_label,updated_at").in("id", passageIds)) : [];
+  const passageById = new Map(passages.map(passage => [passage.id, passage])), workbooks: any[] = [];
+  for (const summary of workbookItems) {
+    const passage = passageById.get(summary.passageId), catalog = passage ? await workbookForPassage(passage) : null, item = workbookItem(catalog, summary.itemKey), attempt = latestWorkbookAttempt.get(`${summary.passageId}:${summary.itemKey}`);
+    if (!catalog || !item || !attempt || attempt.correct === true || catalog.workbookKey !== summary.workbookKey) continue;
+    workbooks.push({ ...summary, prompt: item.prompt, groups: item.groups || [], source: item.source || "", response: Array.isArray(attempt.response?.responses) ? attempt.response.responses : [], answers: item.answers || [] });
+  }
+  const scope = rows<any>(await db.from("ready_exams").select("title,school,grade").eq("id", examId).single());
+  return { meta: { title: scope.title, school: scope.school, grade: scope.grade, studentName: student.name }, words: review.wordItems, workbooks, counts: { word: review.wordItems.length, workbook: workbooks.length } };
 }
 async function setQuestionBookmark(body: any, session: ReadySession) {
   const student = await studentForSession(session), examId = required(body.examId, "Exam", 80), questionId = required(body.questionId, "문제", 80), bookmarked = body.bookmarked === true;
@@ -1270,9 +1356,9 @@ async function personalLibrary(_body:any,session:ReadySession){const student=awa
 async function dispatch(op: string, body: any, session: ReadySession | null) {
   switch (op) {
     case "student_login": return studentLogin(body); case "admin_login": return adminLogin(body); case "logout": return revokeSession(session as ReadySession);
-    case "teacher_bootstrap": return teacherBootstrap(); case "admin_learning_progress": return adminLearningProgress(body); case "admin_learning_progress_detail": return adminLearningProgressDetail(body); case "admin_attempt_replay": return adminAttemptReplay(body); case "delete_impact": return deleteImpact(body); case "create_student": return createStudent(body); case "set_student_code": return setStudentCode(body); case "delete_student": return deleteStudent(body);
+    case "teacher_bootstrap": return teacherBootstrap(); case "admin_workbook_progress": return adminWorkbookProgress(body); case "admin_workbook_progress_detail": return adminWorkbookProgressDetail(body); case "admin_workbook_attempt_replay": return adminWorkbookAttemptReplay(required(body.attemptId, "Attempt", 80)); case "admin_learning_progress": return adminLearningProgress(body); case "admin_learning_progress_detail": return adminLearningProgressDetail(body); case "admin_attempt_replay": return adminAttemptReplay(body); case "delete_impact": return deleteImpact(body); case "create_student": return createStudent(body); case "set_student_code": return setStudentCode(body); case "delete_student": return deleteStudent(body);
     case "assign_scope_passages": return setScopePassages(body, false); case "set_scope_layout": return setScopeLayout(body); case "create_passage": return createPassage(body); case "update_passage": return updatePassage(body); case "delete_passage": return deletePassage(body); case "import_questions": return importQuestions(body); case "import_explanations": return importExplanations(body); case "factory_start": return factoryStart(body); case "factory_confirm": return factoryConfirm(body); case "factory_regenerate": return factoryRegenerate(body);
-    case "student_bootstrap": return studentBootstrap(session as ReadySession); case "student_passage": return studentPassage(body, session as ReadySession); case "word_lookup_meaning": return readerInlineGloss(body, session as ReadySession); case "save_reader_word": return saveReaderWord(body, session as ReadySession); case "remove_reader_word": return removeReaderWord(body, session as ReadySession); case "update_reader_word_meaning": return updateReaderWordMeaning(body, session as ReadySession); case "sentence_easy_translation": return sentenceEasyTranslation(body, session as ReadySession); case "sentence_structure": return sentenceStructure(body, session as ReadySession); case "student_questions": return studentQuestions(body, session as ReadySession); case "student_question_filters": return studentQuestionFilters(body, session as ReadySession); case "student_question_queue": return studentQuestionQueue(body, session as ReadySession); case "student_review_questions": return studentReviewQuestions(body, session as ReadySession); case "student_review_export": return studentReviewExport(body, session as ReadySession); case "set_question_bookmark": return setQuestionBookmark(body, session as ReadySession); case "submit_attempt": return submitAttempt(body, session as ReadySession); case "student_workbook": return studentWorkbook(body, session as ReadySession); case "workbook_assistance": return workbookAssistance(body, session as ReadySession); case "workbook_recall_unlock": return workbookRecallUnlock(body, session as ReadySession); case "set_workbook_bookmark": return setWorkbookBookmark(body, session as ReadySession); case "workbook_hint": return workbookHint(body, session as ReadySession); case "submit_workbook_attempt": return submitWorkbookAttempt(body, session as ReadySession);
+    case "student_bootstrap_active": return studentBootstrapActive(session as ReadySession); case "student_bootstrap": return studentBootstrap(session as ReadySession); case "student_passage": return studentPassage(body, session as ReadySession); case "word_lookup_meaning": return readerInlineGloss(body, session as ReadySession); case "save_reader_word": return saveReaderWord(body, session as ReadySession); case "remove_reader_word": return removeReaderWord(body, session as ReadySession); case "update_reader_word_meaning": return updateReaderWordMeaning(body, session as ReadySession); case "sentence_easy_translation": return sentenceEasyTranslation(body, session as ReadySession); case "sentence_structure": return sentenceStructure(body, session as ReadySession); case "student_review": return studentReview(body, session as ReadySession); case "student_review_export_active": return studentReviewExportActive(body, session as ReadySession); case "student_questions": return studentQuestions(body, session as ReadySession); case "student_question_filters": return studentQuestionFilters(body, session as ReadySession); case "student_question_queue": return studentQuestionQueue(body, session as ReadySession); case "student_review_questions": return studentReviewQuestions(body, session as ReadySession); case "student_review_export": return studentReviewExport(body, session as ReadySession); case "set_question_bookmark": return setQuestionBookmark(body, session as ReadySession); case "submit_attempt": return submitAttempt(body, session as ReadySession); case "student_workbook": return studentWorkbook(body, session as ReadySession); case "workbook_assistance": return workbookAssistance(body, session as ReadySession); case "workbook_recall_unlock": return workbookRecallUnlock(body, session as ReadySession); case "set_workbook_bookmark": return setWorkbookBookmark(body, session as ReadySession); case "workbook_hint": return workbookHint(body, session as ReadySession); case "submit_workbook_attempt": return submitWorkbookAttempt(body, session as ReadySession);
     default: throw new ApiError(404, "알 수 없는 READY 작업입니다.");
   }
 }

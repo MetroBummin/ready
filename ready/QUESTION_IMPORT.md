@@ -1,5 +1,7 @@
 # READY Question Import Workflow
 
+> **Status: DORMANT — preserved for future use.** Import tooling remains available for explicit maintenance and reactivation work, but it is not linked from active Admin.
+
 The active import target is `QUESTION_REPRESENTATION.md`: `source_blocks + prompt + pointers + response + answer/explanation`. The renderer spec below is a compatibility projection, not the semantic source of truth. `QUESTION_AUTHORING.md` governs newly authored AI Questions and must not supply facts, answers, or rewritten prompts during publisher import.
 
 새 bundle은 명시적인 render spec을 반드시 포함한다. importer는 누락되거나 서로 모순되는 명세를 기본적으로 거부한다. `--allow-legacy`는 이미 검수된 과거 bundle에만 사용하고 새 PDF에는 사용하지 않는다.

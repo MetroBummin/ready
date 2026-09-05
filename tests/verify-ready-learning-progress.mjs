@@ -1,7 +1,8 @@
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import { attemptMetrics, groupAttemptCounts, latestAttemptAt, learningPeriodStart, progressAccuracy } from '../ready/admin/learning-progress.js';
-import { questionAttemptReplayHtml, workbookAttemptReplayHtml } from '../ready/admin/attempt-replay.js';
+import { questionAttemptReplayHtml } from '../ready/dormant/questions/admin-attempt-replay.js';
+import { workbookAttemptReplayHtml } from '../ready/admin/attempt-replay.js';
 
 const now=new Date('2026-09-04T06:30:00.000Z');
 assert.equal(learningPeriodStart('today',now).toISOString(),'2026-09-03T15:00:00.000Z');
@@ -37,8 +38,10 @@ assert.match(fallback,/saved answer/);
 
 const server=fs.readFileSync(new URL('../server/ready/index.ts',import.meta.url),'utf8');
 const adminApp=fs.readFileSync(new URL('../ready/admin/app.js',import.meta.url),'utf8');
+const dormantAdminApp=fs.readFileSync(new URL('../ready/dormant/questions/admin-runtime.js',import.meta.url),'utf8');
 const adminSet=server.match(/const adminOps = new Set\(\[([^\]]+)\]\)/)?.[1]||'',studentSet=server.match(/const studentOps = new Set\(\[([^\]]+)\]\)/)?.[1]||'';
 for(const op of ['admin_learning_progress','admin_learning_progress_detail','admin_attempt_replay'])assert.ok(adminSet.includes(op),`${op} must require Admin auth`);
+for(const op of ['admin_workbook_progress','admin_workbook_progress_detail','admin_workbook_attempt_replay'])assert.ok(adminSet.includes(op),`${op} must require Admin auth`);
 assert.doesNotMatch(studentSet,/admin_learning_progress|admin_attempt_replay/,'Student auth must not access Admin analytics');
 assert.match(server,/ready_attempts[\s\S]*ready_workbook_attempts/);
 assert.match(server,/\.eq\("student_id", studentId\)\.gte\("created_at", since\)/);
@@ -46,7 +49,9 @@ assert.match(server,/attempt\.response/,'replay must use the selected attempt re
 assert.match(server,/현재 문항 버전과 일치하지 않아 완전 재현할 수 없습니다/);
 assert.match(server,/questionAttempts\.filter\(attempt => attempt\.correct === false\)/,'Question wrong list must contain only incorrect attempts');
 assert.match(server,/workbookAttempts\.filter\(attempt => attempt\.correct === false\)/,'Workbook wrong list must contain only incorrect attempts');
-assert.match(adminApp,/admin_learning_progress[\s\S]*school:learning\.school,grade:learning\.grade/,'summary request must carry school and grade filters');
+assert.match(dormantAdminApp,/admin_learning_progress[\s\S]*school:learning\.school,grade:learning\.grade/,'Dormant Question analytics must retain its filtered summary request');
+assert.match(adminApp,/admin_workbook_progress[\s\S]*school:learning\.school,grade:learning\.grade/,'Active Workbook summary request must carry school and grade filters');
+assert.doesNotMatch(adminApp,/admin_learning_progress|admin_attempt_replay/,'Active Admin must not call dormant Question analytics');
 assert.match(adminApp,/선택한 기간에 학습 기록이 없습니다/,'students without period attempts need a clear empty state');
 
 const migration=fs.readFileSync(new URL('../supabase/migrations/20260904062636_admin_learning_progress_summary.sql',import.meta.url),'utf8');

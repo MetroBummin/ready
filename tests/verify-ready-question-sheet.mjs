@@ -1,9 +1,9 @@
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
-import { QUESTION_SIDE_PANEL_MEDIA, QUESTION_SHEET_STATES, questionSheetSnapState, questionUsesSidePanel } from '../ready/question-sheet.js';
+import { QUESTION_SIDE_PANEL_MEDIA, QUESTION_SHEET_STATES, questionSheetSnapState, questionUsesSidePanel } from '../ready/dormant/questions/question-sheet.js';
 
-const app=fs.readFileSync(new URL('../ready/app.js',import.meta.url),'utf8');
-const css=fs.readFileSync(new URL('../ready/design.css',import.meta.url),'utf8');
+const app=fs.readFileSync(new URL('../ready/dormant/questions/student-runtime.js',import.meta.url),'utf8');
+const css=fs.readFileSync(new URL('../ready/dormant/questions/legacy-design.css',import.meta.url),'utf8');
 
 assert.equal(QUESTION_SIDE_PANEL_MEDIA,'(min-width:1000px), (min-width:761px) and (pointer:fine)');
 assert.deepEqual([...QUESTION_SHEET_STATES],['collapsed','expanded'],'Question sheet must have exactly two persisted states');

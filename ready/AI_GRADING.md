@@ -1,5 +1,7 @@
 # READY AI Grading
 
+> Workbook grading is active. Question-specific grading is **DORMANT — preserved for future use** with the Question subsystem and is not called by the normal Student or Admin flow.
+
 AI는 Workbook 해석과 자유도가 있는 Question 서술형에만 사용한다. 정답을 생성하지 않고
 출판사 정답표의 reference와 학생 답안의 의미를 비교한다.
 
