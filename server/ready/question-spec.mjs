@@ -136,7 +136,10 @@ export function questionSpecErrors(spec, payload = {}, type = "multiple_choice")
     if (!accepted.length || slots.length !== accepted.length) errors.push("written response slot contract is incomplete");
     const kind = text(guide?.kind), targets = list(guide?.targets);
     if (/correction/.test(kind) && !targets.length) errors.push("written correction targets are missing");
-    if (["sentence", "sentence_cloze", "sentence-cloze", "arrangement"].includes(kind) && /우리말/.test(text(payload.prompt)) && !text(guide?.task_text)) errors.push("written Korean target is missing");
+    const koreanBlocks=list(payload?.representation?.source_blocks).filter(block=>["korean_insert","korean_target"].includes(text(block?.role)));
+    const pointerBlockIds=new Set(list(payload?.representation?.pointers).filter(pointer=>text(pointer?.confidence)!=="unresolved").map(pointer=>text(pointer?.block_id)));
+    const hasInlineKoreanTarget=koreanBlocks.some(block=>pointerBlockIds.has(text(block?.id)));
+    if (["sentence", "sentence_cloze", "sentence-cloze", "arrangement"].includes(kind) && /우리말/.test(text(payload.prompt)) && !text(guide?.task_text) && !hasInlineKoreanTarget) errors.push("written Korean target is missing");
     for (const [index, slot] of slots.entries()) {
       const variants = Array.isArray(accepted[index]) ? accepted[index] : [accepted[index]];
       const counts = new Set(variants.map(value => (text(value).match(/[A-Za-z]+(?:['’][A-Za-z]+)?|[가-힣]+|\d+(?:,\d{3})*(?:\.\d+)?/g) || []).length));

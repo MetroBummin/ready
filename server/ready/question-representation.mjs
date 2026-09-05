@@ -79,9 +79,9 @@ export function buildQuestionRepresentation(extracted,{passageId,canonicalText})
     return {block,restored,alignment};
   });
   const sourceBlocks=aligned.map(({block,restored,alignment})=>{
-    if(block?.force_publisher_text||alignment.mode==='publisher_text')return {id:text(block?.id),kind:'publisher_text',role:text(block?.role),label:text(block?.label),text:text(block?.text),alignment};
+    if(block?.force_publisher_text||alignment.mode==='publisher_text')return {id:text(block?.id),kind:'publisher_text',role:text(block?.role),label:text(block?.label),text:String(block?.text??''),alignment};
     const exactStart=String(canonicalText).indexOf(restored),start=exactStart>=0?exactStart:Number(alignment.canonical_start),end=exactStart>=0?exactStart+restored.length:Number(alignment.canonical_end),canonical=String(canonicalText).slice(start,end);
-    return {id:text(block?.id),kind:'canonical_span',role:text(block?.role),label:text(block?.label),passage_id:passageId,start,end,canonical_text:canonical,display_text:text(block?.text),mutations:list(block?.mutations),alignment};
+    return {id:text(block?.id),kind:'canonical_span',role:text(block?.role),label:text(block?.label),passage_id:passageId,start,end,canonical_text:canonical,display_text:String(block?.text??''),mutations:list(block?.mutations),alignment};
   });
   return {
     version:QUESTION_REPRESENTATION_VERSION,
@@ -108,7 +108,26 @@ function applyMutations(source,mutations,direction='forward'){
   return output;
 }
 
-function blockDisplayText(block){return text(block?.display_text||block?.text||block?.canonical_text);}
+function blockDisplayText(block){
+  const value=[block?.display_text,block?.text,block?.canonical_text].find(candidate=>text(candidate))??'';
+  return text(value)?String(value):'';
+}
+
+function sourceBlockRenderOwner(block){
+  const role=text(block?.role);
+  if(role==='summary')return 'summary';
+  if(role==='word_bank')return 'word_bank';
+  return 'passage';
+}
+
+const INLINE_SOURCE_ROLES=new Set(['english_before','korean_insert','english_after']);
+
+function sourceBlocksDisplayText(blocks){
+  return list(blocks).map((block,index)=>{
+    const previous=blocks[index-1],inlineWithPrevious=previous&&INLINE_SOURCE_ROLES.has(text(previous?.role))&&INLINE_SOURCE_ROLES.has(text(block?.role));
+    return `${index&&!inlineWithPrevious?'\n\n':''}${text(block?.label)?`${text(block.label)} `:''}${blockDisplayText(block)}`;
+  }).join('');
+}
 
 export function questionRepresentationErrors(value,{canonicalByPassage={}}={}){
   const representation=value&&typeof value==='object'?value:{},errors=[],blocks=list(representation.source_blocks),byId=new Map();
@@ -180,6 +199,12 @@ export function questionRepresentationPayloadErrors(payload={},options={}){
   }
   if(['written_text','ordering'].includes(response.type)&&JSON.stringify(list(payload.accepted_answers))!==JSON.stringify(list(answer.accepted_answers)))errors.push('runtime written answer differs from the publisher answer key');
   if(text(payload.explanation)!==text(representation?.explanation?.text))errors.push('runtime explanation differs from the publisher explanation');
+  const renderedPassage=normalized(list(payload?.spec?.interaction?.passage?.segments).map(segment=>segment?.kind==='blank'?'':segment?.text).join(''));
+  for(const block of list(representation.source_blocks).filter(item=>sourceBlockRenderOwner(item)==='summary')){
+    if(renderedPassage.includes(normalized(blockDisplayText(block))))errors.push('summary source block is also rendered in the passage');
+  }
+  const taskText=normalized(payload?.writing_guide?.task_text);
+  if(taskText&&list(representation.source_blocks).filter(item=>sourceBlockRenderOwner(item)==='passage').some(block=>normalized(blockDisplayText(block))===taskText))errors.push('writing task repeats a source block already rendered in the passage');
   return [...new Set(errors)];
 }
 
@@ -205,8 +230,11 @@ function passageSegments(representation){
     pointersByBlock.get(blockId).push(pointer);
   }
   const segments=[];
-  for(const block of list(representation?.source_blocks).filter(item=>['main','summary'].includes(text(item?.role)))){
-    if(segments.length)segments.push({kind:'text',text:'\n\n'});
+  // Source blocks stay in publisher order. Canonical offsets are provenance only.
+  let previousBlock=null;
+  for(const block of list(representation?.source_blocks).filter(item=>sourceBlockRenderOwner(item)==='passage')){
+    const inlineWithPrevious=previousBlock&&INLINE_SOURCE_ROLES.has(text(previousBlock?.role))&&INLINE_SOURCE_ROLES.has(text(block?.role));
+    if(segments.length&&!inlineWithPrevious)segments.push({kind:'text',text:'\n\n'});
     if(text(block?.label))segments.push({kind:'text',text:`${text(block.label)} `});
     const source=blockDisplayText(block),pointers=[...(pointersByBlock.get(text(block?.id))||[])].sort((a,b)=>Number(a.start)-Number(b.start)||Number(a.end)-Number(b.end));
     let cursor=0;
@@ -224,6 +252,7 @@ function passageSegments(representation){
       cursor=end;
     }
     if(cursor<source.length)segments.push({kind:'text',text:source.slice(cursor)});
+    previousBlock=block;
   }
   return segments.length?segments:[{kind:'text',text:'Source unavailable'}];
 }
@@ -234,9 +263,9 @@ function passageSegments(representation){
  */
 export function projectQuestionRepresentation(representation,{taxonomy='content_true',layout='',status='available',source={},difficulty=2}={}){
   const response=representation?.response||{},answer=representation?.answer||{},written=['written_text','ordering'].includes(text(response.type));
-  const segments=passageSegments(representation),mainText=list(representation?.source_blocks).filter(block=>text(block?.role)==='main').map(block=>`${text(block?.label)?`${text(block.label)} `:''}${blockDisplayText(block)}`).join('\n\n');
+  const passageBlocks=list(representation?.source_blocks).filter(block=>sourceBlockRenderOwner(block)==='passage');
+  const segments=passageSegments(representation),mainText=sourceBlocksDisplayText(passageBlocks);
   const summary=list(representation?.source_blocks).find(block=>text(block?.role)==='summary');
-  const koreanTarget=list(representation?.source_blocks).find(block=>text(block?.role)==='korean_target');
   const wordBank=list(representation?.source_blocks).find(block=>text(block?.role)==='word_bank');
   const constraints=response.constraints&&typeof response.constraints==='object'?response.constraints:{};
   const responseLayout=layout||text(constraints.layout)||(written?(list(response.slots).length>1?'sentence_parts':'sentence'):'');
@@ -245,7 +274,7 @@ export function projectQuestionRepresentation(representation,{taxonomy='content_
     const variants=list(answer.accepted_answers?.[index]);
     return {id:text(slot?.id)||`slot-${index+1}`,label:text(slot?.label)||`답 ${index+1}`,control:responseLayout==='sentence'?'textarea':'text',placeholder:'답을 입력하세요',wordCount:lexicalWordCount(variants[0])};
   });
-  const renderer=written?'written_input':summary?'summary':list(representation?.source_blocks).filter(block=>text(block?.role)==='main').length>1?'structural':targetPointers.length?'annotated_passage_mcq':'standard_mcq';
+  const renderer=written?'written_input':summary?'summary':passageBlocks.length>1?'structural':targetPointers.length?'annotated_passage_mcq':'standard_mcq';
   const payload={
     publication_version:3,import_status:status==='available'?'ready':'drop',taxonomy,prompt:text(representation?.prompt),set_text:mainText,explanation:text(representation?.explanation?.text),difficulty:Number(difficulty)||2,source,representation,
     family:renderer==='annotated_passage_mcq'?'annotated':renderer==='structural'?'structural':renderer==='summary'?'summary':'standard',
@@ -256,7 +285,8 @@ export function projectQuestionRepresentation(representation,{taxonomy='content_
   if(written){
     payload.accepted_answers=list(answer.accepted_answers);payload.response_slots=slots.map(slot=>({id:slot.id,label:slot.label,word_count:slot.wordCount}));
     payload.ai_structure={engine:'codex-cli',contract_version:2};
-    payload.writing_guide={kind:text(constraints.kind)||responseLayout,task_text:text(constraints.task_text)||blockDisplayText(koreanTarget),conditions:list(constraints.conditions),targets:targetPointers.slice(0,slots.length).map(pointer=>({id:text(pointer.id),label:text(pointer.label),text:text(pointer.extracted_text)})),word_bank:list(constraints.word_bank).length?list(constraints.word_bank):wordBank?blockDisplayText(wordBank).split(/\s*\/\s*/):[]};
+    const requestedTaskText=text(constraints.task_text),taskTextIsSourceBlock=passageBlocks.some(block=>normalized(blockDisplayText(block))===normalized(requestedTaskText));
+    payload.writing_guide={kind:text(constraints.kind)||responseLayout,task_text:taskTextIsSourceBlock?'':requestedTaskText,conditions:list(constraints.conditions),targets:targetPointers.slice(0,slots.length).map(pointer=>({id:text(pointer.id),label:text(pointer.label),text:text(pointer.extracted_text)})),word_bank:list(constraints.word_bank).length?list(constraints.word_bank):wordBank?blockDisplayText(wordBank).split(/\s*\/\s*/):[]};
   }else {payload.choices=list(response.choices);payload.answer=list(answer.indexes);payload.multi_select=response.type==='multiple_choice';}
   if(summary)payload.summary_text=blockDisplayText(summary);
   return payload;

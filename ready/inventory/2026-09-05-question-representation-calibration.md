@@ -34,14 +34,16 @@ The three `publisher_text` blocks are the Q6 summary frame, Q8 Korean writing ta
 | 4 | five pointers; answers `ⓐ`, `ⓔ`; `tells → telling`, `ban → banning` | PASS |
 | 6 | canonical main + publisher summary; two zero-width blanks; `sustainable / adhere to` | PASS |
 | 7 | three choice-apparatus pointers; `causing / to head / that` | PASS |
-| 8 | English before/after + Korean target; `be being`, non-restrictive `which`, word-bank transformation, exactly 16 words | PASS |
+| 8 | inline `english_before` → `korean_insert` → `english_after`; pointer owns the Korean insert; `be being`, non-restrictive `which`, word-bank transformation, exactly 16 words | PASS |
 | 9 | zero-width blank; `to change their behavior without realizing it` | PASS |
-| 11 | two reference pointers and two independently graded Korean response slots | PASS |
+| 11 | publisher pointers are exactly `that`, `it`; two independently graded Korean response slots | PASS |
 | 12 | two zero-width blanks; `However / For instance` | PASS |
-| 13 | two correction pointers/slots; no-word-addition condition | PASS |
+| 13 | publisher pointers are exactly `has consumed`, `could cause`; answer replacements remain separate; no-word-addition condition | PASS |
 | 15 | five vocabulary pointers; single publisher answer | PASS |
 | 17 | canonical passage + publisher word bank; one arrangement response | PASS |
 | 18 | five grammar pointers; single publisher answer | PASS |
+
+Ownership regressions also require the Q6 summary to render exactly once and the shared Q3/Q4 passage blocks and annotations to remain in publisher display order even when their canonical offsets are non-monotonic.
 
 ## Safe replacement audit
 
