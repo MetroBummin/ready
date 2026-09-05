@@ -8,6 +8,9 @@ const SEGMENT_KINDS=new Set(['text','annotation','blank','inline_options','inlin
 const WRITTEN_LAYOUTS=new Set(['sentence','sentence_cloze','sentence_parts','short_answers','arrangement','correction','multi_correction','summary']);
 const TEMPLATE_KINDS=new Set(['text','slot']);
 
+const koreanCharacters=value=>(String(value||'').match(/[가-힣]+/gu)||[]).join('');
+const representationBlockText=block=>text(block?.display_text||block?.text||block?.canonical_text);
+
 export const INTERACTION_CONTRACT_VERSION=1;
 
 export function requiresPassageEvidence(input={}){
@@ -71,7 +74,11 @@ export function interactionContractErrors(payload={},type='multiple_choice'){
   const sourceFromSegments=segments.map(segment=>segment.kind==='blank'?'':String(segment?.text||'')).join('');
   if(!approved)errors.push('student passage is missing');
   if(!sourceFromSegments&&!segments.some(segment=>segment.kind==='blank'))errors.push('interaction passage renders no source text');
-  if(/[가-힣]/.test(sourceFromSegments))errors.push('interaction passage contains Korean text');
+  const renderedKorean=koreanCharacters(sourceFromSegments);
+  if(renderedKorean){
+    const publisherKorean=koreanCharacters(list(payload?.representation?.source_blocks).filter(block=>['korean_insert','korean_target'].includes(text(block?.role))).map(representationBlockText).join(''));
+    if(!publisherKorean||renderedKorean!==publisherKorean)errors.push('interaction passage contains Korean text that is not owned by a publisher Korean source block');
+  }
   if(/(?:\([A-H]\)|[ⓐ-ⓩ])\s*\[[^\]]+\/[^\]]+\]/.test(sourceFromSegments))errors.push('interaction passage contains inactive inline-choice apparatus');
 
   if(type==='multiple_choice'){
@@ -103,8 +110,12 @@ export function interactionContractErrors(payload={},type='multiple_choice'){
       const positionLabels=new Set(positions.map(item=>text(item.label)));
       if(rows.some(row=>!positionLabels.has(text(row?.cells?.[0]))))errors.push('position choices do not match passage positions');
     }
-    const promptLabels=promptDeviceLabels(payload.prompt);
-    const passageLabels=new Set(segments.filter(segment=>segment.kind!=='text').map(segment=>text(segment.label)).filter(Boolean));
+    const promptLabels=promptDeviceLabels(payload.prompt),blocksById=new Map(list(payload?.representation?.source_blocks).map(block=>[text(block?.id),block]));
+    const auxiliaryPointerLabels=list(payload?.representation?.pointers).filter(pointer=>{
+      const owner=text(blocksById.get(text(pointer?.block_id))?.role);
+      return ['summary','word_bank'].includes(owner)&&text(pointer?.confidence)!=='unresolved';
+    }).map(pointer=>text(pointer?.label)).filter(Boolean);
+    const passageLabels=new Set([...segments.filter(segment=>segment.kind!=='text').map(segment=>text(segment.label)).filter(Boolean),...auxiliaryPointerLabels]);
     if(promptLabels.some(label=>!passageLabels.has(label)))errors.push('prompt devices do not match passage devices');
     if(contract.kind==='choice_matrix'&&JSON.stringify(columns)!==JSON.stringify(promptLabels))errors.push('choice matrix columns do not match prompt devices');
     if(['choice_matrix','inline_options'].includes(contract.kind)){

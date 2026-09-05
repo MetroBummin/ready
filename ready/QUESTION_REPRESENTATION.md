@@ -19,7 +19,7 @@ PDF fonts, line breaks, coordinates, boxes, and page layout are extraction evide
 - `canonical_span`: an immutable range of an existing READY Passage. Local blanks, substitutions, or annotations are declared as overlays/mutations that round-trip to the range.
 - `publisher_text`: first-class problem-specific content such as a summary, Korean writing target, word bank, heavily rewritten passage, or other auxiliary text.
 
-Multiple blocks are normal. An order Question may have `intro`, `A`, `B`, `C`; a summary Question may have `main` plus `summary`; a mixed writing Question may have `english_before`, `korean_insert`, `english_after`.
+Multiple blocks are normal. An order Question may have `intro`, `A`, `B`, `C`; a summary Question may have `main` plus `summary`; a mixed writing Question may have the inline roles `english_before`, `korean_insert`, `english_after`.
 
 Deterministic alignment considers token coverage, canonical coverage, edit ratio, order, and locality. A clean relationship uses `canonical_span`; a broad or ambiguous transformation uses `publisher_text`. Publisher fallback is not a failure.
 
@@ -32,6 +32,8 @@ Preserve the publisher wording, including every visible writing condition. Do no
 A pointer identifies only what the current prompt refers to: underlines, labels, blanks, or insertion points. `span` uses an exact range. `blank` and `point` are zero-width (`start === end`). Labels do not determine roles: `(A)` can label a source block while `ⓐ` can be a target pointer.
 
 Each pointer records `high`, `medium`, `low`, or `unresolved` confidence and extraction evidence. An unresolved pointer does not discard an otherwise complete Question; it remains a QA issue.
+
+Pointer boundaries belong to the publisher annotation and prompt. The Answer Key supplies the answer, while canonical alignment supplies provenance and mutations; neither may widen, shrink, or replace a pointer span.
 
 ### `response`
 
@@ -52,6 +54,8 @@ The publisher Answer Key is the only answer source. Link by source Question iden
 7. Content from different Questions cannot be mixed.
 8. No pre-submit answer leakage.
 9. One READY card contains one independent prompt.
+10. Every student-visible source block has one render owner and appears exactly once: passage blocks in passage order, summary in the summary surface, and word bank in the response guide.
+11. `source_blocks` array order is publisher display order. Canonical offsets never sort or otherwise change that order.
 
 Exact canonical matching and PDF layout reconstruction are not invariants. Taxonomy and renderer are compatibility metadata projected after the semantic representation is valid.
 
