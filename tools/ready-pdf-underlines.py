@@ -94,6 +94,8 @@ with pdfplumber.open(args.pdf) as pdf:
             if value:
                 spans.append({"text": value, "x0": rule["x0"], "x1": rule["x1"], "top": rule["top"],
                               "evidence": "publisher underline geometry intersecting PDF glyphs"})
+        if spans:
+            result[f"page:{page_number}"] = sorted(spans, key=lambda item: (item["top"], item["x0"]))
         for header in headers:
             question = int(header["text"][:-1])
             column = 0 if header["x0"] < page.width / 2 else 1

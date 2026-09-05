@@ -134,5 +134,26 @@ const geometryAmbiguous=applyPublisherUnderlineGeometry(broadGeometryQuestion,{'
 assert.equal(geometryAmbiguous.mode,'unresolved');
 assert(geometryAmbiguous.question.pointers.every(item=>item.confidence==='unresolved'),'Ambiguous geometry must remain QA instead of being repaired from the answer key');
 
+const sharedText='As expected, those who has consumed more energy than the average reduced their use later; however, households changed. The researchers inferred that the lack of a reminder about the environmental benefits of saving energy could cause the information to have an opposite effect.';
+const sharedQuestion={source_question_no:13,prompt:'윗글의 밑줄 친 ⓐ, ⓑ에서 어법상 어색한 부분을 찾아 각각 알맞게 고쳐 쓰시오.',source_blocks:[publisherBlock('shared-main','main',sharedText)],pointers:[pointer('shared-a','ⓐ','shared-main',sharedText,'has consumed'),pointer('shared-b','ⓑ','shared-main',sharedText,'could cause')]};
+const sharedGeometry={'page:4':[
+  {text:'those who has consumed',x0:176.52,x1:283.32,top:370.56},
+  {text:'more energy than the average reduced their use',x0:59.7,x1:283.38,top:384.96},
+  {text:'later',x0:59.7,x1:77.58,top:399.36},
+  {text:'the lack',x0:249,x1:283.38,top:442.56},
+  {text:'of a reminder about the environmental benefits of',x0:59.7,x1:283.38,top:456.96},
+  {text:'saving energy could cause the information to have',x0:59.7,x1:283.38,top:471.36},
+  {text:'an opposite effect',x0:59.7,x1:138,top:485.76},
+]};
+const sharedResolved=applyPublisherUnderlineGeometry(sharedQuestion,sharedGeometry);
+assert.equal(sharedResolved.mode,'source_block_geometry');
+assert.deepEqual(sharedResolved.question.pointers.map(item=>item.extracted_text),['those who has consumed more energy than the average reduced their use later','the lack of a reminder about the environmental benefits of saving energy could cause the information to have an opposite effect'],'A shared passage above its prompt must own the full multi-line publisher underlines');
+assert(sharedResolved.question.pointers.every(item=>item.confidence==='high'));
+const wholeBlock='학생에게 보이는 문장.';
+const wholeBlockQuestion={source_question_no:8,prompt:'윗글의 밑줄 친 문장을 쓰시오.',source_blocks:[publisherBlock('whole-block','korean_insert',wholeBlock)],pointers:[pointer('whole-block-pointer','㉠','whole-block',wholeBlock,wholeBlock)]};
+const wholeBlockResolved=applyPublisherUnderlineGeometry(wholeBlockQuestion,{'page:3':[{text:'학생에게 보이는 문장',x0:20,x1:100,top:200}]});
+assert.equal(wholeBlockResolved.mode,'fallback');
+assert.equal(wholeBlockResolved.question.pointers[0].extracted_text,wholeBlock,'Source-block geometry may expand a fallback pointer but must not shrink an already complete publisher pointer');
+
 assert.equal(TARGET_PASSAGE_ID,'741d6581-1f4c-4e1d-823c-6be85c62bf52');
 console.log('READY semantic Question representation contract verified.');
