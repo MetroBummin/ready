@@ -745,15 +745,14 @@ body[data-ready-mode] .empty{border-radius:20px;background:var(--ready-surface);
 
 body[data-ready-mode] .auth-wrap{width:min(100%,440px)}
 body[data-ready-mode] .auth-card{padding:clamp(28px,5vw,44px);border-top:0;border-radius:26px}
-body[data-ready-mode] .auth-card::before{
-  content:"";
+body[data-ready-mode] .auth-bear{
+  display:block;
   width:54px;
   height:54px;
   margin-bottom:4px;
   border-radius:17px;
-  background:var(--ready-action) url("../assets/favicon/icon-192.png") center/cover no-repeat;
+  object-fit:cover;
 }
-body[data-ready-mode="admin"] .auth-card::before{background-image:url("../assets/favicon/icon-192.png")}
 body[data-ready-mode] .auth-card .button.primary{width:100%;margin-top:4px}
 
 /* Student Home and passage cards */
