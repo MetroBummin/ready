@@ -19,11 +19,12 @@ assert.doesNotMatch(app,/atQuestionBoundary|beginShortsTouch|ArrowUp|ArrowDown|d
 assert.match(app,/reading-passage question-passage question-passage-pane/,'Visible passages must render as a dedicated reading pane');
 assert.match(css,/question-layout\{[^}]*touch-action:pan-y/,'Question pages must preserve native vertical scrolling');
 const passagePaneRule=css.match(/\.question-passage-pane\{([^}]*)\}/)?.[1]||'';
-assert.match(passagePaneRule,/max-height:min\(55svh,40rem\)/,'Passage pane must cap long passages without forcing short ones taller');
-assert.match(passagePaneRule,/overflow-y:auto/,'Long passages must scroll inside the reading pane');
-assert.match(passagePaneRule,/touch-action:pan-y/,'Passage pane must preserve vertical touch scrolling');
-assert.doesNotMatch(passagePaneRule,/(^|;)\s*height:/,'Passage pane must not use a fixed height');
-assert.match(css,/max-height:min\(62svh,40rem\)/,'Bottom-sheet layout must leave most of the mobile viewport to the passage');
+assert.match(passagePaneRule,/max-height:none/,'Touch passage must not be capped inside a nested pane');
+assert.match(passagePaneRule,/overflow:visible/,'Touch passage must use page scrolling');
+assert.match(passagePaneRule,/background:transparent/,'Touch passage must not render as a card');
+assert.match(passagePaneRule,/border-radius:0/,'Touch passage must not render a card radius');
+assert.match(passagePaneRule,/touch-action:pan-y/,'Passage must preserve native page scrolling');
+assert.doesNotMatch(passagePaneRule,/overflow-y:auto/,'Touch passage must not own a nested vertical scroll');
 assert.doesNotMatch(css,/\.shorts-cue/,'The old vertical navigation cue must be removed');
 assert.doesNotMatch(baseCss,/question-topline|question-state|shorts-cue/,'Removed question chrome must not leave active layout hooks');
 
