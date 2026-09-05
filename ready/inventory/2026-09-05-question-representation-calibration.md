@@ -18,8 +18,8 @@
 | `publisher_text` blocks | 3 |
 | local-mutation Questions | 9 |
 | pointers | 28 |
-| high-confidence pointers | 13 |
-| medium-confidence fallback pointers | 15 |
+| high-confidence pointers | 15 |
+| medium-confidence fallback pointers | 13 |
 | unresolved pointers | 0 |
 | single-choice Questions | 11 |
 | multiple-choice Questions | 1 |
@@ -39,7 +39,7 @@ The three `publisher_text` blocks are the Q6 summary frame, Q8 Korean writing ta
 | 9 | zero-width blank; `to change their behavior without realizing it` | PASS |
 | 11 | publisher pointers are exactly `that`, `it`; two independently graded Korean response slots | PASS |
 | 12 | two zero-width blanks; `However / For instance` | PASS |
-| 13 | publisher pointers are exactly `has consumed`, `could cause`; answer replacements remain separate; no-word-addition condition | PASS |
+| 13 | full multi-line publisher underlines are preserved; answer replacements remain separately `had consumed`, `could have caused`; no-word-addition condition | PASS |
 | 15 | five vocabulary pointers; single publisher answer | PASS |
 | 17 | canonical passage + publisher word bank; one arrangement response | PASS |
 | 18 | underline geometry resolves exact pointers `which`, `being surveyed`, `change`, `is`, `setting`; single publisher answer | PASS |
@@ -71,10 +71,12 @@ After the final pointer, render, and display-order ownership rules were deployed
 - Existing target-passage drafts changed: 0 (85 remained draft)
 - Hard deletes, cascade deletes, Workbook changes: 0
 
-The post-write comparison confirmed that all 16 production payload hashes equal the final validated import bundle. Targeted checks confirmed publisher-order Q4 blocks and annotations, a single Q6 summary render owner, inline Q8 `english_before` / `korean_insert` / `english_after`, exact Q11 pointers `that` and `it`, and exact Q13 pointers `has consumed` and `could cause` with replacement-only answers.
+The post-write comparison confirmed that all 16 production payload hashes equal the final validated import bundle. Targeted checks confirmed publisher-order Q4 blocks and annotations, a single Q6 summary render owner, inline Q8 `english_before` / `korean_insert` / `english_after`, and exact Q11 pointers `that` and `it`.
 
 ## Underline-geometry finalization
 
 The importer now reads thin horizontal line and rectangle graphics, intersects them with exact PDF glyph boxes, and uses the resulting publisher span as the primary pointer boundary. Existing text positions are used only to select the correct occurrence when a short underlined token repeats; they never set the final boundary. A clear geometry match is `high`, a text/label fallback is at most `medium`, and geometry that cannot map uniquely is `unresolved` and therefore QA.
 
 The Q18 source-page geometry deterministically resolves `which`, `being surveyed`, `change`, `is`, and `setting`. The longer upstream spans `change certain people’s behavior`, `is many ways`, and `setting people` are no longer retained.
+
+For shared passages above a printed Question number, page-level underline fragments are aligned through the Question's referenced source block and merged only when both their page lines and source ranges are consecutive. This restores Q13's two full publisher underlines while keeping its short correction answers separate.

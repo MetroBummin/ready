@@ -37,6 +37,8 @@ Pointer boundaries belong to the publisher annotation and prompt. The Answer Key
 
 When the PDF contains underline graphics, the importer intersects those coordinates with the underlying text glyphs and treats that exact overlap as primary boundary evidence. A deterministic geometry match is `high`; text/label fallback is not promoted above `medium`; a geometry span that cannot map uniquely remains `unresolved`. A pre-existing approximate text position may select among repeated occurrences, but it never determines the final span length.
 
+For a shared passage printed above its Question prompt, geometry is aligned through the referenced `source_block`, not clipped to the area below the printed Question number. Consecutive underlined lines that are also consecutive in that source block form one publisher pointer.
+
 ### `response`
 
 Response types are `single_choice`, `multiple_choice`, `written_text`, and `ordering`. One publisher prompt may have several slots. Independent prompts must be separate Questions.
