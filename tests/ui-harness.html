@@ -9,7 +9,7 @@
   <link rel="stylesheet" href="../styles/base.css">
   <link rel="stylesheet" href="../design-tokens.css">
   <link rel="stylesheet" href="../ready/ready.css">
-  <link rel="stylesheet" href="../ready/design.css">
+  <link rel="stylesheet" href="../ready/design.css?v=question-horizontal-paging-1">
   <style>
     .harness-stack{display:grid;gap:96px}
     .harness-label{margin-bottom:20px;padding-bottom:8px;border-bottom:1px solid var(--ready-hairline);color:var(--ready-muted);font:700 10px/1.2 var(--ready-font-mono);letter-spacing:.1em;text-transform:uppercase}
@@ -47,7 +47,7 @@
 
       <section id="student-questions">
         <p class="harness-label">Question renderer / submitted wrong</p>
-        <div class="question-layout" data-question-phase="submitted"><div class="reader-shell"><div class="question-topline"><span class="question-progress">08 / 42</span><span class="question-state"><i class="question-result-dot wrong"></i></span><button class="question-bookmark active" aria-label="북마크"><svg viewBox="0 0 24 24"><path d="M6 3h12v18l-6-4-6 4z"/></svg></button></div><p class="eyebrow">GRAMMAR · 너른터 · 18번 지문</p><h1 class="question-prompt">다음 글의 밑줄 친 부분 중, 어법상 틀린 것은?</h1><div class="reading-passage question-passage">People often assume that speed and precision are opposites. In a well-designed system, however, clear structure <span class="question-segment underline">allows</span> a learner to move quickly without losing attention. Each decision is visible, and feedback arrives while the reasoning is still fresh.</div><div class="question-answer-area"><button class="question-choice"><span class="question-choice-mark">①</span><span class="question-choice-copy">assume</span></button><button class="question-choice selected"><span class="question-choice-mark">②</span><span class="question-choice-copy">are · 선택됨</span></button><button class="question-choice correct"><span class="question-choice-mark">③</span><span class="question-choice-copy">allows · 정답</span></button><button class="question-choice wrong"><span class="question-choice-mark">④</span><span class="question-choice-copy">arrives · 내 답안</span></button></div><div class="question-feedback wrong"><strong>Incorrect / 오답</strong><span>내 답안 ④ · 정답 ③. 주어와 동사의 수 일치를 다시 확인하세요.</span><div class="feedback-actions"><button>해설 보기</button></div><p class="explanation-reveal">주어 clear structure는 단수이므로 동사 allows가 쓰입니다.</p></div><div class="shorts-cue"><span>↓</span><small>다음 문제</small></div></div></div>
+        <div class="question-layout" data-question-phase="submitted"><div class="reader-shell"><header class="question-toolbar"><button class="question-back" aria-label="Home으로"><span aria-hidden="true">‹</span></button><span class="question-progress">8 / 42</span><button class="question-bookmark active" aria-label="북마크"><span class="bookmark-star">★</span></button></header><div class="reading-passage question-passage">People often assume that speed and precision are opposites. In a well-designed system, however, clear structure <span class="question-segment underline">allows</span> a learner to move quickly without losing attention. Each decision is visible, and feedback arrives while the reasoning is still fresh.</div><h1 class="question-prompt">다음 글의 밑줄 친 부분 중, 어법상 틀린 것은?</h1><div class="question-answer-area"><button class="question-choice"><span class="question-choice-mark">①</span><span class="question-choice-copy">assume</span></button><button class="question-choice selected"><span class="question-choice-mark">②</span><span class="question-choice-copy">are · 선택됨</span></button><button class="question-choice correct"><span class="question-choice-mark">③</span><span class="question-choice-copy">allows · 정답</span></button><button class="question-choice wrong"><span class="question-choice-mark">④</span><span class="question-choice-copy">arrives · 내 답안</span></button></div><div class="question-feedback wrong"><strong>오답으로 기록했습니다.</strong><span>Review에 자동으로 저장했습니다.</span><div class="feedback-actions"><button>해설 보기</button></div><p class="explanation-reveal">주어 clear structure는 단수이므로 동사 allows가 쓰입니다.</p></div></div></div>
       </section>
 
       <section id="matrix-written">
@@ -78,6 +78,7 @@
     const targets={home:'student-sets',source:'student-filters',question:'student-questions',written:'matrix-written',workbook:'workbook'};
     document.querySelectorAll('.harness-stack>section').forEach(section=>section.hidden=section.id!==targets[focus]);
     document.querySelectorAll('.harness-stack').forEach(stack=>stack.style.gap='0');
+    if(focus==='question'||focus==='written')document.body.classList.add('study-mode','question-study-mode');
   }
 </script>
 </body>
