@@ -57,3 +57,17 @@ Before replacement, the passage had 16 active calibration-bank Questions: 15 wit
 - Other draft experiments were left unchanged.
 
 The passage-wide historical totals after replacement remain 15 attempts and 4 bookmarks across all generations. No other Passage was updated.
+
+## Ownership-rule production reimport
+
+After the final pointer, render, and display-order ownership rules were deployed, the Q3-Q18 source was regenerated from the same PDF (`e3bb6bd922912a9a8d40654080e0fb6c6ca7beb312af819c73657c289499b5ac`) and revalidated at 16 READY, 0 QA, 0 DROP.
+
+- Update method: transactional in-place payload update of the exact 16 available Question IDs
+- Row identity changes: 0
+- Payload changes: 5 (Q4, Q6, Q8, Q11, Q13); the other 11 regenerated payloads were identical
+- Historical links before/after: 12 attempts, 2 bookmarks, 3 AI grading requests
+- Other Questions changed by the transaction: 0 (guarded by an in-transaction non-target row count and payload/status hash)
+- Existing target-passage drafts changed: 0 (85 remained draft)
+- Hard deletes, cascade deletes, Workbook changes: 0
+
+The post-write comparison confirmed that all 16 production payload hashes equal the final validated import bundle. Targeted checks confirmed publisher-order Q4 blocks and annotations, a single Q6 summary render owner, inline Q8 `english_before` / `korean_insert` / `english_after`, exact Q11 pointers `that` and `it`, and exact Q13 pointers `has consumed` and `could cause` with replacement-only answers.
