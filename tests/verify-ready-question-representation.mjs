@@ -5,6 +5,7 @@ import {fileURLToPath} from 'node:url';
 import {alignPublisherText,classifyBodyQuestion,projectQuestionRepresentation,publicQuestionRepresentation,questionRepresentationErrors,questionRepresentationPayloadErrors} from '../server/ready/question-representation.mjs';
 import {validateQuestionSpec} from '../server/ready/question-spec.mjs';
 import {questionPassageHtml,questionSummaryHtml} from '../ready/question-renderer.js';
+import {applyPublisherUnderlineGeometry} from '../server/ready/pointer-geometry.mjs';
 import {BANK_CANONICAL_PASSAGE,TARGET_PASSAGE_ID} from './fixtures/question-reference-bank.mjs';
 import {CALIBRATION_BODY_PROBES} from './fixtures/question-representation-calibration.mjs';
 
@@ -112,6 +113,26 @@ assert(reorderedBlocks[2].start>reorderedBlocks[3].start,'Fixture must be non-mo
 assert(segmentCopy(reorderedPayload).indexOf(sectionA)<segmentCopy(reorderedPayload).indexOf(sectionB)&&segmentCopy(reorderedPayload).indexOf(sectionB)<segmentCopy(reorderedPayload).indexOf(sectionC),'Student passage must preserve publisher A-B-C display order');
 assert.deepEqual(annotationCopy(reorderedPayload).map(item=>item.label),['ⓐ','ⓑ','ⓒ','ⓓ','ⓔ'],'Annotation order must follow publisher display order');
 assert.deepEqual(validateQuestionSpec(reorderedPayload,'multiple_choice','available').errors,[]);
+
+const geometryText='A company updated its app which it would change defaults. After being surveyed, users discussed change certain people’s behavior. There is many ways to help by setting people on the right path.';
+const broadGeometryQuestion={source_question_no:18,prompt:'다음 글의 밑줄 친 ⓐ~ⓔ 중 어법상 알맞게 고쳐 쓰지 못한 것은?',source_blocks:[publisherBlock('geometry-main','main',geometryText)],pointers:[pointer('geometry-a','ⓐ','geometry-main',geometryText,'which'),pointer('geometry-b','ⓑ','geometry-main',geometryText,'being surveyed'),pointer('geometry-c','ⓒ','geometry-main',geometryText,'change certain people’s behavior'),pointer('geometry-d','ⓓ','geometry-main',geometryText,'is many ways'),pointer('geometry-e','ⓔ','geometry-main',geometryText,'setting people')]};
+const q18Geometry={'5:18':[
+  {text:'which',x0:420,x1:443.34,top:483.24},
+  {text:'being surveyed',x0:471.66,x1:535.62,top:540.84},
+  {text:'change',x0:430.98,x1:460.32,top:598.44},
+  {text:'is',x0:393.36,x1:399.42,top:627.24},
+  {text:'setting',x0:368.46,x1:396,top:670.44},
+]};
+const geometryResolved=applyPublisherUnderlineGeometry(broadGeometryQuestion,q18Geometry);
+assert.equal(geometryResolved.mode,'geometry');
+assert.deepEqual(geometryResolved.question.pointers.map(item=>item.extracted_text),['which','being surveyed','change','is','setting'],'PDF underline geometry must replace broad upstream spans with exact publisher glyph spans');
+assert(geometryResolved.question.pointers.every(item=>item.confidence==='high'));
+const geometryFallback=applyPublisherUnderlineGeometry(broadGeometryQuestion,{});
+assert.equal(geometryFallback.mode,'fallback');
+assert(geometryFallback.question.pointers.every(item=>item.confidence==='medium'),'Text-only fallback must not be promoted to high confidence');
+const geometryAmbiguous=applyPublisherUnderlineGeometry(broadGeometryQuestion,{'5:18':q18Geometry['5:18'].map((item,index)=>index===2?{...item,text:'not present'}:item)});
+assert.equal(geometryAmbiguous.mode,'unresolved');
+assert(geometryAmbiguous.question.pointers.every(item=>item.confidence==='unresolved'),'Ambiguous geometry must remain QA instead of being repaired from the answer key');
 
 assert.equal(TARGET_PASSAGE_ID,'741d6581-1f4c-4e1d-823c-6be85c62bf52');
 console.log('READY semantic Question representation contract verified.');

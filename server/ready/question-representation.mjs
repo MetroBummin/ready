@@ -157,7 +157,7 @@ export function questionRepresentationErrors(value,{canonicalByPassage={}}={}){
     if(!block)errors.push(`pointer ${id||index+1} references a missing block`);
     if(!POINTER_KINDS.includes(kind))errors.push(`pointer ${id||index+1} has an unknown kind`);
     if(!POINTER_CONFIDENCE.includes(confidence))errors.push(`pointer ${id||index+1} has no confidence`);
-    if(confidence==='unresolved')continue;
+    if(confidence==='unresolved'){errors.push(`pointer ${id||index+1} is unresolved`);continue;}
     const start=Number(pointer?.start),end=Number(pointer?.end),display=blockDisplayText(block);
     if(!Number.isInteger(start)||!Number.isInteger(end)||start<0||end<start||end>display.length)errors.push(`pointer ${id||index+1} has an invalid range`);
     if(['blank','point'].includes(kind)&&start!==end)errors.push(`pointer ${id||index+1} must be zero-width`);
