@@ -18,7 +18,8 @@
 | `publisher_text` blocks | 3 |
 | local-mutation Questions | 9 |
 | pointers | 28 |
-| high-confidence pointers | 28 |
+| high-confidence pointers | 13 |
+| medium-confidence fallback pointers | 15 |
 | unresolved pointers | 0 |
 | single-choice Questions | 11 |
 | multiple-choice Questions | 1 |
@@ -41,7 +42,7 @@ The three `publisher_text` blocks are the Q6 summary frame, Q8 Korean writing ta
 | 13 | publisher pointers are exactly `has consumed`, `could cause`; answer replacements remain separate; no-word-addition condition | PASS |
 | 15 | five vocabulary pointers; single publisher answer | PASS |
 | 17 | canonical passage + publisher word bank; one arrangement response | PASS |
-| 18 | five grammar pointers; single publisher answer | PASS |
+| 18 | underline geometry resolves exact pointers `which`, `being surveyed`, `change`, `is`, `setting`; single publisher answer | PASS |
 
 Ownership regressions also require the Q6 summary to render exactly once and the shared Q3/Q4 passage blocks and annotations to remain in publisher display order even when their canonical offsets are non-monotonic.
 
@@ -71,3 +72,9 @@ After the final pointer, render, and display-order ownership rules were deployed
 - Hard deletes, cascade deletes, Workbook changes: 0
 
 The post-write comparison confirmed that all 16 production payload hashes equal the final validated import bundle. Targeted checks confirmed publisher-order Q4 blocks and annotations, a single Q6 summary render owner, inline Q8 `english_before` / `korean_insert` / `english_after`, exact Q11 pointers `that` and `it`, and exact Q13 pointers `has consumed` and `could cause` with replacement-only answers.
+
+## Underline-geometry finalization
+
+The importer now reads thin horizontal line and rectangle graphics, intersects them with exact PDF glyph boxes, and uses the resulting publisher span as the primary pointer boundary. Existing text positions are used only to select the correct occurrence when a short underlined token repeats; they never set the final boundary. A clear geometry match is `high`, a text/label fallback is at most `medium`, and geometry that cannot map uniquely is `unresolved` and therefore QA.
+
+The Q18 source-page geometry deterministically resolves `which`, `being surveyed`, `change`, `is`, and `setting`. The longer upstream spans `change certain people’s behavior`, `is many ways`, and `setting people` are no longer retained.
