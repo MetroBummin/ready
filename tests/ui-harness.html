@@ -9,7 +9,7 @@
   <link rel="stylesheet" href="../styles/base.css">
   <link rel="stylesheet" href="../design-tokens.css">
   <link rel="stylesheet" href="../ready/ready.css">
-  <link rel="stylesheet" href="../ready/design.css?v=question-responsive-sheet-1">
+  <link rel="stylesheet" href="../ready/design.css?v=question-page-scroll-scrim-1">
   <style>
     .harness-stack{display:grid;gap:96px}
     .harness-label{margin-bottom:20px;padding-bottom:8px;border-bottom:1px solid var(--ready-hairline);color:var(--ready-muted);font:700 10px/1.2 var(--ready-font-mono);letter-spacing:.1em;text-transform:uppercase}
@@ -68,6 +68,7 @@
   </main>
 </div>
 <script>
+  document.querySelectorAll('.question-solving-surface').forEach(sheet=>{const scrim=document.createElement('button');scrim.type='button';scrim.className='question-sheet-scrim';scrim.dataset.questionSheetScrim='';scrim.tabIndex=-1;sheet.before(scrim);});
   const params=new URLSearchParams(location.search);
   const mode=params.get('mode')==='admin'?'admin':'student';
   document.body.dataset.readyMode=mode;
@@ -81,6 +82,7 @@
     if(focus==='question'||focus==='written')document.body.classList.add('study-mode','question-study-mode');
   }
   if(params.get('sheet')==='expanded')document.querySelector(focus==='written'?'#matrix-written .question-layout':'#student-questions .question-layout')?.setAttribute('data-question-sheet-state','expanded');
+  if(params.get('scroll')==='bottom')requestAnimationFrame(()=>window.scrollTo(0,document.documentElement.scrollHeight));
 </script>
 </body>
 </html>
