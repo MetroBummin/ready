@@ -38,7 +38,7 @@ export function contractResponseComplete(contract,values){
 export function contractResponseControlHtml(contract,index,{escape,value='',disabled=false}={}){
   const slot=list(contract?.response?.slots)[index];
   if(!slot)return '';
-  const attributes=`data-written-slot="${index}" placeholder="${escape(slot.placeholder)}" ${disabled?'disabled':''} autocomplete="off" spellcheck="false"`;
+  const attributes=`data-written-slot="${index}" aria-label="${escape(slot.label)}" placeholder="${escape(slot.placeholder)}" ${disabled?'disabled':''} autocomplete="off" spellcheck="false"`;
   return slot.control==='textarea'?`<textarea rows="3" ${attributes}>${escape(value)}</textarea>`:`<input type="text" ${attributes} value="${escape(value)}">`;
 }
 
