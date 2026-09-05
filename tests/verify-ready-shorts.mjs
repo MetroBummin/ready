@@ -23,7 +23,7 @@ assert.match(passagePaneRule,/max-height:min\(55svh,40rem\)/,'Passage pane must 
 assert.match(passagePaneRule,/overflow-y:auto/,'Long passages must scroll inside the reading pane');
 assert.match(passagePaneRule,/touch-action:pan-y/,'Passage pane must preserve vertical touch scrolling');
 assert.doesNotMatch(passagePaneRule,/(^|;)\s*height:/,'Passage pane must not use a fixed height');
-assert.match(css,/max-height:48svh/,'Mobile passage pane must stay near half the viewport');
+assert.match(css,/max-height:min\(62svh,40rem\)/,'Bottom-sheet layout must leave most of the mobile viewport to the passage');
 assert.doesNotMatch(css,/\.shorts-cue/,'The old vertical navigation cue must be removed');
 assert.doesNotMatch(baseCss,/question-topline|question-state|shorts-cue/,'Removed question chrome must not leave active layout hooks');
 
