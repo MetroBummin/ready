@@ -223,7 +223,7 @@ for(const removed of ['inferredChoiceParts','CHOICE_PART_REPAIRS','WRITING_GUIDE
 }
 assert.match(questionRenderer,/contractChoiceCopyHtml[\s\S]*contractPassageHtml[\s\S]*contractResponseControlHtml/);
 assert.match(app,/contractResponseComplete/);
-assert.match(questionRenderer,/response\.layout==='sentence_cloze'[\s\S]*cloze-frame[\s\S]*cloze-slot-list/,'Partial guided writing must separate its sentence frame from numbered inputs');
+assert.match(questionRenderer,/\['sentence_cloze','summary'\][\s\S]*contractInteractiveTemplateHtml/,'Summary and guided writing frames must own their interactive blanks without duplicate slot lists');
 assert.match(app,/workbook-choice-or[\s\S]*또는/,'Workbook grammar choices must render as an explicit either-or control');
 assert.doesNotMatch(app,/workbookChoiceHtml[^\n]*join\('<i>\/<\/i>'\)/,'Workbook grammar choices must not fall back to slash-separated text');
 assert.match(edge,/publicInteractionContract[\s\S]*deterministicGrade/);
