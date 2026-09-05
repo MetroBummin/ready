@@ -1,21 +1,23 @@
 import assert from 'node:assert/strict';
-import { createShortsWheelGesture, normalizeWheelDelta } from '../ready/shorts-navigation.js';
+import fs from 'node:fs';
+import { QUESTION_PAGE_SWIPE_MIN, QUESTION_PAGE_SWIPE_RATIO, questionPageDirection } from '../ready/question-paging.js';
 
-assert.equal(normalizeWheelDelta({ deltaY: 2, deltaMode: 1 }, 800), 32, 'line wheel delta should normalize to pixels');
-assert.equal(normalizeWheelDelta({ deltaY: 1, deltaMode: 2 }, 700), 700, 'page wheel delta should normalize to viewport pixels');
+const app=fs.readFileSync(new URL('../ready/app.js',import.meta.url),'utf8');
+const css=fs.readFileSync(new URL('../ready/design.css',import.meta.url),'utf8');
+const baseCss=fs.readFileSync(new URL('../ready/ready.css',import.meta.url),'utf8');
 
-const safariTrackpad = createShortsWheelGesture({ threshold: 72, releaseGapMs: 320 });
-assert.equal(safariTrackpad.push({ delta: 9, atBoundary: true, now: 0 }), 0);
-assert.equal(safariTrackpad.push({ delta: 14, atBoundary: true, now: 16 }), 0);
-assert.equal(safariTrackpad.push({ delta: 24, atBoundary: true, now: 32 }), 0);
-assert.equal(safariTrackpad.push({ delta: 28, atBoundary: true, now: 48 }), 1, 'small Safari deltas should become one next intent');
-assert.equal(safariTrackpad.push({ delta: 35, atBoundary: true, now: 64 }), 0, 'momentum must not skip another question');
-assert.equal(safariTrackpad.push({ delta: 35, atBoundary: true, now: 120 }), 0, 'momentum remains locked');
-assert.equal(safariTrackpad.push({ delta: 80, atBoundary: true, now: 500 }), 1, 'a new gesture after a quiet gap may navigate');
+assert.equal(QUESTION_PAGE_SWIPE_MIN,72);
+assert.equal(QUESTION_PAGE_SWIPE_RATIO,1.35);
+assert.equal(questionPageDirection(-90,8),1,'left swipe advances one question');
+assert.equal(questionPageDirection(90,8),-1,'right swipe returns one question');
+assert.equal(questionPageDirection(-90,80),0,'diagonal movement must not page');
+assert.equal(questionPageDirection(20,100,{axis:'y'}),0,'vertical reading scroll must not page');
+assert.equal(questionPageDirection(-90,8,{cancelled:true}),0,'cancelled gestures must not page');
+assert.match(app,/questionPagingTarget[^\n]*\[data-question-choice\][^\n]*reader-inline-source/,'Interactive answers and inline lookup own their gestures');
+assert.match(app,/Math\.abs\(dx\)>Math\.abs\(dy\)\*1\.25[^\n]*axis='x'/,'Horizontal intent must be locked before preventing browser movement');
+assert.doesNotMatch(app,/atQuestionBoundary|beginShortsTouch|ArrowUp|ArrowDown|data-question-prev|data-question-next/,'Vertical question navigation must be removed');
+assert.match(css,/question-layout\{[^}]*touch-action:pan-y/,'Question pages must preserve native vertical scrolling');
+assert.doesNotMatch(css,/\.shorts-cue/,'The old vertical navigation cue must be removed');
+assert.doesNotMatch(baseCss,/question-topline|question-state|shorts-cue/,'Removed question chrome must not leave active layout hooks');
 
-const internalScroll = createShortsWheelGesture();
-assert.equal(internalScroll.push({ delta: 100, atBoundary: false, now: 0 }), 0, 'long passage must scroll before navigation');
-assert.equal(internalScroll.push({ delta: 40, atBoundary: true, now: 30 }), 0);
-assert.equal(internalScroll.push({ delta: 40, atBoundary: true, now: 50 }), 1, 'an additional boundary gesture navigates');
-
-console.log('READY Shorts navigation state machine verified');
+console.log('READY horizontal question paging and vertical scroll ownership verified');

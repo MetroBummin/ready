@@ -63,7 +63,7 @@ assert.equal(questionVisibleInScope(bankRow,{school:'test2',grade:'2학년'}),tr
 assert.equal(questionVisibleInScope(bankRow,{school:'test',grade:'1학년'}),false);
 assert.equal(questionVisibleInScope(bankRow,{school:'한빛고',grade:'2학년'}),false);
 assert.match(edge,/supportingReferences:[\s\S]*showReference/,'Reference provenance must be QA-gated in the public contract');
-assert.match(student,/question-reference-details[\s\S]*Refs \$\{refs\.length\}개/,'QA provenance detail is missing');
+assert.doesNotMatch(student,/question-reference-details|Refs \$\{refs\.length\}개/,'Student Question must not expose QA provenance');
 assert.match(authoringDocs,/Reference questions are examples, not templates[\s\S]*Content Reference[\s\S]*Style Reference/);
 assert.match(typeDocs,/1 READY card = 1 independently answerable Question/);
 

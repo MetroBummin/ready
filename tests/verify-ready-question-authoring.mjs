@@ -56,7 +56,7 @@ const v2={payload:{authoring:{method:AI_REFERENCE_VARIANT_V2}}};
 assert.equal(questionVisibleInScope(v2,{school:'test2',grade:'2학년'}),true);
 assert.equal(questionVisibleInScope(v2,{school:'test',grade:'1학년'}),false);
 assert.equal(questionVisibleInScope(v2,{school:'한빛고',grade:'2학년'}),false);
-assert.match(student,/referenceQuestionNo[\s\S]*questionDifficulty/,'QA Ref badge copy is missing');
+assert.doesNotMatch(student,/questionDifficultyMarkup|question-difficulty-badge/,'Student Question must not expose authoring difficulty or Ref metadata');
 assert.match(edge,/questionVisibleInScope/,'Question access paths must keep the scope gate');
 assert.match(edge,/ready_attempts[\s\S]*ready_question_bookmarks/,'Existing attempt and bookmark paths must remain explicit');
 assert.match(docs,/Canonical passage is immutable[\s\S]*Generate Questions, not replacement passages/,'Authoring contract must lead with immutable canonical rules');

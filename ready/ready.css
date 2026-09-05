@@ -55,7 +55,6 @@ body.study-mode #topbar{display:none}
 
 /* Question/Interaction Contract layout hooks */
 .question-layout{margin-inline:auto}
-.question-topline,.question-state{display:flex;align-items:center}
 .question-answer-area{display:grid}
 .question-choice{display:grid;width:100%;transform:translateX(var(--choice-drag,0));touch-action:pan-y;will-change:transform}
 .question-choice.swiping{transition:none!important}
@@ -65,7 +64,7 @@ body.study-mode #topbar{display:none}
 .question-layout[data-question-phase="solving"] .question-choice-copy .reader-token,
 .question-layout[data-question-phase="submitted"] .question-choice-copy .reader-token{cursor:pointer}
 .question-submit-row{min-height:48px}.question-submit{width:100%}
-.feedback-actions{display:flex;flex-wrap:wrap}.shorts-cue{display:flex;align-items:center;justify-content:center}
+.feedback-actions{display:flex;flex-wrap:wrap}
 .question-block{display:block;white-space:pre-wrap}.question-block.bullet{display:list-item}
 .question-segment.emphasis{text-decoration:underline;text-decoration-thickness:2px;text-underline-offset:3px}
 .question-segment.label::before{content:attr(data-label);margin-right:4px;font-weight:800}
