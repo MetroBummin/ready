@@ -30,6 +30,15 @@ assert.doesNotMatch(student,/call\('student_bootstrap'/,'Active Student must not
 assert.match(student,/student_review['"][\s\S]*student_review_export_active/,'Active Student must use the Question-free Review operations');
 assert.match(admin,/admin_workbook_progress['"][\s\S]*admin_workbook_progress_detail['"][\s\S]*admin_workbook_attempt_replay/,'Active Admin must use Workbook-only progress operations');
 assert.doesNotMatch(activeCss,/\.(?:question|written-response|written-workspace|writing-target|writing-conditions|choice-matrix|passage-pointer)(?:[-\w]|\s|\{|\[|:)/,'Question-only selectors must not remain in active CSS');
+assert.match(student,/student_login['"],\{code:values\.code,remember:true\}/,'Student sessions must be persistent by default');
+assert.doesNotMatch(studentHtml,/name="remember"/,'Student login must not require an optional remember checkbox');
+assert.match(admin,/localStorage\.setItem\(SESSION_KEY/,'Admin opaque sessions must survive reload and browser restart');
+assert.doesNotMatch(admin,/sessionStorage/,'Admin session must not be tab-lifetime only');
+assert.match(admin,/data-paragraph-break/,'Published Passage editor must expose presentation-only paragraph breaks');
+assert.match(admin,/row\.paragraphIndex=paragraph/,'Paragraph breaks must update presentation metadata without splitting sentence rows');
+assert.doesNotMatch(student,/\$\{stage\.stage\}단계/,'Student Workbook choices must not expose numeric stage labels');
+assert.match(student,/workbook-stage-copy"><strong>\$\{esc\(label\)\}/,'Student Workbook choices must lead with the semantic learning name');
+assert.match(student,/function workbookStageLabel\(stage\)[\s\S]*replace\(\/\^\\s\*\\d\+\\s\*단계/,'Legacy numeric prefixes must be stripped from Student Workbook labels');
 
 for(const operation of ['student_questions','student_question_filters','student_question_queue','student_review_questions','student_review_export','set_question_bookmark','submit_attempt','admin_learning_progress','admin_learning_progress_detail','admin_attempt_replay','import_questions']){
   assert.match(edge,new RegExp(`case "${operation}"`),`Dormant server operation must remain preserved: ${operation}`);

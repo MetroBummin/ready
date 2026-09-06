@@ -68,6 +68,18 @@ for(const contract of ['empty_passage_groups','ready_exam_passages_grade_match_t
 for(const protectedTable of ['ready_passage_sentences','ready_questions','ready_attempts','ready_workbook_catalogs','ready_workbook_attempts']){
   assert.ok(!followupMigration.includes(protectedTable),`follow-up migration must not mutate ${protectedTable}`);
 }
+const autoQaMigration=fs.readFileSync(new URL('../supabase/migrations/20260907103000_ready_auto_qa_passage_scopes.sql',import.meta.url),'utf8');
+for(const contract of [
+  "('test', '1학년', 'test 1학년')",
+  "('test2', '2학년', 'test2 2학년')",
+  'ready_sync_passage_to_qa_scope',
+  'ready_passages_sync_qa_scope_trigger',
+  'after insert or update of grade',
+]) assert.ok(autoQaMigration.toLowerCase().includes(contract.toLowerCase()),`auto QA migration contract missing: ${contract}`);
+for(const protectedTable of ['ready_passage_sentences','ready_questions','ready_attempts','ready_workbook_catalogs','ready_workbook_attempts']){
+  assert.ok(!autoQaMigration.includes(protectedTable),`auto QA migration must not mutate ${protectedTable}`);
+}
+assert.doesNotMatch(autoQaMigration,/(?:update|delete\s+from)\s+public\.ready_passages\b/i,'QA assignment must not mutate Passage source rows');
 
 const server=fs.readFileSync(new URL('../server/ready/index.ts',import.meta.url),'utf8');
 assert.match(server,/groupKey:\s*link\.group_key, groupLabel:\s*link\.group_label/);

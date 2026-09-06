@@ -15,11 +15,13 @@ export function tokenSpan(text,tokenStart,tokenEnd,sentenceId='') {
   return {sentenceId,tokenStart,tokenEnd,quote:text.slice(start,end),prefix:text.slice(Math.max(0,start-24),start),suffix:text.slice(end,end+24)};
 }
 export function makeSpan(text,start,end,sentenceId='') {
-  const tokens=spanTokens(text),first=tokens.findIndex(t=>t.start===start),last=tokens.findIndex(t=>t.end===end);
-  return tokenSpan(text,first,last+1,sentenceId);
+  const tokens=spanTokens(text),first=tokens.findIndex(t=>t.start<=start&&t.end>start),last=tokens.findIndex(t=>t.start<end&&t.end>=end);
+  if(first<0||last<first||start<0||end<=start||end>String(text).length)throw new Error('선택 범위를 확인해 주세요.');
+  return {sentenceId,tokenStart:first,tokenEnd:last+1,start,end,quote:text.slice(start,end),prefix:text.slice(Math.max(0,start-24),start),suffix:text.slice(end,end+24)};
 }
 export function locateSpan(text,span) {
   if(!span?.quote||!Number.isInteger(span.tokenStart)||!Number.isInteger(span.tokenEnd)||span.tokenStart<0||span.tokenEnd<=span.tokenStart)return null;
+  if(Number.isInteger(span.start)&&Number.isInteger(span.end)&&span.start>=0&&span.end>span.start&&text.slice(span.start,span.end)===span.quote)return {start:span.start,end:span.end};
   const tokens=spanTokens(text),first=tokens[span.tokenStart],last=tokens[span.tokenEnd-1];
   if(first&&last&&text.slice(first.start,last.end)===span.quote)return {start:first.start,end:last.end};
   return null;
@@ -47,7 +49,7 @@ export function validateTargets(row,step,targets) {
   let last=-1;const text=row[fieldFor(step)],sorted=targets.map(target=>({target,position:locateSpan(text,target.span)})).sort((a,b)=>(a.position?.start??-1)-(b.position?.start??-1));
   for(const {target,position} of sorted){
     if(target.span.sentenceId!==row.id||!position||position.start<last)throw new Error('선택한 표현이 없거나 서로 겹칩니다.');last=position.end;
-    if(step==='verb_form'&&(!String(target.hint||'').trim()||target.answer!==target.span.quote))throw new Error('동사 원형/힌트와 정답을 확인해 주세요.');
+    if(step==='verb_form'&&(!String(target.hint||'').trim()||!String(target.answer||'').trim()))throw new Error('동사 원형/힌트와 정답을 확인해 주세요.');
     if(step==='grammar_choice'&&(target.correct!==target.span.quote||!String(target.distractor||'').trim()||target.correct.trim().toLowerCase()===target.distractor.trim().toLowerCase()||/[,\n]/.test(target.distractor)))throw new Error('어법 정답과 서로 다른 오답이 필요합니다.');
   }
   return sorted.map(({target})=>target);

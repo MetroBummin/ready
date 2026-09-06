@@ -185,6 +185,107 @@ function answerStageRows(text, stage, expectedCount) {
   const candidates = answerStageCandidates(text, stage, expectedCount);
   return candidates.length === 1 ? candidates[0] : [];
 }
+
+export function alignPublisherBlankPrompt(sourcePrompt, answers, canonical) {
+  const originalPrompt = canonicalText(sourcePrompt), target = canonicalText(canonical);
+  const slots = Array.isArray(answers) ? answers.map(value => canonicalText(value)).filter(Boolean) : [];
+  const individualCount = (originalPrompt.match(/_{5,}/g) || []).length;
+  const groupedPrompt = originalPrompt.replace(/_{5,}(?:\s+_{5,})+/g, '______________');
+  const groupedCount = (groupedPrompt.match(/_{5,}/g) || []).length;
+  const prompt = individualCount === slots.length ? originalPrompt : groupedCount === slots.length ? groupedPrompt : '';
+  if (!prompt) return '';
+  const parts = prompt.split(/_{5,}/g);
+  if (!target || !slots.length || parts.length !== slots.length + 1) return '';
+
+  const compact = value => Array.from(canonicalText(value)).filter(char => !/\s/u.test(char));
+  const restored = [];
+  const compactSpans = [];
+  let compactOffset = 0;
+  for (let index = 0; index < slots.length; index += 1) {
+    restored.push(parts[index]);
+    compactOffset += compact(parts[index]).length;
+    const start = compactOffset;
+    restored.push(slots[index]);
+    compactOffset += compact(slots[index]).length;
+    compactSpans.push({ start, end: compactOffset });
+  }
+  restored.push(parts.at(-1));
+
+  const restoredCompact = compact(restored.join('')).join('').toLocaleLowerCase('en-US');
+  const targetChars = Array.from(target);
+  const targetCompact = targetChars.filter(char => !/\s/u.test(char)).join('').toLocaleLowerCase('en-US');
+  if (restoredCompact !== targetCompact) return '';
+
+  const compactPositions = [];
+  targetChars.forEach((char, index) => { if (!/\s/u.test(char)) compactPositions.push(index); });
+  let aligned = targetChars;
+  for (const span of [...compactSpans].reverse()) {
+    const start = compactPositions[span.start];
+    const end = Number.isInteger(compactPositions[span.end - 1]) ? compactPositions[span.end - 1] + 1 : null;
+    if (!Number.isInteger(start) || end <= start) return '';
+    aligned.splice(start, end - start, '______________');
+  }
+  return aligned.join('');
+}
+
+function publisherBlankExercises(text, rows) {
+  const exercises = [];
+  for (const sourceStage of [2, 3]) {
+    const candidates = [];
+    for (const sources of pairedNumberedRowSets(text, sourceStage)) for (const answers of answerStageCandidates(text, sourceStage, sources.length)) {
+      const answerByNumber = new Map(answers.map(row => [row.number, row.answer]));
+      const parsed = [];
+      for (const source of sources) {
+        const answer = clean(answerByNumber.get(source.number)), rawPrompt = clean(source.prompt), row = rows[source.number - 1], answerSlots = answer.split('/').map(value => clean(value)).filter(Boolean);
+        const prompt = alignPublisherBlankPrompt(rawPrompt, answerSlots, sourceStage === 2 ? row?.translation : row?.text);
+        if (!answer || !prompt || !/_{5,}/.test(rawPrompt)) { parsed.length = 0; break; }
+        const restored = restoreBlanks(prompt, answerSlots);
+        const valid = sourceStage === 2 ? restored === clean(row?.translation) : sameEnglish(restored, row?.text);
+        if (!valid) { parsed.length = 0; break; }
+        parsed.push({
+          type: sourceStage === 2 ? 'korean_blank' : 'english_blank',
+          number: source.number,
+          prompt,
+          answers: answerSlots,
+          answer,
+          canonicalStart: source.number,
+          canonicalEnd: source.number,
+          page: null,
+          label: sourceStage === 2 ? '워크북 2 빈칸 연습(우리말)' : '워크북 3 빈칸 연습(영문)',
+          provenance: { origin: 'publisher_answer_key', sourceWorkbookNumber: sourceStage },
+        });
+      }
+      if (parsed.length === sources.length) candidates.push(parsed);
+    }
+    const signatures = new Map(candidates.map(items => [JSON.stringify(items.map(item => [item.number, item.prompt, item.answers])), items]));
+    if (signatures.size === 1) exercises.push(...signatures.values().next().value);
+  }
+  return exercises;
+}
+
+function publisherAlignedCanonicalRows(text, rows) {
+  if (!rows.length) return rows;
+  const koreanSources = pairedNumberedRowSets(text, 2), englishSources = pairedNumberedRowSets(text, 3);
+  const koreanAnswers = koreanSources.flatMap(sources => answerStageCandidates(text, 2, sources.length).map(answers => ({ sources, answers })));
+  const englishAnswers = englishSources.flatMap(sources => answerStageCandidates(text, 3, sources.length).map(answers => ({ sources, answers })));
+  const uniqueRestored = (sets, number) => {
+    const values = new Map();
+    for (const { sources, answers } of sets) {
+      const source = sources.find(item => item.number === number), answer = answers.find(item => item.number === number)?.answer;
+      if (!source || !answer) continue;
+      const restored = restoreBlanks(source.prompt, answer.split('/').map(value => clean(value)).filter(Boolean));
+      if (restored) values.set(canonicalText(restored), restored);
+    }
+    return values.size === 1 ? values.values().next().value : '';
+  };
+  return rows.map((row, index) => {
+    const number = index + 1, english = uniqueRestored(englishAnswers, number), korean = uniqueRestored(koreanAnswers, number);
+    return {
+      text: english && comparableEnglish(english) === comparableEnglish(row.text) ? canonicalText(english) : canonicalText(row.text),
+      translation: korean && canonicalText(korean).replace(/\s/g, '') === canonicalText(row.translation).replace(/\s/g, '') ? canonicalText(korean) : canonicalText(row.translation),
+    };
+  });
+}
 const canonicalSpanIndexCache = new WeakMap();
 function canonicalSpanIndex(rows) {
   if (!Array.isArray(rows)) return new Map();
@@ -383,8 +484,8 @@ export function inspectFullWorkbookText(text, expectedRows = null) {
   const candidate = translationBlocks.flatMap(block => numberedPairs(block.body));
   const stageFourPairs = candidate.filter(item => isEnglish(item.prompt) && isKorean(item.answer)).map(item => ({ text: item.prompt, translation: item.answer }));
   const prose = clean(text, 1_000_000).split(/\r?\n/).filter(line => !/^\s*\d+[.)]/.test(line) && semanticWorkbookType(line) === 'unknown' && !/answer\s*key|정답\s*(및|표|해설)?/i.test(line)).join('\n');
-  const extracted = extractSentenceRows(prose), canonicalSelection = chooseCanonicalWorkbookRows(text, expectedRows), canonicalRows = canonicalSelection.rows, rows = canonicalRows.length ? canonicalRows : stageFourPairs.length ? stageFourPairs : extracted.rows;
-  const inlineExercises = blocks.flatMap(block => numberedPairs(block.body).map(item => ({ ...item, type: semanticWorkbookType(block.title), page: block.page, label: block.title, provenance: { origin: 'publisher_answer_key', sourceWorkbookNumber: Number(block.title.match(/(?:workbook|stage|워크북)\s*(\d+)/i)?.[1]) || null } }))), publisherExercises = canonicalRows.length ? publisherGrammarExercises(text, rows) : [], publisherStages = new Set(publisherExercises.map(item => readyStageForSemanticType(item.type)).filter(Boolean)), exercises = [...publisherExercises, ...inlineExercises.filter(item => { const stage = readyStageForSemanticType(item.type); return stage && !publisherStages.has(stage); })], answeredExercises = exercises.filter(item => clean(item.answer) || (Array.isArray(item.answers) && item.answers.length));
+  const extracted = extractSentenceRows(prose), canonicalSelection = chooseCanonicalWorkbookRows(text, expectedRows), canonicalRows = canonicalSelection.rows, initialRows = canonicalRows.length ? canonicalRows : stageFourPairs.length ? stageFourPairs : extracted.rows, rows = canonicalRows.length ? publisherAlignedCanonicalRows(text, initialRows) : initialRows;
+  const inlineExercises = blocks.flatMap(block => numberedPairs(block.body).map(item => ({ ...item, type: semanticWorkbookType(block.title), page: block.page, label: block.title, provenance: { origin: 'publisher_answer_key', sourceWorkbookNumber: Number(block.title.match(/(?:workbook|stage|워크북)\s*(\d+)/i)?.[1]) || null } }))), publisherExercises = canonicalRows.length ? [...publisherBlankExercises(text, rows), ...publisherGrammarExercises(text, rows)] : [], publisherStages = new Set(publisherExercises.map(item => readyStageForSemanticType(item.type)).filter(Boolean)), exercises = [...publisherExercises, ...inlineExercises.filter(item => { const stage = readyStageForSemanticType(item.type); return stage && !publisherStages.has(stage); })], answeredExercises = exercises.filter(item => clean(item.answer) || (Array.isArray(item.answers) && item.answers.length));
   const sectionAmbiguous = !Array.isArray(expectedRows) && canonicalSelection.candidateCount > 1;
   const confident = fullWorkbook && !sectionAmbiguous && rows.length >= 2 && (canonicalRows.length === rows.length || stageFourPairs.length === rows.length) && answeredExercises.every(item => readyStageForSemanticType(item.type) > 0);
   return {
