@@ -396,7 +396,7 @@ body[data-ready-mode] .workbook-blank.long-slot input{width:100%;max-width:none;
 .workbook-blank.wrong input{border-color:var(--ready-error);background:var(--ready-error-soft)}
 .workbook-blank input.recall-wrong{border-color:var(--ready-error);color:var(--ready-error);background:var(--ready-error-soft)}
 .workbook-blank input.recall-complete{border-color:var(--ready-success);background:var(--ready-success-soft)}
-.workbook-blank.live-mismatch input{border-color:var(--ready-error);background:var(--ready-error-soft)}
+.workbook-blank.live-mismatch input,.workbook-writing.live-mismatch textarea{border-color:var(--ready-error);background:var(--ready-error-soft)}
 .workbook-live-copy,.workbook-slot-hint{grid-column:1;color:var(--ready-muted);font-size:11px;font-weight:650;line-height:1.35;text-align:left}
 .workbook-live-copy b{color:var(--ready-error)}
 .workbook-slot-hint{color:var(--ready-primary)}

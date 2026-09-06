@@ -98,3 +98,46 @@ be present, dry-run diffs must be reviewed, semantic validation and golden
 regression must pass, and unresolved must equal zero. Missing source blocks the
 entire replacement. Passage/sentence identity, Questions, exam links, attempts,
 bookmarks and history are never rewritten by catalog regeneration.
+
+## Passage Studio (current authoring path)
+
+Admin has three top-level destinations: 학생 관리, 시험범위, Studio. Studio extends
+Factory jobs and the live canonical editor; the historical Question APIs and
+legacy catalogs retain their contracts. The source-only rules above remain for
+legacy Factory imports, while Studio uses the teacher-confirmed annotation as
+publication authority.
+
+PDFs can contain multiple Passages; multiple files are imported independently.
+Explicit passage labels separate source pages and answer sections. Ambiguous
+boundaries remain review-required and can be split, merged within one document,
+reordered, or renamed before creating independent Drafts. The import screen also
+allows correcting extracted English/Korean rows. PDF byte SHA-256, filename,
+pages, and publisher exercises stay in the original Factory job. Import never
+calls an AI provider. TSV remains the only paste format.
+
+Each active SENTENCE owns four annotation records: english_blank, korean_blank,
+verb_form, grammar_choice. Each target stores the sentence ID and a zero-based
+half-open token range; quote/context is validation and conservative rebasing
+metadata, not identity. A repeated word is distinguished by token position.
+Adjacent clicks extend the active span, endpoint clicks shrink it, and a distant
+click starts a separate target. All four steps share this interaction.
+
+Authoring uses the existing Gemini provider only on explicit teacher action and
+only for dirty sentences. Validated publisher candidates win. Provider output
+is unconfirmed; each sentence/step is reviewed and confirmed before publication.
+An explicitly confirmed empty target list means there is no suitable target for
+that sentence and step. Invalid spans, overlapping spans, missing verb hints,
+and non-unique grammar answers block confirmation/publication.
+
+Canonical edits rebase exact retained targets when unambiguous and mark only the
+changed sentence stale; removed sentences retain retired annotations. Pure
+translation/word_order/writing retain unchanged item payloads and keys. Catalog
+regeneration never calls AI or reparses PDFs; it compiles Pure and currently
+confirmed Authored records. Drafts do not create a student catalog until Publish.
+Published canonical edits omit stale authored items pending review. Attempts and
+history are not mutated. Revision and Studio version checks reject concurrent
+annotation/publish writes; a failed transaction keeps the previous catalog.
+
+Release order: apply the additive `ready_passage_studio` migration before
+releasing the matching API/Admin. It adds one private JSON state column and two
+service-role-only RPCs. It does not migrate production catalogs or learning data.

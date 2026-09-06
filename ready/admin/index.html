@@ -19,14 +19,14 @@
     />
     <link rel="icon" href="../../assets/favicon/icon-192.png?v=monofy-bear-1" type="image/png" sizes="192x192" />
     <link rel="apple-touch-icon" href="../../assets/favicon/apple-touch-icon.png?v=monofy-bear-1" />
-    <link rel="stylesheet" href="../../styles/fonts.css" />
+    <link rel="stylesheet" href="../../styles/fonts.css" /><link rel="stylesheet" href="studio.css?v=studio-3" />
     <link rel="stylesheet" href="../../styles/tokens.css" />
     <link rel="stylesheet" href="../../styles/base.css" />
     <link rel="stylesheet" href="../../design-tokens.css?v=passage-mastery-1" />
     <link rel="stylesheet" href="../ready.css?v=passage-mastery-1" />
     <link rel="stylesheet" href="../design.css?v=passage-mastery-2" />
     <script defer src="../config.js"></script>
-    <script type="module" src="app.js?v=live-passage-editor-1"></script>
+    <script type="module" src="app.js?v=studio-3"></script>
   </head>
   <body data-ready-mode="admin">
     <div id="app">
@@ -40,15 +40,9 @@
           <img src="../../assets/favicon/icon-192.png" alt=""><span class="mark">READY</span><span class="family">Admin</span>
         </button>
         <nav id="admin-nav" hidden>
-          <button class="navbtn on" type="button" data-route="students">
-            Students</button
-          ><button class="navbtn" type="button" data-route="progress">
-            학습 현황</button
-          ><button class="navbtn" type="button" data-route="passages">
-            Passages</button
-          ><button class="navbtn" type="button" data-route="factory">
-            Workbook Factory</button
-          ><button class="navbtn" type="button" data-route="scopes">시험범위</button>
+          <button class="navbtn on" type="button" data-route="students">학생 관리</button>
+          <button class="navbtn" type="button" data-route="scopes">시험범위</button>
+          <button class="navbtn" type="button" data-route="passages">Studio</button>
         </nav>
         <button
           id="theme-toggle"
@@ -95,10 +89,10 @@
         <section class="view" id="v-passages">
           <div class="page-head">
             <div>
-              <p class="eyebrow">PASSAGE LIBRARY</p>
-              <h1>지문</h1>
+              <p class="eyebrow">STUDIO</p>
+              <h1>Passage Studio</h1>
             </div>
-            <button id="refresh-passages" class="button quiet" type="button">
+            <button class="button primary" type="button" data-route="factory">+ 새 Passage</button><button id="refresh-passages" class="button quiet" type="button">
               새로고침
             </button>
           </div>
@@ -235,9 +229,9 @@
           <div id="learning-progress-detail" hidden></div>
         </section>
         <section class="view" id="v-factory">
-          <div class="page-head"><div><p class="eyebrow">WORKBOOK FACTORY</p><h1>Passage · 워크북</h1><p class="lead">PDF 또는 English / Korean 2열을 Passage Draft로 불러온 뒤 직접 확정합니다.</p></div></div>
+          <div class="page-head"><div><button type="button" class="back-link" data-route="passages">← Studio</button><p class="eyebrow">IMPORT</p><h1>Passage · 워크북</h1><p class="lead">PDF 또는 English / Korean 2열을 Passage Draft로 불러온 뒤 직접 확정합니다.</p></div></div>
           <form id="factory-start-form" class="card form-card">
-            <label><span>생성 방식</span><select name="factoryMode" id="factory-mode"><option value="new_passage">새 Passage + Workbook</option><option value="existing_passage">기존 Passage에 Workbook 추가</option></select></label>
+            <label hidden><span>생성 방식</span><select name="factoryMode" id="factory-mode"><option value="new_passage">새 Passage + Workbook</option><option value="existing_passage">기존 Passage에 Workbook 추가</option></select></label>
             <label id="factory-existing-field" hidden><span>기존 READY Passage</span><select name="existingPassageId" id="factory-existing-passage"><option value="">Passage를 선택하세요</option></select><small>기존 문장·문제·시험범위·풀이 기록은 변경하지 않습니다.</small></label>
             <div class="form-grid" id="factory-new-fields">
               <label><span>지문 제목</span><input name="title" maxlength="120" required></label>
@@ -247,9 +241,9 @@
               <label><span>연도 (모의고사)</span><input name="sourceYear" inputmode="numeric"></label>
               <label><span>월 (모의고사)</span><input name="sourceMonth" inputmode="numeric"></label>
             </div>
-            <label><span>PDF 업로드 <small id="factory-pdf-note">또는 아래에 본문을 붙여 넣으세요.</small></span><input name="pdf" type="file" accept="application/pdf,.pdf"></label>
+            <label><span>PDF 업로드 <small id="factory-pdf-note">또는 아래에 본문을 붙여 넣으세요.</small></span><input name="pdf" type="file" multiple accept="application/pdf,.pdf"></label>
             <label><span>또는 2열 붙여넣기</span><textarea name="sourceText" rows="10" placeholder="English 문장[TAB]Korean 해석&#10;한 행에 한 문장쌍"></textarea><small>붙여넣기는 TAB으로 구분된 두 열만 지원합니다.</small></label>
-            <button class="button primary" type="submit">분석 시작</button>
+            <button class="button primary" type="submit">Passage 불러오기</button>
           </form>
           <section id="factory-review" hidden></section>
         </section>

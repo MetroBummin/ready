@@ -89,3 +89,22 @@ canonical edit increments the Passage revision and automatically rebuilds this c
 verified publisher-only stages. Publication compares the expected revision and atomically replaces
 the catalog, so a failed build keeps the last good student catalog. Attempts and review history are
 append-only and independent from catalog regeneration.
+
+## Studio annotation contract
+
+The semantic stages 1–7 above remain unchanged. Pure is translation (3),
+word_order (6), writing (7); Authored is korean_blank (1), english_blank (2),
+verb_form (4), grammar_choice (5). Only Studio authoring can use AI. All student
+execution and regeneration of Studio catalogs are deterministic.
+
+A target is `{span:{sentenceId,tokenStart,tokenEnd,quote,prefix,suffix}}`.
+`tokenEnd` is exclusive. Tokens are Unicode letter/number words with internal
+apostrophes/hyphens; punctuation and spaces between selected tokens are retained
+in the exact quote. The owning step chooses English or Korean text. Verb form
+also requires `hint` and `answer`; grammar choice requires `correct` and one
+`distractor`. Correct/answer must reproduce the selected canonical surface.
+
+Per-sentence English/Korean snapshots invalidate only changed rows. TITLE and
+SUBTITLE cannot own authoring or Pure exercises. Human confirmation is separate
+from ending a mouse selection. Selecting a distant word finishes editing the
+previous span, but does not publish or human-confirm that step.
