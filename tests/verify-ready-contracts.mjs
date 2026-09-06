@@ -28,7 +28,7 @@ const operationPattern=/(?:call|readyApi|record|api|action)\(['"]([a-z_]+)['"]/g
 const activeClientOps=new Set([...admin.matchAll(operationPattern),...student.matchAll(operationPattern)].map(match=>match[1]));
 const clientOps=new Set([...admin.matchAll(operationPattern),...student.matchAll(operationPattern),...dormantAdmin.matchAll(operationPattern),...dormantStudent.matchAll(operationPattern)].map(match=>match[1]));
 const serverOps=new Set([...edge.matchAll(/case "([a-z_]+)"/g)].map(match=>match[1]));
-const serverOnlyOps=new Set(['create_passage','delete_student','delete_passage','import_questions','import_explanations','sentence_structure']);
+const serverOnlyOps=new Set(['create_passage','delete_student','delete_passage','import_questions','import_explanations','sentence_structure','studio_split_draft']);
 for(const op of clientOps)assert(serverOps.has(op),`Frontend operation has no server contract: ${op}`);
 for(const op of serverOps)assert(clientOps.has(op)||serverOnlyOps.has(op),`Server operation has no active caller: ${op}`);
 

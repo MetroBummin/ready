@@ -18,10 +18,12 @@ export function publisherAnnotations(rows,sourceExercises,metadata={}) {
     if(valid)try{validateTargets(row,stage.semanticType,targets);annotations[row.id].steps[stage.semanticType]={status:'review',source:'publisher',targets,provenance:item.provenance};}catch{}
   }return annotations;
 }
-export function compileStudio({rows,annotations,title,workbookKey,previousCatalog=null,revision=1,requireConfirmed=false,provenance={}}) {
+export function compileStudio({rows,annotations,title,workbookKey,previousCatalog=null,revision=1,requireConfirmed=false,publishStep=null,provenance={}}) {
   const synced=syncAnnotations(rows,annotations),canonical=sentenceRows(rows),errors=[];
   const catalog=generatePassageDeterministicCatalog({title,workbookKey,rows,previousCatalog,provenance:{...provenance,canonicalRevision:revision,studio:true}});
-  for(const stage of catalog.stages.filter(s=>AUTHORED.includes(s.semanticType))){stage.items=[];for(let i=0;i<canonical.length;i++){
+  for(const stage of catalog.stages.filter(s=>AUTHORED.includes(s.semanticType))){
+    if(publishStep&&stage.semanticType!==publishStep){stage.items=structuredClone(previousCatalog?.stages?.find(previous=>previous.semanticType===stage.semanticType)?.items||[]);continue;}
+    stage.items=[];for(let i=0;i<canonical.length;i++){
     const row=canonical[i],record=synced[row.id].steps[stage.semanticType];
     if(record.status!=='confirmed'){if(requireConfirmed)errors.push({sentenceId:row.id,number:i+1,step:stage.semanticType,message:'검토 후 확정해 주세요.'});continue;}
     try{
