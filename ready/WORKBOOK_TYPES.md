@@ -79,3 +79,13 @@ generation and grading are disabled. Missing source is never synthesized.
 Every active catalog declares `contractVersion: semantic-v2`; every stage and
 item declares its `semanticType`. Historical attempts remain `legacy-v1`, so an
 old correction stored as stage 7 can never be interpreted as new writing.
+
+## Live canonical Passage
+
+Passage-only deterministic generation uses every active canonical `SENTENCE` to create exactly
+three safe practices: `translation`, `word_order`, and `writing`. It never reads PDF layout or calls
+AI. `TITLE` and `SUBTITLE` are renderer structure only and never become Workbook items. Saving a
+canonical edit increments the Passage revision and automatically rebuilds this core while retaining
+verified publisher-only stages. Publication compares the expected revision and atomically replaces
+the catalog, so a failed build keeps the last good student catalog. Attempts and review history are
+append-only and independent from catalog regeneration.

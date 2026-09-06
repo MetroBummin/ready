@@ -404,6 +404,13 @@ function chooseKorean(sentence) { return koWords(sentence).filter(word => word.l
 function orderTokens(sentence) { const tokens = words(sentence); return tokens.length >= 2 ? tokens : []; }
 function item(stage, number, key, fields) { return { key, stage, number, ...fields }; }
 function factoryKey(prefix, stage, number) { return `${prefix}-s${stage}-${String(number).padStart(2, '0')}`; }
+function canonicalItemKey(prefix, stage, row, number, previousCatalog) {
+  const sentenceId = clean(row?.id, 80);
+  const previous = previousCatalog?.stages?.flatMap(candidate => candidate.items || []).find(candidate =>
+    Number(candidate.stage) === stage && (sentenceId && candidate.provenance?.canonicalSentenceId === sentenceId || Number(candidate.number) === number));
+  if (previous?.key) return clean(previous.key, 120);
+  return sentenceId ? `${prefix}-s${stage}-${sentenceId.replace(/[^a-z0-9]/gi, '').slice(-12)}` : factoryKey(prefix, stage, number);
+}
 function hashSeed(value) { let hash = 2_166_136_261; for (const char of String(value)) { hash ^= char.charCodeAt(0); hash = Math.imul(hash, 16_777_619); } return hash >>> 0; }
 function seededShuffle(tokens, seed) { const output = [...tokens]; let state = hashSeed(seed); const random = () => { state += 0x6D2B79F5; let value = state; value = Math.imul(value ^ value >>> 15, value | 1); value ^= value + Math.imul(value ^ value >>> 7, value | 61); return ((value ^ value >>> 14) >>> 0) / 4_294_967_296; }; for (let index = output.length - 1; index > 0; index -= 1) { const target = Math.floor(random() * (index + 1)); [output[index], output[target]] = [output[target], output[index]]; } return output; }
 function isCyclicRotation(candidate, canonical) { return candidate.length === canonical.length && candidate.some((_value, offset) => candidate.every((value, index) => value === canonical[(index + offset) % canonical.length])); }
@@ -522,4 +529,36 @@ export function generateWorkbookCatalog({ title, workbookKey, rows, sourceExerci
   const metrics = { elapsedMs: Date.now() - started, sentenceCount: canonical.length, stageCoverage, incompleteStages, pdfExtractedExercises: Number(provenance.pdfExtractedExercises) || 0, sourceReusedExercises: stages.reduce((sum, stage) => sum + stage.items.length, 0), deterministicGeneratedExercises: 0, derivedFallbackExercises: 0, geminiGeneratedExercises: 0, geminiCallCount: 0, geminiTokenUsage: 0, validatorPass: stages.reduce((sum, stage) => sum + stage.items.length, 0), validatorDrop: drops.length, unresolved, dropReasons: drops.reduce((all, drop) => ({ ...all, [drop.reason]: (all[drop.reason] || 0) + 1 }), {}) };
   const source = { ...provenance, semanticContract: SEMANTIC_WORKBOOK_CONTRACT, geminiCallCount: 0 };
   return { contractVersion: SEMANTIC_WORKBOOK_CONTRACT, workbookKey: prefix, title: clean(title, 120) || 'READY Workbook', source, importReport: { factory: true, metrics, drops }, stages, metrics };
+}
+
+// Passage-only deterministic core. It deliberately consumes canonical rows
+// only and never PDF geometry, publisher numbering, or an AI provider.
+export function generatePassageDeterministicCatalog({ title, workbookKey, rows, previousCatalog = null, provenance = {} }) {
+  const started = Date.now(), prefix = clean(workbookKey, 100).replace(/[^a-z0-9-]/gi, '-').toLowerCase() || 'factory';
+  const canonical = (Array.isArray(rows) ? rows : []).filter(row => clean(row?.blockType || row?.block_type || 'SENTENCE', 20).toUpperCase() === 'SENTENCE' && row?.active !== false)
+    .map((row, index) => ({ ...row, text: clean(row?.text), translation: clean(row?.translation), index: index + 1 }));
+  if (!canonical.length || canonical.some(row => !row.text || !row.translation)) throw new Error('Canonical SENTENCE English/Korean pairs are required.');
+  const generated = new Map([[3, []], [6, []], [7, []]]), drops = [];
+  for (const row of canonical) {
+    const shared = { origin: 'canonical_passage', canonicalSentenceId: clean(row.id, 80) || null, canonicalRevision: Number(provenance.canonicalRevision) || null };
+    generated.get(3).push(item(3, row.index, canonicalItemKey(prefix, 3, row, row.index, previousCatalog), { kind: 'translation_input', semanticType: 'translation', source: row.text, prompt: '우리말 해석을 입력하세요.', answers: [row.translation], provenance: shared }));
+    const tokens = orderTokens(row.text), shuffled = factoryOrderBank(tokens, `${prefix}:${row.id || row.index}:word-order`);
+    if (shuffled.length) generated.get(6).push(item(6, row.index, canonicalItemKey(prefix, 6, row, row.index, previousCatalog), { kind: 'reorder_groups', semanticType: 'word_order', source: row.translation, prompt: '⟦ORDER:0⟧.', groups: [shuffled], answers: [tokens.join(' ').toLowerCase()], canonicalStart: row.index, canonicalEnd: row.index, provenance: shared }));
+    else drops.push({ stage: 6, number: row.index, reason: 'stage6_word_order' });
+    generated.get(7).push(item(7, row.index, canonicalItemKey(prefix, 7, row, row.index, previousCatalog), { kind: 'full_sentence_input', semanticType: 'writing', source: row.translation, prompt: '', answers: [row.text], canonicalStart: row.index, canonicalEnd: row.index, provenance: shared }));
+  }
+  const rowByNumber = new Map(canonical.map(row => [row.index, row]));
+  for (const stage of [3, 6, 7]) for (const candidate of generated.get(stage)) {
+    const reason = validateSemanticWorkbookItem(stage, candidate, rowByNumber, canonical);
+    if (reason) drops.push({ stage, number: candidate.number, reason });
+  }
+  if (drops.length) throw new Error(`Deterministic validation failed: ${drops.map(drop => `${drop.stage}:${drop.number}:${drop.reason}`).join(', ')}`);
+  const preserved = new Map((previousCatalog?.stages || []).filter(stage => ![3, 6, 7].includes(Number(stage.stage))).map(stage => [Number(stage.stage), structuredClone(stage)]));
+  const stages = FACTORY_STAGES.map(stage => {
+    if (generated.has(stage)) { const [stageTitle, instruction, semanticType] = stageMeta[stage]; return { stage, semanticType, title: stageTitle, instruction, items: generated.get(stage) }; }
+    return preserved.get(stage) || { stage, semanticType: stageMeta[stage][2], title: stageMeta[stage][0], instruction: stageMeta[stage][1], items: [] };
+  });
+  const counts = Object.fromEntries(stages.map(stage => [stage.stage, { ready: stage.items.length, expected: [3, 6, 7].includes(stage.stage) ? canonical.length : stage.items.length }]));
+  const metrics = { elapsedMs: Date.now() - started, sentenceCount: canonical.length, stageCoverage: counts, incompleteStages: [], deterministicGeneratedExercises: canonical.length * 3, preservedPublisherExercises: stages.filter(stage => ![3, 6, 7].includes(stage.stage)).reduce((sum, stage) => sum + stage.items.length, 0), geminiGeneratedExercises: 0, geminiCallCount: 0, geminiTokenUsage: 0, validatorPass: stages.reduce((sum, stage) => sum + stage.items.length, 0), validatorDrop: 0, unresolved: 0, dropReasons: {} };
+  return { contractVersion: SEMANTIC_WORKBOOK_CONTRACT, workbookKey: prefix, title: clean(title, 120) || 'READY Workbook', source: { ...(previousCatalog?.source || {}), ...provenance, canonicalSource: 'ready_passage_sentences', deterministicCore: ['translation','word_order','writing'], geminiCallCount: 0 }, importReport: { factory: true, metrics, drops: [] }, stages, metrics };
 }
