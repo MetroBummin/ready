@@ -39,6 +39,12 @@ const fresh=syncAnnotations(rows,{}),invalid=applyCandidates(rows,fresh,[{senten
 const backend=readFileSync(new URL('../server/ready/index.ts',import.meta.url),'utf8');
 assert.doesNotMatch(backend.match(/async function studioImport[\s\S]*?async function studioSplitDraft/)[0],/geminiSentenceJson/);
 assert.doesNotMatch(backend.match(/async function regenerateDeterministicPassage[\s\S]*?async function savePassageCanonical/)[0],/geminiSentenceJson/);
+const studioUi=readFileSync(new URL('../ready/admin/studio-ui.js',import.meta.url),'utf8');
+assert.match(studioUi,/\['blank_pair','verb_form','grammar_choice'\]/,'English and Korean blank review must share one UI step');
+assert.match(studioUi,/if\(PURE\.includes\(step\)\)[\s\S]*studio_preview/,'AUTO chips must open Student Preview directly');
+assert.match(studioUi,/workbookWritingHtml/,'Writing Preview must reuse the production writing component');
+assert.doesNotMatch(studioUi,/PURE\.includes\(step\)\?['"]<p class="empty"/,'AUTO must not show an intermediate explanation screen');
+assert.match(backend,/for\(let offset=0;offset<needed\.length;offset\+=8\)/,'Gemini authoring must use bounded batches');
 console.log('READY Studio: real September batch, spans, confirmations, dirty scope, stable keys and AI boundaries passed.');
 
 const {selectToken}=await import('../ready/admin/studio-selection.js');
