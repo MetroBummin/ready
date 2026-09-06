@@ -21,6 +21,9 @@ assert.ok(catalog.stages.every(s=>s.items.length===3));assert.ok(!JSON.stringify
 const changed=structuredClone(rows);changed[2].text+=' Today.';
 const dirty=syncAnnotations(changed,annotations);assert.deepEqual(dirty['sentence-1'],annotations['sentence-1']);assert.deepEqual(dirtyRows(changed,dirty).map(r=>r.id),['sentence-2']);
 assert.throws(()=>compileStudio({rows:changed,annotations:dirty,title:'Fixture',workbookKey:'fixture',requireConfirmed:true}));
+const stageAnnotations=structuredClone(dirty);stageAnnotations['sentence-2'].steps.english_blank.status='confirmed';
+const stagePublish=compileStudio({rows:changed,annotations:stageAnnotations,title:'Fixture',workbookKey:'fixture',previousCatalog:catalog,revision:2,requireConfirmed:true,publishStep:'english_blank'});
+assert.deepEqual(stagePublish.stages.find(stage=>stage.semanticType==='korean_blank').items,catalog.stages.find(stage=>stage.semanticType==='korean_blank').items,'publishing one stage must preserve other authored stages');
 const partial=compileStudio({rows:changed,annotations:dirty,title:'Fixture',workbookKey:'fixture',previousCatalog:catalog,revision:2});
 assert.equal(partial.stages[0].items.length,2);assert.deepEqual(partial.stages[2].items[0],catalog.stages[2].items[0]);
 assert.equal(partial.stages[2].items[1].key,catalog.stages[2].items[1].key);
