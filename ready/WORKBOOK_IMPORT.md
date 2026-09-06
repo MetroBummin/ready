@@ -31,13 +31,14 @@ source, prompt, reason을 남긴다. 현재 학생 학습 범위는 2~9단계이
 
 ## Workbook Factory input
 
-Admin Factory는 다음 입력을 같은 canonical sentence review 단계로 모은다.
+Admin Factory의 공식 입력은 다음 두 가지뿐이며, 둘 다 게시 전에 Passage Editor의
+`Passage Draft` 단계로 모인다.
 
 - 텍스트층이 있는 전체 Workbook PDF
 - 영문 본문과 출판사 해석이 함께 있는 PDF
-- 영문/우리말 교대 텍스트
 - `English<TAB>Korean` 두 열 TSV
-- 영문만 있는 본문 텍스트(출판사 해석이 없음을 명시하고 review에서 멈춤)
+
+CSV/HWP/DOCX, 교대 줄 텍스트, 영문-only paste는 공식 입력이 아니다.
 
 Factory에는 두 target mode가 있다.
 
@@ -53,36 +54,30 @@ Factory에는 두 target mode가 있다.
 5·6·7단계 coverage가 불완전하면 기존 catalog를 유지한 채 재생성을 중단한다. code-backed workbook은
 이 경로에서도 변경할 수 없다.
 
-`existing_passage` review의 문장쌍은 읽기 전용이다. Factory 시작 후 canonical rows가 바뀌면
-스냅샷 검증을 실패시키고 새 작업을 요구한다. 최종 validator를 통과한 catalog만 기존
-`passage_id`로 insert하며, `ready_workbook_catalogs.passage_id` 기본키가 동시 중복도 막는다.
+게시된 Passage도 Passage Editor에서 계속 수정한다. TITLE/SUBTITLE/SENTENCE와 문단 번호는
+구조 metadata이며 TITLE/SUBTITLE은 Workbook item이 아니다. 기존 row는 id를 유지하고,
+삭제한 row는 historical FK 보존을 위해 inactive로 남긴다. 저장하면 canonical revision을
+올리고 `translation`, `word_order`, `writing` deterministic core를 자동 생성·검증한 뒤
+catalog를 원자 교체한다. 실패 시 canonical 수정은 남고 이전 정상 catalog는 유지된다.
+AI 호출은 발생하지 않으며 AI artifact는 `재생성 필요` 상태만 된다.
 
-Factory Stage 5·6은 canonical 문장별 coverage를 계산하고, 출판사 source에서 검증된 문항이
-없는 sentence만 Gemini fallback 대상으로 보낸다. PDF source의 5단계는 괄호별 hint와
-Answer Key의 slash별 answer를 source of truth로 사용하며, 페이지 경계를 넘어간 답도 이어서
-읽는다. 영어 표면형의 접미사만 보고 동사를 추측하는 fallback은 사용하지 않는다. Stage 7의 출판사 passage/range 문항은
-여러 correction pair를 하나의 exercise로 보존하며, source가 전혀 없을 때만 문장별 fallback을
-사용한다. 최종 5·6·7 coverage가 기대 수량보다 적으면 바로 게시하지 않고 Admin 확인을 요구한다.
-Stage 8의 generated order bank는 한 영어 단어당 chip 하나를 사용한다.
+generator 코드가 바뀌면 Admin의 지문별 또는 전체 deterministic 재생성을 사용한다. 각 Passage는
+독립적으로 검증·교체되며 AI 전체 재생성 경로는 존재하지 않는다. `npm run workbook:check`는
+DB/AI/publish 없이 동일 generator의 contract만 검사한다.
 
-7단계 Answer Key가 밑줄 친 전체 절을 반복하더라도 학생 응답 contract에는 실제로 달라진
-최소 표현만 저장한다. 원문 왕복 검증에는 출판사 전체 표현 snapshot을 별도로 사용한다.
-Gemini fallback 뒤에도 5·6·7단계가 비면 추측 문항을 만들지 않고 불완전 상태로 보고한다.
-재생성은 기존 PDF/source exercise를 우선 재사용하고, 검증하지 못한 exercise는 INVALID로 남긴다.
-PDF에서 추출한 전체 `sourceExercises`는 Factory job에만 보존한다. catalog provenance에는
-문서 해시·파일명·추출 수량 등 재현에 필요한 요약만 남겨 원본을 중복 저장하지 않는다.
-Edge 재생성은 자원 한도 안에서 끝나도록 단계별 최대 6문장의 Gemini batch를 한 차례만
-실행하고, 그 후 남은 6·7단계를 위 검증 절차로 채운다. 전체 문장 수와 관계없이 Gemini
-호출은 5·6·7단계 각 1회, 최대 3회로 제한된다.
+Full PDF의 publisher exercise는 Answer Key와 canonical round-trip이 검증된 경우에만 별도
+source exercise로 보존한다. PDF의 괄호, slash, correction span, printed stage 번호를 근거로
+canonical 문장을 다시 추측하지 않는다. 검증하지 못한 exercise는 INVALID로 남기며 AI로
+채우지 않는다. PDF에서 추출한 전체 `sourceExercises`는 Factory job에만 보존하고 catalog
+provenance에는 문서 해시·파일명·추출 수량 등 재현에 필요한 요약만 둔다.
 
 PDF는 PDF.js의 표준 Unicode text layer로 읽고 페이지 표지만 보존한다. 출판사명, 파일명,
 페이지 좌표, 폰트명 또는 임의 x 좌표로 열을 추측하지 않는다. 스캔 PDF나 손상된 문자맵은
 조용히 일부만 수용하지 않고 review/unsupported로 멈춘다.
 
 전체 Workbook에서 번호가 일치하는 2단계 영문과 3단계 우리말을 canonical pair로 만들고,
-5·6·7단계는 출판사 문제와 Answer Key의 같은 번호를 연결한다. 원문을 복원하는 round-trip이
-성공한 source exercise를 먼저 재사용하며, 부족한 번호만 한 번의 구조화 배치 생성 대상으로
-보낸다. 2·3·4·8·9단계는 검토가 끝난 canonical pair에서 결정론적으로 생성한다.
+출판사 문제와 Answer Key는 같은 source identity로 연결한다. 원문을 복원하는 round-trip이
+성공한 source exercise만 재사용하며, 부족한 source exercise를 AI나 추측으로 채우지 않는다.
 
 Factory는 문장쌍이나 정답 연결이 불완전한 상태에서 일부 catalog를 publish하지 않는다.
 각 exercise validator 실패만 INVALID로 남기며, 기존 학생 Attempt/Review 데이터는 append-only
