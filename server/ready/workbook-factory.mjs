@@ -62,19 +62,19 @@ export function semanticWorkbookType(label) {
 }
 
 function sentenceLines(text) {
-  return clean(text, 80_000).split(/\r?\n/).map(line => clean(line.replace(/^\s*(?:\d+[.)]|[-•])\s*/, ''))).filter(Boolean);
+  return clean(text, 1_000_000).split(/\r?\n/).map(line => clean(line.replace(/^\s*(?:\d+[.)]|[-•])\s*/, ''))).filter(Boolean);
 }
 function isEnglish(line) { return words(line).length >= 2 && !/[가-힣]/.test(line); }
 function isKorean(line) { return /[가-힣]/.test(line) && koWords(line).length >= 1; }
 function englishSentences(text) {
-  return clean(text, 80_000).replace(/\r?\n+/g, ' ').match(/[^.!?]+(?:[.!?]+|$)/g)?.map(value => clean(value)).filter(isEnglish) || [];
+  return clean(text, 1_000_000).replace(/\r?\n+/g, ' ').match(/[^.!?]+(?:[.!?]+|$)/g)?.map(value => clean(value)).filter(isEnglish) || [];
 }
 function koreanSentences(text) {
-  return clean(text, 80_000).replace(/\r?\n+/g, ' ').match(/[^.!?。]+(?:[.!?。]+|$)/g)?.map(value => clean(value)).filter(isKorean) || [];
+  return clean(text, 1_000_000).replace(/\r?\n+/g, ' ').match(/[^.!?。]+(?:[.!?。]+|$)/g)?.map(value => clean(value)).filter(isKorean) || [];
 }
 
 export function extractSentenceRows(text) {
-  const rawLines = clean(text, 80_000).split(/\r?\n/).map(line => line.trim()).filter(Boolean);
+  const rawLines = clean(text, 1_000_000).split(/\r?\n/).map(line => line.trim()).filter(Boolean);
   const tsvLines = rawLines.filter(line => line.includes('\t'));
   if (tsvLines.length) {
     if (tsvLines.length !== rawLines.length) return { rows: [], needsTranslation: false, pairing: 'invalid_mixed_tsv' };
@@ -95,7 +95,7 @@ export function extractSentenceRows(text) {
 }
 
 function pageBlocks(text) {
-  const lines = clean(text, 80_000).split(/\r?\n/).map(line => clean(line)).filter(Boolean), blocks = [], headings = [];
+  const lines = clean(text, 1_000_000).split(/\r?\n/).map(line => clean(line)).filter(Boolean), blocks = [], headings = [];
   let current = { title: '', body: [], page: 1 };
   for (const line of lines) {
     const page = line.match(/^\[?page\s*(\d+)\]?$/i);
@@ -121,7 +121,7 @@ function numberedPairs(lines) {
 }
 
 function workbookStagePages(text, stage) {
-  return clean(text, 80_000).split(/(?=\[PAGE\s+\d+\])/i).filter(page => !/Answer\s*Key/i.test(page) && new RegExp(`워크북\\s*${stage}(?:\\D|$)`).test(page));
+  return clean(text, 1_000_000).split(/(?=\[PAGE\s+\d+\])/i).filter(page => !/Answer\s*Key/i.test(page) && new RegExp(`워크북\\s*${stage}(?:\\D|$)`).test(page));
 }
 function parsedPairedNumberedRows(text, stage) {
   const value = workbookStagePages(text, stage).join('\n'), starts = [...value.matchAll(/(?:^|\n)(\d+)\.\s*/g)], rows = [];
@@ -382,7 +382,7 @@ export function inspectFullWorkbookText(text, expectedRows = null) {
   const translationBlocks = blocks.filter(block => semanticWorkbookType(block.title) === 'translation');
   const candidate = translationBlocks.flatMap(block => numberedPairs(block.body));
   const stageFourPairs = candidate.filter(item => isEnglish(item.prompt) && isKorean(item.answer)).map(item => ({ text: item.prompt, translation: item.answer }));
-  const prose = clean(text, 80_000).split(/\r?\n/).filter(line => !/^\s*\d+[.)]/.test(line) && semanticWorkbookType(line) === 'unknown' && !/answer\s*key|정답\s*(및|표|해설)?/i.test(line)).join('\n');
+  const prose = clean(text, 1_000_000).split(/\r?\n/).filter(line => !/^\s*\d+[.)]/.test(line) && semanticWorkbookType(line) === 'unknown' && !/answer\s*key|정답\s*(및|표|해설)?/i.test(line)).join('\n');
   const extracted = extractSentenceRows(prose), canonicalSelection = chooseCanonicalWorkbookRows(text, expectedRows), canonicalRows = canonicalSelection.rows, rows = canonicalRows.length ? canonicalRows : stageFourPairs.length ? stageFourPairs : extracted.rows;
   const inlineExercises = blocks.flatMap(block => numberedPairs(block.body).map(item => ({ ...item, type: semanticWorkbookType(block.title), page: block.page, label: block.title, provenance: { origin: 'publisher_answer_key', sourceWorkbookNumber: Number(block.title.match(/(?:workbook|stage|워크북)\s*(\d+)/i)?.[1]) || null } }))), publisherExercises = canonicalRows.length ? publisherGrammarExercises(text, rows) : [], publisherStages = new Set(publisherExercises.map(item => readyStageForSemanticType(item.type)).filter(Boolean)), exercises = [...publisherExercises, ...inlineExercises.filter(item => { const stage = readyStageForSemanticType(item.type); return stage && !publisherStages.has(stage); })], answeredExercises = exercises.filter(item => clean(item.answer) || (Array.isArray(item.answers) && item.answers.length));
   const sectionAmbiguous = !Array.isArray(expectedRows) && canonicalSelection.candidateCount > 1;
@@ -407,7 +407,7 @@ function factoryKey(prefix, stage, number) { return `${prefix}-s${stage}-${Strin
 function canonicalItemKey(prefix, stage, row, number, previousCatalog) {
   const sentenceId = clean(row?.id, 80);
   const previous = previousCatalog?.stages?.flatMap(candidate => candidate.items || []).find(candidate =>
-    Number(candidate.stage) === stage && (sentenceId && candidate.provenance?.canonicalSentenceId === sentenceId || Number(candidate.number) === number));
+    Number(candidate.stage) === stage && (sentenceId && candidate.provenance?.canonicalSentenceId === sentenceId || !candidate.provenance?.canonicalSentenceId && Number(candidate.number) === number));
   if (previous?.key) return clean(previous.key, 120);
   return sentenceId ? `${prefix}-s${stage}-${sentenceId.replace(/[^a-z0-9]/gi, '').slice(-12)}` : factoryKey(prefix, stage, number);
 }
@@ -540,12 +540,16 @@ export function generatePassageDeterministicCatalog({ title, workbookKey, rows, 
   if (!canonical.length || canonical.some(row => !row.text || !row.translation)) throw new Error('Canonical SENTENCE English/Korean pairs are required.');
   const generated = new Map([[3, []], [6, []], [7, []]]), drops = [];
   for (const row of canonical) {
-    const shared = { origin: 'canonical_passage', canonicalSentenceId: clean(row.id, 80) || null, canonicalRevision: Number(provenance.canonicalRevision) || null };
+    const shared = { snapshot: JSON.stringify([row.text,row.translation]), generator: 'passage-core-v2', origin: 'canonical_passage', canonicalSentenceId: clean(row.id, 80) || null, canonicalRevision: Number(provenance.canonicalRevision) || null };
     generated.get(3).push(item(3, row.index, canonicalItemKey(prefix, 3, row, row.index, previousCatalog), { kind: 'translation_input', semanticType: 'translation', source: row.text, prompt: '우리말 해석을 입력하세요.', answers: [row.translation], provenance: shared }));
     const tokens = orderTokens(row.text), shuffled = factoryOrderBank(tokens, `${prefix}:${row.id || row.index}:word-order`);
     if (shuffled.length) generated.get(6).push(item(6, row.index, canonicalItemKey(prefix, 6, row, row.index, previousCatalog), { kind: 'reorder_groups', semanticType: 'word_order', source: row.translation, prompt: '⟦ORDER:0⟧.', groups: [shuffled], answers: [tokens.join(' ').toLowerCase()], canonicalStart: row.index, canonicalEnd: row.index, provenance: shared }));
     else drops.push({ stage: 6, number: row.index, reason: 'stage6_word_order' });
     generated.get(7).push(item(7, row.index, canonicalItemKey(prefix, 7, row, row.index, previousCatalog), { kind: 'full_sentence_input', semanticType: 'writing', source: row.translation, prompt: '', answers: [row.text], canonicalStart: row.index, canonicalEnd: row.index, provenance: shared }));
+  }
+  for(const stage of [3,6,7])for(let index=0;index<generated.get(stage).length;index++){
+    const next=generated.get(stage)[index],prior=previousCatalog?.stages?.find(s=>Number(s.stage)===stage)?.items?.find(item=>item.key===next.key);
+    if(prior?.provenance?.generator==='passage-core-v2'&&prior.provenance.snapshot===next.provenance.snapshot&&prior.number===next.number)generated.get(stage)[index]=structuredClone(prior);
   }
   const rowByNumber = new Map(canonical.map(row => [row.index, row]));
   for (const stage of [3, 6, 7]) for (const candidate of generated.get(stage)) {

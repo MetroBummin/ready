@@ -5,7 +5,7 @@ import { fileURLToPath } from 'node:url';
 
 const root=resolve(dirname(fileURLToPath(import.meta.url)),'..');
 const read=path=>readFileSync(resolve(root,path),'utf8');
-const admin=read('ready/admin/app.js');
+const admin=read('ready/admin/app.js')+'\n'+read('ready/admin/studio-ui.js');
 const student=read('ready/app.js');
 const dormantAdmin=read('ready/dormant/questions/admin-runtime.js');
 const dormantStudent=read('ready/dormant/questions/student-runtime.js');
@@ -24,7 +24,7 @@ const objectiveFallback=read('tools/ready-structure-objective-fallback-with-code
 const pipelineValidator=read('tools/ready-validate-pipeline.mjs');
 const shortsMigration=read('supabase/migrations/20260831113000_ready_shorts_bookmarks_ai_grading.sql');
 
-const operationPattern=/(?:call|readyApi|record)\(['"]([a-z_]+)['"]/g;
+const operationPattern=/(?:call|readyApi|record|api|action)\(['"]([a-z_]+)['"]/g;
 const activeClientOps=new Set([...admin.matchAll(operationPattern),...student.matchAll(operationPattern)].map(match=>match[1]));
 const clientOps=new Set([...admin.matchAll(operationPattern),...student.matchAll(operationPattern),...dormantAdmin.matchAll(operationPattern),...dormantStudent.matchAll(operationPattern)].map(match=>match[1]));
 const serverOps=new Set([...edge.matchAll(/case "([a-z_]+)"/g)].map(match=>match[1]));
