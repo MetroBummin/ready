@@ -12,7 +12,8 @@ assert.match(edge,/item\.semanticType === "writing" \|\| Number\(item\.stage\) =
 assert.doesNotMatch(app,/readyApi\('workbook_assistance'|readyApi\('workbook_recall_unlock'/,'A Workbook interaction must not fetch assistance or recall answers');
 assert.match(app,/function workbookSubmitHtml\(session,item,result\)\{if\(result\)return'';/,'All unanswered Workbook stages must expose the explicit submit button');
 assert.doesNotMatch(app,/function workbookSubmitHtml[^\n]*recall_unlock/,'Recall stages must use the same submit lifecycle as every other stage');
-assert.doesNotMatch(app,/async function handleWorkbookRecallInput[\s\S]{0,1600}submitWorkbook\(\)/,'Recall completion must enable submit without submitting automatically');
+assert.doesNotMatch(app,/async function handleWorkbookRecallInput[\s\S]{0,1600}submitWorkbook\(\)/,'Recall completion must wait for explicit submit');
+assert.doesNotMatch(app,/function workbookSubmitHtml[^\n]*disabled/,'Incomplete deterministic responses must remain submittable');
 assert.match(app,/function queueWorkbookAttempt[\s\S]{0,400}setTimeout\(\(\)=>flushWorkbookAttempts\(\),180\)/,'Attempts must batch outside the interaction path');
 assert.match(app,/submit_workbook_attempts/,'Attempt persistence must use the batch endpoint');
 assert.match(app,/pagehide[\s\S]{0,160}keepalive:true/,'Pending attempts must flush when the page leaves');

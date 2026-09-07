@@ -1329,6 +1329,8 @@ async function studentWorkbook(body: any, session: ReadySession) {
   if (!catalog) throw new ApiError(404, "이 지문에는 아직 READY 워크북이 없습니다.");
   const attempts = rows<any[]>(await db.from("ready_workbook_attempts").select("item_key,correct,created_at").eq("student_id", student.id).eq("exam_id", examId).eq("passage_id", passageId).eq("workbook_key", catalog.workbookKey).order("created_at", { ascending: false }));
   const bookmarkRows = rows<any[]>(await db.from("ready_workbook_bookmarks").select("item_key").eq("student_id", student.id).eq("exam_id", examId).eq("passage_id", passageId).eq("workbook_key", catalog.workbookKey)), bookmarks = new Set(bookmarkRows.map(row => row.item_key));
+  const progressRows = rows<any[]>(await db.from("ready_workbook_stage_progress").select("progress_key,correct_clears").eq("student_id", student.id).eq("exam_id", examId).eq("passage_id", passageId).eq("workbook_key", catalog.workbookKey).eq("stage_contract_version", catalog.contractVersion || "legacy-v1"));
+  const progress = new Map(progressRows.map(row => [row.progress_key, Number(row.correct_clears) || 0]));
   const latest = new Map<string, boolean>();
   for (const attempt of attempts) if (!latest.has(attempt.item_key)) latest.set(attempt.item_key, attempt.correct === true);
   const semanticCatalog = catalog.contractVersion === SEMANTIC_WORKBOOK_CONTRACT;
@@ -1338,6 +1340,8 @@ async function studentWorkbook(body: any, session: ReadySession) {
     total: stage.items.length,
     attempted: stage.items.filter((item: any) => latest.has(item.key)).length,
     completed: stage.items.filter((item: any) => latest.get(item.key) === true).length,
+    correctClears: progress.get(stage.semanticType || `stage:${stage.stage}`) || 0,
+    progressPercent: stage.items.length ? Math.floor(((progress.get(stage.semanticType || `stage:${stage.stage}`) || 0) * 100) / stage.items.length) : 0,
     items: await Promise.all(stage.items.map(async (item: any) => ({
       key: item.key, stage: item.stage, semanticType: clean(item.semanticType, 40), number: item.number, kind: item.kind || "blank_input",
       source: item.source, prompt: item.prompt, slotCount: item.answers.length,
@@ -1346,7 +1350,7 @@ async function studentWorkbook(body: any, session: ReadySession) {
       wordBank: Array.isArray(item.wordBank) ? item.wordBank : [],
       pairCount: Number(item.pairCount) || 0, subtype: clean(item.subtype, 40),
       assistance: await publicWorkbookAssistance(item, sha256Hex),
-      grading: item.kind === "translation_ai"
+      grading: item.kind === "translation_ai" || item.semanticType === "translation"
         ? { mode: "ai" }
         : { mode: "deterministic", kind: item.kind === "correction_pairs" ? "correction_pairs" : "exact", answers: item.answers },
       completed: latest.get(item.key) === true, lastResult: latest.get(item.key) ?? null, bookmarked: bookmarks.has(item.key),
@@ -1410,10 +1414,9 @@ async function submitWorkbookAttempt(body: any, session: ReadySession) {
   const passage = await studentPassageAccess(examId, passageId, student), catalog = await workbookForPassage(passage), item = workbookItem(catalog, itemKey);
   if (!catalog || !item) throw new ApiError(404, "현재 풀 수 없는 워크북 문제입니다.");
   const revealedAnswer = body.revealAnswer === true, rawResponses = Array.isArray(body.responses) ? body.responses : [];
-  const responses = revealedAnswer ? Array.from({ length: item.answers.length }, (_, index) => clean(rawResponses[index], 1_000)) : cleanList(rawResponses, 80, 1_000);
-  if (!revealedAnswer && responses.length !== item.answers.length) throw new ApiError(400, "모든 빈칸을 입력해 주세요.");
+  const responses = Array.from({ length: item.answers.length }, (_, index) => clean(rawResponses[index], 1_000));
   let slotResults = responses.map((response, index) => !!response && normalizeWorkbookAnswer(response) === normalizeWorkbookAnswer(item.answers[index])), resultAnswers=item.answers, correct = !revealedAnswer && slotResults.every(Boolean), aiFeedback = "", aiFeedbackLines: string[] = [], aiScore: number | null = null, gradingPolicy: string | null = null, aiRequestId: string | null = null;
-  if(item.kind==="correction_pairs"){const pairGrade=gradeWorkbookCorrectionPairs(item.answers,responses,{allowIncomplete:revealedAnswer});if(!pairGrade.valid)throw new ApiError(400,"모든 고침 쌍을 입력해 주세요.");slotResults=pairGrade.slotResults;resultAnswers=pairGrade.alignedAnswers;correct=!revealedAnswer&&pairGrade.correct;}
+  if(item.kind==="correction_pairs"){const pairGrade=gradeWorkbookCorrectionPairs(item.answers,responses,{allowIncomplete:true});if(!pairGrade.valid)throw new ApiError(400,"고침 쌍 형식을 확인해 주세요.");slotResults=pairGrade.slotResults;resultAnswers=pairGrade.alignedAnswers;correct=!revealedAnswer&&pairGrade.correct;}
   let hintCount = 0, usedFullAnswerHint = false, completedAfterHint = false;
   if ((item.semanticType === "writing" || Number(item.stage) === 9) && body.hintReceipt) {
     const hintState = await verifyHintReceipt(body.hintReceipt, { studentId: student.id, examId, passageId, itemKey });
@@ -1423,7 +1426,8 @@ async function submitWorkbookAttempt(body: any, session: ReadySession) {
     completedAfterHint = correct && usedFullAnswerHint;
     if (usedFullAnswerHint) correct = false;
   }
-  if (catalog.contractVersion !== SEMANTIC_WORKBOOK_CONTRACT && item.kind === "translation_ai" && !revealedAnswer) {
+  const semanticTranslation = item.kind === "translation_ai" || item.semanticType === "translation";
+  if (semanticTranslation && !revealedAnswer && responses[0]) {
     const today = new Date(); today.setHours(0, 0, 0, 0);
     const used = await db.from("ready_workbook_ai_grading_requests").select("id", { count: "exact", head: true }).eq("student_id", student.id).gte("created_at", today.toISOString());
     if (used.error) throw new ApiError(500, used.error.message);
@@ -1440,6 +1444,12 @@ async function submitWorkbookAttempt(body: any, session: ReadySession) {
       await db.from("ready_workbook_ai_grading_requests").update({ status: "failed", error_code: error instanceof ApiError ? `http_${error.status}` : "unknown", completed_at: new Date().toISOString() }).eq("id", aiRequestId).eq("status", "pending");
       throw error;
     }
+  } else if (semanticTranslation && !revealedAnswer) {
+    correct = false;
+    slotResults = [false];
+    aiFeedbackLines = ["해석을 입력하지 않아 채점할 수 없습니다."];
+    aiFeedback = aiFeedbackLines[0];
+    gradingPolicy = WORKBOOK_TRANSLATION_GRADING_POLICY.version;
   }
   const clientAttemptId=clean(body.clientAttemptId,36)||null;
   if(clientAttemptId&&!/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(clientAttemptId))throw new ApiError(400,"Workbook 기록 ID를 확인해 주세요.");
@@ -1461,7 +1471,11 @@ async function submitWorkbookAttempt(body: any, session: ReadySession) {
   }
   const bookmark = await db.from("ready_workbook_bookmarks").select("item_key").eq("student_id", student.id).eq("exam_id", examId).eq("passage_id", passageId).eq("workbook_key", catalog.workbookKey).eq("item_key", item.key).maybeSingle();
   if (bookmark.error) throw new ApiError(500, bookmark.error.message);
-  return { attempt: inserted, correct, revealedAnswer, answers: correct ? [] : resultAnswers, slotResults, aiFeedback, aiFeedbackLines, aiScore, gradingPolicy, aiRequestId, hintCount, usedFullAnswerHint, completedAfterHint, bookmarked: !!bookmark.data, reviewCount: (await eligibleReviewQuestionIds(student.id, examId)).length + await workbookReviewCount(student.id, examId) };
+  const stageItems = catalog.stages.find((stage: any) => stage.stage === item.stage)?.items || [], progressKey = item.semanticType || `stage:${item.stage}`;
+  const progressResult = await db.from("ready_workbook_stage_progress").select("correct_clears").eq("student_id", student.id).eq("exam_id", examId).eq("passage_id", passageId).eq("workbook_key", catalog.workbookKey).eq("stage_contract_version", catalog.contractVersion || "legacy-v1").eq("progress_key", progressKey).maybeSingle();
+  if (progressResult.error) throw new ApiError(500, progressResult.error.message);
+  const correctClears = Number(progressResult.data?.correct_clears) || 0, progressPercent = stageItems.length ? Math.floor(correctClears * 100 / stageItems.length) : 0;
+  return { attempt: inserted, correct, revealedAnswer, answers: correct ? [] : resultAnswers, slotResults, aiFeedback, aiFeedbackLines, aiScore, gradingPolicy, aiRequestId, hintCount, usedFullAnswerHint, completedAfterHint, correctClears, progressPercent, bookmarked: !!bookmark.data, reviewCount: (await eligibleReviewQuestionIds(student.id, examId)).length + await workbookReviewCount(student.id, examId) };
 }
 async function submitWorkbookAttempts(body:any,session:ReadySession){
   const attempts=Array.isArray(body.attempts)?body.attempts.slice(0,20):[];

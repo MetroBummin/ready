@@ -32,6 +32,8 @@ Workbook에서는 `translation_ai`만 AI 채점이며 빈칸, 동사형, 어법 
 Question 서술형은 기존 `correct` 기반 semantics를 유지하며 이 점수 정책을 공유하지 않는다.
 # Workbook boundary
 
-Workbook semantic-v2 makes zero model calls during import, generation, runtime
-or grading. Translation uses the publisher/canonical Korean reference and
-deterministic normalization. Question and Reader AI policies are unchanged.
+Workbook semantic-v2 makes zero model calls during import and catalog generation.
+At runtime only the `translation` stage calls the model: the publisher/canonical
+Korean sentence remains the private semantic reference and the student response is
+persisted before inference. Every other Workbook stage is deterministic. Question
+and Reader AI policies are unchanged.
