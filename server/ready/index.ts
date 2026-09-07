@@ -1149,6 +1149,15 @@ async function studentReviewQuestions(body: any, session: ReadySession) {
 async function studentReview(body: any, session: ReadySession) {
   const student = await studentForSession(session), examId = required(body.examId, "Exam", 80);
   await studentExamAccess(examId, student);
+  const kind = clean(body.kind, 20);
+  if (kind === "word") { const wordItems = await wordReviewItems(student.id, examId); return { kind, wordItems, count: wordItems.length }; }
+  if (kind === "workbook") { const workbookItems = await workbookReviewItems(student.id, examId); return { kind, workbookItems, count: workbookItems.length }; }
+  if (kind === "sentence") {
+    const sentenceResult = await db.from("ready_saved_sentences").select("id,source_text_snapshot,translation_snapshot,created_at,passage:ready_passages(title)").eq("student_id", student.id).eq("exam_id", examId).order("created_at", { ascending: false });
+    if (sentenceResult.error) throw new ApiError(500, sentenceResult.error.message);
+    const sentenceItems = rows<any[]>(sentenceResult); return { kind, sentenceItems, count: sentenceItems.length };
+  }
+  if (kind) throw new ApiError(400, "지원하지 않는 Review 유형입니다.");
   const [wordItems, workbookItems, sentenceResult] = await Promise.all([
     wordReviewItems(student.id, examId),
     workbookReviewItems(student.id, examId),

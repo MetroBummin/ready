@@ -4,6 +4,11 @@ export function workbookProgressPercent(correctClears,total){
   return pool?Math.floor(clears*100/pool):0;
 }
 
+export function reconcileWorkbookProgress(currentClears,incomingClears,total){
+  const correctClears=Math.max(0,Math.floor(Number(currentClears)||0),Math.floor(Number(incomingClears)||0));
+  return {correctClears,progressPercent:workbookProgressPercent(correctClears,total)};
+}
+
 export function workbookProgressVisual(value){
   const percent=Math.max(0,Math.floor(Number(value)||0));
   const remainder=percent%100;

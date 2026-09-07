@@ -358,7 +358,7 @@ body[data-ready-mode="student"] #student-reader .reader-inline-sentence{-webkit-
 .workbook-stage-list-head h2{margin:0;font-size:16px;font-weight:720}
 .workbook-stage-list-head small{color:var(--ready-muted);font:650 11px/1 var(--ready-font-mono)}
 .workbook-stage-option{display:flex;width:100%;min-height:74px;align-items:center;justify-content:space-between;gap:var(--ready-space-4);padding:var(--ready-space-3) var(--ready-space-4);border:0;border-bottom:1px solid var(--ready-hairline);border-radius:0;color:var(--ready-ink);background:transparent;text-align:left;cursor:pointer}
-.workbook-stage-option:hover{color:var(--ready-primary);background:var(--ready-canvas-quiet);transform:none}
+@media (hover:hover) and (pointer:fine){.workbook-stage-option:hover{color:var(--ready-primary);background:var(--ready-canvas-quiet);transform:none}}
 .workbook-stage-option:focus-visible{outline-offset:-2px}
 .workbook-stage-option:disabled{color:var(--ready-muted);background:var(--ready-canvas-quiet);cursor:not-allowed;opacity:.72}
 .workbook-stage-copy{display:grid;min-width:0;gap:4px}
@@ -839,9 +839,10 @@ body[data-ready-mode="student"] .reading-passage{font-size:18px;line-height:1.72
   border:1px solid var(--ready-hairline);
   border-radius:18px;
   background:linear-gradient(to right,var(--workbook-progress-fill) 0 var(--workbook-progress),var(--ready-surface) var(--workbook-progress) 100%);
+  -webkit-tap-highlight-color:transparent;
   transition:border-color 160ms ease,box-shadow 160ms ease,background 240ms ease;
 }
-.workbook-stage-option:hover{border-color:var(--ready-hairline-strong);color:var(--ready-ink);box-shadow:var(--ready-shadow-soft)}
+@media (hover:hover) and (pointer:fine){.workbook-stage-option:hover{border-color:var(--ready-hairline-strong);color:var(--ready-ink);box-shadow:var(--ready-shadow-soft)}}
 .workbook-stage-option:disabled{border-color:transparent;border-radius:18px;background:var(--ready-surface)}
 .workbook-stage-option.progress-cycle-2,.workbook-milestone.progress-cycle-2{--workbook-progress-color:#df9229}
 .workbook-stage-option.progress-cycle-3,.workbook-milestone.progress-cycle-3{--workbook-progress-color:#e87831}
@@ -889,6 +890,7 @@ body[data-ready-mode] .word-review-tab{min-height:42px;padding:0 14px;border-rad
 .word-review-tab::after{display:none}
 .word-review-tab[aria-current="page"],.word-review-tab.is-active{color:var(--ready-on-action);background:var(--ready-action)}
 .word-review-list,.review-sentence-list,.review-workbook-list{display:grid;gap:10px;margin-top:14px}
+.review-panel-loading{display:grid;min-height:180px;place-items:center;color:var(--ready-muted);font-size:13px}
 .word-review-item,.review-sentence-list article,.review-workbook-list button{border:1px solid var(--ready-hairline);border-radius:18px;background:var(--ready-surface)}
 .word-review-summary{min-height:82px;padding:14px 18px}
 .word-review-detail{margin:0 18px 18px;padding:16px;border:0;border-radius:16px;background:var(--ready-canvas)}
