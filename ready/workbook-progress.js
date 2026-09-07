@@ -10,6 +10,15 @@ export function workbookProgressVisual(value){
   return {
     percent,
     fill:percent>0&&remainder===0?100:remainder,
-    cycle:percent<=100?1:percent<=200?2:percent<=300?3:percent<=500?4:5,
+    cycle:percent<=100?1:percent<=200?2:percent<=300?3:percent<=400?4:percent<=500?5:6,
   };
+}
+
+export function workbookCycleMilestone(previousClears,nextClears,total){
+  const pool=Math.max(0,Math.floor(Number(total)||0));
+  if(!pool)return 0;
+  const previous=Math.max(0,Math.floor(Number(previousClears)||0));
+  const next=Math.max(previous,Math.floor(Number(nextClears)||0));
+  const previousCycle=Math.floor(previous/pool),nextCycle=Math.floor(next/pool);
+  return nextCycle>previousCycle?nextCycle*100:0;
 }
