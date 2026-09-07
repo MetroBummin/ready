@@ -36,9 +36,18 @@ const mismatch=await livePrefixState(prefix+'Z',writing.assistance.slots[0]);ass
 assert.equal((await livePrefixState(answer,writing.assistance.slots[0])).complete,true);
 
 const item=catalog.stages[1].items[0];
-await call('submit_workbook_attempt',{examId:exam,passageId,itemKey:item.key,responses:item.answers},token);
+let progress=await call('submit_workbook_attempt',{examId:exam,passageId,itemKey:item.key,responses:item.answers.map(()=> '__wrong__')},token);
+assert.equal(progress.correct,false);assert.equal(progress.correctClears,0,'a wrong attempt must not advance the cycle');
+progress=await call('submit_workbook_attempt',{examId:exam,passageId,itemKey:item.key,responses:item.answers},token);
+assert.equal(progress.correctClears,1);
+for(let repeat=0;repeat<4;repeat++)progress=await call('submit_workbook_attempt',{examId:exam,passageId,itemKey:item.key,responses:item.answers},token);
+assert.equal(progress.correctClears,1,'repeated correct attempts for one item must count once in the current cycle');
+for(const remaining of catalog.stages[1].items.slice(1))progress=await call('submit_workbook_attempt',{examId:exam,passageId,itemKey:remaining.key,responses:remaining.answers},token);
+assert.equal(progress.progressPercent,100);assert.equal(progress.completedCycles,1);assert.deepEqual(progress.currentCycleClears,[]);
+for(const nextCycleItem of catalog.stages[1].items)progress=await call('submit_workbook_attempt',{examId:exam,passageId,itemKey:nextCycleItem.key,responses:nextCycleItem.answers},token);
+assert.equal(progress.progressPercent,200);assert.equal(progress.completedCycles,2);assert.deepEqual(progress.currentCycleClears,[]);
 const attemptBefore=(await pg.query('select * from ready_workbook_attempts')).rows;
-assert.equal(attemptBefore.length,1);
+assert.equal(attemptBefore.length,5+catalog.stages[1].items.length*2);
 const edited=structuredClone(context.rows);edited[3].text+=' Today.';
 await call('save_passage_canonical',{passageId,title:context.passage.title,sourceType:'MOCK_EXAM',grade:'2학년',sourceYear:2026,sourceMonth:9,rows:edited},admin);
 context=await call('studio_open',{passageId},admin);
@@ -48,7 +57,7 @@ await assert.rejects(()=>callContext('studio_publish'));
 result=await callContext('studio_author');context.studio=result.studio;assert.deepEqual(aiCalls[2],[edited[3].id]);
 for(const step of ['english_blank','korean_blank','verb_form','grammar_choice']){result=await callContext('studio_confirm_step',{sentenceId:edited[3].id,step,targets:context.studio.annotations[edited[3].id].steps[step].targets});context.studio=result.studio;}
 await callContext('studio_publish');assert.deepEqual((await pg.query('select * from ready_workbook_attempts')).rows,attemptBefore);
-workbook=await call('student_workbook',{examId:exam,passageId},token);assert.equal(workbook.stages.find(s=>s.stage===2).attempted,1);
+workbook=await call('student_workbook',{examId:exam,passageId},token);assert.equal(workbook.stages.find(s=>s.stage===2).attempted,catalog.stages[1].items.length);assert.equal(workbook.stages.find(s=>s.stage===2).progressPercent,200);
 assert.equal((await pg.query('select * from ready_workbook_catalogs')).rows.length,1);assert.equal(aiCalls.length,3);
 // Boundary merge keeps both publisher sources and rejects cross-document merges.
 const mergeDrafts=[];

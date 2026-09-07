@@ -3,7 +3,7 @@ import { livePrefixState, normalizedPrefixSteps, sha256Browser } from './workboo
 const escapeHtml=value=>String(value??'').replace(/[&<>'"]/g,char=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[char]));
 
 export function workbookWritingHtml({value='',disabled=false,visibleAnswer='',liveState=null}={}){
-  return `${visibleAnswer?`<p class="workbook-writing-hint" role="status"><strong>5초 힌트</strong><span>${escapeHtml(visibleAnswer)}</span></p>`:''}<label class="workbook-translation workbook-writing${liveState?.valid===false?' live-mismatch':''}"><span>영어 문장 전체</span><textarea rows="4" data-workbook-slot="0" data-workbook-live-prefix="true" ${disabled?'disabled':''} placeholder="영어 문장 전체를 입력하세요" autocapitalize="sentences" spellcheck="false">${escapeHtml(value)}</textarea>${liveState?.valid===false?`<small class="workbook-live-copy"><span>${escapeHtml(value.slice(0,liveState.mismatchIndex))}</span><b>${escapeHtml(value.slice(liveState.mismatchIndex))}</b></small>`:''}</label>`;
+  return `${visibleAnswer?`<p class="workbook-writing-hint" role="status"><strong>5초 힌트</strong><span>${escapeHtml(visibleAnswer)}</span></p>`:''}<label class="workbook-translation workbook-writing${liveState?.valid===false?' live-mismatch':''}"><span>영어 문장 전체</span><textarea rows="4" data-workbook-slot="0" data-workbook-live-prefix="true" enterkeyhint="done" ${disabled?'disabled':''} placeholder="영어 문장 전체를 입력하세요" autocapitalize="sentences" spellcheck="false">${escapeHtml(value)}</textarea>${liveState?.valid===false?`<small class="workbook-live-copy"><span>${escapeHtml(value.slice(0,liveState.mismatchIndex))}</span><b>${escapeHtml(value.slice(liveState.mismatchIndex))}</b></small>`:''}</label>`;
 }
 
 export function renderWritingPrefixState(input,value,state){

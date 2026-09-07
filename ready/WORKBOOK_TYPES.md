@@ -47,6 +47,7 @@ mixed Check는 현재 학습 범위 밖으로 원본만 보존한다.
 - 한국어·영어 recall은 메모리의 계약으로 첫 음절/글자가 맞는 즉시 전체 slot을 완성하며, slot별 서버 해제 요청을 사용하지 않는다.
 - semantic `writing`은 같은 catalog에 포함된 prefix 계약으로 실시간 오류를 표시하고, 명시적으로 요청한 전체답 힌트만 서버 receipt를 받는다.
 - deterministic 결과는 먼저 기기에서 표시한다. Attempt 저장과 Review/progress 동기화는 로컬 영속 queue에서 background batch로 처리하고 서버는 같은 규칙으로 다시 검증한다.
+- 단계 진도는 current cycle의 `item_key`별 최초 정답만 센다. 모든 item을 한 번씩 clear하면 100% cycle을 닫고 빈 unique set으로 다음 cycle을 시작한다. 같은 cycle의 중복 정답과 오답은 진도를 올리지 않는다.
 - 2·3단계의 미세 오타는 Attempt가 아니며, 모든 slot recall 완료 시 한 번만 append한다.
 - semantic `writing`의 전체답 힌트는 제출을 막지 않지만 해당 Attempt를 오답으로 기록하고 Review에 남긴다.
 - 해석 AI는 새로운 정답을 만들지 않고 비공개 출판사 해석과 의미만 비교한다.

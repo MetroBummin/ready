@@ -1338,8 +1338,10 @@ async function studentWorkbook(body: any, session: ReadySession) {
   if (!catalog) throw new ApiError(404, "이 지문에는 아직 READY 워크북이 없습니다.");
   const attempts = rows<any[]>(await db.from("ready_workbook_attempts").select("item_key,correct,created_at").eq("student_id", student.id).eq("exam_id", examId).eq("passage_id", passageId).eq("workbook_key", catalog.workbookKey).order("created_at", { ascending: false }));
   const bookmarkRows = rows<any[]>(await db.from("ready_workbook_bookmarks").select("item_key").eq("student_id", student.id).eq("exam_id", examId).eq("passage_id", passageId).eq("workbook_key", catalog.workbookKey)), bookmarks = new Set(bookmarkRows.map(row => row.item_key));
-  const progressRows = rows<any[]>(await db.from("ready_workbook_stage_progress").select("progress_key,correct_clears").eq("student_id", student.id).eq("exam_id", examId).eq("passage_id", passageId).eq("workbook_key", catalog.workbookKey).eq("stage_contract_version", catalog.contractVersion || "legacy-v1"));
-  const progress = new Map(progressRows.map(row => [row.progress_key, Number(row.correct_clears) || 0]));
+  const progressRows = rows<any[]>(await db.from("ready_workbook_stage_progress").select("progress_key,correct_clears,completed_cycles,current_cycle").eq("student_id", student.id).eq("exam_id", examId).eq("passage_id", passageId).eq("workbook_key", catalog.workbookKey).eq("stage_contract_version", catalog.contractVersion || "legacy-v1"));
+  const cycleClearRows = rows<any[]>(await db.from("ready_workbook_cycle_item_clears").select("progress_key,cycle_number,item_key").eq("student_id", student.id).eq("exam_id", examId).eq("passage_id", passageId).eq("workbook_key", catalog.workbookKey).eq("stage_contract_version", catalog.contractVersion || "legacy-v1"));
+  const progress = new Map(progressRows.map(row => [row.progress_key, row])), currentCycleClears = new Map<string, Set<string>>();
+  for (const clear of cycleClearRows) { const row = progress.get(clear.progress_key); if (row && Number(clear.cycle_number) === (Number(row.current_cycle) || 1)) { const keys = currentCycleClears.get(clear.progress_key) || new Set<string>(); keys.add(clear.item_key); currentCycleClears.set(clear.progress_key, keys); } }
   const latest = new Map<string, boolean>();
   for (const attempt of attempts) if (!latest.has(attempt.item_key)) latest.set(attempt.item_key, attempt.correct === true);
   const semanticCatalog = catalog.contractVersion === SEMANTIC_WORKBOOK_CONTRACT;
@@ -1348,9 +1350,12 @@ async function studentWorkbook(body: any, session: ReadySession) {
     locked: false, lockReason: "",
     total: stage.items.length,
     attempted: stage.items.filter((item: any) => latest.has(item.key)).length,
-    completed: stage.items.filter((item: any) => latest.get(item.key) === true).length,
-    correctClears: progress.get(stage.semanticType || `stage:${stage.stage}`) || 0,
-    progressPercent: stage.items.length ? Math.floor(((progress.get(stage.semanticType || `stage:${stage.stage}`) || 0) * 100) / stage.items.length) : 0,
+    completed: currentCycleClears.get(stage.semanticType || `stage:${stage.stage}`)?.size || 0,
+    completedCycles: Number(progress.get(stage.semanticType || `stage:${stage.stage}`)?.completed_cycles) || 0,
+    currentCycle: Number(progress.get(stage.semanticType || `stage:${stage.stage}`)?.current_cycle) || 1,
+    currentCycleClears: [...(currentCycleClears.get(stage.semanticType || `stage:${stage.stage}`) || [])],
+    correctClears: Number(progress.get(stage.semanticType || `stage:${stage.stage}`)?.correct_clears) || 0,
+    progressPercent: stage.items.length ? Math.floor(((Number(progress.get(stage.semanticType || `stage:${stage.stage}`)?.correct_clears) || 0) * 100) / stage.items.length) : 0,
     items: await Promise.all(stage.items.map(async (item: any) => ({
       key: item.key, stage: item.stage, semanticType: clean(item.semanticType, 40), number: item.number, kind: item.kind || "blank_input",
       source: item.source, prompt: item.prompt, slotCount: item.answers.length,
@@ -1362,7 +1367,7 @@ async function studentWorkbook(body: any, session: ReadySession) {
       grading: item.kind === "translation_ai" || item.semanticType === "translation"
         ? { mode: "ai" }
         : { mode: "deterministic", kind: item.kind === "correction_pairs" ? "correction_pairs" : "exact", answers: item.answers },
-      completed: latest.get(item.key) === true, lastResult: latest.get(item.key) ?? null, bookmarked: bookmarks.has(item.key),
+      completed: currentCycleClears.get(stage.semanticType || `stage:${stage.stage}`)?.has(item.key) === true, lastResult: latest.get(item.key) ?? null, bookmarked: bookmarks.has(item.key),
     }))),
   })));
   const savedWords=await savedWordList(student.id,examId);
@@ -1422,6 +1427,7 @@ async function submitWorkbookAttempt(body: any, session: ReadySession) {
   const student = await studentForSession(session), examId = required(body.examId, "Exam", 80), passageId = required(body.passageId, "지문", 80), itemKey = required(body.itemKey, "워크북 문제", 120);
   const passage = await studentPassageAccess(examId, passageId, student), catalog = await workbookForPassage(passage), item = workbookItem(catalog, itemKey);
   if (!catalog || !item) throw new ApiError(404, "현재 풀 수 없는 워크북 문제입니다.");
+  const stageItems = catalog.stages.find((stage: any) => stage.stage === item.stage)?.items || [];
   const revealedAnswer = body.revealAnswer === true, rawResponses = Array.isArray(body.responses) ? body.responses : [];
   const responses = Array.from({ length: item.answers.length }, (_, index) => clean(rawResponses[index], 1_000));
   let slotResults = responses.map((response, index) => !!response && normalizeWorkbookAnswer(response) === normalizeWorkbookAnswer(item.answers[index])), resultAnswers=item.answers, correct = !revealedAnswer && slotResults.every(Boolean), aiFeedback = "", aiFeedbackLines: string[] = [], aiScore: number | null = null, gradingPolicy: string | null = null, aiRequestId: string | null = null;
@@ -1466,7 +1472,7 @@ async function submitWorkbookAttempt(body: any, session: ReadySession) {
     student_id: student.id, exam_id: examId, passage_id: passageId, workbook_key: catalog.workbookKey,
     item_key: item.key, stage: item.stage, stage_contract_version: catalog.contractVersion || "legacy-v1", semantic_type: item.semanticType || null, response: { responses, revealedAnswer }, correct, ai_grading_request_id: aiRequestId,
     hint_count: hintCount, used_full_answer_hint: usedFullAnswerHint, completed_after_hint: completedAfterHint,
-    passage_revision: Number(passage.canonical_revision) || null, catalog_revision: Number(catalog.source?.canonicalRevision) || null,client_attempt_id:clientAttemptId,
+    passage_revision: Number(passage.canonical_revision) || null, catalog_revision: Number(catalog.source?.canonicalRevision) || null,client_attempt_id:clientAttemptId,stage_item_count:stageItems.length,
   }).select("id,correct,created_at").single();
   let inserted:any;
   if(insertResult.error&&insertResult.error.code==='23505'&&clientAttemptId)inserted=rows<any>(await db.from("ready_workbook_attempts").select("id,correct,created_at").eq("student_id",student.id).eq("client_attempt_id",clientAttemptId).single());
@@ -1480,11 +1486,13 @@ async function submitWorkbookAttempt(body: any, session: ReadySession) {
   }
   const bookmark = await db.from("ready_workbook_bookmarks").select("item_key").eq("student_id", student.id).eq("exam_id", examId).eq("passage_id", passageId).eq("workbook_key", catalog.workbookKey).eq("item_key", item.key).maybeSingle();
   if (bookmark.error) throw new ApiError(500, bookmark.error.message);
-  const stageItems = catalog.stages.find((stage: any) => stage.stage === item.stage)?.items || [], progressKey = item.semanticType || `stage:${item.stage}`;
-  const progressResult = await db.from("ready_workbook_stage_progress").select("correct_clears").eq("student_id", student.id).eq("exam_id", examId).eq("passage_id", passageId).eq("workbook_key", catalog.workbookKey).eq("stage_contract_version", catalog.contractVersion || "legacy-v1").eq("progress_key", progressKey).maybeSingle();
+  const progressKey = item.semanticType || `stage:${item.stage}`;
+  const progressResult = await db.from("ready_workbook_stage_progress").select("correct_clears,completed_cycles,current_cycle").eq("student_id", student.id).eq("exam_id", examId).eq("passage_id", passageId).eq("workbook_key", catalog.workbookKey).eq("stage_contract_version", catalog.contractVersion || "legacy-v1").eq("progress_key", progressKey).maybeSingle();
   if (progressResult.error) throw new ApiError(500, progressResult.error.message);
-  const correctClears = Number(progressResult.data?.correct_clears) || 0, progressPercent = stageItems.length ? Math.floor(correctClears * 100 / stageItems.length) : 0;
-  return { attempt: inserted, correct, revealedAnswer, answers: correct ? [] : resultAnswers, slotResults, aiFeedback, aiFeedbackLines, aiScore, gradingPolicy, aiRequestId, hintCount, usedFullAnswerHint, completedAfterHint, correctClears, progressPercent, bookmarked: !!bookmark.data, reviewCount: (await eligibleReviewQuestionIds(student.id, examId)).length + await workbookReviewCount(student.id, examId) };
+  const completedCycles = Number(progressResult.data?.completed_cycles) || 0, currentCycle = Number(progressResult.data?.current_cycle) || 1, clearResult = await db.from("ready_workbook_cycle_item_clears").select("item_key").eq("student_id", student.id).eq("exam_id", examId).eq("passage_id", passageId).eq("workbook_key", catalog.workbookKey).eq("stage_contract_version", catalog.contractVersion || "legacy-v1").eq("progress_key", progressKey).eq("cycle_number", currentCycle);
+  if (clearResult.error) throw new ApiError(500, clearResult.error.message);
+  const currentCycleClears = rows<any[]>(clearResult).map(row => row.item_key), correctClears = Number(progressResult.data?.correct_clears) || 0, progressPercent = stageItems.length ? Math.floor(correctClears * 100 / stageItems.length) : 0;
+  return { attempt: inserted, correct, revealedAnswer, answers: correct ? [] : resultAnswers, slotResults, aiFeedback, aiFeedbackLines, aiScore, gradingPolicy, aiRequestId, hintCount, usedFullAnswerHint, completedAfterHint, correctClears, completedCycles, currentCycle, currentCycleClears, progressPercent, bookmarked: !!bookmark.data, reviewCount: (await eligibleReviewQuestionIds(student.id, examId)).length + await workbookReviewCount(student.id, examId) };
 }
 async function submitWorkbookAttempts(body:any,session:ReadySession){
   const attempts=Array.isArray(body.attempts)?body.attempts.slice(0,20):[];
