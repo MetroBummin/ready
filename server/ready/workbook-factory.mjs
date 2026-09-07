@@ -563,7 +563,7 @@ function fullWorkbookItems(sourceExercises, rows, prefix) {
     const provenance = { ...(source.provenance || {}), semanticType, mappedReadyStage: stage, sourceWorkbookNumber: Number(source?.provenance?.sourceWorkbookNumber || source?.provenance?.sourceWorkbookStage) || null };
     if (stage === 1 && restoreBlanks(prompt, answers) === ko) byStage.get(1).push(item(1, number, key, { kind: 'blank_input', semanticType, source: en, prompt, answers, provenance }));
     if (stage === 2 && sameEnglish(restoreBlanks(prompt, answers), en)) byStage.get(2).push(item(2, number, key, { kind: 'blank_input', semanticType, source: ko, prompt, answers, provenance }));
-    if (stage === 3 && sameEnglish(prompt, en) && answers.length === 1 && answers[0] === ko) byStage.get(3).push(item(3, number, key, { kind: 'translation_input', semanticType, source: en, prompt: '우리말 해석을 입력하세요.', answers: [ko], provenance }));
+    if (stage === 3 && sameEnglish(prompt, en) && answers.length === 1 && answers[0] === ko) byStage.get(3).push(item(3, number, key, { kind: 'translation_ai', semanticType, source: en, prompt: '우리말 해석을 입력하세요.', answers: [ko], provenance }));
     if (stage === 4 && sameEnglish(restoreBlanks(prompt, answers), en)) { const hints = Array.isArray(source?.hints) && source.hints.length === answers.length ? source.hints.map(value => clean(value, 120)) : answers; byStage.get(4).push(item(4, number, key, { kind: 'verb_form', semanticType, source: ko, prompt, hints, answers, provenance })); }
     if (stage === 5) {
       const groups = Array.isArray(source?.groups) ? source.groups.map(group => Array.isArray(group) ? group.map(value => clean(value, 160)).filter(Boolean) : []) : [];
@@ -599,7 +599,7 @@ export function validateSemanticWorkbookItem(stage, candidate, rowByNumber, cano
   const en = clean(row?.text), ko = clean(row?.translation);
   if (stage === 1) return candidate.answers?.length >= 1 && candidate.source === en && restoreBlanks(candidate.prompt, candidate.answers) === ko ? '' : 'stage1_round_trip';
   if (stage === 2) return candidate.answers?.length >= 1 && candidate.source === ko && sameEnglish(restoreBlanks(candidate.prompt, candidate.answers), en) ? '' : 'stage2_round_trip';
-  if (stage === 3) return candidate.kind === 'translation_input' && candidate.source === en && candidate.answers?.[0] === ko ? '' : 'stage3_reference';
+  if (stage === 3) return ['translation_ai','translation_input'].includes(candidate.kind) && candidate.source === en && candidate.answers?.[0] === ko ? '' : 'stage3_reference';
   if (stage === 4) return candidate.kind === 'verb_form' && candidate.answers?.length >= 1 && candidate.hints?.length === candidate.answers.length && sameEnglish(restoreBlanks(candidate.prompt, candidate.answers), en) ? '' : 'stage4_round_trip';
   if (stage === 5) {
     const answers = candidate.answers || [], groups = candidate.groups || []; let rebuilt = clean(candidate.prompt);
@@ -642,7 +642,7 @@ export function generatePassageDeterministicCatalog({ title, workbookKey, rows, 
   const generated = new Map([[3, []], [6, []], [7, []]]), drops = [];
   for (const row of canonical) {
     const shared = { snapshot: JSON.stringify([row.text,row.translation]), generator: 'passage-core-v2', origin: 'canonical_passage', canonicalSentenceId: clean(row.id, 80) || null, canonicalRevision: Number(provenance.canonicalRevision) || null };
-    generated.get(3).push(item(3, row.index, canonicalItemKey(prefix, 3, row, row.index, previousCatalog), { kind: 'translation_input', semanticType: 'translation', source: row.text, prompt: '우리말 해석을 입력하세요.', answers: [row.translation], provenance: shared }));
+    generated.get(3).push(item(3, row.index, canonicalItemKey(prefix, 3, row, row.index, previousCatalog), { kind: 'translation_ai', semanticType: 'translation', source: row.text, prompt: '우리말 해석을 입력하세요.', answers: [row.translation], provenance: shared }));
     const tokens = orderTokens(row.text), shuffled = factoryOrderBank(tokens, `${prefix}:${row.id || row.index}:word-order`);
     if (shuffled.length) generated.get(6).push(item(6, row.index, canonicalItemKey(prefix, 6, row, row.index, previousCatalog), { kind: 'reorder_groups', semanticType: 'word_order', source: row.translation, prompt: '⟦ORDER:0⟧.', groups: [shuffled], answers: [tokens.join(' ').toLowerCase()], canonicalStart: row.index, canonicalEnd: row.index, provenance: shared }));
     else drops.push({ stage: 6, number: row.index, reason: 'stage6_word_order' });

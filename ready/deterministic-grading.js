@@ -9,7 +9,7 @@ export function normalizeDeterministicAnswer(value){
 export function gradeLocalWorkbook(contract={},responses=[],{usedFullAnswerHint=false}={}){
   if(contract.mode!=='deterministic')return {valid:false,needsServer:true};
   const answers=list(contract.answers),values=list(responses);
-  if(!answers.length||values.length!==answers.length||values.some(value=>!String(value??'').trim()))return {valid:false,needsServer:false};
+  if(!answers.length||values.length!==answers.length)return {valid:false,needsServer:false};
   const slotResults=values.map((value,index)=>normalizeDeterministicAnswer(value)===normalizeDeterministicAnswer(answers[index]));
   const completed=slotResults.every(Boolean),correct=completed&&!usedFullAnswerHint;
   return {valid:true,correct,completedAfterHint:completed&&usedFullAnswerHint,answers:correct?[]:answers,slotResults,needsServer:false};

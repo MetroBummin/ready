@@ -74,7 +74,9 @@ READY Workbook has exactly seven active semantic stages:
 
 Source workbook numbers are provenance only. Paragraph ordering, correction,
 reading-only and ambiguous mixed exercises are unsupported. Workbook AI
-generation and grading are disabled. Missing source is never synthesized.
+generation is disabled; only submitted `translation` responses use semantic AI
+grading against the private canonical Korean reference. Missing source is never
+synthesized.
 
 Every active catalog declares `contractVersion: semantic-v2`; every stage and
 item declares its `semanticType`. Historical attempts remain `legacy-v1`, so an
@@ -94,8 +96,9 @@ append-only and independent from catalog regeneration.
 
 The semantic stages 1–7 above remain unchanged. Pure is translation (3),
 word_order (6), writing (7); Authored is korean_blank (1), english_blank (2),
-verb_form (4), grammar_choice (5). Only Studio authoring can use AI. All student
-execution and regeneration of Studio catalogs are deterministic.
+verb_form (4), grammar_choice (5). Studio AI can propose authoring targets, while
+Student AI is limited to semantic translation grading. Catalog regeneration and
+all non-translation Student grading remain deterministic.
 
 A target is `{span:{sentenceId,tokenStart,tokenEnd,quote,prefix,suffix}}`.
 `tokenEnd` is exclusive. Tokens are Unicode letter/number words with internal
