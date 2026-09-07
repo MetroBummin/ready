@@ -293,15 +293,15 @@ assert.match(mockWorkbookImporter,/publisher_frame_not_safely_structured[\s\S]*d
 assert.match(app,/placeholder="\$\{esc\(hint\|\|'\'\)\}"/,'Stage 5 base verbs must be input placeholders, not exposed labels');
 assert.doesNotMatch(app,/reserved=recall\?item\.grading\?\.answers/,'Recall layout must not require plaintext answers before reveal');
 assert.match(app,/function syncWorkbookSlotWidth\(input\)[^\n]*long-slot/,'Typed blank slots must grow and promote long responses to a wide field');
-assert.match(app,/workbook-order-bank-slot \$\{chosenSet\.has\(chipIndex\)\?'used'/,'Stage 8 must preserve every bank slot after selection');
+assert.match(app,/workbook-order-bank-slot \$\{chosenSet\.has\(chipIndex\)\?'used':!visible\.has\(chipIndex\)\?'withheld'/,'Stage 8 must preserve selected chip identity while withholding later choices');
 assert.match(app,/changeWorkbookOrder[\s\S]*refreshWorkbookOrderGroup\(group\)/,'Stage 8 chip changes must locally refresh only their group');
 assert.doesNotMatch(app,/changeWorkbookOrder[^\n]*renderWorkbook\(\)/,'Stage 8 chip changes must not rerender the full Workbook');
 assert.match(read('ready/design.css'),/workbook-order-bank-slot\.used\{visibility:hidden/,'Selected Stage 8 chips must keep their original geometry');
 assert.match(read('ready/design.css'),/workbook-order-built\{[^}]*min-height:68px/,'Stage 8 must keep a compact fixed assembly area');
 assert.doesNotMatch(read('ready/design.css'),/--workbook-order-stable-height/,'Stage 8 must not mirror the full bank height into the assembly area');
-assert.doesNotMatch(app,/chooseWorkbookOption[^\n]*queueWorkbookAutoSubmit|changeWorkbookOrder[^\n]*queueWorkbookAutoSubmit/,'Choice and reorder tasks must wait for the explicit local submit action');
+assert.match(app,/chipIndex!==progressive\.nextExpected[\s\S]{0,220}submitWorkbook\(\)/,'Stage 8 must grade immediately when a wrong visible chip is selected');
 assert.doesNotMatch(app,/function queueWorkbookAutoSubmit/,'Workbook stages must never submit implicitly');
-assert.match(app,/function workbookSubmitHtml\(session,item,result\)\{if\(result\)return'';/,'Every unanswered Workbook stage must render the explicit submit action');
+assert.match(app,/function workbookSubmitHtml\(session,item,result\)[^\n]*data-submit-workbook/,'Every unanswered Workbook stage must render the explicit submit action');
 assert.doesNotMatch(app,/function workbookSubmitHtml[^\n]*recall_unlock/,'Recall stages must not hide the submit action');
 assert.doesNotMatch(app,/async function handleWorkbookRecallInput[\s\S]{0,1600}submitWorkbook\(\)/,'Completing every recall slot must wait for the student to press submit');
 assert.match(app,/gradeLocalWorkbook[\s\S]{0,700}applyWorkbookOutcome[\s\S]{0,300}persistWorkbookAttempt/,'Workbook must apply a deterministic result before background persistence');
@@ -320,7 +320,7 @@ assert.match(app,/verifierMatches\(cue,verifier\)[\s\S]{0,180}composing[^\n]*fla
 assert.match(app,/flashRecallWrong[\s\S]*220/,'A wrong recall cue must clear after a brief red signal');
 assert.match(app,/data-workbook-live-prefix[\s\S]*workbook-live-copy/,'Stage 9 must show live mismatch feedback without ending the attempt');
 assert.match(app,/hintReceipt[\s\S]*completedAfterHint/,'Stage 9 hint state must survive through final grading');
-assert.match(app,/item\.semanticType==='writing'[\s\S]*data-workbook-hint>힌트 보기/,'Semantic Stage 7 exposes one full-answer hint action.');
+assert.match(app,/writing\?`<button class="button quiet workbook-submit-hint"[^\n]*data-workbook-hint/,'Semantic writing exposes its one-use hint beside submit.');
 assert.doesNotMatch(app,/workbookToolbarActionHtml[^\n]*data-workbook-reveal/,'The top Answer action must be removed');
 assert.doesNotMatch(app,/workbook-hint-actions/,'Stage 9 hint controls must not remain below the prompt');
 assert.match(edge,/revealedAnswer = body\.revealAnswer === true[\s\S]*correct = !revealedAnswer/,'Answer reveal must be persisted as an explicit wrong attempt');
