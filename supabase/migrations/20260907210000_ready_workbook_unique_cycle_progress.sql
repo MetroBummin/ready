@@ -130,22 +130,8 @@ begin
 end;
 $$;
 
--- Recover stage sizes from the catalog snapshot when possible, then replay all
--- correct attempts chronologically through the new unique-cycle trigger.
-update public.ready_workbook_attempts attempt set stage_item_count = source.item_count
-from (
-  select attempt_id, item_count from (
-    select a.id as attempt_id, jsonb_array_length(stage.value->'items') as item_count,
-      row_number() over (partition by a.id order by catalog.updated_at desc) as position
-    from public.ready_workbook_attempts a
-    join public.ready_workbook_catalogs catalog
-      on catalog.passage_id = a.passage_id and catalog.workbook_key = a.workbook_key
-    cross join lateral jsonb_array_elements(catalog.catalog->'stages') stage(value)
-    where (stage.value->>'stage')::integer = a.stage
-  ) ranked where position = 1 and item_count > 0
-) source
-where attempt.id = source.attempt_id and attempt.stage_item_count is null;
-
+-- Recover stage sizes from the catalog snapshot without mutating append-only
+-- attempts, then replay correct history chronologically.
 delete from public.ready_workbook_cycle_item_clears;
 delete from public.ready_workbook_stage_progress;
 
@@ -154,14 +140,22 @@ declare
   replay record;
 begin
   for replay in
-    select * from public.ready_workbook_attempts
-    where correct is true and stage_item_count > 0
-    order by created_at, id
+    select ranked.* from (
+      select a.*, jsonb_array_length(stage.value->'items') as replay_stage_item_count,
+        row_number() over (partition by a.id order by catalog.updated_at desc) as catalog_position
+      from public.ready_workbook_attempts a
+      join public.ready_workbook_catalogs catalog
+        on catalog.passage_id = a.passage_id and catalog.workbook_key = a.workbook_key
+      cross join lateral jsonb_array_elements(catalog.catalog->'stages') stage(value)
+      where a.correct is true and (stage.value->>'stage')::integer = a.stage
+    ) ranked
+    where ranked.catalog_position = 1 and ranked.replay_stage_item_count > 0
+    order by ranked.created_at, ranked.id
   loop
     perform public.ready_record_workbook_cycle_clear(
       replay.student_id, replay.exam_id, replay.passage_id, replay.workbook_key,
       replay.stage_contract_version, replay.semantic_type, replay.stage, replay.item_key,
-      replay.stage_item_count, replay.created_at
+      replay.replay_stage_item_count, replay.created_at
     );
   end loop;
 end;

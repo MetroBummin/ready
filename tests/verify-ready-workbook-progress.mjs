@@ -84,7 +84,8 @@ assert.match(css,/target-group-0/);
 assert.match(css,/target-group-1/);
 assert.match(migration,/primary key \([\s\S]*progress_key, cycle_number, item_key/,'database progress must enforce one item clear per cycle');
 assert.match(migration,/on conflict do nothing/,'duplicate clears in a cycle must not advance progress');
-assert.match(migration,/order by created_at, id/,'historical correct attempts must be replayed chronologically');
-assert.match(migration,/where correct is true and stage_item_count > 0/,'only recoverable correct history may be backfilled');
+assert.match(migration,/order by ranked\.created_at, ranked\.id/,'historical correct attempts must be replayed chronologically');
+assert.match(migration,/where a\.correct is true[\s\S]*replay_stage_item_count > 0/,'only catalog-backed correct history may be replayed');
+assert.doesNotMatch(migration,/update public\.ready_workbook_attempts/,'append-only attempts must never be mutated during backfill');
 
 console.log('READY infinite Workbook progress, incomplete submit, semantic translation and Authoring QA passed.');
