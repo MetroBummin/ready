@@ -29,6 +29,13 @@ assert.equal(partial.stages[0].items.length,2);assert.deepEqual(partial.stages[2
 assert.equal(partial.stages[2].items[1].key,catalog.stages[2].items[1].key);
 const reordered=compileStudio({rows:[rows[0],rows[3],rows[1],rows[2]],annotations,title:'Fixture',workbookKey:'fixture',previousCatalog:catalog});
 assert.equal(reordered.stages[2].items[1].key,catalog.stages[2].items[0].key);assert.equal(new Set(reordered.stages[2].items.map(i=>i.key)).size,3);
+const contractionRow={id:'contraction-row',blockType:'SENTENCE',active:true,text:"I'm standing here.",translation:'나는 여기 서 있다.'};
+const contractionAnnotations=syncAnnotations([contractionRow],{});
+for(const stage of AUTHORED)contractionAnnotations[contractionRow.id].steps[stage]={status:'confirmed',source:'teacher',targets:[]};
+contractionAnnotations[contractionRow.id].steps.verb_form={status:'confirmed',source:'teacher',targets:[{span:makeSpan(contractionRow.text,1,12,contractionRow.id),hint:'be, stand',answer:'am standing'}]};
+const contractionCatalog=compileStudio({rows:[contractionRow],annotations:contractionAnnotations,title:'Contraction',workbookKey:'contraction',requireConfirmed:true,publishStep:'verb_form'});
+const contractionItem=contractionCatalog.stages.find(stage=>stage.semanticType==='verb_form').items[0];
+assert.equal(contractionItem.prompt,'I _____ here.');assert.deepEqual(contractionItem.answers,['am standing']);
 const removed=syncAnnotations([rows[0],rows[1],rows[3]],annotations);assert.equal(removed['sentence-2'].retired,true);assert.deepEqual(removed['sentence-1'],annotations['sentence-1']);
 const split=syncAnnotations([rows[0],rows[1],{...rows[2],id:'new-split'},rows[3]],annotations);assert.equal(split['new-split'].steps.english_blank.status,'needed');assert.equal(split['sentence-2'].retired,true);
 const repeated='one word and one word';const span=makeSpan(repeated,13,21);assert.deepEqual(locateSpan(repeated,span),{start:13,end:21});
