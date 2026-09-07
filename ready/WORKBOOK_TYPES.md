@@ -42,20 +42,20 @@ mixed Check는 현재 학습 범위 밖으로 원본만 보존한다.
 ## Runtime contract
 
 - `student_workbook`: 접근 가능한 Passage의 공개 item과 최신 진도만 반환한다.
-- `submit_workbook_attempt`: 응답을 서버 정규화 후 정답표와 비교하고 append-only 시도를 남긴다.
-- 현재 학습 중인 deterministic item은 즉시 피드백을 위해 정답 계약을 함께 받는다. 화면에는 제출 전 표시하지 않는다.
-- 2·3단계는 현재 item의 정답을 메모리에서 사용해 첫 음절/글자가 맞는 즉시 전체 slot을 완성한다. slot별 네트워크 해제는 runtime fast path에서 사용하지 않는다.
-- 9단계는 현재 문항에 한해 지연 로딩한 salted prefix verifier로 실시간 오류만 표시하고, 힌트는 요청한 slot 조각만 반환한다.
-- deterministic 결과는 먼저 기기에서 표시하고 Attempt 저장과 Review/progress 동기화는 뒤에서 수행한다. 서버는 같은 규칙으로 다시 검증한다.
+- `submit_workbook_attempts`: 기기에서 판정한 여러 응답을 한 요청으로 다시 검증하고 append-only 시도를 남긴다. `client_attempt_id`는 재전송 중복만 막으며 과거 시도를 덮어쓰지 않는다.
+- 인증된 학생에게 배정된 deterministic Workbook은 catalog와 함께 정답·recall·prefix 계약을 한 번 받는다. 화면에는 제출 전 정답을 표시하지 않지만 DevTools 수준의 answer secrecy는 성능을 위해 보장하지 않는다.
+- 한국어·영어 recall은 메모리의 계약으로 첫 음절/글자가 맞는 즉시 전체 slot을 완성하며, slot별 서버 해제 요청을 사용하지 않는다.
+- semantic `writing`은 같은 catalog에 포함된 prefix 계약으로 실시간 오류를 표시하고, 명시적으로 요청한 전체답 힌트만 서버 receipt를 받는다.
+- deterministic 결과는 먼저 기기에서 표시한다. Attempt 저장과 Review/progress 동기화는 로컬 영속 queue에서 background batch로 처리하고 서버는 같은 규칙으로 다시 검증한다.
 - 2·3단계의 미세 오타는 Attempt가 아니며, 모든 slot recall 완료 시 한 번만 append한다.
-- 9단계 전체답 힌트는 제출을 막지 않지만 해당 Attempt를 오답으로 기록하고 Review에 남긴다.
+- semantic `writing`의 전체답 힌트는 제출을 막지 않지만 해당 Attempt를 오답으로 기록하고 Review에 남긴다.
 - 해석 AI는 새로운 정답을 만들지 않고 비공개 출판사 해석과 의미만 비교한다.
 - 틀린 제출 뒤에만 해당 빈칸의 정답을 보여 준다.
 - `ready_workbook_attempts`는 원시 기록을 수정하거나 삭제하지 않는다.
 - 오답은 exercise 단위로 Review에 자동 저장되고, 정답 처리되면 자동 오답 상태만 해소한다.
 - 수동 북마크는 정답 여부와 무관하게 사용자가 직접 해제할 때까지 유지한다.
 - Review에서 해당 exercise를 열 때도 원래 Workbook renderer를 그대로 사용한다.
-- Stage 9 Attempt는 `hint_count`, `used_full_answer_hint`, `completed_after_hint`를 함께 보존한다.
+- Writing Attempt는 `hint_count`, `used_full_answer_hint`, `completed_after_hint`를 함께 보존한다.
 
 일반 추출기는 `tools/ready-extract-workbook-contract.py`다. 카탈로그마다 원본 파일명과
 SHA-256, 단계별 `source / ready / invalid` 수를 남긴다. 7단계도 교재별 예외 없이 같은

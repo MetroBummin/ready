@@ -30,7 +30,7 @@ const token='local-student-session-for-studio-testing-0001',hash=await crypto.su
 await pg.query("insert into ready_sessions(token_hash,actor_type,student_id,expires_at) values($1,'student',$2,now()+interval '1 day')",[Buffer.from(hash).toString('hex'),studentId]);
 let workbook=await call('student_workbook',{examId:exam,passageId},token);
 const writing=workbook.stages.find(s=>s.stage===7).items[0],answer=catalog.stages.find(s=>s.stage===7).items[0].answers[0];
-assert.equal(writing.kind,'full_sentence_input');assert.equal(writing.source,context.rows[0].translation);assert.equal(writing.assistance.mode,'prefix_typing');writing.assistance=(await call('workbook_assistance',{examId:exam,passageId,itemKey:writing.key},token)).assistance;assert.equal(writing.assistance.slots.length,1);
+assert.equal(writing.kind,'full_sentence_input');assert.equal(writing.source,context.rows[0].translation);assert.equal(writing.assistance.mode,'prefix_typing');assert.equal(writing.assistance.slots.length,1);assert.deepEqual(writing.grading.answers,[answer]);
 const prefix=answer.slice(0,9);assert.equal((await livePrefixState(prefix,writing.assistance.slots[0])).valid,true);
 const mismatch=await livePrefixState(prefix+'Z',writing.assistance.slots[0]);assert.equal(mismatch.valid,false);assert.equal(mismatch.mismatchIndex,prefix.length);
 assert.equal((await livePrefixState(answer,writing.assistance.slots[0])).complete,true);

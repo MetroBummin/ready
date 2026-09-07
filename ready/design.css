@@ -519,7 +519,7 @@ body[data-ready-mode] .review-export-preview-button{width:100%;min-height:52px}.
 .review-export-inline-answer{display:grid;grid-template-columns:1fr 1fr;gap:3mm;margin-top:5mm;padding:4mm;background:#f2f2ef}.review-export-answer{display:grid;gap:1mm}.review-export-answer strong{font-size:8pt;color:#666}.review-export-inline-answer>p{grid-column:1/-1;margin:1mm 0 0}.review-export-inline-answer>p strong{margin-right:3mm}.review-export-key{break-before:page}.review-export-key ol{display:grid;grid-template-columns:1fr 1fr;gap:0 8mm;padding:0;list-style:none}.review-export-key li{display:grid;grid-template-columns:12mm 1fr;gap:2mm;padding:3mm 0;border-bottom:1px solid #ddd}.review-export-key li strong{font-family:var(--ready-font-mono)}
 
 /* Admin learning progress: attempt-only summary and read-only replay. */
-.student-resume{display:flex;align-items:center;justify-content:space-between;gap:24px;margin:0 0 32px;padding:24px 28px;border:1px solid var(--line);border-radius:var(--radius-lg);background:var(--surface)}
+.student-resume{display:flex;align-items:center;justify-content:space-between;gap:24px;margin:0 0 32px;padding:24px 28px;border:1px solid var(--ready-hairline);border-radius:var(--ready-radius-lg);background:var(--ready-surface)}
 .student-resume div{display:grid;gap:5px}.student-resume strong{font-size:1.15rem}.student-resume span{color:var(--muted)}
 .reader-block-title{margin:2.2em 0 .65em;font-size:1.45rem}.reader-block-subtitle{margin:1.7em 0 .55em;font-size:1.05rem;color:var(--muted)}
 .pipeline-state{display:block;font-size:.78rem;line-height:1.55}.pipeline-state.good{color:var(--success)}.pipeline-state.bad{color:var(--danger)}.pipeline-state.warn{color:var(--warning)}.pipeline-state.muted{color:var(--muted)}
@@ -865,6 +865,8 @@ body[data-ready-mode] .workbook-correction-row input{min-height:44px;height:44px
 .workbook-order-built{padding:12px;border:1px solid var(--ready-hairline);border-radius:16px;background:var(--ready-canvas)}
 body[data-ready-mode] .workbook-order-built button,
 body[data-ready-mode] .workbook-order-bank button{min-height:46px;padding:9px 13px;border-radius:14px}
+.workbook-submit-actions{display:flex;justify-content:flex-end;margin-top:var(--ready-space-6)}
+.workbook-submit-actions .button{min-width:112px}
 
 /* Review keeps its passage-centric hierarchy while softening interactions. */
 body[data-ready-mode] .review-export-open{min-height:44px;border-radius:14px}
