@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 
 const read=path=>readFileSync(new URL(`../${path}`,import.meta.url),'utf8');
-const app=read('ready/app.js'),admin=read('ready/admin/app.js'),studio=read('ready/admin/studio-ui.js'),edge=read('server/ready/index.ts');
+const app=read('ready/app.js'),admin=read('ready/admin/app.js'),studio=read('ready/admin/studio-ui.js'),edge=read('server/ready/index.ts'),design=read('ready/design.css');
 
 assert.match(edge,/assistance: await publicWorkbookAssistance\(item, sha256Hex\)/,'Workbook assistance must be bundled with the authenticated catalog');
 assert.match(edge,/mode: "deterministic"[\s\S]{0,140}answers: item\.answers/,'Deterministic answers must be bundled once for local grading');
@@ -21,6 +21,13 @@ assert.match(app,/saveWorkbookAttemptQueue[\s\S]*restoreWorkbookAttempts/,'Pendi
 assert.match(edge,/client_attempt_id:clientAttemptId[\s\S]*error\.code==='23505'/,'Background retries must be idempotent without overwriting an attempt');
 assert.match(app,/const cached=cachedWorkbook\(passageId\);if\(cached\)startWorkbookSession/,'Workbook cache must render before background revalidation');
 assert.match(app,/function prefetchWorkbooks/,'Assigned Workbooks must prefetch in idle time');
+assert.match(app,/function prefetchReview[\s\S]*loadReviewKind\('word'/,'Review must prefetch its default tab after dashboard bootstrap');
+assert.match(app,/function openReview\(\)[^\n]*renderReview\(\);loadReviewKind/,'Review shell must render before its background request');
+assert.doesNotMatch(app,/call\('student_review'/,'Review data must not activate the global loading overlay');
+assert.match(app,/data\.loaded\?\.\[kind\]&&\(!force\|\|state\.reviewValidated\[kind\]\)/,'an already loaded Review tab must switch with zero network requests');
+assert.match(edge,/if \(kind === "word"\)[\s\S]*if \(kind === "workbook"\)[\s\S]*if \(kind === "sentence"\)/,'Review tabs must load independently');
+assert.match(design,/@media \(hover:hover\) and \(pointer:fine\)\{\.workbook-stage-option:hover/,'Workbook hover visuals must be fine-pointer only');
+assert.match(design,/-webkit-tap-highlight-color:transparent/,'mobile Workbook cards must not retain browser tap highlight');
 assert.match(admin,/call\('studio_open'/,'Admin Passage must use one blocking bundle request');
 assert.match(studio,/current\.previewCatalog\?\.stages/,'AUTO chips must use the loaded preview catalog');
 assert.doesNotMatch(studio,/if\(PURE\.includes\(step\)\)\{const result=await action\('studio_preview'\)/,'AUTO chip changes must not call the server');

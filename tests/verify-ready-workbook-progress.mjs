@@ -1,12 +1,14 @@
 import assert from 'node:assert/strict';
 import {readFile} from 'node:fs/promises';
-import {workbookCycleMilestone,workbookProgressPercent,workbookProgressVisual} from '../ready/workbook-progress.js';
+import {reconcileWorkbookProgress,workbookCycleMilestone,workbookProgressPercent,workbookProgressVisual} from '../ready/workbook-progress.js';
 import {gradeLocalWorkbook,gradeWorkbookCorrectionPairs} from '../ready/deterministic-grading.js';
 
 assert.equal(workbookProgressPercent(0,41),0);
 assert.equal(workbookProgressPercent(41,41),100);
 assert.equal(workbookProgressPercent(43,41),104);
 assert.equal(workbookProgressPercent(82,41),200);
+assert.deepEqual(reconcileWorkbookProgress(43,42,41),{correctClears:43,progressPercent:104});
+assert.deepEqual(reconcileWorkbookProgress(43,44,41),{correctClears:44,progressPercent:107});
 assert.deepEqual(workbookProgressVisual(100),{percent:100,fill:100,cycle:1});
 assert.deepEqual(workbookProgressVisual(105),{percent:105,fill:5,cycle:2});
 assert.deepEqual(workbookProgressVisual(200),{percent:200,fill:100,cycle:2});
@@ -51,6 +53,8 @@ assert.match(app,/readerGestureDecision\(\{maxDistance:pointer\.maxDistance,scro
 assert.match(app,/guardNavTailClick[\s\S]*decision!==\'SCROLL\'[\s\S]*stopImmediatePropagation/,'a scroll gesture tail must not activate a navigation click');
 assert.match(app,/navigationIsCurrent\(navigation\)/,'late async responses must not replace the current student screen');
 assert.match(app,/workbookCycleMilestone\(before,stage\.correctClears,stage\.total\)/,'a completed pool cycle must raise a milestone');
+assert.match(app,/WORKBOOK_PROGRESS_FLOOR/,'optimistic clears must survive cache and server reconciliation');
+assert.match(app,/reconcileWorkbookProgress\(stage\.correctClears,incoming\.correctClears,stage\.total\)/,'background refresh must never lower visible clears');
 assert.match(app,/data-workbook-repeat[\s\S]*data-workbook-other/,'milestone must offer repeat and other-learning actions');
 assert.match(designCss,/progress-cycle-6/,'500% and above must use the deepest progress color');
 assert.match(app,/Array\.from\(\{length:item\.slotCount\}/,'incomplete positions must be preserved');
