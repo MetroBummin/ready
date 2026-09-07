@@ -15,6 +15,30 @@ export function workbookRecallIsPendingJamo(value,mode){
   return /[\u1100-\u11ff\u3131-\u318e\ua960-\ua97f\ud7b0-\ud7ff]/u.test(String(value??'').normalize('NFKC'));
 }
 
+const HANGUL_INITIALS=['ㄱ','ㄲ','ㄴ','ㄷ','ㄸ','ㄹ','ㅁ','ㅂ','ㅃ','ㅅ','ㅆ','ㅇ','ㅈ','ㅉ','ㅊ','ㅋ','ㅌ','ㅍ','ㅎ'];
+const HANGUL_MEDIALS=['ㅏ','ㅐ','ㅑ','ㅒ','ㅓ','ㅔ','ㅕ','ㅖ','ㅗ','ㅘ','ㅙ','ㅚ','ㅛ','ㅜ','ㅝ','ㅞ','ㅟ','ㅠ','ㅡ','ㅢ','ㅣ'];
+const HANGUL_FINALS=['','ㄱ','ㄲ','ㄳ','ㄴ','ㄵ','ㄶ','ㄷ','ㄹ','ㄺ','ㄻ','ㄼ','ㄽ','ㄾ','ㄿ','ㅀ','ㅁ','ㅂ','ㅄ','ㅅ','ㅆ','ㅇ','ㅈ','ㅊ','ㅋ','ㅌ','ㅍ','ㅎ'];
+const HANGUL_BUILD={ㄲ:'ㄱㄱ',ㄸ:'ㄷㄷ',ㅃ:'ㅂㅂ',ㅆ:'ㅅㅅ',ㅉ:'ㅈㅈ',ㅘ:'ㅗㅏ',ㅙ:'ㅗㅐ',ㅚ:'ㅗㅣ',ㅝ:'ㅜㅓ',ㅞ:'ㅜㅔ',ㅟ:'ㅜㅣ',ㅢ:'ㅡㅣ',ㄳ:'ㄱㅅ',ㄵ:'ㄴㅈ',ㄶ:'ㄴㅎ',ㄺ:'ㄹㄱ',ㄻ:'ㄹㅁ',ㄼ:'ㄹㅂ',ㄽ:'ㄹㅅ',ㄾ:'ㄹㅌ',ㄿ:'ㄹㅍ',ㅀ:'ㄹㅎ',ㅄ:'ㅂㅅ'};
+const HANGUL_JAMO_TO_COMPAT={...Object.fromEntries(HANGUL_INITIALS.map((value,index)=>[String.fromCodePoint(0x1100+index),value])),...Object.fromEntries(HANGUL_MEDIALS.map((value,index)=>[String.fromCodePoint(0x1161+index),value])),...Object.fromEntries(HANGUL_FINALS.slice(1).map((value,index)=>[String.fromCodePoint(0x11a8+index),value]))};
+const hangulBuild=value=>[...(HANGUL_BUILD[value]||value||'')];
+function firstHangulUnit(value){
+  const text=String(value??'').trim().normalize('NFC'),match=text.match(/[\u1100-\u11ff\u3131-\u318e\ua960-\ua97f\uac00-\ud7ff]/u),character=match?.[0];
+  if(!character)return [];
+  const code=character.codePointAt(0);
+  if(code>=0xac00&&code<=0xd7a3){const offset=code-0xac00,initial=HANGUL_INITIALS[Math.floor(offset/588)],medial=HANGUL_MEDIALS[Math.floor(offset%588/28)],final=HANGUL_FINALS[offset%28];return [...hangulBuild(initial),...hangulBuild(medial),...hangulBuild(final)];}
+  const compatibility=HANGUL_JAMO_TO_COMPAT[character]||(code>=0x3131&&code<=0x318e?character:character.normalize('NFKC'));
+  return hangulBuild(compatibility);
+}
+
+export function koreanRecallCompositionState(value,answer){
+  const current=firstHangulUnit(value),expected=firstHangulUnit(answer);
+  if(!current.length)return String(value??'').trim()?{state:'mismatch'}:{state:'empty'};
+  if(expected.length<2)return {state:'mismatch'};
+  const possible=current.length<=expected.length&&current.every((jamo,index)=>jamo===expected[index]);
+  if(!possible)return {state:'mismatch'};
+  return {state:current.length===expected.length?'exact':'partial'};
+}
+
 export function workbookAssistanceMode(item){
   if(item?.semanticType==='korean_blank')return {mode:'recall_unlock',recallMode:'korean_syllable'};
   if(item?.semanticType==='english_blank')return {mode:'recall_unlock',recallMode:'english_initial'};
