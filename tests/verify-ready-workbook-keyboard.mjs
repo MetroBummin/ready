@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
-import {progressiveOrderState,workbookEnterAction,workbookOrderAnswerIndexes} from '../ready/workbook-interaction.js';
+import {progressiveOrderState,shuffleWorkbookOrderBatch,workbookEnterAction,workbookOrderAnswerIndexes} from '../ready/workbook-interaction.js';
 
 const app=readFileSync(new URL('../ready/app.js',import.meta.url),'utf8');
 const writing=readFileSync(new URL('../ready/workbook-writing-ui.js',import.meta.url),'utf8');
@@ -26,9 +26,20 @@ assert.doesNotMatch(app,/WORKBOOK_AUTOFOCUS_TYPES[^\n]*(grammar_choice|word_orde
 
 const duplicateGroup=['to','learn','to','read','well','today','fast'];
 assert.deepEqual(workbookOrderAnswerIndexes(duplicateGroup,'to learn to read well today fast'),[0,1,2,3,4,5,6],'Repeated chips must retain identity by index');
-const order=progressiveOrderState(duplicateGroup,'to learn to read well today fast',[],5);
-assert.equal(order.visible.length,5,'Progressive ordering must show at most five chips by default');
-assert(order.visible.includes(order.nextExpected),'The next correct chip must always be visible');
+const answerTokens=Array.from({length:20},(_,index)=>`word${index+1}`),twentyChipGroup=[...answerTokens.slice(6),...answerTokens.slice(0,6)],answer=answerTokens.join(' '),expected=workbookOrderAnswerIndexes(twentyChipGroup,answer);
+const batch1=progressiveOrderState(twentyChipGroup,answer,[]);
+assert.deepEqual(batch1.batch,expected.slice(0,6),'The first visible batch must contain exactly answer positions 1-6');
+const shuffled1=shuffleWorkbookOrderBatch(batch1.batch,()=>0),started=progressiveOrderState(twentyChipGroup,answer,[],6,shuffled1),afterOne=progressiveOrderState(twentyChipGroup,answer,[expected[0]],6,shuffled1);
+assert.deepEqual(started.visible,shuffled1,'The stored batch shuffle must control visible chip order');
+assert.deepEqual(afterOne.visible,shuffled1,'A click inside a batch must not reshuffle or replace its visible pool');
+const batch2=progressiveOrderState(twentyChipGroup,answer,expected.slice(0,6));
+assert.equal(batch2.batchIndex,1,'The second batch must appear only after all six first-batch chips are correct');
+assert.deepEqual(batch2.batch,expected.slice(6,12),'The second visible batch must contain exactly answer positions 7-12');
+assert.deepEqual(progressiveOrderState(twentyChipGroup,answer,expected.slice(0,5)).batch,expected.slice(0,6),'Five correct chips must still show only the first batch');
+assert.match(app,/if\(!orders\[progressive\.batchIndex\]\)orders\[progressive\.batchIndex\]=shuffleWorkbookOrderBatch/,'Each ordering batch must be shuffled once and cached on entry');
+assert.match(app,/delete session\.orderBatchOrders\?\.\[item\.key\]/,'Retry must discard stored batch shuffles and restart from batch one');
+assert.match(app,/if\(item\.kind==='reorder_groups'\)\{session\.orderSelections\[item\.key\]=Array\.from[\s\S]{0,180}next=Array\(item\.slotCount\)\.fill\(''\)/,'Ordering retry must clear every group and response in the problem');
+assert.match(app,/if\(remove&&position>=0\)current\.splice\(position\)/,'Removing a built chip must rewind the confirmed prefix from that position');
 assert.match(app,/chipIndex!==progressive\.nextExpected[\s\S]{0,220}submitWorkbook\(\)/,'A wrong ordering chip must immediately finalize the local attempt');
 assert.match(app,/hintUsed\?'힌트 사용함':'힌트 보기'/,'Writing hint must become visibly exhausted after its one use');
 assert.match(app,/data-workbook-submit[\s\S]{0,300}data-workbook-hint[\s\S]{0,300}data-submit-workbook/,'Writing hint must live beside submit');

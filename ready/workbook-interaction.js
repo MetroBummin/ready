@@ -25,12 +25,21 @@ export function workbookOrderAnswerIndexes(group=[],answer=''){
   return expected.length===group.length?expected:[];
 }
 
-export function progressiveOrderState(group=[],answer='',chosen=[],visibleCount=5){
-  const expected=workbookOrderAnswerIndexes(group,answer),chosenSet=new Set(chosen),remaining=group.map((_,index)=>index).filter(index=>!chosenSet.has(index));
-  if(!expected.length)return {expected,visible:remaining,nextExpected:-1};
-  const nextExpected=expected[chosen.length]??-1,limit=Math.max(4,Math.min(6,Number(visibleCount)||5));
-  if(remaining.length<=limit)return {expected,visible:remaining,nextExpected};
-  const visible=remaining.slice(0,limit);
-  if(nextExpected>=0&&!visible.includes(nextExpected))visible[visible.length-1]=nextExpected;
-  return {expected,visible:visible.sort((left,right)=>left-right),nextExpected};
+export function shuffleWorkbookOrderBatch(batch=[],random=Math.random){
+  const shuffled=[...batch];
+  for(let index=shuffled.length-1;index>0;index-=1){
+    const target=Math.max(0,Math.min(index,Math.floor(random()*(index+1))));
+    [shuffled[index],shuffled[target]]=[shuffled[target],shuffled[index]];
+  }
+  return shuffled;
+}
+
+export function progressiveOrderState(group=[],answer='',chosen=[],visibleCount=6,batchOrder=[]){
+  const expected=workbookOrderAnswerIndexes(group,answer),limit=Math.max(4,Math.min(6,Number(visibleCount)||6));
+  if(!expected.length)return {expected,visible:group.map((_,index)=>index),batch:[],batchIndex:0,nextExpected:-1};
+  let matched=0;
+  while(matched<chosen.length&&chosen[matched]===expected[matched])matched+=1;
+  const lastBatch=Math.max(0,Math.ceil(expected.length/limit)-1),batchIndex=Math.min(lastBatch,Math.floor(matched/limit));
+  const batch=expected.slice(batchIndex*limit,(batchIndex+1)*limit),sameBatch=batchOrder.length===batch.length&&batch.every(index=>batchOrder.includes(index));
+  return {expected,visible:sameBatch?[...batchOrder]:batch,batch,batchIndex,nextExpected:expected[matched]??-1};
 }

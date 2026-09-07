@@ -293,7 +293,8 @@ assert.match(mockWorkbookImporter,/publisher_frame_not_safely_structured[\s\S]*d
 assert.match(app,/placeholder="\$\{esc\(hint\|\|'\'\)\}"/,'Stage 5 base verbs must be input placeholders, not exposed labels');
 assert.doesNotMatch(app,/reserved=recall\?item\.grading\?\.answers/,'Recall layout must not require plaintext answers before reveal');
 assert.match(app,/function syncWorkbookSlotWidth\(input\)[^\n]*long-slot/,'Typed blank slots must grow and promote long responses to a wide field');
-assert.match(app,/workbook-order-bank-slot \$\{chosenSet\.has\(chipIndex\)\?'used':!visible\.has\(chipIndex\)\?'withheld'/,'Stage 8 must preserve selected chip identity while withholding later choices');
+assert.match(app,/progressive\.visible\.map\(chipIndex=>`<span class="workbook-order-bank-slot/,'Stage 8 must render only the current fixed answer-position batch in its stored shuffled order');
+assert.match(app,/data-workbook-order-batch="\$\{progressive\.batchIndex\}"/,'Stage 8 must expose the active fixed batch for interaction QA');
 assert.match(app,/changeWorkbookOrder[\s\S]*refreshWorkbookOrderGroup\(group\)/,'Stage 8 chip changes must locally refresh only their group');
 assert.doesNotMatch(app,/changeWorkbookOrder[^\n]*renderWorkbook\(\)/,'Stage 8 chip changes must not rerender the full Workbook');
 assert.match(read('ready/design.css'),/workbook-order-bank-slot\.used\{visibility:hidden/,'Selected Stage 8 chips must keep their original geometry');
