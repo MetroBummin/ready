@@ -833,22 +833,21 @@ body[data-ready-mode="student"] .reading-passage{font-size:18px;line-height:1.72
 .workbook-stage-list{display:grid;gap:10px;border:0}
 .workbook-stage-list-head{border:0}
 .workbook-stage-option{
+  --workbook-progress-color:#e4bd32;
+  --workbook-progress-fill:color-mix(in srgb,var(--workbook-progress-color) 28%,var(--ready-surface));
   min-height:76px;
   padding:14px 18px;
   border:1px solid var(--ready-hairline);
   border-radius:18px;
-  background:var(--ready-surface);
+  background:linear-gradient(to right,var(--workbook-progress-fill) 0 var(--workbook-progress),var(--ready-surface) var(--workbook-progress) 100%);
+  transition:border-color 160ms ease,box-shadow 160ms ease,background 240ms ease;
 }
-.workbook-stage-option:hover{border-color:var(--ready-hairline-strong);color:var(--ready-ink);background:var(--ready-surface);box-shadow:var(--ready-shadow-soft)}
-.workbook-stage-option:disabled{border-color:transparent;border-radius:18px}
-.workbook-stage-option{--workbook-progress-color:#e4bd32}
+.workbook-stage-option:hover{border-color:var(--ready-hairline-strong);color:var(--ready-ink);box-shadow:var(--ready-shadow-soft)}
+.workbook-stage-option:disabled{border-color:transparent;border-radius:18px;background:var(--ready-surface)}
 .workbook-stage-option.progress-cycle-2{--workbook-progress-color:#dc8f2d}
 .workbook-stage-option.progress-cycle-3{--workbook-progress-color:#d26845}
 .workbook-stage-option.progress-cycle-4{--workbook-progress-color:#9a548f}
 .workbook-stage-option.progress-cycle-5{--workbook-progress-color:#633f7c}
-.workbook-stage-gauge{display:block;width:min(240px,48vw);height:7px;overflow:hidden;border-radius:999px;background:color-mix(in srgb,var(--workbook-progress-color) 15%,var(--ready-canvas-quiet))}
-.workbook-stage-gauge i{display:block;width:var(--workbook-progress);height:100%;border-radius:inherit;background:var(--workbook-progress-color);transition:width 240ms ease}
-.workbook-stage-option:disabled .workbook-stage-gauge{display:none}
 .workbook-study-layout{width:min(100%,920px)}
 .workbook-card.workbook-focus-card{padding:clamp(22px,4vw,34px);border:1px solid var(--ready-hairline);border-radius:24px;background:var(--ready-surface);box-shadow:var(--ready-shadow-soft)}
 .workbook-card blockquote,.workbook-task-passage{padding:18px 20px;border:0;border-radius:18px;background:var(--ready-canvas-quiet);font-size:17px;line-height:1.72}

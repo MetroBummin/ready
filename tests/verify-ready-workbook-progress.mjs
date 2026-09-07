@@ -24,16 +24,19 @@ const pair=gradeWorkbookCorrectionPairs(['moving','to move'],['',''],{allowIncom
 assert.equal(pair.valid,true);
 assert.equal(pair.correct,false);
 
-const [app,edge,factory,studio,css,migration]=await Promise.all([
+const [app,edge,factory,studio,css,designCss,migration]=await Promise.all([
   readFile(new URL('../ready/app.js',import.meta.url),'utf8'),
   readFile(new URL('../server/ready/index.ts',import.meta.url),'utf8'),
   readFile(new URL('../server/ready/workbook-factory.mjs',import.meta.url),'utf8'),
   readFile(new URL('../ready/admin/studio-ui.js',import.meta.url),'utf8'),
   readFile(new URL('../ready/admin/studio.css',import.meta.url),'utf8'),
+  readFile(new URL('../ready/design.css',import.meta.url),'utf8'),
   readFile(new URL('../supabase/migrations/20260907170000_ready_workbook_infinite_progress.sql',import.meta.url),'utf8'),
 ]);
 assert.match(app,/data-submit-workbook>제출<\/button>/,'submit must be enabled from first render');
 assert.doesNotMatch(app,/data-submit-workbook[^>]*disabled/,'response completeness must not disable submit');
+assert.doesNotMatch(app,/workbook-stage-gauge/,'the stage card itself must be the progress gauge');
+assert.match(designCss,/linear-gradient\(to right,var\(--workbook-progress-fill\) 0 var\(--workbook-progress\)/,'stage progress must fill the full card background');
 assert.match(app,/Array\.from\(\{length:item\.slotCount\}/,'incomplete positions must be preserved');
 assert.match(edge,/item\.kind === "translation_ai" \|\| item\.semanticType === "translation"/,'semantic translation must use AI grading');
 assert.match(edge,/responses\[0\][\s\S]*callLegacyWorkbookTranslationGrade/,'non-empty translation must reach semantic AI grading');
