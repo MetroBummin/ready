@@ -57,8 +57,10 @@ const [app,edge,factory,studio,css,designCss,migration]=await Promise.all([
 ]);
 assert.match(app,/data-submit-workbook>제출<\/button>/,'submit must be enabled from first render');
 assert.doesNotMatch(app,/data-submit-workbook[^>]*disabled/,'response completeness must not disable submit');
-assert.doesNotMatch(app,/workbook-stage-gauge/,'the stage card itself must be the progress gauge');
-assert.match(designCss,/linear-gradient\(to right,var\(--workbook-progress-fill\) 0 var\(--workbook-progress\)/,'stage progress must fill the full card background');
+assert.match(app,/workbook-stage-gauge/,'stage progress must render in a dedicated gauge below the card content');
+assert.match(designCss,/workbook-stage-option\{[\s\S]*background:var\(--ready-surface\)/,'stage cards must retain a neutral READY surface');
+assert.match(designCss,/workbook-stage-gauge\{[^}]*height:8px/,'the premium progress rail must remain thin');
+assert.match(designCss,/workbook-stage-gauge i\{[^}]*linear-gradient/,'progress fill must use a restrained same-cycle gradient');
 assert.doesNotMatch(app,/reader-actions/,'Passage must not end with the old Workbook start card');
 assert.doesNotMatch(app,/reader-learning|reader-workbook-sheet|data-workbook-sheet/,'Passage must contain only the reader, without a learning dock or sheet');
 assert.doesNotMatch(designCss,/reader-learning|reader-workbook-sheet/,'removed Passage dock and fade styles must not remain dormant');

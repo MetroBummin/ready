@@ -391,7 +391,7 @@ body[data-ready-mode] .workbook-blank input{box-sizing:border-box;width:calc(var
 body[data-ready-mode] .workbook-blank.long-slot input{width:100%;max-width:none;text-align:left}
 .workbook-blank input::placeholder{color:var(--ready-body);opacity:.72}
 .workbook-blank input:focus::placeholder{color:transparent}
-.workbook-blank.verb-form-slot input:focus::placeholder{color:var(--ready-primary);opacity:.72}
+.workbook-blank.verb-form-leading-slot input:focus::placeholder{color:var(--ready-primary);opacity:.72}
 .workbook-blank.correct input{border-color:var(--ready-success);background:var(--ready-success-soft)}
 .workbook-blank.wrong input{border-color:var(--ready-error);background:var(--ready-error-soft)}
 .workbook-blank input.recall-wrong{border-color:var(--ready-error);color:var(--ready-error);background:var(--ready-error-soft)}
@@ -429,12 +429,12 @@ body[data-ready-mode] .workbook-correction-row input{min-height:36px;height:36px
 .bookmark-star{font-size:23px;line-height:1;transform:translateY(-1px)}
 .workbook-answer-action{min-height:32px;padding:4px 7px;border:0;border-radius:var(--ready-radius-xs);color:var(--ready-muted);background:transparent;font:700 12px/1.2 var(--ready-font-sans);cursor:pointer}
 .workbook-answer-action:hover,.workbook-answer-action:focus-visible{color:var(--ready-ink);background:var(--ready-canvas-quiet)}
-.workbook-order-built,.workbook-order-bank{display:flex;flex-wrap:wrap;gap:var(--ready-space-2);align-items:center}.workbook-order-bank-slot{display:inline-flex;min-height:36px}.workbook-order-bank-slot.used{visibility:hidden;pointer-events:none}.workbook-order-bank-slot.withheld{display:none}
+.workbook-order-built,.workbook-order-bank{display:flex;flex-wrap:wrap;gap:var(--ready-space-2);align-items:center}.workbook-order-bank{min-height:var(--workbook-order-bank-height,36px);align-content:flex-start}.workbook-order-bank-slot{display:inline-flex;min-height:36px}.workbook-order-bank-slot.used{display:none}.workbook-order-bank-slot.withheld{display:none}
 .workbook-translation{display:grid;gap:var(--ready-space-2);color:var(--ready-muted);font-size:12px;font-weight:750}.workbook-translation textarea{width:100%;min-height:84px;padding:10px;border:1px solid var(--ready-hairline-strong);color:var(--ready-ink);background:var(--ready-canvas-quiet);font:500 15px/1.55 var(--ready-font-sans);resize:vertical}.workbook-word-bank{display:flex;flex-wrap:wrap;gap:var(--ready-space-1);align-items:center;margin:0 0 var(--ready-space-4)}.workbook-word-bank small{margin-right:var(--ready-space-2);color:var(--ready-muted);font-weight:750}.workbook-word-bank span{padding:5px 8px;border:1px solid var(--ready-hairline);background:var(--ready-canvas-quiet);font-size:13px}
 .workbook-writing textarea{min-height:112px}.workbook-writing-hint{display:grid;gap:4px;margin:0 0 var(--ready-space-3);padding:10px 0;border-block:1px solid var(--ready-hairline);color:var(--ready-ink)}.workbook-writing-hint strong{color:var(--ready-accent);font-size:11px;letter-spacing:.08em}.workbook-writing-hint span{font:650 15px/1.55 var(--ready-font-sans)}
-.workbook-order-built{box-sizing:border-box;width:100%;min-width:0;min-height:68px;padding:8px 0 12px;border-bottom:1px solid var(--ready-hairline-strong)}
-body[data-ready-mode] .workbook-order-built button,body[data-ready-mode] .workbook-order-bank button{min-height:36px;padding:6px 10px;border:1px solid var(--ready-hairline-strong);border-radius:var(--ready-radius-xs);color:var(--ready-ink);background:var(--ready-surface);font:700 14px/1.2 var(--ready-font-sans);cursor:pointer}
-.workbook-order-built button{border-color:var(--ready-action);background:color-mix(in srgb,var(--ready-action) 8%,var(--ready-surface))}
+.workbook-order-built{display:grid;box-sizing:border-box;width:100%;min-width:0;min-height:68px;padding:8px 0 12px;border-bottom:1px solid var(--ready-hairline-strong);font-size:17px;font-weight:650;line-height:1.7}
+.workbook-order-built-sizer,.workbook-order-built-text{grid-area:1/1}.workbook-order-built-sizer{visibility:hidden}.workbook-order-built-text em{color:var(--ready-muted);font-size:13px;font-style:normal;font-weight:600}
+body[data-ready-mode] .workbook-order-bank button{min-height:36px;padding:6px 10px;border:1px solid var(--ready-hairline-strong);border-radius:var(--ready-radius-xs);color:var(--ready-ink);background:var(--ready-surface);font:700 14px/1.2 var(--ready-font-sans);cursor:pointer}
 /* Review keeps a quiet dictionary hierarchy inside READY's neutral system. */
 body[data-ready-mode="student"] #student-review{width:min(100%,1120px);padding-top:var(--ready-space-6)}
 body[data-ready-mode] .review-head h1{margin:8px 0 0;font-size:38px;letter-spacing:-.035em}
@@ -833,23 +833,30 @@ body[data-ready-mode="student"] .reading-passage{font-size:18px;line-height:1.72
 .workbook-stage-list{display:grid;gap:10px;border:0}
 .workbook-stage-list-head{border:0}
 .workbook-stage-option{
-  --workbook-progress-color:#f0c92f;
-  --workbook-progress-fill:color-mix(in srgb,var(--workbook-progress-color) 28%,var(--ready-surface));
-  min-height:76px;
-  padding:14px 18px;
+  --workbook-progress-start:#ffe36a;
+  --workbook-progress-end:#f2c72e;
+  display:grid;
+  min-height:84px;
+  grid-template-columns:minmax(0,1fr) auto;
+  gap:12px 18px;
+  padding:15px 18px 14px;
   border:1px solid var(--ready-hairline);
   border-radius:18px;
-  background:linear-gradient(to right,var(--workbook-progress-fill) 0 var(--workbook-progress),var(--ready-surface) var(--workbook-progress) 100%);
+  background:var(--ready-surface);
   -webkit-tap-highlight-color:transparent;
-  transition:border-color 160ms ease,box-shadow 160ms ease,background 240ms ease;
+  transition:border-color 160ms ease,box-shadow 160ms ease;
 }
 @media (hover:hover) and (pointer:fine){.workbook-stage-option:hover{border-color:var(--ready-hairline-strong);color:var(--ready-ink);box-shadow:var(--ready-shadow-soft)}}
 .workbook-stage-option:disabled{border-color:transparent;border-radius:18px;background:var(--ready-surface)}
-.workbook-stage-option.progress-cycle-2,.workbook-milestone.progress-cycle-2{--workbook-progress-color:#df9229}
-.workbook-stage-option.progress-cycle-3,.workbook-milestone.progress-cycle-3{--workbook-progress-color:#e87831}
-.workbook-stage-option.progress-cycle-4,.workbook-milestone.progress-cycle-4{--workbook-progress-color:#df657f}
-.workbook-stage-option.progress-cycle-5,.workbook-milestone.progress-cycle-5{--workbook-progress-color:#b94fa7}
-.workbook-stage-option.progress-cycle-6,.workbook-milestone.progress-cycle-6{--workbook-progress-color:#6947a8}
+.workbook-stage-copy{align-self:end}.workbook-stage-state{align-self:end}.workbook-stage-state small{color:var(--ready-ink);font-size:14px;font-weight:760}
+.workbook-stage-gauge{position:relative;display:block;height:8px;grid-column:1/-1;overflow:visible;border-radius:999px;background:color-mix(in srgb,var(--ready-canvas-quiet) 78%,var(--ready-hairline));box-shadow:inset 0 1px 2px rgba(28,27,24,.05)}
+.workbook-stage-gauge i{position:relative;display:block;width:var(--workbook-progress);height:100%;border-radius:inherit;background:linear-gradient(90deg,var(--workbook-progress-start),var(--workbook-progress-end));transition:width 260ms ease}
+.workbook-stage-option.has-progress .workbook-stage-gauge i::after{position:absolute;top:50%;right:0;width:10px;height:10px;border:1px solid var(--workbook-progress-end);border-radius:50%;background:var(--ready-surface);box-shadow:0 0 5px color-mix(in srgb,var(--workbook-progress-end) 26%,transparent);content:"";transform:translate(1px,-50%)}
+.workbook-stage-option.progress-cycle-2{--workbook-progress-start:#ffbd84;--workbook-progress-end:#f28a43}.workbook-milestone.progress-cycle-2{--workbook-progress-color:#df9229}
+.workbook-stage-option.progress-cycle-3{--workbook-progress-start:#f47c87;--workbook-progress-end:#eb5f82}.workbook-milestone.progress-cycle-3{--workbook-progress-color:#e87831}
+.workbook-stage-option.progress-cycle-4{--workbook-progress-start:#f272ad;--workbook-progress-end:#d94fca}.workbook-milestone.progress-cycle-4{--workbook-progress-color:#df657f}
+.workbook-stage-option.progress-cycle-5{--workbook-progress-start:#b77bea;--workbook-progress-end:#8760df}.workbook-milestone.progress-cycle-5{--workbook-progress-color:#b94fa7}
+.workbook-stage-option.progress-cycle-6{--workbook-progress-start:#8757df;--workbook-progress-end:#556ee0}.workbook-milestone.progress-cycle-6{--workbook-progress-color:#6947a8}
 .workbook-study-layout{width:min(100%,920px)}
 .workbook-card.workbook-focus-card{padding:clamp(22px,4vw,34px);border:1px solid var(--ready-hairline);border-radius:24px;background:var(--ready-surface);box-shadow:var(--ready-shadow-soft)}
 .workbook-card blockquote,.workbook-task-passage{padding:18px 20px;border:0;border-radius:18px;background:var(--ready-canvas-quiet);font-size:17px;line-height:1.72}
@@ -870,8 +877,7 @@ body[data-ready-mode] .workbook-correction-row input{min-height:44px;height:44px
 .workbook-translation textarea{min-height:110px;padding:14px;border-radius:16px;background:var(--ready-canvas)}
 .workbook-translation.correct textarea{border-color:var(--ready-success);background:var(--ready-success-soft)}.workbook-translation.wrong textarea{border-color:var(--ready-error);background:var(--ready-error-soft)}
 .workbook-word-bank span{border-radius:999px}
-.workbook-order-built{padding:12px;border:1px solid var(--ready-hairline);border-radius:16px;background:var(--ready-canvas)}
-body[data-ready-mode] .workbook-order-built button,
+.workbook-order-built{padding:14px 16px;border:1px solid var(--ready-hairline);border-radius:16px;background:var(--ready-canvas)}
 body[data-ready-mode] .workbook-order-bank button{min-height:46px;padding:9px 13px;border-radius:14px}
 .workbook-submit-actions{display:flex;justify-content:flex-end;gap:var(--ready-space-2);margin-top:var(--ready-space-6)}
 .workbook-submit-actions .button{min-width:112px}
