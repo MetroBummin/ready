@@ -300,6 +300,10 @@ assert.match(read('ready/design.css'),/workbook-order-bank-slot\.used\{visibilit
 assert.match(read('ready/design.css'),/workbook-order-built\{[^}]*min-height:68px/,'Stage 8 must keep a compact fixed assembly area');
 assert.doesNotMatch(read('ready/design.css'),/--workbook-order-stable-height/,'Stage 8 must not mirror the full bank height into the assembly area');
 assert.doesNotMatch(app,/chooseWorkbookOption[^\n]*queueWorkbookAutoSubmit|changeWorkbookOrder[^\n]*queueWorkbookAutoSubmit/,'Choice and reorder tasks must wait for the explicit local submit action');
+assert.doesNotMatch(app,/function queueWorkbookAutoSubmit/,'Workbook stages must never submit implicitly');
+assert.match(app,/function workbookSubmitHtml\(session,item,result\)\{if\(result\)return'';/,'Every unanswered Workbook stage must render the explicit submit action');
+assert.doesNotMatch(app,/function workbookSubmitHtml[^\n]*recall_unlock/,'Recall stages must not hide the submit action');
+assert.doesNotMatch(app,/async function handleWorkbookRecallInput[\s\S]{0,1600}submitWorkbook\(\)/,'Completing every recall slot must wait for the student to press submit');
 assert.match(app,/gradeLocalWorkbook[\s\S]{0,700}applyWorkbookOutcome[\s\S]{0,300}renderWorkbook\(\)[\s\S]{0,200}persistWorkbookAttempt/,'Workbook must render a deterministic result before persistence');
 assert.doesNotMatch(app,/function renderWorkbook\(\)[^\n]*stage\.instruction/,'Focused Workbook must not repeat stage instructions');
 assert.match(app,/function renderWorkbook\(\)[^\n]*workbookSubmitHtml/,'Focused Workbook must render the bottom-right local submit action');
