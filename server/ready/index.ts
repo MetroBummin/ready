@@ -1357,7 +1357,7 @@ async function studentWorkbook(body: any, session: ReadySession) {
     }))),
   })));
   const savedWords=await savedWordList(student.id,examId);
-  return { contractVersion: catalog.contractVersion || 'legacy-v1', workbookKey: catalog.workbookKey, catalogRevision: Number(catalog.revision)||0, title: catalog.title, passage: { id: passage.id, title: passage.title, updated_at: passage.updated_at, canonical_revision: Number(passage.canonical_revision)||0 }, savedWords, stages };
+  return { contractVersion: catalog.contractVersion || 'legacy-v1', workbookKey: catalog.workbookKey, catalogRevision: Number(catalog.revision)||0, title: catalog.title, recentStage: Number(attempts[0]?.stage)||null, passage: { id: passage.id, title: passage.title, updated_at: passage.updated_at, canonical_revision: Number(passage.canonical_revision)||0 }, savedWords, stages };
 }
 
 async function workbookAssistance(body: any, session: ReadySession) {

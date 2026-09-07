@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import {readFile} from 'node:fs/promises';
-import {workbookProgressPercent,workbookProgressVisual} from '../ready/workbook-progress.js';
+import {workbookCycleMilestone,workbookProgressPercent,workbookProgressVisual} from '../ready/workbook-progress.js';
 import {gradeLocalWorkbook,gradeWorkbookCorrectionPairs} from '../ready/deterministic-grading.js';
 
 assert.equal(workbookProgressPercent(0,41),0);
@@ -11,7 +11,14 @@ assert.deepEqual(workbookProgressVisual(100),{percent:100,fill:100,cycle:1});
 assert.deepEqual(workbookProgressVisual(105),{percent:105,fill:5,cycle:2});
 assert.deepEqual(workbookProgressVisual(200),{percent:200,fill:100,cycle:2});
 assert.deepEqual(workbookProgressVisual(201),{percent:201,fill:1,cycle:3});
-assert.deepEqual(workbookProgressVisual(501),{percent:501,fill:1,cycle:5});
+assert.deepEqual(workbookProgressVisual(400),{percent:400,fill:100,cycle:4});
+assert.deepEqual(workbookProgressVisual(401),{percent:401,fill:1,cycle:5});
+assert.deepEqual(workbookProgressVisual(500),{percent:500,fill:100,cycle:5});
+assert.deepEqual(workbookProgressVisual(501),{percent:501,fill:1,cycle:6});
+assert.equal(workbookCycleMilestone(40,41,41),100);
+assert.equal(workbookCycleMilestone(41,42,41),0);
+assert.equal(workbookCycleMilestone(81,82,41),200);
+assert.equal(workbookCycleMilestone(82,83,41),0);
 
 const incomplete=gradeLocalWorkbook({mode:'deterministic',answers:['one','two']},['one','']);
 assert.equal(incomplete.valid,true);
@@ -37,10 +44,21 @@ assert.match(app,/data-submit-workbook>제출<\/button>/,'submit must be enabled
 assert.doesNotMatch(app,/data-submit-workbook[^>]*disabled/,'response completeness must not disable submit');
 assert.doesNotMatch(app,/workbook-stage-gauge/,'the stage card itself must be the progress gauge');
 assert.match(designCss,/linear-gradient\(to right,var\(--workbook-progress-fill\) 0 var\(--workbook-progress\)/,'stage progress must fill the full card background');
+assert.doesNotMatch(app,/reader-actions/,'Passage must not end with the old Workbook start card');
+assert.match(app,/reader-learning-dock[\s\S]*reader-workbook-sheet/,'Passage must expose the compact Learning Dock and full Workbook sheet');
+assert.match(app,/data-reader-workbook-stage/,'Dock and sheet stages must start the selected learning immediately');
+assert.match(app,/data-workbook-sheet-drag/,'Workbook sheet drag must be owned by its header');
+assert.match(app,/data-workbook-sheet-close[\s\S]*stopImmediatePropagation/,'the scrim close path must own its tap');
+assert.match(app,/workbookCycleMilestone\(before,stage\.correctClears,stage\.total\)/,'a completed pool cycle must raise a milestone');
+assert.match(app,/data-workbook-repeat[\s\S]*data-workbook-other/,'milestone must offer repeat and other-learning actions');
+assert.match(designCss,/\.reader-learning-dock::before[\s\S]*linear-gradient/,'Dock must fade into the READY canvas');
+assert.match(designCss,/\.reader-learning-gauge span[^}]*width:var\(--workbook-progress\)/,'Dock and sheet must display a progress gauge');
+assert.match(designCss,/progress-cycle-6/,'500% and above must use the deepest progress color');
 assert.match(app,/Array\.from\(\{length:item\.slotCount\}/,'incomplete positions must be preserved');
 assert.match(edge,/item\.kind === "translation_ai" \|\| item\.semanticType === "translation"/,'semantic translation must use AI grading');
 assert.match(edge,/responses\[0\][\s\S]*callLegacyWorkbookTranslationGrade/,'non-empty translation must reach semantic AI grading');
 assert.match(edge,/해석을 입력하지 않아 채점할 수 없습니다/,'empty translation must produce explicit wrong feedback without inference');
+assert.match(edge,/recentStage: Number\(attempts\[0\]\?\.stage\)\|\|null/,'Passage Dock must resume the latest stage');
 assert.match(factory,/kind: 'translation_ai', semanticType: 'translation'/,'new semantic translation items must advertise AI grading');
 assert.match(studio,/✓ \$\{esc\(target\.correct/,'grammar authoring must expose the correct side');
 assert.match(studio,/target\.distractor\|\|'오답 필요'/,'grammar authoring must expose a missing or actual distractor');
