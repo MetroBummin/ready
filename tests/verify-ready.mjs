@@ -294,7 +294,9 @@ assert.match(importer,/minimal_correction_pair[\s\S]*comparable/,'Stage 7 must l
 assert.match(mockWorkbookImporter,/current_question[\s\S]*grouped\.setdefault\(current_question/,'Combined mock-exam continuation pages must stay attached to their current passage');
 assert.match(mockWorkbookImporter,/marker_paired_rows[\s\S]*answer_start[\s\S]*answer_end/,'Combined mock-exam Stage 5 must follow publisher answer ids instead of display numbering');
 assert.match(mockWorkbookImporter,/publisher_frame_not_safely_structured[\s\S]*derivedFallbacks/,'Unsafe mock-exam writing frames must remain explicit audited fallbacks');
-assert.match(app,/placeholder="\$\{esc\(hint\|\|'\'\)\}"/,'Stage 5 base verbs must be input placeholders, not exposed labels');
+assert.match(app,/verbForm=item\.semanticType==='verb_form'/,'Stage 5 must identify verb-form blanks locally');
+assert.match(app,/verbForm\?' verb-form-slot'/,'Stage 5 base-verb placeholders must receive a persistent focused style');
+assert.match(read('ready/design.css'),/\.workbook-blank\.verb-form-slot input:focus::placeholder\{color:var\(--ready-primary\)/,'Focused Stage 5 blanks must keep their base-verb cue visible');
 assert.match(app,/reserved=item\.grading\?\.answers\?\.\[slot\]\|\|expected/,'Deterministic inline blanks must reserve their answer width before typing');
 assert.match(app,/measure=\[hint,reserved,'답'\]/,'Typed values must never participate in deterministic blank width');
 assert.match(app,/data-workbook-fixed-width="true"/,'Inline blanks must opt out of input-driven width changes');
@@ -326,7 +328,7 @@ assert.doesNotMatch(edge,/grading:[^\n]*server_deterministic/,'Deterministic Wor
 assert.doesNotMatch(app,/readyApi\('workbook_recall_unlock'/,'Stage 2 and 3 must unlock from the authenticated Workbook bundle without another request');
 assert.match(edge,/async function workbookRecallUnlock[\s\S]*cue !== expected[\s\S]*return \{ slot, answer: item\.answers\[slot\] \}/,'Recall unlock must validate the cue on the server before returning one answer');
 assert.match(edge,/item\.semanticType !== 'writing'[\s\S]*answer: item\.answers\[0\][\s\S]*visibleForMs: 5000/,'Stage 7 hint returns the full answer only after an explicit request.');
-assert.match(app,/verifierMatches\(cue,verifier\)[\s\S]{0,180}composing[^\n]*flashRecallWrong/,'IME composition may complete a matching Korean cue immediately but must defer a partial mismatch');
+assert.match(app,/mode==='korean_syllable'[\s\S]{0,260}WORKBOOK_KOREAN_RECALL_STABILIZE_MS/,'A complete Korean syllable must stabilize briefly before verification');
 assert.match(app,/event\?\.isComposing\|\|input\.dataset\.composing==='true'\|\|workbookRecallIsPendingJamo\(raw,mode\)/,'iOS recall must defer validation for composition events and standalone Hangul jamo');
 assert.match(app,/flashRecallWrong[\s\S]*220/,'A wrong recall cue must clear after a brief red signal');
 assert.match(app,/data-workbook-live-prefix[\s\S]*workbook-live-copy/,'Stage 9 must show live mismatch feedback without ending the attempt');

@@ -22,7 +22,11 @@ assert.match(app,/input\.dataset\.recallComplete='true'[\s\S]{0,220}next\.focus/
 assert.match(app,/enterkeyhint="\$\{slot<item\.slotCount-1\?'next':'done'\}"/,'Multi-slot controls must expose next and done keyboard hints');
 assert.match(app,/handleWorkbookRecallInput\(input,event\)/,'Recall input must forward the native composition state on iOS');
 assert.match(app,/workbookRecallIsPendingJamo\(raw,mode\)/,'Standalone Hangul jamo must remain pending until the first complete syllable');
-assert.match(app,/snapshot=input\.value[\s\S]{0,220}input\.value!==snapshot\)return handleWorkbookRecallInput\(input\)/,'Recall verification must restart instead of clearing a newer IME value');
+assert.match(app,/WORKBOOK_KOREAN_RECALL_STABILIZE_MS=130/,'Only Korean recall must wait briefly for a syllable to stabilize');
+assert.match(app,/assistance\.recallSequence\?\.\[index\]===sequence&&input\.value===snapshot/,'Recall callbacks must ignore stale input values and sequences');
+assert.match(app,/clearWorkbookRecallTimers\(input\)[\s\S]{0,300}updateWorkbookSlot\(index,input\.value\)/,'Every recall value change must cancel older validation and wrong timers');
+assert.doesNotMatch(app,/flashRecallWrong[\s\S]{0,900}input\.focus\(/,'A delayed wrong callback must never reclaim focus from a newer slot');
+assert.match(app,/const ownsFocus=document\.activeElement===input&&session\.focusedSlot===index[\s\S]{0,550}if\(ownsFocus&&next\)/,'Only the latest focus owner may transfer focus after recall completion');
 assert.match(app,/enterkeyhint="done"/,'Blank and translation controls must expose a mobile completion key');
 assert.match(writing,/enterkeyhint="done"/,'Writing must expose a mobile completion key');
 assert.doesNotMatch(app,/WORKBOOK_AUTOFOCUS_TYPES[^\n]*(grammar_choice|word_order)/,'Choice and ordering stages must not opt into autofocus');
