@@ -10,6 +10,11 @@ export function workbookRecallCue(value,mode){
   return text.match(/[A-Za-z]/)?.[0]?.toLowerCase()||'';
 }
 
+export function workbookRecallIsPendingJamo(value,mode){
+  if(mode!=='korean_syllable'||workbookRecallCue(value,mode))return false;
+  return /[\u1100-\u11ff\u3131-\u318e\ua960-\ua97f\ud7b0-\ud7ff]/u.test(String(value??'').normalize('NFKC'));
+}
+
 export function workbookAssistanceMode(item){
   if(item?.semanticType==='korean_blank')return {mode:'recall_unlock',recallMode:'korean_syllable'};
   if(item?.semanticType==='english_blank')return {mode:'recall_unlock',recallMode:'english_initial'};

@@ -386,8 +386,8 @@ body[data-ready-mode="student"] #student-reader .reader-inline-sentence{-webkit-
 .workbook-card blockquote,.workbook-task-passage{margin:0 0 var(--ready-space-5);padding:var(--ready-space-4);border:0;border-left:2px solid var(--ready-ink);border-radius:0;color:var(--ready-body);background:var(--ready-canvas-quiet);font-size:16px;line-height:1.7;overflow-wrap:anywhere}
 .workbook-prompt{min-width:0;color:var(--ready-ink);font-size:16px;font-weight:500;line-height:1.8;overflow-wrap:anywhere}
 .workbook-blank{display:inline-grid;width:auto;min-width:0;gap:3px;margin:0 3px;vertical-align:middle}
-body[data-ready-mode] .workbook-blank input{box-sizing:border-box;width:calc(var(--workbook-slot-ch,8)*1ch + 28px);min-width:56px;max-width:320px;min-height:34px;height:34px;padding:2px 7px;border:0;border-bottom:2px solid var(--ready-ink);border-radius:0;background:var(--ready-canvas-quiet);font-size:15px;text-align:center}
-.workbook-blank.long-slot{width:min(100%,calc(var(--workbook-slot-ch)*1ch + 28px));margin-block:6px}
+body[data-ready-mode] .workbook-blank input{box-sizing:border-box;width:calc(var(--workbook-slot-ch,8)*1ch + 18px);min-width:46px;max-width:320px;min-height:34px;height:34px;padding:2px 6px;border:0;border-bottom:2px solid var(--ready-ink);border-radius:0;background:var(--ready-canvas-quiet);font-size:15px;text-align:center}
+.workbook-blank.long-slot{width:min(100%,calc(var(--workbook-slot-ch)*1ch + 18px));margin-block:6px}
 body[data-ready-mode] .workbook-blank.long-slot input{width:100%;max-width:none;text-align:left}
 .workbook-blank input::placeholder{color:var(--ready-body);opacity:.72}
 .workbook-blank input:focus::placeholder{color:transparent}
@@ -946,6 +946,9 @@ body[data-ready-mode] .sheet{border-radius:24px 0 0 24px}
   body[data-ready-mode="student"] .reader-prose p{font-size:17px}
   .workbook-milestone{padding:34px 20px;border-radius:24px}
   .workbook-card.workbook-focus-card{margin-inline:-4px;padding:20px 16px}
+  .workbook-prompt.inline-blank-task{line-height:2.05}
+  body[data-ready-mode] .workbook-blank{margin:2px 2px}
+  body[data-ready-mode] .workbook-blank input{min-height:37px;height:37px;padding:4px 7px;border-radius:10px}
   .workbook-card blockquote,.workbook-task-passage{margin-inline:0!important;padding-inline:16px!important}
   .workbook-choice-group{display:grid;width:100%;grid-template-columns:1fr 1fr;margin:8px 0}
   .workbook-choice-or{display:none}
