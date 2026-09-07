@@ -6,7 +6,7 @@ const app=read('ready/app.js'),admin=read('ready/admin/app.js'),studio=read('rea
 
 assert.match(edge,/assistance: await publicWorkbookAssistance\(item, sha256Hex\)/,'Workbook assistance must be bundled with the authenticated catalog');
 assert.match(edge,/mode: "deterministic"[\s\S]{0,140}answers: item\.answers/,'Deterministic answers must be bundled once for local grading');
-assert.match(app,/function workbookTaskHtml\(item,values,result,session,lookupText=null\)[\s\S]{0,1600}return `<div class="workbook-prompt"/,'Verb-form items must remain on the shared visible blank-input renderer');
+assert.match(app,/function workbookTaskHtml\(item,values,result,session,lookupText=null\)[\s\S]{0,1600}return `<div class="workbook-prompt inline-blank-task"/,'Verb-form items must remain on the shared visible blank-input renderer');
 assert.match(app,/item\.grading\.kind==='correction_pairs'[\s\S]{0,420}gradeLocalWorkbook\(item\.grading,responses/,'Verb-form and other exact deterministic items must grade locally');
 assert.match(edge,/item\.semanticType === "writing" \|\| Number\(item\.stage\) === 9/,'Writing hint persistence must follow the semantic stage while retaining legacy stage 9');
 assert.doesNotMatch(app,/readyApi\('workbook_assistance'|readyApi\('workbook_recall_unlock'/,'A Workbook interaction must not fetch assistance or recall answers');

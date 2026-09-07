@@ -20,6 +20,9 @@ assert.match(app,/refreshWorkbookOutcome\(session,item\)/,'Local and AI results 
 assert.doesNotMatch(app,/input\.readOnly=true/,'Recall completion must not make the current field readonly before transferring focus');
 assert.match(app,/input\.dataset\.recallComplete='true'[\s\S]{0,220}next\.focus/,'Recall completion must transfer focus without replacing input DOM');
 assert.match(app,/enterkeyhint="\$\{slot<item\.slotCount-1\?'next':'done'\}"/,'Multi-slot controls must expose next and done keyboard hints');
+assert.match(app,/handleWorkbookRecallInput\(input,event\)/,'Recall input must forward the native composition state on iOS');
+assert.match(app,/workbookRecallIsPendingJamo\(raw,mode\)/,'Standalone Hangul jamo must remain pending until the first complete syllable');
+assert.match(app,/snapshot=input\.value[\s\S]{0,220}input\.value!==snapshot\)return handleWorkbookRecallInput\(input\)/,'Recall verification must restart instead of clearing a newer IME value');
 assert.match(app,/enterkeyhint="done"/,'Blank and translation controls must expose a mobile completion key');
 assert.match(writing,/enterkeyhint="done"/,'Writing must expose a mobile completion key');
 assert.doesNotMatch(app,/WORKBOOK_AUTOFOCUS_TYPES[^\n]*(grammar_choice|word_order)/,'Choice and ordering stages must not opt into autofocus');

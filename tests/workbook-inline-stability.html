@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <link rel="stylesheet" href="../styles/tokens.css">
+  <link rel="stylesheet" href="../styles/base.css">
+  <link rel="stylesheet" href="../ready/design.css?v=workbook-inline-stability-2">
+  <title>Workbook inline stability QA</title>
+</head>
+<body data-ready-mode="student">
+  <main style="max-width:390px;margin:auto">
+    <section class="workbook-card workbook-focus-card">
+      <p class="workbook-prompt inline-blank-task" id="qa-sentence">
+        The mobile layout
+        <span class="workbook-blank" data-workbook-fixed-width="true" style="--workbook-slot-ch:7"><input id="qa-hanging" type="text" aria-label="hanging blank"></span>
+        stable while three
+        <span class="workbook-blank" data-workbook-fixed-width="true" style="--workbook-slot-ch:7"><input type="text" aria-label="compact blank two"></span>
+        inline blanks
+        <span class="workbook-blank" data-workbook-fixed-width="true" style="--workbook-slot-ch:7"><input type="text" aria-label="compact blank three"></span>
+        wrap across lines.
+      </p>
+      <output id="qa-result" style="display:block;margin-top:20px;font:12px/1.5 monospace"></output>
+    </section>
+  </main>
+  <script>
+    const input=document.querySelector('#qa-hanging'),sentence=document.querySelector('#qa-sentence'),output=document.querySelector('#qa-result');
+    const layout=()=>[...sentence.childNodes].map(node=>node.nodeType===Node.TEXT_NODE?node.textContent:node.getBoundingClientRect().top).join('|');
+    const initial=layout(),width=input.getBoundingClientRect().width,height=input.getBoundingClientRect().height;
+    for(const value of ['h','hang','hanging']){input.value=value;input.dispatchEvent(new InputEvent('input',{bubbles:true,inputType:'insertText',data:value.at(-1)}));}
+    const stable=initial===layout();output.value=`layout=${stable?'stable':'moved'}; width=${Math.round(width)}px; height=${Math.round(height)}px; blanks=${sentence.querySelectorAll('.workbook-blank').length}`;
+    document.body.dataset.qaStable=String(stable);
+  </script>
+</body>
+</html>
