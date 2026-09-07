@@ -304,9 +304,9 @@ assert.doesNotMatch(app,/function queueWorkbookAutoSubmit/,'Workbook stages must
 assert.match(app,/function workbookSubmitHtml\(session,item,result\)\{if\(result\)return'';/,'Every unanswered Workbook stage must render the explicit submit action');
 assert.doesNotMatch(app,/function workbookSubmitHtml[^\n]*recall_unlock/,'Recall stages must not hide the submit action');
 assert.doesNotMatch(app,/async function handleWorkbookRecallInput[\s\S]{0,1600}submitWorkbook\(\)/,'Completing every recall slot must wait for the student to press submit');
-assert.match(app,/gradeLocalWorkbook[\s\S]{0,700}applyWorkbookOutcome[\s\S]{0,300}renderWorkbook\(\)[\s\S]{0,200}persistWorkbookAttempt/,'Workbook must render a deterministic result before persistence');
-assert.doesNotMatch(app,/function renderWorkbook\(\)[^\n]*stage\.instruction/,'Focused Workbook must not repeat stage instructions');
-assert.match(app,/function renderWorkbook\(\)[^\n]*workbookSubmitHtml/,'Focused Workbook must render the bottom-right local submit action');
+assert.match(app,/gradeLocalWorkbook[\s\S]{0,700}applyWorkbookOutcome[\s\S]{0,300}persistWorkbookAttempt/,'Workbook must apply a deterministic result before background persistence');
+assert.doesNotMatch(app,/function renderWorkbook\([^\n]*\)[^\n]*stage\.instruction/,'Focused Workbook must not repeat stage instructions');
+assert.match(app,/function renderWorkbook\([^\n]*\)[^\n]*workbookSubmitHtml/,'Focused Workbook must render the bottom-right local submit action');
 assert.match(app,/event\.isComposing\|\|event\.keyCode===229/,'Enter grading must ignore active IME composition');
 assert.match(app,/backGesture=dx<=-64\|\|\(swipe\.fromLeftEdge&&dx>=64\)/,'Workbook previous navigation must support left swipe and the iOS-style edge gesture');
 assert.match(edge,/grading: item\.kind === "translation_ai" \|\| item\.semanticType === "translation"[\s\S]*mode: "deterministic"[\s\S]*answers: item\.answers/,'Workbook grading contracts must ship in the assigned authenticated bundle.');
