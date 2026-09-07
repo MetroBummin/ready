@@ -428,7 +428,7 @@ body[data-ready-mode] .workbook-correction-row input{min-height:36px;height:36px
 .bookmark-star{font-size:23px;line-height:1;transform:translateY(-1px)}
 .workbook-answer-action{min-height:32px;padding:4px 7px;border:0;border-radius:var(--ready-radius-xs);color:var(--ready-muted);background:transparent;font:700 12px/1.2 var(--ready-font-sans);cursor:pointer}
 .workbook-answer-action:hover,.workbook-answer-action:focus-visible{color:var(--ready-ink);background:var(--ready-canvas-quiet)}
-.workbook-order-built,.workbook-order-bank{display:flex;flex-wrap:wrap;gap:var(--ready-space-2);align-items:center}.workbook-order-bank-slot{display:inline-flex;min-height:36px}.workbook-order-bank-slot.used{visibility:hidden;pointer-events:none}
+.workbook-order-built,.workbook-order-bank{display:flex;flex-wrap:wrap;gap:var(--ready-space-2);align-items:center}.workbook-order-bank-slot{display:inline-flex;min-height:36px}.workbook-order-bank-slot.used{visibility:hidden;pointer-events:none}.workbook-order-bank-slot.withheld{display:none}
 .workbook-translation{display:grid;gap:var(--ready-space-2);color:var(--ready-muted);font-size:12px;font-weight:750}.workbook-translation textarea{width:100%;min-height:84px;padding:10px;border:1px solid var(--ready-hairline-strong);color:var(--ready-ink);background:var(--ready-canvas-quiet);font:500 15px/1.55 var(--ready-font-sans);resize:vertical}.workbook-word-bank{display:flex;flex-wrap:wrap;gap:var(--ready-space-1);align-items:center;margin:0 0 var(--ready-space-4)}.workbook-word-bank small{margin-right:var(--ready-space-2);color:var(--ready-muted);font-weight:750}.workbook-word-bank span{padding:5px 8px;border:1px solid var(--ready-hairline);background:var(--ready-canvas-quiet);font-size:13px}
 .workbook-writing textarea{min-height:112px}.workbook-writing-hint{display:grid;gap:4px;margin:0 0 var(--ready-space-3);padding:10px 0;border-block:1px solid var(--ready-hairline);color:var(--ready-ink)}.workbook-writing-hint strong{color:var(--ready-accent);font-size:11px;letter-spacing:.08em}.workbook-writing-hint span{font:650 15px/1.55 var(--ready-font-sans)}
 .workbook-order-built{box-sizing:border-box;width:100%;min-width:0;min-height:68px;padding:8px 0 12px;border-bottom:1px solid var(--ready-hairline-strong)}
@@ -867,12 +867,14 @@ body[data-ready-mode] .workbook-correction-row input{min-height:44px;height:44px
 .workbook-bookmark{width:44px;height:44px;border-radius:50%}
 .workbook-answer-action{min-height:40px;padding:8px 12px;border-radius:12px}
 .workbook-translation textarea{min-height:110px;padding:14px;border-radius:16px;background:var(--ready-canvas)}
+.workbook-translation.correct textarea{border-color:var(--ready-success);background:var(--ready-success-soft)}.workbook-translation.wrong textarea{border-color:var(--ready-error);background:var(--ready-error-soft)}
 .workbook-word-bank span{border-radius:999px}
 .workbook-order-built{padding:12px;border:1px solid var(--ready-hairline);border-radius:16px;background:var(--ready-canvas)}
 body[data-ready-mode] .workbook-order-built button,
 body[data-ready-mode] .workbook-order-bank button{min-height:46px;padding:9px 13px;border-radius:14px}
-.workbook-submit-actions{display:flex;justify-content:flex-end;margin-top:var(--ready-space-6)}
+.workbook-submit-actions{display:flex;justify-content:flex-end;gap:var(--ready-space-2);margin-top:var(--ready-space-6)}
 .workbook-submit-actions .button{min-width:112px}
+.workbook-submit-hint:disabled{border-color:var(--ready-hairline);color:var(--ready-muted);background:var(--ready-canvas-quiet);opacity:.68}
 .workbook-milestone-shell{display:grid;min-height:calc(100dvh - 120px);place-items:center;width:min(100%,760px);margin:0 auto}
 .workbook-milestone{--workbook-progress-color:#f0c92f;--workbook-progress-on:#241d08;display:grid;width:min(100%,600px);justify-items:center;padding:clamp(34px,7vw,64px);border:1px solid color-mix(in srgb,var(--workbook-progress-color) 34%,var(--ready-hairline));border-radius:30px;background:radial-gradient(circle at 50% 18%,color-mix(in srgb,var(--workbook-progress-color) 22%,transparent),transparent 46%),var(--ready-surface);box-shadow:var(--ready-shadow-soft);text-align:center;animation:workbook-milestone-in 420ms cubic-bezier(.2,.85,.3,1) both}
 .workbook-milestone-mark{position:relative;display:grid;width:112px;height:112px;place-items:center;margin-bottom:24px;border-radius:50%;background:conic-gradient(var(--workbook-progress-color) 0 100%,transparent 0);box-shadow:0 0 0 12px color-mix(in srgb,var(--workbook-progress-color) 14%,transparent)}
