@@ -6,7 +6,7 @@ const READ_ONLY_OPS = new Set([
   'admin_workbook_progress', 'admin_workbook_progress_detail', 'admin_workbook_attempt_replay',
 ]);
 
-export async function readyApi(op, data = {}, token = '', { signal } = {}) {
+export async function readyApi(op, data = {}, token = '', { signal, keepalive = false } = {}) {
   const { API_URL } = getConfig();
   if (!API_URL) throw new Error('READY config.js의 API_URL을 확인해 주세요.');
   let response;
@@ -20,6 +20,7 @@ export async function readyApi(op, data = {}, token = '', { signal } = {}) {
           ...(token ? { authorization: `Bearer ${token}` } : {}),
         },
         signal,
+        keepalive,
         body: JSON.stringify({ op, ...data }),
       });
     } catch {
