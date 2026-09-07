@@ -391,6 +391,7 @@ body[data-ready-mode] .workbook-blank input{box-sizing:border-box;width:calc(var
 body[data-ready-mode] .workbook-blank.long-slot input{width:100%;max-width:none;text-align:left}
 .workbook-blank input::placeholder{color:var(--ready-body);opacity:.72}
 .workbook-blank input:focus::placeholder{color:transparent}
+.workbook-blank.verb-form-slot input:focus::placeholder{color:var(--ready-primary);opacity:.72}
 .workbook-blank.correct input{border-color:var(--ready-success);background:var(--ready-success-soft)}
 .workbook-blank.wrong input{border-color:var(--ready-error);background:var(--ready-error-soft)}
 .workbook-blank input.recall-wrong{border-color:var(--ready-error);color:var(--ready-error);background:var(--ready-error-soft)}
