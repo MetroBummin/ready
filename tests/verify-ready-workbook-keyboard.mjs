@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
-import {progressiveOrderState,shuffleWorkbookOrderBatch,workbookEnterAction,workbookOrderAnswerIndexes} from '../ready/workbook-interaction.js';
+import {progressiveOrderState,shuffleWorkbookOrderBatch,workbookEnterAction,workbookOrderAnswerIndexes,workbookOrderClick,workbookOrderTokenMatches} from '../ready/workbook-interaction.js';
 
 const app=readFileSync(new URL('../ready/app.js',import.meta.url),'utf8');
 const writing=readFileSync(new URL('../ready/workbook-writing-ui.js',import.meta.url),'utf8');
@@ -35,6 +35,17 @@ assert.doesNotMatch(app,/WORKBOOK_AUTOFOCUS_TYPES[^\n]*(grammar_choice|word_orde
 
 const duplicateGroup=['to','learn','to','read','well','today','fast'];
 assert.deepEqual(workbookOrderAnswerIndexes(duplicateGroup,'to learn to read well today fast'),[0,1,2,3,4,5,6],'Repeated chips must retain identity by index');
+const twoDuplicates=['the','cat','the'],twoDuplicateAnswer='the cat the';
+assert.equal(workbookOrderTokenMatches(twoDuplicates,0,2),true,'Either visible duplicate must match the expected token text');
+assert.deepEqual(workbookOrderClick(twoDuplicates,twoDuplicateAnswer,[],[],2),{type:'correct',chosen:[0],consumed:[2]},'A duplicate click must store the expected canonical index while consuming the visible chip');
+const threeDuplicates=['cat','the','runs','the','the'],threeDuplicateAnswer='the cat runs the the';
+let duplicateState={chosen:[],consumed:[]};
+for(const chipIndex of [4,0,2,1,3])duplicateState=workbookOrderClick(threeDuplicates,threeDuplicateAnswer,duplicateState.chosen,duplicateState.consumed,chipIndex);
+assert.deepEqual(duplicateState,{type:'correct',chosen:[1,0,2,3,4],consumed:[4,0,2,1,3]},'Three visible duplicates must progress by canonical answer position without reusing a physical chip');
+const duplicateBatch=['the','a','b','c','d','the','e','f'],duplicateBatchAnswer=duplicateBatch.join(' ');
+let duplicateBatchState={chosen:[],consumed:[]};
+for(const chipIndex of [5,1,2,3,4,0])duplicateBatchState=workbookOrderClick(duplicateBatch,duplicateBatchAnswer,duplicateBatchState.chosen,duplicateBatchState.consumed,chipIndex);
+assert.equal(progressiveOrderState(duplicateBatch,duplicateBatchAnswer,duplicateBatchState.chosen).batchIndex,1,'A duplicate accepted from its first batch must advance to the following fixed batch normally');
 const answerTokens=Array.from({length:20},(_,index)=>`word${index+1}`),twentyChipGroup=[...answerTokens.slice(6),...answerTokens.slice(0,6)],answer=answerTokens.join(' '),expected=workbookOrderAnswerIndexes(twentyChipGroup,answer);
 const batch1=progressiveOrderState(twentyChipGroup,answer,[]);
 assert.deepEqual(batch1.batch,expected.slice(0,6),'The first visible batch must contain exactly answer positions 1-6');
@@ -48,8 +59,10 @@ assert.deepEqual(progressiveOrderState(twentyChipGroup,answer,expected.slice(0,5
 assert.match(app,/if\(!orders\[progressive\.batchIndex\]\)orders\[progressive\.batchIndex\]=shuffleWorkbookOrderBatch/,'Each ordering batch must be shuffled once and cached on entry');
 assert.match(app,/delete session\.orderBatchOrders\?\.\[item\.key\]/,'Retry must discard stored batch shuffles and restart from batch one');
 assert.match(app,/if\(item\.kind==='reorder_groups'\)\{session\.orderSelections\[item\.key\]=Array\.from[\s\S]{0,180}next=Array\(item\.slotCount\)\.fill\(''\)/,'Ordering retry must clear every group and response in the problem');
-assert.match(app,/if\(remove&&position>=0\)current\.splice\(position\)/,'Removing a built chip must rewind the confirmed prefix from that position');
-assert.match(app,/chipIndex!==progressive\.nextExpected[\s\S]{0,220}submitWorkbook\(\)/,'A wrong ordering chip must immediately finalize the local attempt');
+assert.match(app,/if\(remove&&position>=0\)\{current\.splice\(position\);consumed\[group\]\.splice\(position\)/,'Removing a built chip must rewind the confirmed prefix from that position');
+assert.match(app,/workbookOrderClick\(words,answer,current,consumed\[group\],chipIndex\)[\s\S]{0,260}click\.type==='wrong'\)return submitWorkbook\(\)/,'Only a normalized token-text mismatch must immediately finalize the local attempt');
+assert.match(app,/composition\.state==='mismatch'\)\{if\(event\?\.isComposing\|\|input\.dataset\.composing==='true'\)return;return flashRecallWrong/,'Korean mismatch feedback must remain composition-aware');
+assert.match(app,/verifyWorkbookRecallInput\(input,session,item,index,mode,sequence,input\.value,\{allowComposing:true\}\)/,'A complete Korean syllable must unlock without waiting for compositionend');
 assert.match(app,/workbook-order-built-sizer[\s\S]{0,180}workbook-order-built-text/,'Ordering must reserve the completed sentence geometry while rendering selected words as plain text');
 assert.doesNotMatch(app,/data-workbook-order-remove=/,'The assembled sentence must not render selected words as removable chips');
 assert.match(app,/hintUsed\?'힌트 사용함':'힌트 보기'/,'Writing hint must become visibly exhausted after its one use');

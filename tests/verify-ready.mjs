@@ -322,7 +322,7 @@ assert.match(read('ready/design.css'),/workbook-order-bank-slot\.used\{display:n
 assert.match(read('ready/design.css'),/workbook-order-built\{[^}]*min-height:68px/,'Stage 8 must keep a compact fixed assembly area');
 assert.doesNotMatch(read('ready/design.css'),/--workbook-order-stable-height/,'Stage 8 must not mirror the full bank height into the assembly area');
 assert.match(read('ready/design.css'),/workbook-order-bank\{[^}]*min-height:var\(--workbook-order-bank-height/,'Stage 8 must reserve the active bank height while selected chips disappear');
-assert.match(app,/chipIndex!==progressive\.nextExpected[\s\S]{0,220}submitWorkbook\(\)/,'Stage 8 must grade immediately when a wrong visible chip is selected');
+assert.match(app,/workbookOrderClick\(words,answer,current,consumed\[group\],chipIndex\)[\s\S]{0,260}click\.type==='wrong'\)return submitWorkbook\(\)/,'Stage 8 must grade immediately when a normalized token-text mismatch is selected');
 assert.doesNotMatch(app,/function queueWorkbookAutoSubmit/,'Workbook stages must never submit implicitly');
 assert.match(app,/function workbookSubmitHtml\(session,item,result\)[^\n]*data-submit-workbook/,'Every unanswered Workbook stage must render the explicit submit action');
 assert.doesNotMatch(app,/function workbookSubmitHtml[^\n]*recall_unlock/,'Recall stages must not hide the submit action');

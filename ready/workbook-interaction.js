@@ -25,6 +25,23 @@ export function workbookOrderAnswerIndexes(group=[],answer=''){
   return expected.length===group.length?expected:[];
 }
 
+export function workbookOrderTokenMatches(group=[],expectedIndex=-1,clickedIndex=-1){
+  const expected=clean(group[expectedIndex]),clicked=clean(group[clickedIndex]);
+  return Boolean(expected)&&expected===clicked;
+}
+
+export function workbookOrderClick(group=[],answer='',chosen=[],consumed=[],chipIndex=-1){
+  const progressive=progressiveOrderState(group,answer,chosen),nextChosen=[...chosen],nextConsumed=[...consumed];
+  if(!Number.isInteger(chipIndex)||chipIndex<0||chipIndex>=group.length||nextConsumed.includes(chipIndex)||progressive.nextExpected<0)return {type:'ignore',chosen:nextChosen,consumed:nextConsumed};
+  nextConsumed.push(chipIndex);
+  if(!workbookOrderTokenMatches(group,progressive.nextExpected,chipIndex)){
+    nextChosen.push(chipIndex);
+    return {type:'wrong',chosen:nextChosen,consumed:nextConsumed};
+  }
+  nextChosen.push(progressive.nextExpected);
+  return {type:'correct',chosen:nextChosen,consumed:nextConsumed};
+}
+
 export function shuffleWorkbookOrderBatch(batch=[],random=Math.random){
   const shuffled=[...batch];
   for(let index=shuffled.length-1;index>0;index-=1){
