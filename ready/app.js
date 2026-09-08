@@ -154,7 +154,7 @@ function syncWorkbookSlotWidth(input){const wrapper=input.closest('.workbook-bla
 const workbookRecallWrongTimers=new WeakMap();
 function clearWorkbookRecallTimers(input){const wrong=workbookRecallWrongTimers.get(input);if(wrong)clearTimeout(wrong);workbookRecallWrongTimers.delete(input);input.classList.remove('recall-wrong');}
 function workbookRecallIsCurrent(input,session,item,index,sequence,snapshot){const current=workbookCurrent(),assistance=workbookAssistanceState(session,item);return input.isConnected&&current.session===session&&current.item?.key===item.key&&!session.results[item.key]&&assistance.recallSequence?.[index]===sequence&&input.value===snapshot&&input.dataset.recallComplete!=='true';}
-function flashRecallWrong(input,session,item,index,sequence,snapshot){if(!workbookRecallIsCurrent(input,session,item,index,sequence,snapshot))return;input.classList.add('recall-wrong');const timer=setTimeout(()=>{workbookRecallWrongTimers.delete(input);if(!workbookRecallIsCurrent(input,session,item,index,sequence,snapshot))return;input.value='';updateWorkbookSlot(index,'');input.classList.remove('recall-wrong');},220);workbookRecallWrongTimers.set(input,timer);}
+function flashRecallWrong(input,session,item,index,sequence,snapshot,{lockInput=false}={}){if(!workbookRecallIsCurrent(input,session,item,index,sequence,snapshot))return;input.classList.add('recall-wrong');if(lockInput){input.dataset.recallRejecting='true';input.readOnly=true;}const timer=setTimeout(()=>{workbookRecallWrongTimers.delete(input);const current=workbookCurrent();if(!input.isConnected||current.session!==session||current.item?.key!==item.key||session.results[item.key]||input.dataset.recallRejecting!=='true'&&lockInput)return;input.value='';updateWorkbookSlot(index,'');input.classList.remove('recall-wrong');if(lockInput){delete input.dataset.recallRejecting;input.readOnly=false;}},220);workbookRecallWrongTimers.set(input,timer);}
 async function verifyWorkbookRecallInput(input,session,item,index,mode,sequence,snapshot,{allowComposing=false}={}){
   if(!workbookRecallIsCurrent(input,session,item,index,sequence,snapshot)||(!allowComposing&&input.dataset.composing==='true')||workbookRecallIsPendingJamo(snapshot,mode))return;
   const cue=workbookRecallCue(snapshot,mode);if(!cue)return flashRecallWrong(input,session,item,index,sequence,snapshot);
@@ -166,14 +166,14 @@ async function verifyWorkbookRecallInput(input,session,item,index,mode,sequence,
 function handleWorkbookRecallInput(input,event=null){
   const {session,item}=workbookCurrent();
   if(!session||!item||session.results[item.key]||input.dataset.unlocking==='true'||input.dataset.recallComplete==='true')return;
-  if(event?.type==='compositionend'&&input.dataset.recallRejected==='true')return;
-  if(event?.type==='input'&&input.dataset.recallRejected==='true'&&input.dataset.composing!=='true')delete input.dataset.recallRejected;
+  if(input.dataset.recallRejecting==='true'||event?.type==='compositionend'&&input.dataset.recallRejected==='true')return;
+  if(event?.type==='input'&&input.dataset.recallRejected==='true')delete input.dataset.recallRejected;
   const index=Number(input.dataset.workbookSlot),mode=input.dataset.workbookRecall,raw=String(input.value||'').trim(),assistance=workbookAssistanceState(session,item);assistance.recallSequence??={};const sequence=(assistance.recallSequence[index]||0)+1;assistance.recallSequence[index]=sequence;clearWorkbookRecallTimers(input);updateWorkbookSlot(index,input.value);
   if(!raw)return;
   if(mode==='korean_syllable'){
     const composition=koreanRecallCompositionState(raw,item.grading?.answers?.[index]);
     if(composition.state==='partial'||composition.state==='empty')return;
-    if(composition.state==='mismatch'){input.dataset.recallRejected='true';return flashRecallWrong(input,session,item,index,sequence,input.value);}
+    if(composition.state==='mismatch'){input.dataset.recallRejected='true';return flashRecallWrong(input,session,item,index,sequence,input.value,{lockInput:true});}
     return verifyWorkbookRecallInput(input,session,item,index,mode,sequence,input.value,{allowComposing:true});
   }
   if(workbookRecallIsPendingJamo(raw,mode))return;
@@ -333,7 +333,7 @@ document.addEventListener('pointercancel',event=>finishWorkbookBackSwipe(event,t
 document.addEventListener('click',event=>{const button=event.target.closest?.('[data-workbook-hint],[data-workbook-reveal]');if(!button)return;event.stopImmediatePropagation();if(button.hasAttribute('data-workbook-hint'))requestWorkbookHint();else revealWorkbookAnswer();},true);
 document.addEventListener('click',event=>{const button=event.target.closest?.('[data-workbook-stages]');if(!button)return;event.stopImmediatePropagation();beginNavigation();renderWorkbookStages();},true);
 document.addEventListener('focusin',event=>{if(event.target.matches?.('[data-workbook-slot]')&&state.workbookSession)state.workbookSession.focusedSlot=Number(event.target.dataset.workbookSlot)||0;});
-document.addEventListener('compositionstart',event=>{if(event.target.matches?.('[data-workbook-recall]')){delete event.target.dataset.recallRejected;event.target.dataset.composing='true';}});
+document.addEventListener('compositionstart',event=>{if(event.target.matches?.('[data-workbook-recall]'))event.target.dataset.composing='true';});
 document.addEventListener('compositionend',event=>{if(!event.target.matches?.('[data-workbook-recall]'))return;event.target.dataset.composing='false';handleWorkbookRecallInput(event.target,event);});
 document.addEventListener('beforeinput',event=>{if(event.target.matches?.('[data-workbook-graded="true"],[data-recall-complete="true"]'))event.preventDefault();},true);
 document.addEventListener('click',event=>{const button=event.target.closest?.('[data-review-kind]');if(!button)return;event.stopImmediatePropagation();state.reviewKind=button.dataset.reviewKind;renderReview();loadReviewKind(state.reviewKind);},true);
