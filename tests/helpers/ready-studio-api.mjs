@@ -54,8 +54,8 @@ globalThis.fetch=async(url,options)=>{
 };
 let source=readFileSync(repo+'/server/ready/index.ts','utf8').replace(/import \{ createClient \} from "[^"]+";/,'const createClient=()=>globalThis.__studioDb;');
 source=source.replace(/(from\s*|import\()(["'])(\.[^"']+)\2/g,(_,lead,quote,path)=>lead+quote+pathToFileURL(resolve(repo+'/server/ready',path)).href+quote);
-source+='\nexport {dispatch};';writeFileSync(resolve(scratch,'edge.mjs'),stripTypeScriptTypes(source,{mode:'transform'}));
-export const {dispatch}=await import(pathToFileURL(resolve(scratch,'edge.mjs')).href);
+source+='\nexport {dispatch,geminiSentenceJson};';writeFileSync(resolve(scratch,'edge.mjs'),stripTypeScriptTypes(source,{mode:'transform'}));
+export const {dispatch,geminiSentenceJson}=await import(pathToFileURL(resolve(scratch,'edge.mjs')).href);
 export async function request(op,data={},token='') {return handler(new Request('http://localhost/api',{method:'POST',headers:{'content-type':'application/json',authorization:'Bearer '+token},body:JSON.stringify({op,...data})}));}
 export async function call(op,data={},token=''){const res=await request(op,data,token),body=await res.json();if(!res.ok)throw Object.assign(new Error(body.error),{body,status:res.status});return body;}
 export const admin=(await call('admin_login',{password:'studio-local'})).session.token;
