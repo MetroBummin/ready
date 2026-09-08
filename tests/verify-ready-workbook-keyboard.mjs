@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {progressiveOrderState,shuffleWorkbookOrderBatch,workbookEnterAction,workbookOrderAnswerIndexes,workbookOrderClick,workbookOrderTokenMatches} from '../ready/workbook-interaction.js';
+import {koreanRecallCompositionState} from '../ready/workbook-assistance.js';
 
 const app=readFileSync(new URL('../ready/app.js',import.meta.url),'utf8');
 const writing=readFileSync(new URL('../ready/workbook-writing-ui.js',import.meta.url),'utf8');
@@ -17,17 +18,22 @@ assert.match(app,/const action=workbookEnterAction\(workbookValues\(session,item
 assert.match(app,/if\(action\.type==='submit'\)return submitWorkbook\(\);if\(action\.type==='next'\)return moveWorkbook\(1,\{focus:true,preserveKeyboard:true\}\)/,'First Enter submits and second correct Enter transfers focus to the next card');
 assert.match(app,/session\.aiPending\[item\.key\]=true;delete session\.aiErrors\[item\.key\];refreshWorkbookAiStatus\(session,item\)/,'Semantic translation grading must keep its focused textarea mounted while awaiting AI');
 assert.match(app,/refreshWorkbookOutcome\(session,item\)/,'Local and AI results must update the mounted card in place');
-assert.doesNotMatch(app,/input\.readOnly=true/,'Recall completion must not make the current field readonly before transferring focus');
-assert.match(app,/input\.dataset\.recallComplete='true'[\s\S]{0,220}next\.focus/,'Recall completion must transfer focus without replacing input DOM');
+assert.match(app,/input\.dataset\.recallComplete='true';input\.readOnly=true;input\.setAttribute\('aria-readonly','true'\)[\s\S]{0,220}next\.focus/,'Recall completion must lock the completed input before preserving next-slot focus transfer');
 assert.match(app,/enterkeyhint="\$\{slot<item\.slotCount-1\?'next':'done'\}"/,'Multi-slot controls must expose next and done keyboard hints');
 assert.match(app,/handleWorkbookRecallInput\(input,event\)/,'Recall input must forward the native composition state on iOS');
 assert.match(app,/composition\.state==='partial'\|\|composition\.state==='empty'/,'A possible Hangul composition prefix must stay neutral');
-assert.match(app,/composition\.state==='mismatch'[\s\S]{0,100}flashRecallWrong/,'Only an impossible Hangul composition may show mismatch feedback');
+assert.deepEqual(koreanRecallCompositionState('ㅅ','숙련된'),{state:'partial'},'A partial Korean jamo must not unlock');
+assert.deepEqual(koreanRecallCompositionState('숙','숙련된'),{state:'exact'},'A completed matching Korean syllable must unlock');
+assert.deepEqual(koreanRecallCompositionState('ㅇ','숙련된'),{state:'mismatch'},'An impossible first Korean jamo must reject');
+assert.match(app,/composition\.state==='mismatch'\)\{input\.dataset\.recallRejected='true';return flashRecallWrong/,'An impossible Korean composition must show wrong feedback even while composing');
+assert.match(app,/if\(workbookRecallIsPendingJamo\(raw,mode\)\)return;\s*verifyWorkbookRecallInput\(input,session,item,index,mode,sequence,input\.value,\{allowComposing:true\}\)/,'English recall must verify its first letter even during active composition');
 assert.doesNotMatch(app,/KOREAN_RECALL_STABILIZE|RecallValidationTimers/,'Korean recall correctness must not depend on a timer');
 assert.match(app,/assistance\.recallSequence\?\.\[index\]===sequence&&input\.value===snapshot/,'Recall callbacks must ignore stale input values and sequences');
 assert.match(app,/clearWorkbookRecallTimers\(input\)[\s\S]{0,300}updateWorkbookSlot\(index,input\.value\)/,'Every recall value change must cancel older wrong feedback');
 assert.doesNotMatch(app,/flashRecallWrong[\s\S]{0,900}input\.focus\(/,'A delayed wrong callback must never reclaim focus from a newer slot');
 assert.match(app,/const ownsFocus=document\.activeElement===input&&session\.focusedSlot===index[\s\S]{0,550}if\(ownsFocus&&next\)/,'Only the latest focus owner may transfer focus after recall completion');
+assert.match(app,/event\?\.type==='compositionend'&&input\.dataset\.recallRejected==='true'\)return/,'A stale compositionend after a rejected Korean value must not revive it');
+assert.match(app,/compositionstart[\s\S]{0,180}delete event\.target\.dataset\.recallRejected/,'A fresh Korean composition must be allowed after wrong feedback clears');
 assert.match(app,/slot\?\.dataset\.workbookRecall==='korean_syllable'[\s\S]{0,260}handleWorkbookRecallInput\(slot,event\);return/,'Enter on an unfinished Korean recall must commit recall validation instead of submitting the workbook');
 assert.match(app,/enterkeyhint="done"/,'Blank and translation controls must expose a mobile completion key');
 assert.match(writing,/enterkeyhint="done"/,'Writing must expose a mobile completion key');
@@ -61,7 +67,6 @@ assert.match(app,/delete session\.orderBatchOrders\?\.\[item\.key\]/,'Retry must
 assert.match(app,/if\(item\.kind==='reorder_groups'\)\{session\.orderSelections\[item\.key\]=Array\.from[\s\S]{0,180}next=Array\(item\.slotCount\)\.fill\(''\)/,'Ordering retry must clear every group and response in the problem');
 assert.match(app,/if\(remove&&position>=0\)\{current\.splice\(position\);consumed\[group\]\.splice\(position\)/,'Removing a built chip must rewind the confirmed prefix from that position');
 assert.match(app,/workbookOrderClick\(words,answer,current,consumed\[group\],chipIndex\)[\s\S]{0,260}click\.type==='wrong'\)return submitWorkbook\(\)/,'Only a normalized token-text mismatch must immediately finalize the local attempt');
-assert.match(app,/composition\.state==='mismatch'\)\{if\(event\?\.isComposing\|\|input\.dataset\.composing==='true'\)return;return flashRecallWrong/,'Korean mismatch feedback must remain composition-aware');
 assert.match(app,/verifyWorkbookRecallInput\(input,session,item,index,mode,sequence,input\.value,\{allowComposing:true\}\)/,'A complete Korean syllable must unlock without waiting for compositionend');
 assert.match(app,/workbook-order-built-sizer[\s\S]{0,180}workbook-order-built-text/,'Ordering must reserve the completed sentence geometry while rendering selected words as plain text');
 assert.doesNotMatch(app,/data-workbook-order-remove=/,'The assembled sentence must not render selected words as removable chips');
