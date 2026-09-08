@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {AUTHORED,spanTokens,makeSpan,locateSpan,snapshot,syncAnnotations,dirtyRows,applyCandidates,validateTargets} from '../ready/admin/studio-contract.js';
-import {compileStudio} from '../server/ready/studio-authoring.mjs';
+import {compileStudio,publisherAnnotationAudit} from '../server/ready/studio-authoring.mjs';
 import {inspectStudioDocument} from '../server/ready/studio-import.mjs';
 const text=readFileSync(new URL('./fixtures/studio/september-2026.txt',import.meta.url),'utf8');
 const drafts=inspectStudioDocument(text,{title:'2026년 9월 고2',documentSha256:'file-a'});
@@ -52,6 +52,22 @@ assert.match(studioUi,/if\(PURE\.includes\(step\)\)[\s\S]*studio_preview/,'AUTO 
 assert.match(studioUi,/workbookWritingHtml/,'Writing Preview must reuse the production writing component');
 assert.doesNotMatch(studioUi,/PURE\.includes\(step\)\?['"]<p class="empty"/,'AUTO must not show an intermediate explanation screen');
 assert.match(backend,/for\(let offset=0;offset<needed\.length;offset\+=8\)/,'Gemini authoring must use bounded batches');
+
+const publisherRows=[
+  {id:'publisher-1',blockType:'SENTENCE',text:"First man's story is clear.",translation:'첫 번째 이야기는 매우 분명하다.'},
+  {id:'publisher-2',blockType:'SENTENCE',text:'Second "quoted" line works.',translation:'두 번째 인용 문장도 작동한다.'},
+];
+const publisherSource=[
+  {type:'korean_blank',number:1,prompt:'첫 번째 ______________ ______________ 분명하다.',answers:['이야기는','매우'],answer:'이야기는 / 매우',canonicalStart:1,canonicalEnd:1,provenance:{origin:'publisher_answer_key'}},
+  {type:'verb_form',number:1,prompt:'First man’s story ______________ clear.',answers:['is'],hints:['be'],answer:'is',canonicalStart:1,canonicalEnd:1,provenance:{origin:'publisher_answer_key'}},
+  {type:'grammar_vocab_choice',number:1,prompt:'First ⟦CHOICE:0⟧ story is clear. Second "⟦CHOICE:1⟧" line works.',answers:["man's",'quoted'],groups:[["man's",'mans'],['quoted','quoting']],canonicalStart:1,canonicalEnd:2,provenance:{origin:'publisher_answer_key'}},
+];
+const publisherAudit=publisherAnnotationAudit(publisherRows,publisherSource,{documentName:'Publisher mapping regression'});
+assert.deepEqual(publisherAudit.drops,[],'Publisher conversion errors must be observable and the supported fixture must not drop.');
+assert.equal(publisherAudit.annotations['publisher-1'].steps.korean_blank.targets.length,2,'Adjacent publisher blanks must resolve by their exact answers.');
+assert.equal(publisherAudit.annotations['publisher-1'].steps.verb_form.source,'publisher','Smart apostrophes in the publisher frame must match canonical punctuation.');
+assert.equal(publisherAudit.annotations['publisher-1'].steps.grammar_choice.targets.length,1,'A multi-sentence publisher item must map its first target to the first canonical sentence.');
+assert.equal(publisherAudit.annotations['publisher-2'].steps.grammar_choice.targets.length,1,'A multi-sentence publisher item must map its second target to the second canonical sentence.');
 console.log('READY Studio: real September batch, spans, confirmations, dirty scope, stable keys and AI boundaries passed.');
 
 const {selectToken}=await import('../ready/admin/studio-selection.js');

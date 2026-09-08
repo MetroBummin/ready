@@ -1,29 +1,55 @@
 import {generatePassageDeterministicCatalog,validateSemanticWorkbookItem,generateWorkbookCatalog} from './workbook-factory.mjs';
 import {AUTHORED,sentenceRows,snapshot,syncAnnotations,locateSpan,makeSpan,fieldFor,validateTargets} from '../../ready/admin/studio-contract.js';
 const STAGE={korean_blank:1,english_blank:2,verb_form:4,grammar_choice:5};
-export function publisherAnnotations(rows,sourceExercises,metadata={}) {
+const publisherFrame=value=>String(value??'').normalize('NFKC').replace(/[‘’]/g,"'").replace(/[“”]/g,'"').replace(/[‐‑‒–—]/g,'-');
+function startsPublisherFrame(text,expected,at){return publisherFrame(text.slice(at,at+expected.length))===publisherFrame(expected);}
+function indexPublisherFrame(text,expected,from){
+  if(!expected)return from;
+  for(let at=from;at<=text.length-expected.length;at++)if(startsPublisherFrame(text,expected,at))return at;
+  return -1;
+}
+export function publisherAnnotationAudit(rows,sourceExercises,metadata={}) {
   const canonical=sentenceRows(rows),annotations=syncAnnotations(rows,{});
-  if(!sourceExercises?.length)return annotations;
+  const drops=[];
+  if(!sourceExercises?.length)return {annotations,drops};
   const catalog=generateWorkbookCatalog({title:'Publisher candidates',workbookKey:'publisher',rows:canonical,sourceExercises,provenance:metadata});
   for(const stage of catalog.stages.filter(s=>AUTHORED.includes(s.semanticType)))for(const item of stage.items){
-    const row=canonical[item.number-1];if(!row||item.canonicalEnd&&item.canonicalStart!==item.canonicalEnd)continue;
-    const text=row[fieldFor(stage.semanticType)],targets=[];let cursor=0,valid=true;
+    const start=Number(item.canonicalStart)||Number(item.number),end=Number(item.canonicalEnd)||start,spanRows=canonical.slice(start-1,end);
+    if(start<1||end<start||spanRows.length!==end-start+1){drops.push({stage:stage.semanticType,number:item.number,canonicalStart:start,canonicalEnd:end,reason:'wrong_canonical_row'});continue;}
+    const field=fieldFor(stage.semanticType),segments=[];let text='';
+    for(const row of spanRows){if(text)text+=' ';const from=text.length;text+=row[field];segments.push({row,from,to:text.length});}
+    const targets=[];let cursor=0,valid=true;
     // Walk the validated frame, so repeated answers cannot select the wrong occurrence.
     const parts=item.prompt.split(/_{5,}|⟦CHOICE:\d+⟧/);
     for(let i=0;i<item.answers.length;i++){
       const answer=item.answers[i],fixed=parts[i]||'',nextFixed=parts[i+1]||'';
-      if(text.startsWith(fixed,cursor))cursor+=fixed.length;
+      if(startsPublisherFrame(text,fixed,cursor))cursor+=fixed.length;
       else if(stage.stage===4&&fixed.trimEnd()!==fixed&&text.startsWith(fixed.trimEnd()+"'",cursor))cursor+=fixed.trimEnd().length;
-      else {valid=false;break;}
-      const end=nextFixed?text.indexOf(nextFixed,cursor):text.length;
-      if(end<cursor){valid=false;break;}
-      const quote=text.slice(cursor,end);
-      if(stage.stage!==4&&quote!==answer){valid=false;break;}
-      try{targets.push({span:makeSpan(text,cursor,end,row.id),...(stage.stage===4?{hint:item.hints[i],answer}:{}),...(stage.stage===5?{correct:answer,distractor:item.groups[i].find(v=>v!==answer)}:{})});}catch{valid=false;break;}cursor=end;
+      else {drops.push({stage:stage.semanticType,number:item.number,canonicalStart:start,canonicalEnd:end,reason:'prompt_fixed_mismatch',target:i+1});valid=false;break;}
+      const exactAnswer=startsPublisherFrame(text,answer,cursor),targetEnd=exactAnswer?cursor+answer.length:nextFixed?indexPublisherFrame(text,nextFixed,cursor):text.length;
+      if(targetEnd<cursor){drops.push({stage:stage.semanticType,number:item.number,canonicalStart:start,canonicalEnd:end,reason:'prompt_next_fixed_missing',target:i+1});valid=false;break;}
+      const quote=text.slice(cursor,targetEnd);
+      if(stage.stage!==4&&publisherFrame(quote)!==publisherFrame(answer)){drops.push({stage:stage.semanticType,number:item.number,canonicalStart:start,canonicalEnd:end,reason:'answer_quote_mismatch',target:i+1});valid=false;break;}
+      targets.push({start:cursor,end:targetEnd,quote,...(stage.stage===4?{hint:item.hints[i],answer}:{}),...(stage.stage===5?{correct:quote,distractor:item.groups[i].find(v=>publisherFrame(v)!==publisherFrame(answer))}:{})});cursor=targetEnd;
     }
-    if(valid)try{validateTargets(row,stage.semanticType,targets);annotations[row.id].steps[stage.semanticType]={status:'review',source:'publisher',targets,provenance:item.provenance};}catch{}
-  }return annotations;
+    const tail=parts.at(-1)||'';
+    if(valid&&(!startsPublisherFrame(text,tail,cursor)||cursor+tail.length!==text.length)){drops.push({stage:stage.semanticType,number:item.number,canonicalStart:start,canonicalEnd:end,reason:'prompt_tail_mismatch'});valid=false;}
+    if(valid){
+      const grouped=new Map();
+      for(let i=0;i<targets.length;i++){
+        const target=targets[i],segment=segments.find(candidate=>target.start>=candidate.from&&target.end<=candidate.to);
+        if(!segment){drops.push({stage:stage.semanticType,number:item.number,canonicalStart:start,canonicalEnd:end,reason:'multi_sentence_target',target:i+1});valid=false;break;}
+        try{const converted={...target,span:makeSpan(segment.row[field],target.start-segment.from,target.end-segment.from,segment.row.id)};delete converted.start;delete converted.end;delete converted.quote;const list=grouped.get(segment.row)||[];list.push(converted);grouped.set(segment.row,list);}
+        catch(error){drops.push({stage:stage.semanticType,number:item.number,canonicalStart:start,canonicalEnd:end,reason:'makeSpan',target:i+1,message:error.message});valid=false;break;}
+      }
+      if(valid)for(const [row,rowTargets] of grouped)try{
+        const prior=annotations[row.id].steps[stage.semanticType],merged=prior.source==='publisher'?[...prior.targets,...rowTargets]:rowTargets;
+        validateTargets(row,stage.semanticType,merged);annotations[row.id].steps[stage.semanticType]={status:'review',source:'publisher',targets:merged,provenance:item.provenance};
+      }catch(error){drops.push({stage:stage.semanticType,number:item.number,canonicalStart:start,canonicalEnd:end,reason:'validateTargets',message:error.message});}
+    }
+  }return {annotations,drops};
 }
+export function publisherAnnotations(rows,sourceExercises,metadata={}) {return publisherAnnotationAudit(rows,sourceExercises,metadata).annotations;}
 export function compileStudio({rows,annotations,title,workbookKey,previousCatalog=null,revision=1,requireConfirmed=false,publishStep=null,provenance={}}) {
   const synced=syncAnnotations(rows,annotations),canonical=sentenceRows(rows),errors=[];
   const catalog=generatePassageDeterministicCatalog({title,workbookKey,rows,previousCatalog,provenance:{...provenance,canonicalRevision:revision,studio:true}});

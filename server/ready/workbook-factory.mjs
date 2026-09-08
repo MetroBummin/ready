@@ -231,18 +231,17 @@ export function alignPublisherBlankPrompt(sourcePrompt, answers, canonical) {
 function publisherBlankExercises(text, rows) {
   const exercises = [];
   for (const sourceStage of [2, 3]) {
-    const candidates = [];
+    const byNumber = new Map();
     for (const sources of pairedNumberedRowSets(text, sourceStage)) for (const answers of answerStageCandidates(text, sourceStage, sources.length)) {
       const answerByNumber = new Map(answers.map(row => [row.number, row.answer]));
-      const parsed = [];
       for (const source of sources) {
         const answer = clean(answerByNumber.get(source.number)), rawPrompt = clean(source.prompt), row = rows[source.number - 1], answerSlots = answer.split('/').map(value => clean(value)).filter(Boolean);
         const prompt = alignPublisherBlankPrompt(rawPrompt, answerSlots, sourceStage === 2 ? row?.translation : row?.text);
-        if (!answer || !prompt || !/_{5,}/.test(rawPrompt)) { parsed.length = 0; break; }
+        if (!answer || !prompt || !/_{5,}/.test(rawPrompt)) continue;
         const restored = restoreBlanks(prompt, answerSlots);
         const valid = sourceStage === 2 ? restored === clean(row?.translation) : sameEnglish(restored, row?.text);
-        if (!valid) { parsed.length = 0; break; }
-        parsed.push({
+        if (!valid) continue;
+        const item = {
           type: sourceStage === 2 ? 'korean_blank' : 'english_blank',
           number: source.number,
           prompt,
@@ -253,12 +252,12 @@ function publisherBlankExercises(text, rows) {
           page: null,
           label: sourceStage === 2 ? '워크북 2 빈칸 연습(우리말)' : '워크북 3 빈칸 연습(영문)',
           provenance: { origin: 'publisher_answer_key', sourceWorkbookNumber: sourceStage },
-        });
+        };
+        const signature=JSON.stringify([item.prompt,item.answers]),candidates=byNumber.get(item.number)||new Map();
+        candidates.set(signature,item);byNumber.set(item.number,candidates);
       }
-      if (parsed.length === sources.length) candidates.push(parsed);
     }
-    const signatures = new Map(candidates.map(items => [JSON.stringify(items.map(item => [item.number, item.prompt, item.answers])), items]));
-    if (signatures.size === 1) exercises.push(...signatures.values().next().value);
+    for(const candidates of [...byNumber.values()])if(candidates.size===1)exercises.push(candidates.values().next().value);
   }
   return exercises;
 }
@@ -561,10 +560,10 @@ function fullWorkbookItems(sourceExercises, rows, prefix) {
     if (!stage || !number || !row || !prompt || !answers.length) continue;
     const key = factoryKey(prefix, stage, number), en = clean(row.text), ko = clean(row.translation), semanticType = stageMeta[stage][2];
     const provenance = { ...(source.provenance || {}), semanticType, mappedReadyStage: stage, sourceWorkbookNumber: Number(source?.provenance?.sourceWorkbookNumber || source?.provenance?.sourceWorkbookStage) || null };
-    if (stage === 1 && restoreBlanks(prompt, answers) === ko) byStage.get(1).push(item(1, number, key, { kind: 'blank_input', semanticType, source: en, prompt, answers, provenance }));
-    if (stage === 2 && sameEnglish(restoreBlanks(prompt, answers), en)) byStage.get(2).push(item(2, number, key, { kind: 'blank_input', semanticType, source: ko, prompt, answers, provenance }));
+    if (stage === 1 && restoreBlanks(prompt, answers) === ko) byStage.get(1).push(item(1, number, key, { kind: 'blank_input', semanticType, source: en, prompt, answers, canonicalStart:Number(source?.canonicalStart)||number,canonicalEnd:Number(source?.canonicalEnd)||Number(source?.canonicalStart)||number, provenance }));
+    if (stage === 2 && sameEnglish(restoreBlanks(prompt, answers), en)) byStage.get(2).push(item(2, number, key, { kind: 'blank_input', semanticType, source: ko, prompt, answers, canonicalStart:Number(source?.canonicalStart)||number,canonicalEnd:Number(source?.canonicalEnd)||Number(source?.canonicalStart)||number, provenance }));
     if (stage === 3 && sameEnglish(prompt, en) && answers.length === 1 && answers[0] === ko) byStage.get(3).push(item(3, number, key, { kind: 'translation_ai', semanticType, source: en, prompt: '우리말 해석을 입력하세요.', answers: [ko], provenance }));
-    if (stage === 4 && sameEnglish(restoreBlanks(prompt, answers), en)) { const hints = Array.isArray(source?.hints) && source.hints.length === answers.length ? source.hints.map(value => clean(value, 120)) : answers; byStage.get(4).push(item(4, number, key, { kind: 'verb_form', semanticType, source: ko, prompt, hints, answers, provenance })); }
+    if (stage === 4 && sameEnglish(restoreBlanks(prompt, answers), en)) { const hints = Array.isArray(source?.hints) && source.hints.length === answers.length ? source.hints.map(value => clean(value, 120)) : answers; byStage.get(4).push(item(4, number, key, { kind: 'verb_form', semanticType, source: ko, prompt, hints, answers, canonicalStart:Number(source?.canonicalStart)||number,canonicalEnd:Number(source?.canonicalEnd)||Number(source?.canonicalStart)||number, provenance })); }
     if (stage === 5) {
       const groups = Array.isArray(source?.groups) ? source.groups.map(group => Array.isArray(group) ? group.map(value => clean(value, 160)).filter(Boolean) : []) : [];
       if (groups.length === answers.length && groups.every((group, index) => group.length >= 2 && group.some(option => sameOption(option, answers[index])))) {
