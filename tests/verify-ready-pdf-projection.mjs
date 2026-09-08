@@ -1,0 +1,16 @@
+import assert from 'node:assert/strict';
+import {canonicalArtifact,catalogArtifact,rowDigest} from './helpers/ready-pdf-fixtures.mjs';
+const rows=[{id:'random',blockType:'TITLE',text:'A title',translation:''},{id:'random-2',blockType:'SENTENCE',paragraphIndex:1,text:'They learn to learn.',translation:'그들은 배우는 것을 배운다.'}];
+assert.deepEqual(canonicalArtifact(rows),canonicalArtifact(rows.map(r=>({...r,id:crypto.randomUUID(),revision:55,updatedAt:Date.now()}))));
+assert.notEqual(rowDigest(rows),rowDigest([...rows].reverse()));
+const item={key:'ephemeral',number:1,kind:'reorder_groups',semanticType:'word_order',prompt:'⟦ORDER:0⟧.',source:rows[1].translation,answers:['they learn to learn'],groups:[['learn','they','learn','to']],provenance:{origin:'canonical_passage',canonicalRevision:1}};
+const catalog={stages:[{stage:6,semanticType:'word_order',items:[item]}],metrics:{elapsedMs:1}};
+const changed=structuredClone(catalog);changed.metrics.elapsedMs=300;changed.stages[0].items[0].key='another-id';changed.stages[0].items[0].provenance.canonicalRevision=99;changed.stages[0].items[0].groups[0].reverse();
+assert.deepEqual(catalogArtifact(changed),catalogArtifact(catalog),'metadata and display shuffle changes are not semantic regressions');
+changed.stages[0].items[0].groups[0].pop();
+assert.notDeepEqual(catalogArtifact(changed),catalogArtifact(catalog),'a lost duplicate token must fail');
+const wrong=structuredClone(catalog);wrong.stages[0].items[0].answers=['they learn to forget'];
+assert.notDeepEqual(catalogArtifact(wrong),catalogArtifact(catalog),'a changed answer must fail');
+const wrongSource=structuredClone(catalog);wrongSource.stages[0].items[0].provenance.origin='publisher_answer_key';
+assert.notDeepEqual(catalogArtifact(wrongSource),catalogArtifact(catalog),'PURE/publisher provenance cannot drift');
+console.log('READY PDF golden projection preserves meaning and ignores volatile runtime metadata.');

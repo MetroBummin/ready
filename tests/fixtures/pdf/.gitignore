@@ -1,0 +1,5 @@
+# Licensed source documents and full-text normalized expected artifacts stay local.
+*.pdf
+*-reviewed.json
+expected/
+sources.json

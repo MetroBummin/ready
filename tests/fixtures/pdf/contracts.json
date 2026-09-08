@@ -1,0 +1,5811 @@
+{
+  "version": 1,
+  "note": "Semantic import baseline, not a claim that every publisher stage is supported. Blocked / unresolved sources must remain in review. See README for reviewed canonical boundaries and current limits.",
+  "documents": [
+    {
+      "id": "ybm-park-lesson4-text",
+      "file": "ybm-park-lesson4-text.pdf",
+      "documentName": "(2022개정)2026년_영어II_YBM(박준언)_4과_본문 (3).pdf",
+      "title": "ybm-park-lesson4-text",
+      "sha256": "56427eea3cbd2c8e0fbaa6bf17c62356a63876127fa39ffe95bb54684cf7aa05",
+      "pages": 5,
+      "kind": "text",
+      "importLabels": [
+        ""
+      ],
+      "drafts": [
+        {
+          "number": "",
+          "reviewRequired": true,
+          "pages": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ],
+          "rawRowCount": 9,
+          "sourceExerciseCounts": {},
+          "blockedCanonical": true,
+          "reason": "Deterministic validation failed: 6:1:stage6_word_order, 6:2:stage6_word_order, 6:3:stage6_word_order, 6:4:stage6_word_order"
+        }
+      ],
+      "reviewedFile": "ybm-reviewed.json",
+      "reviewedCounts": [
+        52,
+        12
+      ],
+      "reviewed": [
+        {
+          "number": "",
+          "digest": "ee3ef55959018533968584364e0a5d5c6df1162c175a6e6bb762cb2c255b2dad",
+          "layout": [
+            [
+              "ybm-title",
+              "TITLE",
+              null,
+              1
+            ],
+            [
+              "ybm-s1",
+              "SENTENCE",
+              0,
+              1
+            ],
+            [
+              "ybm-s2",
+              "SENTENCE",
+              0,
+              1
+            ],
+            [
+              "ybm-s3",
+              "SENTENCE",
+              0,
+              1
+            ],
+            [
+              "ybm-s4",
+              "SENTENCE",
+              0,
+              1
+            ],
+            [
+              "ybm-s5",
+              "SENTENCE",
+              1,
+              1
+            ],
+            [
+              "ybm-s6",
+              "SENTENCE",
+              1,
+              1
+            ],
+            [
+              "ybm-s7",
+              "SENTENCE",
+              1,
+              1
+            ],
+            [
+              "ybm-s8",
+              "SENTENCE",
+              1,
+              1
+            ],
+            [
+              "ybm-s9",
+              "SENTENCE",
+              1,
+              1
+            ],
+            [
+              "ybm-s10",
+              "SENTENCE",
+              2,
+              1
+            ],
+            [
+              "ybm-s11",
+              "SENTENCE",
+              2,
+              1
+            ],
+            [
+              "ybm-s12",
+              "SENTENCE",
+              2,
+              1
+            ],
+            [
+              "ybm-s13",
+              "SENTENCE",
+              2,
+              1
+            ],
+            [
+              "ybm-s14",
+              "SENTENCE",
+              3,
+              2
+            ],
+            [
+              "ybm-s15",
+              "SENTENCE",
+              3,
+              2
+            ],
+            [
+              "ybm-s16",
+              "SENTENCE",
+              3,
+              2
+            ],
+            [
+              "ybm-s17",
+              "SENTENCE",
+              3,
+              2
+            ],
+            [
+              "ybm-s18",
+              "SENTENCE",
+              3,
+              2
+            ],
+            [
+              "ybm-s19",
+              "SENTENCE",
+              3,
+              2
+            ],
+            [
+              "ybm-s20",
+              "SENTENCE",
+              4,
+              2
+            ],
+            [
+              "ybm-s21",
+              "SENTENCE",
+              4,
+              2
+            ],
+            [
+              "ybm-s22",
+              "SENTENCE",
+              4,
+              2
+            ],
+            [
+              "ybm-s23",
+              "SENTENCE",
+              5,
+              2
+            ],
+            [
+              "ybm-s24",
+              "SENTENCE",
+              5,
+              2
+            ],
+            [
+              "ybm-s25",
+              "SENTENCE",
+              5,
+              2
+            ],
+            [
+              "ybm-s26",
+              "SENTENCE",
+              5,
+              2
+            ],
+            [
+              "ybm-s27",
+              "SENTENCE",
+              5,
+              2
+            ],
+            [
+              "ybm-s28",
+              "SENTENCE",
+              5,
+              2
+            ],
+            [
+              "ybm-s29",
+              "SENTENCE",
+              5,
+              2
+            ],
+            [
+              "ybm-s30",
+              "SENTENCE",
+              5,
+              2
+            ],
+            [
+              "ybm-s31",
+              "SENTENCE",
+              5,
+              2
+            ],
+            [
+              "ybm-s32",
+              "SENTENCE",
+              6,
+              3
+            ],
+            [
+              "ybm-s33",
+              "SENTENCE",
+              6,
+              3
+            ],
+            [
+              "ybm-s34",
+              "SENTENCE",
+              6,
+              3
+            ],
+            [
+              "ybm-s35",
+              "SENTENCE",
+              6,
+              3
+            ],
+            [
+              "ybm-s36",
+              "SENTENCE",
+              6,
+              3
+            ],
+            [
+              "ybm-s37",
+              "SENTENCE",
+              6,
+              3
+            ],
+            [
+              "ybm-s38",
+              "SENTENCE",
+              7,
+              3
+            ],
+            [
+              "ybm-s39",
+              "SENTENCE",
+              7,
+              3
+            ],
+            [
+              "ybm-s40",
+              "SENTENCE",
+              7,
+              3
+            ],
+            [
+              "ybm-s41",
+              "SENTENCE",
+              7,
+              3
+            ],
+            [
+              "ybm-s42",
+              "SENTENCE",
+              8,
+              3
+            ],
+            [
+              "ybm-s43",
+              "SENTENCE",
+              8,
+              3
+            ],
+            [
+              "ybm-s44",
+              "SENTENCE",
+              8,
+              3
+            ],
+            [
+              "ybm-s45",
+              "SENTENCE",
+              8,
+              3
+            ],
+            [
+              "ybm-s46",
+              "SENTENCE",
+              9,
+              4
+            ],
+            [
+              "ybm-s47",
+              "SENTENCE",
+              9,
+              4
+            ],
+            [
+              "ybm-s48",
+              "SENTENCE",
+              9,
+              4
+            ],
+            [
+              "ybm-s49",
+              "SENTENCE",
+              9,
+              4
+            ],
+            [
+              "ybm-s50",
+              "SENTENCE",
+              10,
+              4
+            ],
+            [
+              "ybm-s51",
+              "SENTENCE",
+              10,
+              4
+            ],
+            [
+              "ybm-s52",
+              "SENTENCE",
+              10,
+              4
+            ]
+          ]
+        },
+        {
+          "number": "",
+          "digest": "6fbf262d194053a3e2b241bfe25c3bdf9d3304359935f9cda59ff4ee85385d37",
+          "layout": [
+            [
+              "ybm-reading",
+              "SUBTITLE",
+              null,
+              5
+            ],
+            [
+              "ybm-reading-title",
+              "TITLE",
+              null,
+              5
+            ],
+            [
+              "ybm-s53",
+              "SENTENCE",
+              11,
+              5
+            ],
+            [
+              "ybm-s54",
+              "SENTENCE",
+              11,
+              5
+            ],
+            [
+              "ybm-s55",
+              "SENTENCE",
+              11,
+              5
+            ],
+            [
+              "ybm-s56",
+              "SENTENCE",
+              11,
+              5
+            ],
+            [
+              "ybm-s57",
+              "SENTENCE",
+              11,
+              5
+            ],
+            [
+              "ybm-s58",
+              "SENTENCE",
+              11,
+              5
+            ],
+            [
+              "ybm-s59",
+              "SENTENCE",
+              11,
+              5
+            ],
+            [
+              "ybm-s60",
+              "SENTENCE",
+              11,
+              5
+            ],
+            [
+              "ybm-s61",
+              "SENTENCE",
+              12,
+              5
+            ],
+            [
+              "ybm-s62",
+              "SENTENCE",
+              12,
+              5
+            ],
+            [
+              "ybm-s63",
+              "SENTENCE",
+              12,
+              5
+            ],
+            [
+              "ybm-s64",
+              "SENTENCE",
+              12,
+              5
+            ]
+          ]
+        }
+      ],
+      "expectedDigests": {
+        "factory": "228bc450203820a5955036354cc8a5f17ba4aec8bb38b6ddf7b846194ded7bd3",
+        "student": "875e7d6c1afd09c29e7511735dcb01f5a3ac6b82d47579e6bd7d2348e96b01f7"
+      }
+    },
+    {
+      "id": "donga-lee-lesson4",
+      "file": "donga-lee-lesson4.pdf",
+      "documentName": "(2022개정)2025년_공통영어2_동아(이병민)_4과_본문10단계 워크북 통합본(1~10) (1).pdf",
+      "title": "donga-lee-lesson4",
+      "sha256": "75c7d9118edd4fa0d891c33dd873283450c18c63765642a23fe96c3c13eb4ecf",
+      "pages": 50,
+      "kind": "full",
+      "importLabels": [
+        ""
+      ],
+      "drafts": [
+        {
+          "number": "",
+          "reviewRequired": false,
+          "pages": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29,
+            30,
+            31,
+            32,
+            33,
+            34,
+            35,
+            36,
+            37,
+            38,
+            39,
+            40,
+            41,
+            42,
+            43,
+            44,
+            45,
+            46,
+            47,
+            48,
+            49,
+            50
+          ],
+          "rawRowCount": 41,
+          "sourceExerciseCounts": {
+            "korean_blank": 41,
+            "grammar_vocab_choice": 36,
+            "translation": 246,
+            "verb_form": 71,
+            "word_order": 83,
+            "writing": 83
+          },
+          "canonical": {
+            "count": 41,
+            "digest": "8518a25ec244bf7a4a3aa019dd350bc5571cbd5b71d131fcf35802856da8e330",
+            "first": [
+              "You might have heard the expression, \"There is more than meets the eye.\"",
+              "여러분은 '눈에 보이는 것이 다가 아니다.'라는 표현을 들어 보았을 것입니다."
+            ],
+            "last": [
+              "Thanks to science, this great masterpiece has been brought back to life for all to see.",
+              "과학 덕분에 이 위대한 걸작이 되살아나 모두가 감상할 수 있게 되었습니다."
+            ]
+          },
+          "publisherStages": {
+            "korean_blank": 41,
+            "english_blank": 0,
+            "translation": 0,
+            "verb_form": 0,
+            "grammar_choice": 36,
+            "word_order": 0,
+            "writing": 0
+          },
+          "unresolved": 483,
+          "samples": [
+            {
+              "stage": 1,
+              "number": 4,
+              "kind": "blank_input",
+              "prompt": "우리는 예술가가 표현한 ______________ 아름다움______________ 색상, 형태, 음영을 보며 예술을 ______________.",
+              "answers": [
+                "전체적인",
+                "뿐만 아니라",
+                "감상합니다"
+              ]
+            },
+            {
+              "stage": 5,
+              "number": 2,
+              "kind": "choice_groups",
+              "prompt": "It means that there ⟦CHOICE:0⟧ more to something than there ⟦CHOICE:1⟧ to be at first. This can apply to art as well.",
+              "answers": [
+                "is",
+                "appears"
+              ],
+              "groups": [
+                [
+                  "are",
+                  "is"
+                ],
+                [
+                  "appears",
+                  "appear"
+                ]
+              ],
+              "canonicalStart": 2,
+              "canonicalEnd": 3
+            }
+          ],
+          "itemDigests": {
+            "korean_blank": "15d77097bbd4513ffe5d9fd73913e9423dde36089c9ff78c62ebe2a131fc950c",
+            "english_blank": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "translation": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "verb_form": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "grammar_choice": "f3e3722432af24e06003c01ce1bb3f4694871c851a4e4cec00518dfbd48bee60",
+            "word_order": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "writing": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+          },
+          "publisherAnnotationCounts": {
+            "english_blank": 0,
+            "korean_blank": 41,
+            "verb_form": 0,
+            "grammar_choice": 0
+          }
+        }
+      ],
+      "expectedDigests": {
+        "factory": "15b421e8cd58bdcbcb412c60f12db50e383a86009ac4b46265cba99eb37ffa0d",
+        "student": "f73b6e0889e2d8a719ed290d53c86ce0b0a54c6749e168d75c57c2603688246d"
+      }
+    },
+    {
+      "id": "miraen-kim-lesson3",
+      "file": "miraen-kim-lesson3.pdf",
+      "documentName": "(2022개정)2026년_영어II_미래엔(김성연)_3과_본문10단계 워크북 통합본(1~10).pdf",
+      "title": "miraen-kim-lesson3",
+      "sha256": "68c677496e2e7388f803323413cb065875d4d13a9e99b4c418da8a7caaa222a3",
+      "pages": 63,
+      "kind": "full",
+      "importLabels": [
+        ""
+      ],
+      "drafts": [
+        {
+          "number": "",
+          "reviewRequired": true,
+          "pages": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29,
+            30,
+            31,
+            32,
+            33,
+            34,
+            35,
+            36,
+            37,
+            38,
+            39,
+            40,
+            41,
+            42,
+            43,
+            44,
+            45,
+            46,
+            47,
+            48,
+            49,
+            50,
+            51,
+            52,
+            53,
+            54,
+            55,
+            56,
+            57,
+            58,
+            59,
+            60,
+            61,
+            62,
+            63
+          ],
+          "rawRowCount": 31,
+          "sourceExerciseCounts": {
+            "verb_form": 31,
+            "grammar_vocab_choice": 26,
+            "translation": 230,
+            "word_order": 75,
+            "writing": 73
+          },
+          "canonical": {
+            "count": 31,
+            "digest": "3cf3d187c511268b9e2f59fbafdc2947602a2e09362326f3e72ba6aff09294ed",
+            "first": [
+              "Hughie is a charming young man who has achieved everything except making money.",
+              "Hughie는 돈을 버는 것을 제외하고 모든 것을 이룬 매력적인 젊은 남자이다."
+            ],
+            "last": [
+              "When they were married, Alan was the best man, and the Baron made a speech at the wedding. \"Millionaire models,\" remarked Alan, \"are rare enough, but model millionaires are rarer still!\"",
+              "그들이 결혼할 때, Alan이 신랑 들러리를 맡았고, 남작은 결혼식에서 축사를 했다. \"백만장자인 모델도 드물 지만, 모범적인 백만장자는 더더욱 드물지!\" Alan이 말했다."
+            ]
+          },
+          "publisherStages": {
+            "korean_blank": 0,
+            "english_blank": 0,
+            "translation": 0,
+            "verb_form": 31,
+            "grammar_choice": 26,
+            "word_order": 0,
+            "writing": 0
+          },
+          "unresolved": 378,
+          "samples": [
+            {
+              "stage": 4,
+              "number": 7,
+              "kind": "verb_form",
+              "prompt": "\"And how much ______________ you ______________ for your picture, Alan?\" ______________ Hughie. \"Oh, for this I ______________ two thousand!\" \"Pounds?\" \"Guineas. Painters, poets, and doctors always ______________ guineas.\"",
+              "answers": [
+                "do",
+                "get",
+                "asked",
+                "get",
+                "get"
+              ],
+              "hints": [
+                "do",
+                "get",
+                "ask",
+                "get",
+                "get"
+              ]
+            },
+            {
+              "stage": 5,
+              "number": 26,
+              "kind": "choice_groups",
+              "prompt": "On the outside ⟦CHOICE:0⟧ ⟦CHOICE:1⟧, \"A wedding present to Hughie Erskine and Laura Merton, from an old beggar,\" and inside ⟦CHOICE:2⟧ a check for 10,000 pounds. When they were married, Alan was the best man, and the Baron made a speech at the wedding. \"Millionaire models,\" remarked Alan, \"⟦CHOICE:3⟧ rare enough, but model millionaires are rarer still!\"",
+              "answers": [
+                "was",
+                "written",
+                "was",
+                "are"
+              ],
+              "groups": [
+                [
+                  "was",
+                  "were"
+                ],
+                [
+                  "writing",
+                  "written"
+                ],
+                [
+                  "was",
+                  "were"
+                ],
+                [
+                  "is",
+                  "are"
+                ]
+              ],
+              "canonicalStart": 30,
+              "canonicalEnd": 31
+            }
+          ],
+          "itemDigests": {
+            "korean_blank": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "english_blank": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "translation": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "verb_form": "f0933049ddedef928996a4a94c3e71b1b01a6091d4c4e9b7bb9b529851d56955",
+            "grammar_choice": "9f47de4df898f018d90727b75af9286f2336499c753f19e7ef174f97ac4fb78a",
+            "word_order": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "writing": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+          },
+          "publisherAnnotationCounts": {
+            "english_blank": 0,
+            "korean_blank": 0,
+            "verb_form": 6,
+            "grammar_choice": 0
+          }
+        }
+      ],
+      "expectedDigests": {
+        "factory": "710afe25d41976188c4fca4f7abd213de3cd13a2a32280c06a95038a9445a741",
+        "student": "fc7ad38d61d08e5931b75595b295d32e871fc4559d3163663f710034f97859b7"
+      }
+    },
+    {
+      "id": "cheonjae-kang-lesson2",
+      "file": "cheonjae-kang-lesson2.pdf",
+      "documentName": "(2022개정)2026년_영어II_천재(강상구)_2과_본문10단계 워크북 통합본(1~10).pdf",
+      "title": "cheonjae-kang-lesson2",
+      "sha256": "3b8d75eaa374150e36335c3c9c579704768b306e188081c7cc61cb7f9809a2a2",
+      "pages": 83,
+      "kind": "full",
+      "importLabels": [
+        ""
+      ],
+      "drafts": [
+        {
+          "number": "",
+          "reviewRequired": true,
+          "pages": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29,
+            30,
+            31,
+            32,
+            33,
+            34,
+            35,
+            36,
+            37,
+            38,
+            39,
+            40,
+            41,
+            42,
+            43,
+            44,
+            45,
+            46,
+            47,
+            48,
+            49,
+            50,
+            51,
+            52,
+            53,
+            54,
+            55,
+            56,
+            57,
+            58,
+            59,
+            60,
+            61,
+            62,
+            63,
+            64,
+            65,
+            66,
+            67,
+            68,
+            69,
+            70,
+            71,
+            72,
+            73,
+            74,
+            75,
+            76,
+            77,
+            78,
+            79,
+            80,
+            81,
+            82,
+            83
+          ],
+          "rawRowCount": 40,
+          "sourceExerciseCounts": {
+            "korean_blank": 40,
+            "grammar_vocab_choice": 40,
+            "translation": 105,
+            "verb_form": 72,
+            "word_order": 53,
+            "writing": 49
+          },
+          "canonical": {
+            "count": 40,
+            "digest": "ddea861a4d1fe3afa02f06a7085c6c5c1ce7ee15fa404ebaddae5d99f4ba8d83",
+            "first": [
+              "You have probably received a notification from your smartphone telling you that it is time to exercise or move.",
+              "스마트폰에서 이제 운동하거나 움직일 시간이라는 알림을 받아 본 적이 있을 것이다."
+            ],
+            "last": [
+              "As we are all choice architects every now and then, it pays to know how to set people on the right path.",
+              "우리 모두가 때때로 선택 설계자이기 때문에, 사람들을 올바른 길에 놓는 방법을 아는 것 은 도움이 된다."
+            ]
+          },
+          "publisherStages": {
+            "korean_blank": 40,
+            "english_blank": 0,
+            "translation": 0,
+            "verb_form": 0,
+            "grammar_choice": 40,
+            "word_order": 0,
+            "writing": 0
+          },
+          "unresolved": 279,
+          "samples": [
+            {
+              "stage": 1,
+              "number": 1,
+              "kind": "blank_input",
+              "prompt": "스마트폰에서 이제 ______________거나 ______________ 시간이라는 ______________을 받아 본 적이 있을 것이다.",
+              "answers": [
+                "운동하",
+                "움직일",
+                "알림"
+              ]
+            },
+            {
+              "stage": 5,
+              "number": 19,
+              "kind": "choice_groups",
+              "prompt": "Through Peer Pressure If you are told ⟦CHOICE:0⟧ other people do, you might do it too, because you think it is probably a good idea to do ⟦CHOICE:1⟧ they do.",
+              "answers": [
+                "what",
+                "what"
+              ],
+              "groups": [
+                [
+                  "that",
+                  "what"
+                ],
+                [
+                  "what",
+                  "that"
+                ]
+              ],
+              "canonicalStart": 19,
+              "canonicalEnd": 19
+            }
+          ],
+          "itemDigests": {
+            "korean_blank": "4b9f48c7abfec918bcb92805208858ddfd66eb51430a89334869cc23f58ceffc",
+            "english_blank": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "translation": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "verb_form": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "grammar_choice": "5a2be176867a1c4997f540e24e2dfbe0708dbc1acaf6dabc4ecdcbcd7e14d8a9",
+            "word_order": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "writing": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+          },
+          "publisherAnnotationCounts": {
+            "english_blank": 0,
+            "korean_blank": 40,
+            "verb_form": 0,
+            "grammar_choice": 33
+          }
+        }
+      ],
+      "expectedDigests": {
+        "factory": "cfe7cd16577e86b65fa094433bfbf943e6ebb5144019cff2d4e6aece0a33fffb",
+        "student": "5e13d1ff57fae09dba46ad92632fe57d3e484ae3a9a9b793111cc2e600842357"
+      }
+    },
+    {
+      "id": "mock-2026-june-grade2",
+      "file": "mock-2026-june-grade2.pdf",
+      "documentName": "2026년_고2_6월_부산광역시 교육청_학력평가_10단계_WORKBOOK_통합본(1~10).pdf",
+      "title": "mock-2026-june-grade2",
+      "sha256": "756844d4748fa117eddb2384ca17ea8ee1172d1c06cc5d236b0cf03c3193a0eb",
+      "pages": 305,
+      "kind": "full",
+      "importLabels": [
+        "18",
+        "19",
+        "",
+        "20",
+        "21",
+        "22",
+        "23",
+        "24",
+        "25",
+        "26",
+        "27",
+        "28",
+        "29",
+        "30",
+        "31",
+        "32",
+        "33",
+        "34",
+        "35",
+        "36",
+        "37",
+        "38",
+        "39",
+        "40",
+        "41~42",
+        "43~45"
+      ],
+      "drafts": [
+        {
+          "number": "18",
+          "reviewRequired": true,
+          "pages": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            279,
+            280
+          ],
+          "rawRowCount": 7,
+          "sourceExerciseCounts": {
+            "korean_blank": 7,
+            "english_blank": 7,
+            "verb_form": 7,
+            "grammar_vocab_choice": 6,
+            "translation": 14,
+            "word_order": 14,
+            "writing": 28
+          },
+          "canonical": {
+            "count": 7,
+            "digest": "6a15309bd3c7f94784657c64c8bbc7177bbdf057fdae5b72bf098b41a790d2a7",
+            "first": [
+              "Dear students, The annual Riverdale Science Fair will be held on July 18 with the theme \"Sustainable Future.\"",
+              "학생 여러분께, 연례 Riverdale 과학 박람회가 7월 18일 \"지속 가능한 미래\"라는 주제로 개최될 예정입니다."
+            ],
+            "last": [
+              "We look forward to your participation. Mr. Howard, Science Teacher",
+              "여러분의 참가를 기대하겠습니다. Howard 선생님, 과학 교사"
+            ]
+          },
+          "publisherStages": {
+            "korean_blank": 7,
+            "english_blank": 7,
+            "translation": 0,
+            "verb_form": 7,
+            "grammar_choice": 6,
+            "word_order": 0,
+            "writing": 0
+          },
+          "unresolved": 56,
+          "samples": [
+            {
+              "stage": 1,
+              "number": 1,
+              "kind": "blank_input",
+              "prompt": "학생 여러분께, ______________ Riverdale 과학 ______________가 7월 18일 \"______________ 미래\"라는 주제로 ______________ 예정입니다.",
+              "answers": [
+                "연례",
+                "박람회",
+                "지속 가능한",
+                "개최될"
+              ]
+            },
+            {
+              "stage": 2,
+              "number": 1,
+              "kind": "blank_input",
+              "prompt": "Dear students, The ______________ Riverdale Science ______________ will be ______________ on July 18 with the theme \"______________ Future.\"",
+              "answers": [
+                "annual",
+                "Fair",
+                "held",
+                "Sustainable"
+              ]
+            },
+            {
+              "stage": 4,
+              "number": 2,
+              "kind": "verb_form",
+              "prompt": "Although we ______________ the fair last month, student registration ______________ still lower than we expected.",
+              "answers": [
+                "announced",
+                "is"
+              ],
+              "hints": [
+                "announce",
+                "be"
+              ]
+            },
+            {
+              "stage": 5,
+              "number": 1,
+              "kind": "choice_groups",
+              "prompt": "Dear students, The annual Riverdale Science Fair will ⟦CHOICE:0⟧ on July 18 with the theme \"Sustainable Future.\"",
+              "answers": [
+                "be held"
+              ],
+              "groups": [
+                [
+                  "hold",
+                  "be held"
+                ]
+              ],
+              "canonicalStart": 1,
+              "canonicalEnd": 1
+            }
+          ],
+          "itemDigests": {
+            "korean_blank": "c64d90da253458ecf7e72fb27626146d58efdd3f553218f0205aaa1f7af7a4ee",
+            "english_blank": "5b8e73db047f30e13a6e2ab24f8e7aa7ba6e94391123bc16ca1f8f6c8bd9d776",
+            "translation": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "verb_form": "bffaaa25b61f3c49f30f19b757fd7e69ccd3e82ce44f73b72baae8eefd04fee1",
+            "grammar_choice": "bc38bb1c037f0bb0e8f8fb5b6a4be719398fb5b26bbf3cfbe666700b9af2d4cc",
+            "word_order": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "writing": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+          },
+          "publisherAnnotationCounts": {
+            "english_blank": 7,
+            "korean_blank": 7,
+            "verb_form": 6,
+            "grammar_choice": 4
+          }
+        },
+        {
+          "number": "19",
+          "reviewRequired": true,
+          "pages": [
+            12,
+            15,
+            18,
+            20,
+            280
+          ],
+          "rawRowCount": 39,
+          "sourceExerciseCounts": {
+            "translation": 11,
+            "verb_form": 6,
+            "grammar_choice": 7,
+            "word_order": 6,
+            "writing": 6
+          },
+          "blockedCanonical": true,
+          "reason": "Canonical SENTENCE English/Korean pairs are required."
+        },
+        {
+          "number": "",
+          "reviewRequired": true,
+          "pages": [
+            13,
+            14,
+            16,
+            17,
+            19,
+            21
+          ],
+          "rawRowCount": 42,
+          "sourceExerciseCounts": {},
+          "blockedCanonical": true,
+          "reason": "Canonical SENTENCE English/Korean pairs are required."
+        },
+        {
+          "number": "20",
+          "reviewRequired": true,
+          "pages": [
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29,
+            30,
+            31,
+            32,
+            280,
+            281,
+            282
+          ],
+          "rawRowCount": 6,
+          "sourceExerciseCounts": {
+            "verb_form": 6,
+            "grammar_vocab_choice": 6,
+            "korean_blank": 8,
+            "translation": 8,
+            "word_order": 8,
+            "writing": 13
+          },
+          "canonical": {
+            "count": 6,
+            "digest": "8278089b48aed4116054e9ebb5caaab15020a4771f523fdc612c8a5c22fd6280",
+            "first": [
+              "We can sometimes assume that the whole will be as good as each of its parts.",
+              "우리는 때때로 전체가 그것의 각 부분들만큼 좋을 것이라고 가정할 수 있다."
+            ],
+            "last": [
+              "When assembling a team with a common goal, always check the overall view as well as the individuals involved.",
+              "공동의 목표를 가진 팀을 구성할 때, 관련된 개개인뿐만 아니라 전체적인 관점도 항상 확인하라."
+            ]
+          },
+          "publisherStages": {
+            "korean_blank": 0,
+            "english_blank": 0,
+            "translation": 0,
+            "verb_form": 6,
+            "grammar_choice": 6,
+            "word_order": 0,
+            "writing": 0
+          },
+          "unresolved": 37,
+          "samples": [
+            {
+              "stage": 4,
+              "number": 5,
+              "kind": "verb_form",
+              "prompt": "Equally, a unit ______________ of good people can still ______________ on a doomed project, and a project ______________ of good ideas ______________ a stable center.",
+              "answers": [
+                "composed",
+                "be working",
+                "composed",
+                "may lack"
+              ],
+              "hints": [
+                "compose",
+                "be, work",
+                "compose",
+                "may, lack"
+              ]
+            },
+            {
+              "stage": 5,
+              "number": 5,
+              "kind": "choice_groups",
+              "prompt": "Equally, a unit ⟦CHOICE:0⟧ of good people can still be working on a doomed project, and a project ⟦CHOICE:1⟧ of good ideas may lack a stable center.",
+              "answers": [
+                "composed",
+                "composed"
+              ],
+              "groups": [
+                [
+                  "composes",
+                  "composed"
+                ],
+                [
+                  "composes",
+                  "composed"
+                ]
+              ],
+              "canonicalStart": 5,
+              "canonicalEnd": 5
+            }
+          ],
+          "itemDigests": {
+            "korean_blank": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "english_blank": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "translation": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "verb_form": "4e2f1875123b0b39635243bf0f51db6516401d60fd4b97f585a35aadeaaece0d",
+            "grammar_choice": "fb87cd38e55f23e83221faed512292a4325aa8ae56254a699da37d39e228c5d0",
+            "word_order": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "writing": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+          },
+          "publisherAnnotationCounts": {
+            "english_blank": 0,
+            "korean_blank": 0,
+            "verb_form": 3,
+            "grammar_choice": 3
+          }
+        },
+        {
+          "number": "21",
+          "reviewRequired": true,
+          "pages": [
+            33,
+            34,
+            35,
+            36,
+            37,
+            38,
+            39,
+            40,
+            41,
+            42,
+            43,
+            44,
+            282,
+            283
+          ],
+          "rawRowCount": 8,
+          "sourceExerciseCounts": {
+            "korean_blank": 8,
+            "english_blank": 8,
+            "verb_form": 8,
+            "grammar_vocab_choice": 5,
+            "translation": 16,
+            "word_order": 16,
+            "writing": 32
+          },
+          "canonical": {
+            "count": 8,
+            "digest": "af71d5e4773f175dbcd1f06cc55734393031f4a341994f1ded78a24b5f300fd8",
+            "first": [
+              "Humans excel at visual imagery.",
+              "인간은 시각적 심상에 뛰어나다."
+            ],
+            "last": [
+              "As the Bard said, \"You cannot cloy the hungry edge of appetite by bare imagination of a feast.\"",
+              "Bard가 말했듯, \"진수성찬에 대한 있는 그대로의 상상으로 식욕의 굶주린 날을 배 불릴 수 없다.\""
+            ]
+          },
+          "publisherStages": {
+            "korean_blank": 8,
+            "english_blank": 8,
+            "translation": 0,
+            "verb_form": 8,
+            "grammar_choice": 5,
+            "word_order": 0,
+            "writing": 0
+          },
+          "unresolved": 64,
+          "samples": [
+            {
+              "stage": 1,
+              "number": 1,
+              "kind": "blank_input",
+              "prompt": "인간은 ______________ ______________에 ______________.",
+              "answers": [
+                "시각적",
+                "심상",
+                "뛰어나다"
+              ]
+            },
+            {
+              "stage": 2,
+              "number": 1,
+              "kind": "blank_input",
+              "prompt": "Humans ______________ at ______________ ______________.",
+              "answers": [
+                "excel",
+                "visual",
+                "imagery"
+              ]
+            },
+            {
+              "stage": 4,
+              "number": 2,
+              "kind": "verb_form",
+              "prompt": "Our brains ______________ this ability ______________ an internal mental picture or model of the world in which we ______________ forthcoming actions, without the risks or the penalties of ______________ them in the real world.",
+              "answers": [
+                "evolved",
+                "to create",
+                "can rehearse",
+                "doing"
+              ],
+              "hints": [
+                "evolve",
+                "create",
+                "can, rehearse",
+                "do"
+              ]
+            },
+            {
+              "stage": 5,
+              "number": 5,
+              "kind": "choice_groups",
+              "prompt": "You ⟦CHOICE:0⟧ have no incentive to find real food and ⟦CHOICE:1⟧ soon starve to death. As the Bard said, \"You cannot cloy the hungry edge of appetite by bare imagination of a feast.\"",
+              "answers": [
+                "would",
+                "would"
+              ],
+              "groups": [
+                [
+                  "would",
+                  "will"
+                ],
+                [
+                  "will",
+                  "would"
+                ]
+              ],
+              "canonicalStart": 7,
+              "canonicalEnd": 8
+            }
+          ],
+          "itemDigests": {
+            "korean_blank": "d65df43c2914ff03c72de1255ac8e636626a0ac4adad7de159f26bb16de021b1",
+            "english_blank": "70a7724fec83c57294d00ca634c7301581ad842fdade595d08f188bae791ff8f",
+            "translation": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "verb_form": "ca08c246d889163f438ca82ef402362b56f84e66df878056701f9bc62dd4cf53",
+            "grammar_choice": "a4696552775ad82cac4ffab9b39bf06aa3f67c3b34194a26e281afdc835b3077",
+            "word_order": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "writing": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+          },
+          "publisherAnnotationCounts": {
+            "english_blank": 7,
+            "korean_blank": 8,
+            "verb_form": 5,
+            "grammar_choice": 0
+          }
+        },
+        {
+          "number": "22",
+          "reviewRequired": true,
+          "pages": [
+            45,
+            46,
+            47,
+            48,
+            49,
+            50,
+            51,
+            52,
+            53,
+            54,
+            55,
+            56,
+            57,
+            58,
+            283,
+            284
+          ],
+          "rawRowCount": 8,
+          "sourceExerciseCounts": {
+            "korean_blank": 8,
+            "english_blank": 8,
+            "verb_form": 8,
+            "grammar_vocab_choice": 8,
+            "translation": 16,
+            "word_order": 18,
+            "writing": 34
+          },
+          "canonical": {
+            "count": 8,
+            "digest": "3d78068908d9c1a19bf28223fd8e1e17f671f7e302fe22ded62e6ff319c228a1",
+            "first": [
+              "For each objective probability - from one percent to 100 percent - we want to know the subjective probability weight.",
+              "각각의 객관적 확률 - 1퍼센트부터 100퍼센트까지 - 에 대해 우리는 주관적인 확 률의 가중치를 알고 싶어 한다."
+            ],
+            "last": [
+              "However, the odds of a single ticket winning the largest, most popular U.S. lotteries are on the order of one in 175 million.",
+              "그러나, 가장 규모가 크고, 가장 인기 있는 미국 복권에 단 하나의 티켓이 당첨될 가능성은 1억 7,500만 분의 1과 비슷하다."
+            ]
+          },
+          "publisherStages": {
+            "korean_blank": 8,
+            "english_blank": 8,
+            "translation": 0,
+            "verb_form": 8,
+            "grammar_choice": 8,
+            "word_order": 0,
+            "writing": 0
+          },
+          "unresolved": 68,
+          "samples": [
+            {
+              "stage": 1,
+              "number": 1,
+              "kind": "blank_input",
+              "prompt": "각각의 ______________ ______________ - 1퍼센트부터 100퍼센트까지 - 에 대해 우리는 ______________ 확 률의 ______________를 알고 싶어 한다.",
+              "answers": [
+                "객관적",
+                "확률",
+                "주관적인",
+                "가중치"
+              ]
+            },
+            {
+              "stage": 2,
+              "number": 1,
+              "kind": "blank_input",
+              "prompt": "For each ______________ ______________ - from one percent to 100 percent - we want to know the ______________ probability ______________.",
+              "answers": [
+                "objective",
+                "probability",
+                "subjective",
+                "weight"
+              ]
+            },
+            {
+              "stage": 4,
+              "number": 5,
+              "kind": "verb_form",
+              "prompt": "That is, an event that ______________ an objective one‐percent chance of ______________ ______________ like it ______________ a five‐percent chance of ______________.",
+              "answers": [
+                "has",
+                "occurring",
+                "could subjectively seem",
+                "has",
+                "occurring"
+              ],
+              "hints": [
+                "have",
+                "occur",
+                "could, subjectively, seem",
+                "have",
+                "occur"
+              ]
+            },
+            {
+              "stage": 5,
+              "number": 3,
+              "kind": "choice_groups",
+              "prompt": "Events ⟦CHOICE:0⟧ could happen but aren't likely — low-probability events — can ⟦CHOICE:1⟧ as probabilities up to about 25 percent.",
+              "answers": [
+                "that",
+                "be defined"
+              ],
+              "groups": [
+                [
+                  "where",
+                  "that"
+                ],
+                [
+                  "be defined",
+                  "define"
+                ]
+              ],
+              "canonicalStart": 3,
+              "canonicalEnd": 3
+            }
+          ],
+          "itemDigests": {
+            "korean_blank": "d4ceab9a570401976c32bcdcd46a06b2ba23cd18cc4450e26c3ff2ec8f36a226",
+            "english_blank": "f020e2a5e3a45a1ffbaa2bbe73489c5ebbf3ff00f74642b8ba0f2b1b6b8b31da",
+            "translation": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "verb_form": "722736237bdf98f1146dea3c5b651c522c4ac0ecdbcf1d274fe32acda9b81bad",
+            "grammar_choice": "542bf81dc721f58d3d33a9a24eca16ebf2c116bb05d85108ac0172945c5098d5",
+            "word_order": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "writing": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+          },
+          "publisherAnnotationCounts": {
+            "english_blank": 7,
+            "korean_blank": 8,
+            "verb_form": 3,
+            "grammar_choice": 5
+          }
+        },
+        {
+          "number": "23",
+          "reviewRequired": true,
+          "pages": [
+            59,
+            60,
+            61,
+            62,
+            63,
+            64,
+            65,
+            66,
+            67,
+            68,
+            69,
+            284,
+            285
+          ],
+          "rawRowCount": 6,
+          "sourceExerciseCounts": {
+            "korean_blank": 6,
+            "grammar_vocab_choice": 6,
+            "translation": 12,
+            "word_order": 12,
+            "writing": 24,
+            "verb_form": 6
+          },
+          "canonical": {
+            "count": 6,
+            "digest": "da4dbb822e9fe1a98bdb77d717205008698cd7257dd0cf0743a93f89d9b982b4",
+            "first": [
+              "Many of the barriers to trade exist not because of a lack of markets or customers, but because there are major barriers to getting products to market at competitive prices.",
+              "무역에 대한 많은 장벽들은 시장이나 고객의 부족 때문이 아니라, 제품들을 경쟁력 있는 가격으로 시장에 내놓는 데에 큰 장벽들이 있기 때문에 존재하는 것이다."
+            ],
+            "last": [
+              "So a common currency provides for a strong economic foundation that all can benefit from.",
+              "그러므로 공동 통화는 모두가 이익을 얻을 수 있는 강력한 경제적 토대를 제공한다."
+            ]
+          },
+          "publisherStages": {
+            "korean_blank": 6,
+            "english_blank": 0,
+            "translation": 0,
+            "verb_form": 0,
+            "grammar_choice": 6,
+            "word_order": 0,
+            "writing": 0
+          },
+          "unresolved": 54,
+          "samples": [
+            {
+              "stage": 1,
+              "number": 1,
+              "kind": "blank_input",
+              "prompt": "______________에 대한 많은 ______________은 시장이나 고객의 ______________ 때문이 아니라, 제품들을 ______________ 가격으로 시장에 내놓는 데에 큰 장벽들이 있기 때문에 ______________는 것이다.",
+              "answers": [
+                "무역",
+                "장벽들",
+                "부족",
+                "경쟁력 있는",
+                "존재하"
+              ]
+            },
+            {
+              "stage": 5,
+              "number": 1,
+              "kind": "choice_groups",
+              "prompt": "Many of the barriers to trade ⟦CHOICE:0⟧ not ⟦CHOICE:1⟧ a lack of markets or customers, but because there are major barriers to ⟦CHOICE:2⟧ products to market at competitive prices.",
+              "answers": [
+                "exist",
+                "because of",
+                "getting"
+              ],
+              "groups": [
+                [
+                  "exist",
+                  "exists"
+                ],
+                [
+                  "because",
+                  "because of"
+                ],
+                [
+                  "getting",
+                  "get"
+                ]
+              ],
+              "canonicalStart": 1,
+              "canonicalEnd": 1
+            }
+          ],
+          "itemDigests": {
+            "korean_blank": "c9c33ee2f431793fd38db3de31f25967f7a5b79e9fb8aa97337de397e202a6d1",
+            "english_blank": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "translation": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "verb_form": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "grammar_choice": "89d76a22b79a90d23bf31f2f89afcd39d3704a221f9215d428c32930f5df0691",
+            "word_order": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "writing": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+          },
+          "publisherAnnotationCounts": {
+            "english_blank": 0,
+            "korean_blank": 5,
+            "verb_form": 0,
+            "grammar_choice": 3
+          }
+        },
+        {
+          "number": "24",
+          "reviewRequired": true,
+          "pages": [
+            70,
+            71,
+            72,
+            73,
+            74,
+            75,
+            76,
+            77,
+            78,
+            79,
+            80,
+            285,
+            286
+          ],
+          "rawRowCount": 8,
+          "sourceExerciseCounts": {
+            "korean_blank": 8,
+            "english_blank": 8,
+            "verb_form": 8,
+            "grammar_vocab_choice": 7,
+            "translation": 16,
+            "word_order": 16,
+            "writing": 32
+          },
+          "canonical": {
+            "count": 8,
+            "digest": "4c2efcf7ec7241612174c43d5a619f33504f60e837b8ca2fb75621e2004fcf50",
+            "first": [
+              "The light from even our nearest stellar neighbour takes four years to reach us.",
+              "심지어 우리의 가장 가까운 별의 이웃으로부터 온 빛도 우리에게 도달하는 데 4년이 걸린다."
+            ],
+            "last": [
+              "This means we have a chance of understanding the history of the universe because we can see the more distant parts of it as they were in the past, thousands or millions or billions of years ago.",
+              "이는 우리가 그것의 더 먼 부분들을 수천 또는 수백만 또는 수십억 년 전 과거의 모습대 로 볼 수 있기 때문에 우주의 역사를 이해할 기회를 가질 수 있음을 의미한다."
+            ]
+          },
+          "publisherStages": {
+            "korean_blank": 8,
+            "english_blank": 8,
+            "translation": 0,
+            "verb_form": 8,
+            "grammar_choice": 7,
+            "word_order": 0,
+            "writing": 0
+          },
+          "unresolved": 64,
+          "samples": [
+            {
+              "stage": 1,
+              "number": 1,
+              "kind": "blank_input",
+              "prompt": "심지어 우리의 가장 가까운 ______________ 이웃으로부터 온 빛도 우리에게 ______________는 데 4년이 걸린다.",
+              "answers": [
+                "별의",
+                "도달하"
+              ]
+            },
+            {
+              "stage": 2,
+              "number": 1,
+              "kind": "blank_input",
+              "prompt": "The light from even our nearest ______________ neighbour takes four years to ______________ us.",
+              "answers": [
+                "stellar",
+                "reach"
+              ]
+            },
+            {
+              "stage": 4,
+              "number": 1,
+              "kind": "verb_form",
+              "prompt": "The light from even our nearest stellar neighbour ______________ four years ______________ us.",
+              "answers": [
+                "takes",
+                "to reach"
+              ],
+              "hints": [
+                "take",
+                "reach"
+              ]
+            },
+            {
+              "stage": 5,
+              "number": 1,
+              "kind": "choice_groups",
+              "prompt": "The light from even our nearest stellar neighbour ⟦CHOICE:0⟧ four years ⟦CHOICE:1⟧ us.",
+              "answers": [
+                "takes",
+                "to reach"
+              ],
+              "groups": [
+                [
+                  "takes",
+                  "take"
+                ],
+                [
+                  "reach",
+                  "to reach"
+                ]
+              ],
+              "canonicalStart": 1,
+              "canonicalEnd": 1
+            }
+          ],
+          "itemDigests": {
+            "korean_blank": "78c47bcc5350018ca98b509546f358cefcbf778869293280aeb94be42776b5fa",
+            "english_blank": "031036ef5f6e6bde4933dd7bd5fa6b71c0f0c1264bf8c8d34ef2e9041978bb46",
+            "translation": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "verb_form": "ca5ec5403ec63b7fa5507072e400f611864c51ba8b51e2c01b342fcc19aa5cb5",
+            "grammar_choice": "22ddb3e5f40b21edd8e54ce1bf36ceb3ad631728ca056b32afb3c57e0b3e4419",
+            "word_order": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "writing": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+          },
+          "publisherAnnotationCounts": {
+            "english_blank": 8,
+            "korean_blank": 8,
+            "verb_form": 7,
+            "grammar_choice": 1
+          }
+        },
+        {
+          "number": "25",
+          "reviewRequired": true,
+          "pages": [
+            81
+          ],
+          "rawRowCount": 2,
+          "sourceExerciseCounts": {},
+          "blockedCanonical": true,
+          "reason": "Deterministic validation failed: 6:1:stage6_word_order"
+        },
+        {
+          "number": "26",
+          "reviewRequired": true,
+          "pages": [
+            82,
+            83,
+            84,
+            85,
+            86,
+            87,
+            88,
+            89,
+            90,
+            91,
+            92,
+            286,
+            287
+          ],
+          "rawRowCount": 7,
+          "sourceExerciseCounts": {
+            "korean_blank": 7,
+            "english_blank": 7,
+            "verb_form": 7,
+            "grammar_vocab_choice": 7,
+            "translation": 13,
+            "word_order": 14,
+            "writing": 28
+          },
+          "canonical": {
+            "count": 7,
+            "digest": "d6dfcb3c55e5136dc967eda1feba84cc5b046fd3648d4dcae5efd791d289b54e",
+            "first": [
+              "Jacob Lawrence was an American painter known for vivid scenes of African-American history and daily life.",
+              "Jacob Lawrence는 아프리카계 미국인의 역사와 일상생활의 생생한 장면들로 알려진 미국인 화 가였다."
+            ],
+            "last": [
+              "Until a few weeks before his death, he continued to explore the lives of African-Americans through his painting.",
+              "그의 사망 몇 주 전까지도, 그는 그의 그림을 통해 아프리카계 미국인들의 삶을 계속 탐구했다."
+            ]
+          },
+          "publisherStages": {
+            "korean_blank": 7,
+            "english_blank": 7,
+            "translation": 0,
+            "verb_form": 7,
+            "grammar_choice": 7,
+            "word_order": 0,
+            "writing": 0
+          },
+          "unresolved": 55,
+          "samples": [
+            {
+              "stage": 1,
+              "number": 4,
+              "kind": "blank_input",
+              "prompt": "Jacob Lawrence의 ______________으로 널리 ______________ The Migration Series는 그가 전국적인 ______________을 받게 해 주었다.",
+              "answers": [
+                "걸작",
+                "여겨지는",
+                "인정"
+              ]
+            },
+            {
+              "stage": 2,
+              "number": 4,
+              "kind": "blank_input",
+              "prompt": "The Migration Series, widely ______________ as Jacob Lawrence's ______________, brought him national ______________.",
+              "answers": [
+                "regarded",
+                "masterpiece",
+                "recognition"
+              ]
+            },
+            {
+              "stage": 4,
+              "number": 1,
+              "kind": "verb_form",
+              "prompt": "Jacob Lawrence ______________ an American painter ______________ for vivid scenes of African-American history and daily life.",
+              "answers": [
+                "was",
+                "known"
+              ],
+              "hints": [
+                "be",
+                "know"
+              ]
+            },
+            {
+              "stage": 5,
+              "number": 1,
+              "kind": "choice_groups",
+              "prompt": "Jacob Lawrence was an American painter ⟦CHOICE:0⟧ for vivid scenes of African-American history and daily life.",
+              "answers": [
+                "known"
+              ],
+              "groups": [
+                [
+                  "known",
+                  "knowing"
+                ]
+              ],
+              "canonicalStart": 1,
+              "canonicalEnd": 1
+            }
+          ],
+          "itemDigests": {
+            "korean_blank": "a125182214ec54b8dbde91081ea789c1e4ea2b2d959e1938ef5faa841be1e5ee",
+            "english_blank": "11c1db46d70b4817d19308db7a7204096bee53690f53d17b237caecea5d7527e",
+            "translation": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "verb_form": "76092d6d3fa2f50ef7892519a0db99a1d61f08c72258281392409f938ad692d5",
+            "grammar_choice": "96f3f6f11079fa5fa7a7c56590a7b9c23efd694dac5878e90b995d4537b61ced",
+            "word_order": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "writing": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+          },
+          "publisherAnnotationCounts": {
+            "english_blank": 7,
+            "korean_blank": 7,
+            "verb_form": 5,
+            "grammar_choice": 5
+          }
+        },
+        {
+          "number": "27",
+          "reviewRequired": true,
+          "pages": [
+            93
+          ],
+          "rawRowCount": 2,
+          "sourceExerciseCounts": {},
+          "blockedCanonical": true,
+          "reason": "Deterministic validation failed: 6:1:stage6_word_order"
+        },
+        {
+          "number": "28",
+          "reviewRequired": true,
+          "pages": [
+            94
+          ],
+          "rawRowCount": 2,
+          "sourceExerciseCounts": {},
+          "blockedCanonical": true,
+          "reason": "Deterministic validation failed: 6:1:stage6_word_order"
+        },
+        {
+          "number": "29",
+          "reviewRequired": true,
+          "pages": [
+            95,
+            96,
+            97,
+            98,
+            99,
+            100,
+            101,
+            102,
+            103,
+            104,
+            105,
+            106,
+            287,
+            288
+          ],
+          "rawRowCount": 7,
+          "sourceExerciseCounts": {
+            "korean_blank": 7,
+            "english_blank": 7,
+            "verb_form": 7,
+            "grammar_vocab_choice": 7,
+            "translation": 6,
+            "word_order": 9,
+            "writing": 24
+          },
+          "canonical": {
+            "count": 7,
+            "digest": "164a0941c4854d6dff4b50b4aa2387320f2ca2376336bc4e3581c9a9fae750bb",
+            "first": [
+              "The renowned British philosopher Alfred North Whitehead asserted that \"civilization advances by extending the number of operations we can perform without thinking about them.\"",
+              "저명한 영국 철학자 Alfred North Whitehead는 \"문명은 우리가 그것들에 대해 생각하 지 않고 수행할 수 있는 작업들의 수를 확장함으로써 진보한다.\"라고 주장했다."
+            ],
+            "last": [
+              "In today's world, we need the first advantage to handle pocketbook strain; but we need the second advantage to handle something potentially more important - brain strain.",
+              "오늘날의 세상에서, 우리는 금전적인 부담을 처리하는 첫 번째 이점이 필 요하지만, 우리는 잠재적으로 더 중요한 무언가를 처리하는 두 번째 이점도 필요하다 - 두뇌 부담."
+            ]
+          },
+          "publisherStages": {
+            "korean_blank": 7,
+            "english_blank": 7,
+            "translation": 0,
+            "verb_form": 7,
+            "grammar_choice": 7,
+            "word_order": 0,
+            "writing": 0
+          },
+          "unresolved": 39,
+          "samples": [
+            {
+              "stage": 1,
+              "number": 1,
+              "kind": "blank_input",
+              "prompt": "______________ 영국 철학자 Alfred North Whitehead는 \"______________은 우리가 그것들에 대해 생각하 지 않고 수행할 수 있는 ______________의 수를 ______________으로써 ______________.\"라고 ______________.",
+              "answers": [
+                "저명한",
+                "문명",
+                "작업들",
+                "확장함",
+                "진보한다",
+                "주장했다"
+              ]
+            },
+            {
+              "stage": 2,
+              "number": 6,
+              "kind": "blank_input",
+              "prompt": "Not only do we expect them to ______________ us money, we also expect them to ______________ us the time and mental energy required to think about how to do it.",
+              "answers": [
+                "save",
+                "save"
+              ]
+            },
+            {
+              "stage": 4,
+              "number": 4,
+              "kind": "verb_form",
+              "prompt": "Mailed‐out coupons that — because of a printing error — ______________ no savings to recipients ______________ just as much customer response as ______________ error‐free coupons that ______________ substantial savings.",
+              "answers": [
+                "offered",
+                "produced",
+                "did",
+                "offered"
+              ],
+              "hints": [
+                "offer",
+                "produce",
+                "do",
+                "offer"
+              ]
+            },
+            {
+              "stage": 5,
+              "number": 2,
+              "kind": "choice_groups",
+              "prompt": "Take, for example, the \"advance\" ⟦CHOICE:0⟧ to civilization by the discount coupon, which ⟦CHOICE:1⟧ consumers to assume that they will receive a reduced purchase price by presenting the coupon.",
+              "answers": [
+                "offered",
+                "allows"
+              ],
+              "groups": [
+                [
+                  "offered",
+                  "offering"
+                ],
+                [
+                  "allow",
+                  "allows"
+                ]
+              ],
+              "canonicalStart": 2,
+              "canonicalEnd": 2
+            }
+          ],
+          "itemDigests": {
+            "korean_blank": "e66c5aa5a7d8aed19545c9ab29da958c07fbb741ec6448729255a81c033a1ce7",
+            "english_blank": "499c5c84997691e0e59ce348a98b16a2b8cb30bb25fe7dd3e9a475dc99937b54",
+            "translation": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "verb_form": "27cc783211540bcf9e760ffaf6bbff55daa2bfed39806c3781077920727312ec",
+            "grammar_choice": "e83809b32644993ba65d4e712d98bb11f7f9980d818e8bf53775a0301b2da171",
+            "word_order": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "writing": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+          },
+          "publisherAnnotationCounts": {
+            "english_blank": 7,
+            "korean_blank": 7,
+            "verb_form": 2,
+            "grammar_choice": 2
+          }
+        },
+        {
+          "number": "30",
+          "reviewRequired": true,
+          "pages": [
+            107,
+            108,
+            109,
+            110,
+            111,
+            112,
+            113,
+            114,
+            115,
+            116,
+            117,
+            288,
+            289,
+            290
+          ],
+          "rawRowCount": 7,
+          "sourceExerciseCounts": {
+            "korean_blank": 7,
+            "verb_form": 7,
+            "grammar_vocab_choice": 6,
+            "translation": 14,
+            "word_order": 14,
+            "writing": 28
+          },
+          "canonical": {
+            "count": 7,
+            "digest": "0a499e38e826ac3d8e35f5725011ed6b1fbbe3408a618c63d196906113c4f2c6",
+            "first": [
+              "Usually, innovative high-tech products have low price elasticity.",
+              "일반적으로, 혁신적인 첨단 기술 제품은 낮은 가격 탄력성을 지닌다."
+            ],
+            "last": [
+              "Furthermore, the high price of these products is often perceived as a sign of quality and reinforces a customer's confidence in the company.",
+              "더욱이, 이러한 제품들의 높은 가격은 흔히 우수함의 표시로 인식되고 그 회사 에 대한 고객의 신뢰를 강화한다."
+            ]
+          },
+          "publisherStages": {
+            "korean_blank": 7,
+            "english_blank": 0,
+            "translation": 0,
+            "verb_form": 7,
+            "grammar_choice": 6,
+            "word_order": 0,
+            "writing": 0
+          },
+          "unresolved": 56,
+          "samples": [
+            {
+              "stage": 1,
+              "number": 1,
+              "kind": "blank_input",
+              "prompt": "일반적으로, ______________ ______________ 제품은 낮은 가격 ______________을 지닌다.",
+              "answers": [
+                "혁신적인",
+                "첨단 기술",
+                "탄력성"
+              ]
+            },
+            {
+              "stage": 4,
+              "number": 4,
+              "kind": "verb_form",
+              "prompt": "Additionally, at the first stage of the technology, buyers — either innovators or forerunners — ______________ less sensitive to price than to additional performance; they often ______________ deep pockets or ______________ ready ______________ a lot for a new innovative and outstanding product.",
+              "answers": [
+                "are",
+                "have",
+                "are",
+                "to spend"
+              ],
+              "hints": [
+                "be",
+                "have",
+                "be",
+                "spend"
+              ]
+            },
+            {
+              "stage": 5,
+              "number": 2,
+              "kind": "choice_groups",
+              "prompt": "These high‐tech products have ⟦CHOICE:0⟧ substitutes, ⟦CHOICE:1⟧ that the costs to switch to another product ⟦CHOICE:2⟧ high.",
+              "answers": [
+                "few",
+                "meaning",
+                "are"
+              ],
+              "groups": [
+                [
+                  "little",
+                  "few"
+                ],
+                [
+                  "mean",
+                  "meaning"
+                ],
+                [
+                  "is",
+                  "are"
+                ]
+              ],
+              "canonicalStart": 3,
+              "canonicalEnd": 3
+            }
+          ],
+          "itemDigests": {
+            "korean_blank": "c5d286bd113d74da774dd116f9d3e90a370b59499821b7265c76135bd4c0c391",
+            "english_blank": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "translation": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "verb_form": "28c08264535b53df33ebdd2238912b877ec03c53025226ade808e860880d513e",
+            "grammar_choice": "ea85b8852526e380351089aea686ab84b78284413657f2a6b9a149afff63e76c",
+            "word_order": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "writing": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+          },
+          "publisherAnnotationCounts": {
+            "english_blank": 0,
+            "korean_blank": 7,
+            "verb_form": 2,
+            "grammar_choice": 0
+          }
+        },
+        {
+          "number": "31",
+          "reviewRequired": true,
+          "pages": [
+            118,
+            119,
+            120,
+            121,
+            122,
+            123,
+            124,
+            125,
+            126,
+            127,
+            128,
+            290,
+            291
+          ],
+          "rawRowCount": 7,
+          "sourceExerciseCounts": {
+            "korean_blank": 7,
+            "english_blank": 7,
+            "verb_form": 7,
+            "grammar_vocab_choice": 6,
+            "translation": 14,
+            "word_order": 14,
+            "writing": 28
+          },
+          "canonical": {
+            "count": 7,
+            "digest": "b80a982bc37236b30caafc9cf8ce50f2017aace7b5d242fae345146953906f35",
+            "first": [
+              "One easily underappreciated feature of a city street or square is its \"future-proof\" nature.",
+              "도시의 거리나 광장에 대한 한 가지 쉽게 과소평가되는 특징은 그것의 \"미래를 견뎌 내는\" 속성이다."
+            ],
+            "last": [
+              "As she pointed out, the great advantage of a city architecture is its ability to support change in uses, and Jacobs correctly predicted the persistence of the city itself, unlike those who predicted the rise of the Internet would mean the death of the city.",
+              "그녀가 지적했듯이, 도시 건축의 큰 이점은 용도들의 변화를 지원하는 그것의 능력이 며, 그리고 Jacobs는, 인터넷의 부상이 도시의 소멸을 의미할 것이라고 예측했던 사람들과는 달리, 도시 그 자체의 지속성을 정확히 예측했다."
+            ]
+          },
+          "publisherStages": {
+            "korean_blank": 7,
+            "english_blank": 7,
+            "translation": 0,
+            "verb_form": 7,
+            "grammar_choice": 6,
+            "word_order": 0,
+            "writing": 0
+          },
+          "unresolved": 56,
+          "samples": [
+            {
+              "stage": 1,
+              "number": 1,
+              "kind": "blank_input",
+              "prompt": "도시의 거리나 광장에 대한 한 가지 쉽게 ______________ ______________은 그것의 \"______________\" 속성이다.",
+              "answers": [
+                "과소평가되는",
+                "특징",
+                "미래를 견뎌 내는"
+              ]
+            },
+            {
+              "stage": 2,
+              "number": 1,
+              "kind": "blank_input",
+              "prompt": "One easily ______________ ______________ of a city street or square is its \"______________\" nature.",
+              "answers": [
+                "underappreciated",
+                "feature",
+                "future‐proof"
+              ]
+            },
+            {
+              "stage": 4,
+              "number": 3,
+              "kind": "verb_form",
+              "prompt": "The city square ______________ a fairly future‐proof technology, as ______________ the shopping street, even in an age of online shopping.",
+              "answers": [
+                "is",
+                "is"
+              ],
+              "hints": [
+                "be",
+                "be"
+              ]
+            },
+            {
+              "stage": 5,
+              "number": 2,
+              "kind": "choice_groups",
+              "prompt": "The ancient medieval squares in places like Marrakesh and Siena ⟦CHOICE:0⟧ still places ⟦CHOICE:1⟧ stuff is sold every day, even if the stuff itself has changed over the last five hundred years.",
+              "answers": [
+                "are",
+                "where"
+              ],
+              "groups": [
+                [
+                  "are",
+                  "is"
+                ],
+                [
+                  "where",
+                  "which"
+                ]
+              ],
+              "canonicalStart": 2,
+              "canonicalEnd": 2
+            }
+          ],
+          "itemDigests": {
+            "korean_blank": "f6de77eee6a9c46a7edd1e85aedca3345e8c289b66ea351103753faf016ea0e7",
+            "english_blank": "a481a5af659d7b0c44592b0b1b5a6166ef84eb2dd7b04e28e92d59e8c68ac3cf",
+            "translation": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "verb_form": "a98eb21011a3024e5bd889eae6d7122f92415b68109b12dc825b4a53759b9b8d",
+            "grammar_choice": "46bc50dd07ca499de18ef9c19804647a067567b89e49d671844a2bbadc21d507",
+            "word_order": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "writing": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+          },
+          "publisherAnnotationCounts": {
+            "english_blank": 6,
+            "korean_blank": 7,
+            "verb_form": 5,
+            "grammar_choice": 1
+          }
+        },
+        {
+          "number": "32",
+          "reviewRequired": true,
+          "pages": [
+            129,
+            130,
+            131,
+            132,
+            133,
+            134,
+            135,
+            136,
+            137,
+            138,
+            139,
+            291,
+            292
+          ],
+          "rawRowCount": 6,
+          "sourceExerciseCounts": {
+            "korean_blank": 6,
+            "verb_form": 6,
+            "grammar_vocab_choice": 6,
+            "translation": 12,
+            "word_order": 12,
+            "writing": 24
+          },
+          "canonical": {
+            "count": 6,
+            "digest": "eea55a26eb33b86c0f92e1fa280af4ef9a84395e8667bbe14ef8ef3565a8ef36",
+            "first": [
+              "The genomics revolution made it possible to see just how impactful touch is to plants on a deeper level.",
+              "유전체학 혁명은 접촉이 식물에 정말 얼마나 영향을 미치는지를 더 깊은 차원에서 확인할 수 있게 해 주었다."
+            ],
+            "last": [
+              "Touched multiple times, arabidopsis cut its upward growth rate by as much as 30 percent.",
+              "여러 번 접촉되었을 때, 애기장대는 그것의 위로 자라는 성장률을 많게는 30퍼센트까지 줄였다."
+            ]
+          },
+          "publisherStages": {
+            "korean_blank": 6,
+            "english_blank": 0,
+            "translation": 0,
+            "verb_form": 6,
+            "grammar_choice": 6,
+            "word_order": 0,
+            "writing": 0
+          },
+          "unresolved": 48,
+          "samples": [
+            {
+              "stage": 1,
+              "number": 1,
+              "kind": "blank_input",
+              "prompt": "______________ ______________은 접촉이 식물에 정말 얼마나 ______________지를 더 깊은 차원에서 확인할 수 있게 해 주었다.",
+              "answers": [
+                "유전체학",
+                "혁명",
+                "영향을 미치는"
+              ]
+            },
+            {
+              "stage": 4,
+              "number": 1,
+              "kind": "verb_form",
+              "prompt": "The genomics revolution ______________ it possible ______________ just how impactful touch ______________ to plants on a deeper level.",
+              "answers": [
+                "made",
+                "to see",
+                "is"
+              ],
+              "hints": [
+                "make",
+                "see",
+                "be"
+              ]
+            },
+            {
+              "stage": 5,
+              "number": 1,
+              "kind": "choice_groups",
+              "prompt": "The genomics revolution made ⟦CHOICE:0⟧ possible to see just how ⟦CHOICE:1⟧ touch is to plants on a deeper level.",
+              "answers": [
+                "it",
+                "impactful"
+              ],
+              "groups": [
+                [
+                  "it",
+                  "that"
+                ],
+                [
+                  "impactful",
+                  "impactfully"
+                ]
+              ],
+              "canonicalStart": 1,
+              "canonicalEnd": 1
+            }
+          ],
+          "itemDigests": {
+            "korean_blank": "2310a5ecc7f28143ee5d774167abc335c24d36de920868fd6f289eca480a1c1e",
+            "english_blank": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "translation": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "verb_form": "271a1c344e0ad0cb58b121a111b7cf05718aa8d5896f0b5e99b4c75e5f0da4b7",
+            "grammar_choice": "4b76b5b4a277662cc96f4d9c5c40352d9aa754c064ac2d7c430de484652681e9",
+            "word_order": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "writing": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+          },
+          "publisherAnnotationCounts": {
+            "english_blank": 0,
+            "korean_blank": 6,
+            "verb_form": 4,
+            "grammar_choice": 4
+          }
+        },
+        {
+          "number": "33",
+          "reviewRequired": true,
+          "pages": [
+            140,
+            141,
+            142,
+            143,
+            144,
+            145,
+            146,
+            147,
+            148,
+            149,
+            292,
+            293
+          ],
+          "rawRowCount": 5,
+          "sourceExerciseCounts": {
+            "korean_blank": 5,
+            "english_blank": 5,
+            "verb_form": 5,
+            "grammar_vocab_choice": 5,
+            "translation": 9,
+            "word_order": 8,
+            "writing": 8
+          },
+          "canonical": {
+            "count": 5,
+            "digest": "f8b51fac3a2e34bb26235450ae79d5b5d86fbf0412999e6e58548cc0b5500969",
+            "first": [
+              "Evolution will come to a standstill until something in the conditions changes: the onset of an ice age, a change in the average rainfall of the area, a shift in the prevailing wind.",
+              "진화는 빙하기의 시작, 그 지역의 평균 강수량의 변화, 항상풍의 변화와 같은, 상황들 속의 어떤 것이 변할 때까지 정지할 것이다."
+            ],
+            "last": [
+              "If after a few thousand years of reduced temperature the trend reverses and average temperatures creep up again, the animals will come under the influence of a new selection pressure, and will be pushed towards growing shorter coats again.",
+              "만약 수천 년의 낮아진 기온 이후에 그 추세가 역전되고 평균 기온이 다시 서서히 올라간다면, 그 동물들은 새로운 선택 압력의 영향 아래 놓이게 될 것이며, 다시 더 짧은 털을 자라게 하는 쪽으로 나아가게 될 것이다."
+            ]
+          },
+          "publisherStages": {
+            "korean_blank": 5,
+            "english_blank": 5,
+            "translation": 0,
+            "verb_form": 5,
+            "grammar_choice": 5,
+            "word_order": 0,
+            "writing": 0
+          },
+          "unresolved": 25,
+          "samples": [
+            {
+              "stage": 1,
+              "number": 4,
+              "kind": "blank_input",
+              "prompt": "만약 그 지역에서, 수 세기에 걸쳐 ______________는 ______________인, 평균 기온의 ______________ 하향 ______________가 있다면, 꾸준한 선택 '______________'에 의해 동물들의 ______________ 세대는, 이를테면 더 긴 털을 자라게 하는 방향으로, ______________ 것이다.",
+              "answers": [
+                "지속되",
+                "추세",
+                "꾸준한",
+                "추세",
+                "압력",
+                "다음",
+                "나아가게 될"
+              ]
+            },
+            {
+              "stage": 2,
+              "number": 4,
+              "kind": "blank_input",
+              "prompt": "If there is a ______________ downward ______________ in the average temperature in the area, a ______________ that ______________ over centuries, ______________ generations of animals will be ______________ by a steady selection '______________' in the direction, say, of growing longer coats of hair.",
+              "answers": [
+                "steady",
+                "drift",
+                "drift",
+                "persists",
+                "successive",
+                "propelled",
+                "pressure"
+              ]
+            },
+            {
+              "stage": 4,
+              "number": 1,
+              "kind": "verb_form",
+              "prompt": "Evolution ______________ to a standstill until something in the conditions ______________: the onset of an ice age, a change in the average rainfall of the area, a shift in the prevailing wind.",
+              "answers": [
+                "will come",
+                "changes"
+              ],
+              "hints": [
+                "will, come",
+                "change"
+              ]
+            },
+            {
+              "stage": 5,
+              "number": 4,
+              "kind": "choice_groups",
+              "prompt": "If there ⟦CHOICE:0⟧ a steady downward drift in the average temperature in the area, a drift that ⟦CHOICE:1⟧ over centuries, successive generations of animals will be propelled by a steady selection 'pressure' in the direction, say, of growing longer coats of hair.",
+              "answers": [
+                "is",
+                "persists"
+              ],
+              "groups": [
+                [
+                  "will be",
+                  "is"
+                ],
+                [
+                  "persist",
+                  "persists"
+                ]
+              ],
+              "canonicalStart": 4,
+              "canonicalEnd": 4
+            }
+          ],
+          "itemDigests": {
+            "korean_blank": "580be3680e25a8bd4e9ef8daddd028d4bf7f026dede5b206d7207acf9efc0bd2",
+            "english_blank": "ac8b1c91dc720c2969913df6a1a623c4bd31a475c666488872f8691bdc02e8ce",
+            "translation": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "verb_form": "cb5ab38ffa56197d5499fdc8091cd57bab607ad9a470915fd37a9e8cab68271b",
+            "grammar_choice": "6c75eaa88af557ca8e9719efef58a6255a22bf2ddfbb4e2174c5d2227f09683a",
+            "word_order": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "writing": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+          },
+          "publisherAnnotationCounts": {
+            "english_blank": 5,
+            "korean_blank": 5,
+            "verb_form": 4,
+            "grammar_choice": 4
+          }
+        },
+        {
+          "number": "34",
+          "reviewRequired": true,
+          "pages": [
+            150,
+            151,
+            152,
+            153,
+            154,
+            155,
+            156,
+            157,
+            158,
+            159,
+            160,
+            161,
+            293,
+            294
+          ],
+          "rawRowCount": 9,
+          "sourceExerciseCounts": {
+            "korean_blank": 9,
+            "english_blank": 9,
+            "verb_form": 9,
+            "grammar_vocab_choice": 5,
+            "translation": 18,
+            "word_order": 18,
+            "writing": 36
+          },
+          "canonical": {
+            "count": 9,
+            "digest": "4f858ae5431def9aa5d9b3a952431c7f6ccfc99867a808a77ae10f2dfad92967",
+            "first": [
+              "The high price of land in metropolitan areas has implications for the efficient employment of resources.",
+              "대도시의 높은 토지 가격은 자원의 효율적 활용에 영향을 미친다."
+            ],
+            "last": [
+              "Profit-maximizing street vendors substitute public sidewalks for costly commercial space.",
+              "이익 극대화를 추구하는 노점상들은 공공 보행로를 값비싼 상업 공간 대신으로 쓴다."
+            ]
+          },
+          "publisherStages": {
+            "korean_blank": 9,
+            "english_blank": 9,
+            "translation": 0,
+            "verb_form": 9,
+            "grammar_choice": 5,
+            "word_order": 0,
+            "writing": 0
+          },
+          "unresolved": 72,
+          "samples": [
+            {
+              "stage": 1,
+              "number": 1,
+              "kind": "blank_input",
+              "prompt": "______________의 높은 토지 가격은 ______________의 효율적 ______________에 ______________.",
+              "answers": [
+                "대도시",
+                "자원",
+                "활용",
+                "영향을 미친다"
+              ]
+            },
+            {
+              "stage": 2,
+              "number": 1,
+              "kind": "blank_input",
+              "prompt": "The high price of land in ______________ areas ______________ for the efficient ______________ of ______________.",
+              "answers": [
+                "metropolitan",
+                "has implications",
+                "employment",
+                "resources"
+              ]
+            },
+            {
+              "stage": 4,
+              "number": 4,
+              "kind": "verb_form",
+              "prompt": "______________ the resources ______________ ______________ hot dogs: land, labor, capital, entrepreneurial ability, plus intermediate goods such as hot dogs, buns, and other ingredients.",
+              "answers": [
+                "Consider",
+                "used",
+                "to supply"
+              ],
+              "hints": [
+                "Consider",
+                "use",
+                "supply"
+              ]
+            },
+            {
+              "stage": 5,
+              "number": 1,
+              "kind": "choice_groups",
+              "prompt": "The high price of land in metropolitan areas ⟦CHOICE:0⟧ implications for the efficient employment of resources. For example, in New York City, as in many large cities, sidewalk vending carts sell everything from hot dogs to ice cream.",
+              "answers": [
+                "has"
+              ],
+              "groups": [
+                [
+                  "has",
+                  "have"
+                ]
+              ],
+              "canonicalStart": 1,
+              "canonicalEnd": 2
+            }
+          ],
+          "itemDigests": {
+            "korean_blank": "d3ba41e0506c68d9e4e6da4c4302ad00b529b70a9fd50021b513a925ff03eeb0",
+            "english_blank": "573a207636dde90622baa685ba912f554e41509f397f958c9bd8d37431c04dde",
+            "translation": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "verb_form": "651ef13485f8d40d2a69f3f0bef65a2f60ef8ddd48619eb61d964c227838baf0",
+            "grammar_choice": "c0960a111db1898f8bf9902183afdbbc06b7c7b356abc17e410f1b26f1c02e32",
+            "word_order": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "writing": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+          },
+          "publisherAnnotationCounts": {
+            "english_blank": 9,
+            "korean_blank": 9,
+            "verb_form": 8,
+            "grammar_choice": 0
+          }
+        },
+        {
+          "number": "35",
+          "reviewRequired": true,
+          "pages": [
+            162,
+            163,
+            164,
+            165,
+            166,
+            167,
+            168,
+            169,
+            170,
+            171,
+            172,
+            294,
+            295
+          ],
+          "rawRowCount": 5,
+          "sourceExerciseCounts": {
+            "korean_blank": 5,
+            "english_blank": 5,
+            "verb_form": 5,
+            "grammar_vocab_choice": 5,
+            "translation": 19,
+            "word_order": 10,
+            "writing": 10
+          },
+          "canonical": {
+            "count": 5,
+            "digest": "5de5ab41e241aef4c43af1f24d2b15fa6001600f91b6716fa1b2b7830fc34a28",
+            "first": [
+              "The process we go through when we look at a work of art to determine if we recognize and can make sense of its content is not just a visual one.",
+              "예술 작품을 볼 때 우리가 그것의 내용을 인식하고 이해할 수 있는지를 결정하기 위해 우리가 거치는 과정은 단지 시각적인 것만은 아니다."
+            ],
+            "last": [
+              "And then, using all the contextual information we have gathered, we interpret the work of art's content to discover what it means or symbolizes.",
+              "그리고 나서, 우리가 수집해온 모든 맥락적 정보를 사용하여, 우리는 그것이 무엇을 의미하거나 상징하는지를 발견하기 위해 예술 작품의 내용을 해석한다."
+            ]
+          },
+          "publisherStages": {
+            "korean_blank": 5,
+            "english_blank": 5,
+            "translation": 0,
+            "verb_form": 5,
+            "grammar_choice": 5,
+            "word_order": 0,
+            "writing": 0
+          },
+          "unresolved": 39,
+          "samples": [
+            {
+              "stage": 1,
+              "number": 1,
+              "kind": "blank_input",
+              "prompt": "예술 작품을 볼 때 우리가 그것의 ______________을 ______________고 ______________ 수 있는지를 ______________기 위해 우리가 ______________는 과정은 단지 ______________ 것만은 아니다.",
+              "answers": [
+                "내용",
+                "인식하",
+                "이해할",
+                "결정하",
+                "거치",
+                "시각적인"
+              ]
+            },
+            {
+              "stage": 2,
+              "number": 1,
+              "kind": "blank_input",
+              "prompt": "The process we ______________ when we look at a work of art to ______________ if we ______________ and can ______________ of its ______________ is not just a ______________ one.",
+              "answers": [
+                "go through",
+                "determine",
+                "recognize",
+                "make sense",
+                "content",
+                "visual"
+              ]
+            },
+            {
+              "stage": 4,
+              "number": 3,
+              "kind": "verb_form",
+              "prompt": "As we ______________ and ______________, we ______________ clues about what the work ______________ by where it ______________, when it ______________, what culture it ______________ from, who ______________ it, or why it ______________.",
+              "answers": [
+                "look",
+                "think",
+                "may be given",
+                "means",
+                "is",
+                "was made",
+                "came",
+                "created",
+                "was made"
+              ],
+              "hints": [
+                "look",
+                "think",
+                "may, give",
+                "mean",
+                "be",
+                "make",
+                "come",
+                "create",
+                "make"
+              ]
+            },
+            {
+              "stage": 5,
+              "number": 3,
+              "kind": "choice_groups",
+              "prompt": "As we look and think, we may ⟦CHOICE:0⟧ clues about what the work means by where ⟦CHOICE:1⟧, when ⟦CHOICE:2⟧ made, what culture it came from, who created it, or why it was made.",
+              "answers": [
+                "be given",
+                "it is",
+                "it was"
+              ],
+              "groups": [
+                [
+                  "be given",
+                  "give"
+                ],
+                [
+                  "is it",
+                  "it is"
+                ],
+                [
+                  "it was",
+                  "was it"
+                ]
+              ],
+              "canonicalStart": 3,
+              "canonicalEnd": 3
+            }
+          ],
+          "itemDigests": {
+            "korean_blank": "007e6434170e6f040497234872807d749b2e8ccdb5e9abc2dada7dabd7623be6",
+            "english_blank": "c7e1e679a6208ba840d2c2f07cbc213786b1fb7db6087d930d05062c54bf2887",
+            "translation": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "verb_form": "178a804072db21006b6e762930df2baf164ee3ae068ddc7a6bdb2060ffd03b96",
+            "grammar_choice": "78ef52787ab185c9a8b3a7c6fa8c9351078e59a80873755c09946d638da40ade",
+            "word_order": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "writing": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+          },
+          "publisherAnnotationCounts": {
+            "english_blank": 5,
+            "korean_blank": 5,
+            "verb_form": 3,
+            "grammar_choice": 3
+          }
+        },
+        {
+          "number": "36",
+          "reviewRequired": true,
+          "pages": [
+            173,
+            174,
+            175,
+            176,
+            177,
+            178,
+            179,
+            180,
+            181,
+            182,
+            183,
+            184,
+            185,
+            186,
+            187,
+            295,
+            296
+          ],
+          "rawRowCount": 11,
+          "sourceExerciseCounts": {
+            "korean_blank": 11,
+            "translation": 22,
+            "verb_form": 15,
+            "grammar_choice": 17,
+            "word_order": 24,
+            "writing": 46
+          },
+          "canonical": {
+            "count": 11,
+            "digest": "f3a7fca103f8069b6c6d5aaec043f7e3a38f4a6f4350f60171df0b1f84dc7d7d",
+            "first": [
+              "For most animals the struggle to survive takes up all their time.",
+              "대부분의 동물들에게 생존하기 위한 고투는 그들의 모든 시간을 차지한다."
+            ],
+            "last": [
+              "They had time on their hands.",
+              "그들은 여유 시간이 있었다."
+            ]
+          },
+          "publisherStages": {
+            "korean_blank": 11,
+            "english_blank": 0,
+            "translation": 0,
+            "verb_form": 0,
+            "grammar_choice": 0,
+            "word_order": 0,
+            "writing": 0
+          },
+          "unresolved": 124,
+          "samples": [
+            {
+              "stage": 1,
+              "number": 1,
+              "kind": "blank_input",
+              "prompt": "대부분의 동물들에게 생존하기 위한 ______________는 그들의 모든 시간을 ______________.",
+              "answers": [
+                "고투",
+                "차지한다"
+              ]
+            }
+          ],
+          "itemDigests": {
+            "korean_blank": "1b82c86a59a9fd49ea403e8d34e480607d79ceb6ff05b52999b0969d8c474265",
+            "english_blank": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "translation": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "verb_form": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "grammar_choice": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "word_order": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "writing": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+          },
+          "publisherAnnotationCounts": {
+            "english_blank": 0,
+            "korean_blank": 11,
+            "verb_form": 0,
+            "grammar_choice": 0
+          }
+        },
+        {
+          "number": "37",
+          "reviewRequired": true,
+          "pages": [
+            188,
+            189,
+            190,
+            191,
+            192,
+            193,
+            194,
+            195,
+            196,
+            197,
+            198,
+            199,
+            200,
+            201,
+            202,
+            296,
+            297,
+            298
+          ],
+          "rawRowCount": 9,
+          "sourceExerciseCounts": {
+            "korean_blank": 9,
+            "english_blank": 9,
+            "verb_form": 9,
+            "grammar_vocab_choice": 8,
+            "translation": 14,
+            "word_order": 17,
+            "writing": 14
+          },
+          "canonical": {
+            "count": 9,
+            "digest": "476e20d34aa8fb3e969e5e741dfb013434851dae03df2b46e6346db8a95943f1",
+            "first": [
+              "Think about a time when you were startled.",
+              "당신이 깜짝 놀랐던 한 순간에 대해 생각해 보라."
+            ],
+            "last": [
+              "This interference with the proper development and integration of neural networks can result in chronic stress and even mental illness.",
+              "신경망의 적절한 발달과 통합에 대한 이러한 방해는 만성적인 스트레스와 심지어 정신 질환을 초래할 수 있다."
+            ]
+          },
+          "publisherStages": {
+            "korean_blank": 9,
+            "english_blank": 9,
+            "translation": 0,
+            "verb_form": 9,
+            "grammar_choice": 8,
+            "word_order": 0,
+            "writing": 0
+          },
+          "unresolved": 45,
+          "samples": [
+            {
+              "stage": 1,
+              "number": 2,
+              "kind": "blank_input",
+              "prompt": "당신은 ______________에 대해 주변 환경을 ______________는 동안 갑자기 정지하고, 당신의 모든 움직임 들을 ______________고, 그리고 당신의 ______________는가?",
+              "answers": [
+                "위협",
+                "살피",
+                "멈추",
+                "숨을 참았"
+              ]
+            },
+            {
+              "stage": 2,
+              "number": 2,
+              "kind": "blank_input",
+              "prompt": "Did you come to a sudden stop, ______________ all your movements, and ______________ as you ______________ the environment for a ______________?",
+              "answers": [
+                "freeze",
+                "hold your breath",
+                "scanned",
+                "threat"
+              ]
+            },
+            {
+              "stage": 4,
+              "number": 1,
+              "kind": "verb_form",
+              "prompt": "______________ about a time when you ______________ ______________.",
+              "answers": [
+                "Think",
+                "were",
+                "startled"
+              ],
+              "hints": [
+                "Think",
+                "be",
+                "startle"
+              ]
+            },
+            {
+              "stage": 5,
+              "number": 1,
+              "kind": "choice_groups",
+              "prompt": "⟦CHOICE:0⟧ about a time when you were startled.",
+              "answers": [
+                "Think"
+              ],
+              "groups": [
+                [
+                  "Thinking",
+                  "Think"
+                ]
+              ],
+              "canonicalStart": 1,
+              "canonicalEnd": 1
+            }
+          ],
+          "itemDigests": {
+            "korean_blank": "fe2b65aef54b06820b0d27bcd28bdc75e69e83820155bad986729476a23ca154",
+            "english_blank": "29c40563dd8cd19d86f6e982bb56198e1c898cbb2ae5d6d7dc8d0891e4d2d3e2",
+            "translation": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "verb_form": "8b2e0e7be74a8e9a512cd13aa810a2a21e5f5e20fc999c0c77b6270faa2ede2c",
+            "grammar_choice": "00b5df57ae7acdcd779b778597d4cf47b0c6fe7bff88dc1000281f2aecd03809",
+            "word_order": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "writing": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+          },
+          "publisherAnnotationCounts": {
+            "english_blank": 9,
+            "korean_blank": 9,
+            "verb_form": 9,
+            "grammar_choice": 7
+          }
+        },
+        {
+          "number": "38",
+          "reviewRequired": true,
+          "pages": [
+            203,
+            204,
+            205,
+            206,
+            207,
+            208,
+            209,
+            210,
+            211,
+            212,
+            213,
+            298,
+            299
+          ],
+          "rawRowCount": 7,
+          "sourceExerciseCounts": {
+            "korean_blank": 7,
+            "english_blank": 7,
+            "verb_form": 7,
+            "grammar_vocab_choice": 7,
+            "translation": 14,
+            "word_order": 14,
+            "writing": 28
+          },
+          "canonical": {
+            "count": 7,
+            "digest": "ed84d8c588bd2470056c23ca3466c74779e234717c638f0572098bac29141fce",
+            "first": [
+              "Video gaming is one of the most studied technologies with regard to empathy.",
+              "비디오 게임하기는 공감과 관련하여 가장 많이 연구된 기술들 중 하나이다."
+            ],
+            "last": [
+              "A significant body of work shows an association between extensive violent video gaming and reduced empathy in people.",
+              "일단의 상당한 연구가 사람들에게서 광범위한 폭력적 비디오 게임을 하는 것과 감소된 공감 사 이의 연관성을 보여 준다."
+            ]
+          },
+          "publisherStages": {
+            "korean_blank": 7,
+            "english_blank": 7,
+            "translation": 0,
+            "verb_form": 7,
+            "grammar_choice": 7,
+            "word_order": 0,
+            "writing": 0
+          },
+          "unresolved": 56,
+          "samples": [
+            {
+              "stage": 1,
+              "number": 2,
+              "kind": "blank_input",
+              "prompt": "청소년에게 미치는 ______________ 비디오 게임의 ______________에 대해 ______________ 우려들이 존재해 왔기 때문에, 그 주제에 대해 많은 연구가 지난 이삼십 년 동안 ______________ 왔다.",
+              "answers": [
+                "폭력적인",
+                "영향",
+                "오랫동안 지속되어 온",
+                "수행되어"
+              ]
+            },
+            {
+              "stage": 2,
+              "number": 2,
+              "kind": "blank_input",
+              "prompt": "Because there have been ______________ concerns about the ______________ of ______________ video games on youth, much research has been ______________ over the last couple of decades on the topic.",
+              "answers": [
+                "longstanding",
+                "impact",
+                "violent",
+                "conducted"
+              ]
+            },
+            {
+              "stage": 4,
+              "number": 1,
+              "kind": "verb_form",
+              "prompt": "Video gaming ______________ one of the most ______________ technologies with regard to empathy.",
+              "answers": [
+                "is",
+                "studied"
+              ],
+              "hints": [
+                "be",
+                "study"
+              ]
+            },
+            {
+              "stage": 5,
+              "number": 3,
+              "kind": "choice_groups",
+              "prompt": "While measuring and ⟦CHOICE:0⟧ the impact of video game violence, scientists have formulated credible explanations of how ⟦CHOICE:1⟧ affect empathy.",
+              "answers": [
+                "documenting",
+                "video gaming could"
+              ],
+              "groups": [
+                [
+                  "documenting",
+                  "document"
+                ],
+                [
+                  "could video gaming",
+                  "video gaming could"
+                ]
+              ],
+              "canonicalStart": 3,
+              "canonicalEnd": 3
+            }
+          ],
+          "itemDigests": {
+            "korean_blank": "9bb74a42e899193e96f780b811142e432b52653b6ca1eaec980a4aa080ef9c38",
+            "english_blank": "b546b299d527316e02652ce229cbbf8e6e43dfa7c78b318669ea916548d05383",
+            "translation": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "verb_form": "2ea9ee535c2927e4dd21ea704f5e1d0b24c67bdab7a0021e018b4010087e4df5",
+            "grammar_choice": "ff371fa535a04fe9fed0147ae784beea008a1d4e3e6b41603883033e248765f0",
+            "word_order": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "writing": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+          },
+          "publisherAnnotationCounts": {
+            "english_blank": 7,
+            "korean_blank": 7,
+            "verb_form": 6,
+            "grammar_choice": 6
+          }
+        },
+        {
+          "number": "39",
+          "reviewRequired": true,
+          "pages": [
+            214,
+            215,
+            216,
+            217,
+            218,
+            219,
+            220,
+            221,
+            222,
+            223,
+            224,
+            299,
+            300
+          ],
+          "rawRowCount": 7,
+          "sourceExerciseCounts": {
+            "korean_blank": 7,
+            "english_blank": 7,
+            "verb_form": 7,
+            "grammar_vocab_choice": 7,
+            "translation": 14,
+            "word_order": 14,
+            "writing": 28
+          },
+          "canonical": {
+            "count": 7,
+            "digest": "c3a25e5bccaa53cf012450198c5470888377c1838efffc541c15dc7754b0661e",
+            "first": [
+              "Realising the benefits of differentiation, some brands broadcast their social purpose before they do much actual good.",
+              "차별화의 이점들을 인식하면서, 몇몇 브랜드들은 그들이 많은 실제적인 선을 행하기 전에 그들의 사회적 목적을 널리 알린다."
+            ],
+            "last": [
+              "They lose out on positioning for future markets, and they might even make employees feel worse about working for them.",
+              "그들은 미래 시장들을 위한 포지셔닝에서 손해를 보며, 그들은 심지어 직원들로 하여금 그 것들을 위해 일하는 것에 대해 더 나쁘게 느끼게 만들지도 모른다."
+            ]
+          },
+          "publisherStages": {
+            "korean_blank": 7,
+            "english_blank": 7,
+            "translation": 0,
+            "verb_form": 7,
+            "grammar_choice": 7,
+            "word_order": 0,
+            "writing": 0
+          },
+          "unresolved": 56,
+          "samples": [
+            {
+              "stage": 1,
+              "number": 1,
+              "kind": "blank_input",
+              "prompt": "______________의 이점들을 ______________면서, 몇몇 브랜드들은 그들이 많은 실제적인 ______________을 행하기 전에 그들의 사회적 목적을 ______________.",
+              "answers": [
+                "차별화",
+                "인식하",
+                "선",
+                "널리 알린다"
+              ]
+            },
+            {
+              "stage": 2,
+              "number": 1,
+              "kind": "blank_input",
+              "prompt": "______________ the benefits of ______________, some brands ______________ their social purpose before they do much actual ______________.",
+              "answers": [
+                "Realising",
+                "differentiation",
+                "broadcast",
+                "good"
+              ]
+            },
+            {
+              "stage": 4,
+              "number": 1,
+              "kind": "verb_form",
+              "prompt": "______________ the benefits of differentiation, some brands ______________ their social purpose before they ______________ much actual good.",
+              "answers": [
+                "Realising",
+                "broadcast",
+                "do"
+              ],
+              "hints": [
+                "Realise",
+                "broadcast",
+                "do"
+              ]
+            },
+            {
+              "stage": 5,
+              "number": 4,
+              "kind": "choice_groups",
+              "prompt": "Otherwise the mission is just window‐dressing, or ⟦CHOICE:0⟧ we call \"purpose‐washing\" — similar to green‐washing, ⟦CHOICE:1⟧ purpose‐driven activities serve mainly for publicity purposes.",
+              "answers": [
+                "what",
+                "where"
+              ],
+              "groups": [
+                [
+                  "what",
+                  "that"
+                ],
+                [
+                  "which",
+                  "where"
+                ]
+              ],
+              "canonicalStart": 4,
+              "canonicalEnd": 4
+            }
+          ],
+          "itemDigests": {
+            "korean_blank": "dfff4817d3321f4f03e7c794a97720d8b305af8559ab4530ff5b9f668609c04e",
+            "english_blank": "ed1b787fb38b306d9e4391e0ebbf3f72823e67a4e9c1e1ff91b91c160781cc33",
+            "translation": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "verb_form": "c155701d8354ee932fe7d0cfd8576c05b0be4ee4a58d7d733764e6f6df44f83c",
+            "grammar_choice": "f596cbbe3a017afe9c49675dc18aa0b9b14d74c86f63b951ee1a2610ea108ddd",
+            "word_order": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "writing": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+          },
+          "publisherAnnotationCounts": {
+            "english_blank": 6,
+            "korean_blank": 7,
+            "verb_form": 2,
+            "grammar_choice": 2
+          }
+        },
+        {
+          "number": "40",
+          "reviewRequired": true,
+          "pages": [
+            225,
+            226,
+            227,
+            228,
+            229,
+            230,
+            231,
+            232,
+            233,
+            234,
+            235,
+            236,
+            237,
+            300,
+            301
+          ],
+          "rawRowCount": 8,
+          "sourceExerciseCounts": {
+            "korean_blank": 8,
+            "english_blank": 8,
+            "verb_form": 8,
+            "grammar_vocab_choice": 6,
+            "translation": 16,
+            "word_order": 16,
+            "writing": 32
+          },
+          "canonical": {
+            "count": 8,
+            "digest": "ca488c0762991175c3484c39da3b2f81bade045d5753d51424b9a813f0562781",
+            "first": [
+              "The brain needs to create a model of a constant pulse - a schema - so that we know when the musicians are not conforming to it.",
+              "뇌는 우리가 언제 음악가들이 그것에 따르고 있지 않는지를 알게 하기 위해 일정한 박자의 모형 - 도식 - 을 창조할 필요가 있다."
+            ],
+            "last": [
+              "The brain models anticipated musical patterns, which creates the possibility for emotional impact to arise when musicians break these patterns, making music engaging.",
+              "뇌는 예상된 음악적 패턴을 모델링하는데, 이것은 음악가들이 이러한 패턴을 깨뜨릴 때 감정적 영향이 발생할 가능성을 만들어 내며, 음악을 매력적으로 만든다."
+            ]
+          },
+          "publisherStages": {
+            "korean_blank": 8,
+            "english_blank": 8,
+            "translation": 0,
+            "verb_form": 8,
+            "grammar_choice": 6,
+            "word_order": 0,
+            "writing": 0
+          },
+          "unresolved": 64,
+          "samples": [
+            {
+              "stage": 1,
+              "number": 5,
+              "kind": "blank_input",
+              "prompt": "이러한 위반은 어떤 ______________ - ______________, 리듬, 속도 등의 ______________ - 에서든 발생할 수 있지만 그것들은 반드시 발생해야 한다.",
+              "answers": [
+                "영역",
+                "음높이",
+                "영역"
+              ]
+            },
+            {
+              "stage": 2,
+              "number": 5,
+              "kind": "blank_input",
+              "prompt": "These violations can occur in any ______________ - the ______________ of ______________, rhythm, tempo, and so on - but occur they must.",
+              "answers": [
+                "domain",
+                "domain",
+                "pitch"
+              ]
+            },
+            {
+              "stage": 4,
+              "number": 2,
+              "kind": "verb_form",
+              "prompt": "This ______________ similar to variations of a melody: We ______________ ______________ a mental representation of what the melody ______________ in order ______________ — and ______________ — when the musician ______________ liberties with it.",
+              "answers": [
+                "is",
+                "need",
+                "to have",
+                "is",
+                "to know",
+                "appreciate",
+                "is taking"
+              ],
+              "hints": [
+                "be",
+                "need",
+                "have",
+                "be",
+                "know",
+                "appreciate",
+                "be, take"
+              ]
+            },
+            {
+              "stage": 5,
+              "number": 6,
+              "kind": "choice_groups",
+              "prompt": "The brain models anticipated musical patterns, which creates the possibility for emotional impact ⟦CHOICE:0⟧ when musicians break these patterns, ⟦CHOICE:1⟧ music engaging.",
+              "answers": [
+                "to arise",
+                "making"
+              ],
+              "groups": [
+                [
+                  "to arise",
+                  "arising"
+                ],
+                [
+                  "made",
+                  "making"
+                ]
+              ],
+              "canonicalStart": 8,
+              "canonicalEnd": 8
+            }
+          ],
+          "itemDigests": {
+            "korean_blank": "921704460c515dedbbcc3b0305f7743331cccfa55c8f7d48d7b0c19bb1f0d2c5",
+            "english_blank": "631d221a73f2f252a64727590a9cfc5e7c6d4e58e49468a871d75785022e0dd6",
+            "translation": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "verb_form": "e182fe2fc8ad886315744d80cc6fba3f48ee3aebffcea3408ca664850906e0cb",
+            "grammar_choice": "452a98c304b19628c3d3eece1d00ac3ec8acb934aae6fa614b15a46f0e381c3c",
+            "word_order": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "writing": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+          },
+          "publisherAnnotationCounts": {
+            "english_blank": 8,
+            "korean_blank": 8,
+            "verb_form": 5,
+            "grammar_choice": 0
+          }
+        },
+        {
+          "number": "41~42",
+          "reviewRequired": true,
+          "pages": [
+            238,
+            239,
+            240,
+            241,
+            242,
+            243,
+            244,
+            245,
+            246,
+            247,
+            248,
+            249,
+            250,
+            251,
+            252,
+            253,
+            254,
+            255,
+            301,
+            302,
+            303
+          ],
+          "rawRowCount": 11,
+          "sourceExerciseCounts": {
+            "korean_blank": 11,
+            "translation": 22,
+            "verb_form": 18,
+            "grammar_choice": 18,
+            "word_order": 26,
+            "writing": 48
+          },
+          "canonical": {
+            "count": 11,
+            "digest": "8800995bf0bb1397e8aa54193a5a5f1b826ad0535bf75c49d3667ac1dce77d68",
+            "first": [
+              "The major consumer of oil is transport.",
+              "석유의 주요 소비자는 운송이다."
+            ],
+            "last": [
+              "The 'oil majors' have diversified and are now more energy companies than oil companies these days and the OPEC countries are urgently attempting to develop other industries.",
+              "'석유 메이저들'은 사업을 다각화하여, 오늘날에는 이제 석유 회사라기보다 더욱 에너지 기업들 이 되었으며, OPEC 국가들은 다른 산업들을 개발하고자 긴급하게 시도하는 중이다."
+            ]
+          },
+          "publisherStages": {
+            "korean_blank": 11,
+            "english_blank": 0,
+            "translation": 0,
+            "verb_form": 0,
+            "grammar_choice": 0,
+            "word_order": 0,
+            "writing": 0
+          },
+          "unresolved": 132,
+          "samples": [
+            {
+              "stage": 1,
+              "number": 2,
+              "kind": "blank_input",
+              "prompt": "그러나 지난 30여 년에 걸쳐 ______________ 생산______________ 기술에 어떤 일이 일어났는지 ______________자.",
+              "answers": [
+                "내연기관",
+                "에 관련된",
+                "생각해 보"
+              ]
+            }
+          ],
+          "itemDigests": {
+            "korean_blank": "7468c6efccd4d1fea8fc132bb1c2a57762663cb20aa9eaa8ba7789a81fb621cb",
+            "english_blank": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "translation": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "verb_form": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "grammar_choice": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "word_order": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "writing": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+          },
+          "publisherAnnotationCounts": {
+            "english_blank": 0,
+            "korean_blank": 11,
+            "verb_form": 0,
+            "grammar_choice": 0
+          }
+        },
+        {
+          "number": "43~45",
+          "reviewRequired": true,
+          "pages": [
+            256,
+            257,
+            258,
+            259,
+            260,
+            261,
+            262,
+            263,
+            264,
+            265,
+            266,
+            267,
+            268,
+            269,
+            270,
+            271,
+            272,
+            273,
+            274,
+            275,
+            276,
+            277,
+            278,
+            303,
+            304,
+            305
+          ],
+          "rawRowCount": 18,
+          "sourceExerciseCounts": {
+            "korean_blank": 18,
+            "english_blank": 18,
+            "writing": 108,
+            "translation": 32,
+            "verb_form": 35,
+            "grammar_choice": 29,
+            "word_order": 42
+          },
+          "canonical": {
+            "count": 18,
+            "digest": "46a00f53735870df405fccc7ce57168d57930486362f62e08ff3489f06f0616f",
+            "first": [
+              "As part of a kindness project, Orange High School students wrote cheerful letters to elders in a countryside village.",
+              "친절 프로젝트의 일환으로, Orange 고등학교 학생들은 시골 마을 노인들에게 응원의 편지들을 썼다."
+            ],
+            "last": [
+              "Whenever Anna looked at it, she had a warm feeling. It was a daily reminder that people, like plants, sometimes just need a little sunlight.",
+              "Anna가 그것을 볼 때마다, 그녀는 따뜻한 감정을 느꼈다. 그것은 식물처럼 사람들도 가끔씩 그저 약 간의 햇빛이 필요함을 매일 상기시켜 주는 것이었다."
+            ]
+          },
+          "publisherStages": {
+            "korean_blank": 18,
+            "english_blank": 18,
+            "translation": 0,
+            "verb_form": 0,
+            "grammar_choice": 0,
+            "word_order": 0,
+            "writing": 0
+          },
+          "unresolved": 246,
+          "samples": [
+            {
+              "stage": 1,
+              "number": 1,
+              "kind": "blank_input",
+              "prompt": "친절 프로젝트의 일환으로, Orange 고등학교 학생들은 ______________ 마을 노인들에게 ______________ 편지들을 썼다.",
+              "answers": [
+                "시골",
+                "응원의"
+              ]
+            },
+            {
+              "stage": 2,
+              "number": 1,
+              "kind": "blank_input",
+              "prompt": "As part of a kindness project, Orange High School students wrote ______________ letters to elders in a ______________ village.",
+              "answers": [
+                "cheerful",
+                "countryside"
+              ]
+            }
+          ],
+          "itemDigests": {
+            "korean_blank": "510f7af614ab44fac566c4672e3caf5afe197751b6a85458985c22294b7b3777",
+            "english_blank": "e416479eb6a55f8a06d847cce0a50179b13518409e02070fc651cb72fa1257f6",
+            "translation": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "verb_form": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "grammar_choice": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "word_order": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "writing": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+          },
+          "publisherAnnotationCounts": {
+            "english_blank": 18,
+            "korean_blank": 18,
+            "verb_form": 0,
+            "grammar_choice": 0
+          }
+        }
+      ],
+      "apiSlice": {
+        "file": "mock-2026-june-grade2-q21.pdf",
+        "sha256": "0d850a9cf47590d6b6f337d85d3ac2b050f5887f0e6d15a39203f5de85bef2cd",
+        "originalPages": [
+          33,
+          34,
+          35,
+          36,
+          37,
+          38,
+          39,
+          40,
+          41,
+          42,
+          43,
+          44,
+          282,
+          283
+        ],
+        "number": "21",
+        "note": "Original PDF pages copied without content edits; the full 11MB file is still tested for 413 without writes."
+      },
+      "expectedDigests": {
+        "factory": "cca02ee3a16a189f3a1ce598af4b64c23b52b69a5c66e47d0847ff548906bf3c",
+        "student": "0850885c0b1248db8874b8f38030b83fbedd040db30590deb46e2c4e8d71078c"
+      }
+    },
+    {
+      "id": "mock-2026-september-grade2-text",
+      "file": "mock-2026-september-grade2-text.pdf",
+      "documentName": "26년 9월 고2 모의고사 21~40번.pdf",
+      "title": "mock-2026-september-grade2-text",
+      "sha256": "c310ae6e2960eefc91ce29d69b41c64684a4f077557b35986b8da027368c8580",
+      "pages": 20,
+      "kind": "text",
+      "importLabels": [
+        "21",
+        "22",
+        "23",
+        "24",
+        "25",
+        "26",
+        "27",
+        "28",
+        "29",
+        "30",
+        "31",
+        "32",
+        "33",
+        "34",
+        "35",
+        "36",
+        "37",
+        "38",
+        "39",
+        "40"
+      ],
+      "scope": {
+        "from": 21,
+        "to": 40,
+        "available": [
+          "21",
+          "22",
+          "23",
+          "24",
+          "25",
+          "26",
+          "27",
+          "28",
+          "29",
+          "30",
+          "31",
+          "32",
+          "33",
+          "34",
+          "35",
+          "36",
+          "37",
+          "38",
+          "39",
+          "40"
+        ],
+        "missing": []
+      },
+      "drafts": [
+        {
+          "number": "21",
+          "reviewRequired": true,
+          "pages": [
+            1
+          ],
+          "rawRowCount": 9,
+          "sourceExerciseCounts": {},
+          "canonical": {
+            "count": 9,
+            "digest": "f40feb15eb65dc6268226b1fb132ea5e15ed9ea5493ca5f80e58b9ee97bc83e8",
+            "first": [
+              "A meeting in a flexible-time culture like those found in South America, parts of Europe, Africa, and the Middle East is more like an evergreen tree.",
+              "남미, 유럽의 일부 지역, 아프리카, 그리고 중동에서 발견되는 것들과 같은 유 연한 시간 문화에서의 회의는 상록수와 더 비슷하다."
+            ],
+            "last": [
+              "Interruptions, agenda changes, and frequent shifts in direction are seen as natural and necessary.",
+              "방해, 의제 변경과 빈번한 방향 전환은 자연스럽고 필수적인 것으로 간주된 다."
+            ]
+          },
+          "publisherStages": {
+            "korean_blank": 0,
+            "english_blank": 0,
+            "translation": 0,
+            "verb_form": 0,
+            "grammar_choice": 0,
+            "word_order": 0,
+            "writing": 0
+          },
+          "unresolved": 0,
+          "samples": [],
+          "itemDigests": {
+            "korean_blank": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "english_blank": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "translation": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "verb_form": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "grammar_choice": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "word_order": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "writing": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+          },
+          "publisherAnnotationCounts": {
+            "english_blank": 0,
+            "korean_blank": 0,
+            "verb_form": 0,
+            "grammar_choice": 0
+          }
+        },
+        {
+          "number": "22",
+          "reviewRequired": true,
+          "pages": [
+            2
+          ],
+          "rawRowCount": 8,
+          "sourceExerciseCounts": {},
+          "canonical": {
+            "count": 8,
+            "digest": "49a4484608ccaea2fdbb76c51a2ef9ea00e71caa70adf24343c543c7a60d88bc",
+            "first": [
+              "When we are \"always on\" we are constantly ingesting content ─ reading alerts and texts, liking, checking emails, downloading, uploading, upgrading, updating, deleting, submitting responses, and posting.",
+              "우리가 '항상 접속되어' 있을 때 우리는 알림과 문자 읽기, '좋아요' 누르기, 이 메일 확인하기, 다운로드하기, 업로드하기, 업그레이드하기, 업데이트하기, 삭제하기, 답변 제출하기, 그리고 게시물 올리기와 같이 끊임없이 콘텐츠를 섭취한다."
+            ],
+            "last": [
+              "Eat your sandwich. Taste it. Let it go down. Then text.",
+              "샌드위치를 먹어라. 맛을 느껴라. 그것을 내려가게 하라. 그러고 나서 문자를 보내라."
+            ]
+          },
+          "publisherStages": {
+            "korean_blank": 0,
+            "english_blank": 0,
+            "translation": 0,
+            "verb_form": 0,
+            "grammar_choice": 0,
+            "word_order": 0,
+            "writing": 0
+          },
+          "unresolved": 0,
+          "samples": [],
+          "itemDigests": {
+            "korean_blank": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "english_blank": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "translation": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "verb_form": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "grammar_choice": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "word_order": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "writing": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+          },
+          "publisherAnnotationCounts": {
+            "english_blank": 0,
+            "korean_blank": 0,
+            "verb_form": 0,
+            "grammar_choice": 0
+          }
+        },
+        {
+          "number": "23",
+          "reviewRequired": true,
+          "pages": [
+            3
+          ],
+          "rawRowCount": 8,
+          "sourceExerciseCounts": {},
+          "canonical": {
+            "count": 8,
+            "digest": "c8820657211e0b229ba399fe5131fad0a6a3b0591e023fa8843b825833af9ace",
+            "first": [
+              "Music can bring us into a very comfortable rhythm, and it can be satisfying in and of itself.",
+              "음악은 우리를 매우 편안한 리듬 속으로 이끌 수 있으며, 그 자체로 만족감을 줄 수 있다."
+            ],
+            "last": [
+              "This, in turn, creates new and other types of tensions, where the rhythm is unambiguous and predictable, but where unexpected chords and modulations create drama and an experience of development in the piece.",
+              "이것은 다음에는 새롭고 다른 종류의 긴장감을 만들어 내는데, 그곳에서는 리 듬이 모호하지 않고 예측 가능하지만, 예상치 못한 화음과 전조가 드라마를 형성하고 곡의 전개라는 경험을 만들어 낸다."
+            ]
+          },
+          "publisherStages": {
+            "korean_blank": 0,
+            "english_blank": 0,
+            "translation": 0,
+            "verb_form": 0,
+            "grammar_choice": 0,
+            "word_order": 0,
+            "writing": 0
+          },
+          "unresolved": 0,
+          "samples": [],
+          "itemDigests": {
+            "korean_blank": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "english_blank": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "translation": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "verb_form": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "grammar_choice": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "word_order": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "writing": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+          },
+          "publisherAnnotationCounts": {
+            "english_blank": 0,
+            "korean_blank": 0,
+            "verb_form": 0,
+            "grammar_choice": 0
+          }
+        },
+        {
+          "number": "24",
+          "reviewRequired": true,
+          "pages": [
+            4
+          ],
+          "rawRowCount": 8,
+          "sourceExerciseCounts": {},
+          "canonical": {
+            "count": 8,
+            "digest": "0b6fbdaf23694cb877cb9c0d094c3a7c29c35d49975b7004445834b59222bc9e",
+            "first": [
+              "Progressive educators and librarians are developing curricula to teach what we might call attention literacy.",
+              "진보적인 교육자들과 사서들은 우리가 주의력 문해력이라 부를 만한 것을 가 르치기 위한 교육과정을 개발하고 있다."
+            ],
+            "last": [
+              "By treating these as deliberate design choices (often rooted in psychology and profit motives), young people become more critical users rather than passive consumers.",
+              "이러한 것들을 (흔히 심리학과 이윤 동기에 뿌리를 둔) 의도적인 디자인 선택 으로 취급함으로써, 젊은이들은 수동적인 소비자가 아니라 더 비판적인 사용 자가 된다."
+            ]
+          },
+          "publisherStages": {
+            "korean_blank": 0,
+            "english_blank": 0,
+            "translation": 0,
+            "verb_form": 0,
+            "grammar_choice": 0,
+            "word_order": 0,
+            "writing": 0
+          },
+          "unresolved": 0,
+          "samples": [],
+          "itemDigests": {
+            "korean_blank": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "english_blank": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "translation": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "verb_form": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "grammar_choice": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "word_order": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "writing": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+          },
+          "publisherAnnotationCounts": {
+            "english_blank": 0,
+            "korean_blank": 0,
+            "verb_form": 0,
+            "grammar_choice": 0
+          }
+        },
+        {
+          "number": "25",
+          "reviewRequired": true,
+          "pages": [
+            5
+          ],
+          "rawRowCount": 6,
+          "sourceExerciseCounts": {},
+          "canonical": {
+            "count": 6,
+            "digest": "189b56b973488bf66aed59534b2baba7c0b80f80ea39e88f33eeff69bbd04824",
+            "first": [
+              "The graph above shows the willingness to pay for access to sports content across five different age groups, ranging from 16-24 to 55-64.",
+              "위 도표는 16-24세부터 55-64세에 이르는 서로 다른 다섯 개의 연령대별 스 포츠 콘텐츠 이용을 위한 지불 의사를 보여 준다."
+            ],
+            "last": [
+              "Throughout the five age groups, the percentage of those who are Very unwilling to pay increases as the age range goes up.",
+              "다섯 개 연령대에 걸쳐, '매우 지불할 의사가 없는' 응답자의 비율은 연령대가 올라감에 따라 증가한다."
+            ]
+          },
+          "publisherStages": {
+            "korean_blank": 0,
+            "english_blank": 0,
+            "translation": 0,
+            "verb_form": 0,
+            "grammar_choice": 0,
+            "word_order": 0,
+            "writing": 0
+          },
+          "unresolved": 0,
+          "samples": [],
+          "itemDigests": {
+            "korean_blank": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "english_blank": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "translation": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "verb_form": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "grammar_choice": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "word_order": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "writing": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+          },
+          "publisherAnnotationCounts": {
+            "english_blank": 0,
+            "korean_blank": 0,
+            "verb_form": 0,
+            "grammar_choice": 0
+          }
+        },
+        {
+          "number": "26",
+          "reviewRequired": true,
+          "pages": [
+            6
+          ],
+          "rawRowCount": 8,
+          "sourceExerciseCounts": {},
+          "canonical": {
+            "count": 8,
+            "digest": "f3d3159811ba73158f9800311d80ee8ffeee5f699e61bf616f6510da8051b811",
+            "first": [
+              "Frederick Law Olmsted, known as the father of American landscape architecture, was born in 1822.",
+              "미국 조경 건축의 아버지로 알려진 Frederick Law Olmsted는 1822년에 태어났다."
+            ],
+            "last": [
+              "In 1979, the National Park Service designated his home and office in Brookline, Massachusetts, as a National Historic Site to honor his legacy.",
+              "1979년, National Park Service는 그의 유산을 기리기 위해 Massachusetts주 Brookline에 있는 그의 집과 사무실을 National Historic Site로 지정했다."
+            ]
+          },
+          "publisherStages": {
+            "korean_blank": 0,
+            "english_blank": 0,
+            "translation": 0,
+            "verb_form": 0,
+            "grammar_choice": 0,
+            "word_order": 0,
+            "writing": 0
+          },
+          "unresolved": 0,
+          "samples": [],
+          "itemDigests": {
+            "korean_blank": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "english_blank": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "translation": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "verb_form": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "grammar_choice": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "word_order": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "writing": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+          },
+          "publisherAnnotationCounts": {
+            "english_blank": 0,
+            "korean_blank": 0,
+            "verb_form": 0,
+            "grammar_choice": 0
+          }
+        },
+        {
+          "number": "27",
+          "reviewRequired": true,
+          "pages": [
+            7
+          ],
+          "rawRowCount": 9,
+          "sourceExerciseCounts": {},
+          "canonical": {
+            "count": 9,
+            "digest": "0e8921aef9258ae6c9b9b81f15c4882e0a55da68a348a6fdbd45c5410d32c344",
+            "first": [
+              "Ashwood Dunes Reforestation Event Ashwood Dunes Reforestation Event Join us for a meaningful morning at the annual Ashwood Dunes Reforestation.",
+              "매년 개최되는 Ashwood Dunes Reforestation에서 뜻깊은 오전 시간을 함께해 주세요."
+            ],
+            "last": [
+              "For more information, please visit www.ashwooddunes.com.",
+              "더 많은 정보를 원하시면, www.ashwooddunes.com을 방문하세요."
+            ]
+          },
+          "publisherStages": {
+            "korean_blank": 0,
+            "english_blank": 0,
+            "translation": 0,
+            "verb_form": 0,
+            "grammar_choice": 0,
+            "word_order": 0,
+            "writing": 0
+          },
+          "unresolved": 0,
+          "samples": [],
+          "itemDigests": {
+            "korean_blank": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "english_blank": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "translation": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "verb_form": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "grammar_choice": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "word_order": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "writing": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+          },
+          "publisherAnnotationCounts": {
+            "english_blank": 0,
+            "korean_blank": 0,
+            "verb_form": 0,
+            "grammar_choice": 0
+          }
+        },
+        {
+          "number": "28",
+          "reviewRequired": true,
+          "pages": [
+            8
+          ],
+          "rawRowCount": 6,
+          "sourceExerciseCounts": {},
+          "canonical": {
+            "count": 6,
+            "digest": "d483d75445c834ee840bcc061a24c9fe54b56884bb90845fdd09473a5d6624a6",
+            "first": [
+              "2026 Footnote Dance Program 2026 Footnote Dance Program The 2026 Footnote Dance Program is a modern dance program created for youth aged 13-18.",
+              "2026 Footnote Dance Program은 13-18세 청소년을 위해 만들어진 모 던 댄스 프로그램입니다."
+            ],
+            "last": [
+              "A free shuttle bus service will be provided for all participants and visitors.",
+              "무료 셔틀 버스 서비스가 모든 참가자와 방문객을 위해 제공될 것입니다. Pre-registration is required. click here 사전 등록 필수. 여기를 클릭하세요123456789101112"
+            ]
+          },
+          "publisherStages": {
+            "korean_blank": 0,
+            "english_blank": 0,
+            "translation": 0,
+            "verb_form": 0,
+            "grammar_choice": 0,
+            "word_order": 0,
+            "writing": 0
+          },
+          "unresolved": 0,
+          "samples": [],
+          "itemDigests": {
+            "korean_blank": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "english_blank": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "translation": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "verb_form": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "grammar_choice": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "word_order": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "writing": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+          },
+          "publisherAnnotationCounts": {
+            "english_blank": 0,
+            "korean_blank": 0,
+            "verb_form": 0,
+            "grammar_choice": 0
+          }
+        },
+        {
+          "number": "29",
+          "reviewRequired": true,
+          "pages": [
+            9
+          ],
+          "rawRowCount": 7,
+          "sourceExerciseCounts": {},
+          "canonical": {
+            "count": 7,
+            "digest": "b320ebc5c18e32f223951475c5c2746e0b4b56c127b4883075dc025d4cae106f",
+            "first": [
+              "Capitalism is not a system where cash is everywhere but rather one in which islands of cash exchange exist within oceans of cheap ─ or potentially cheap ─ natures.",
+              "자본주의는 현금이 어디에나 존재하는 시스템이라기보다는, 값싼 혹은 잠재 적으로 값싼 만물의 바다 안에 현금 교환이라는 섬들이 존재하는 시스템이다."
+            ],
+            "last": [
+              "Frontiers are so important in these processes because they offer places where the new cheap things can be seized ─ and the cheap work of humans and other natures can be forcefully taken.",
+              "이러한 과정에서 미개척 영역이 중요한데, 왜냐하면 그것이 새로운 값싼 것들 이 확보될 수 있는 장소를 제공하기 때문이다. 즉, 값싼 인간의 노동력과 다른 만물이 강제로 취해질 수 있다는 것이다."
+            ]
+          },
+          "publisherStages": {
+            "korean_blank": 0,
+            "english_blank": 0,
+            "translation": 0,
+            "verb_form": 0,
+            "grammar_choice": 0,
+            "word_order": 0,
+            "writing": 0
+          },
+          "unresolved": 0,
+          "samples": [],
+          "itemDigests": {
+            "korean_blank": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "english_blank": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "translation": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "verb_form": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "grammar_choice": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "word_order": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "writing": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+          },
+          "publisherAnnotationCounts": {
+            "english_blank": 0,
+            "korean_blank": 0,
+            "verb_form": 0,
+            "grammar_choice": 0
+          }
+        },
+        {
+          "number": "30",
+          "reviewRequired": true,
+          "pages": [
+            10
+          ],
+          "rawRowCount": 7,
+          "sourceExerciseCounts": {},
+          "canonical": {
+            "count": 7,
+            "digest": "f8badf155cfd8507a203b2daed3a2cbae6d01c3ebd007f26db3f5c5ef0f6052f",
+            "first": [
+              "Some people are more likely to cheat and steal after purchasing \"eco-friendly\" products, probably because they feel licensed to do so since they morally account the \"eco- friendly\" choice as a \"good\" deed.",
+              "어떤 사람들은 '친환경' 제품을 구매한 후에 속이거나 훔칠 가능성이 더 높은 데, 아마도 그들은 '친환경적' 선택을 '착한' 행위라고 도덕적으로 간주하여 그 렇게 할 자격이 있다고 느끼기 때문일 것이다."
+            ],
+            "last": [
+              "For instance, people are more likely to sign a petition addressing environmental damage after viewing evidence of human-caused environmental damage.",
+              "예를 들어, 사람들은 인간이 유발한 환경 훼손의 증거를 본 후에 환경 훼손을 다루는 청원서에 서명할 가능성이 더 높다."
+            ]
+          },
+          "publisherStages": {
+            "korean_blank": 0,
+            "english_blank": 0,
+            "translation": 0,
+            "verb_form": 0,
+            "grammar_choice": 0,
+            "word_order": 0,
+            "writing": 0
+          },
+          "unresolved": 0,
+          "samples": [],
+          "itemDigests": {
+            "korean_blank": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "english_blank": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "translation": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "verb_form": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "grammar_choice": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "word_order": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "writing": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+          },
+          "publisherAnnotationCounts": {
+            "english_blank": 0,
+            "korean_blank": 0,
+            "verb_form": 0,
+            "grammar_choice": 0
+          }
+        },
+        {
+          "number": "31",
+          "reviewRequired": true,
+          "pages": [
+            11
+          ],
+          "rawRowCount": 6,
+          "sourceExerciseCounts": {},
+          "canonical": {
+            "count": 6,
+            "digest": "a86b23ca4d3253b308f8771517b343daf57d3b5206e117a62971bd7b453b296a",
+            "first": [
+              "Human geography is becoming unclear.",
+              "인문 지리학은 모호해지고 있다."
+            ],
+            "last": [
+              "Highly paid digital nomads and billionaires with multiple passports as well as migratory workers are all part of the diverse and growing global demographic of quantum people.",
+              "이주 노동자뿐만 아니라 고액 연봉의 디지털 유목민들과 여러 개의 여권을 가 진 억만장자들도 모두 다양하고 증가하는 양자 인류라는 글로벌 인구 집단의 일부이다."
+            ]
+          },
+          "publisherStages": {
+            "korean_blank": 0,
+            "english_blank": 0,
+            "translation": 0,
+            "verb_form": 0,
+            "grammar_choice": 0,
+            "word_order": 0,
+            "writing": 0
+          },
+          "unresolved": 0,
+          "samples": [],
+          "itemDigests": {
+            "korean_blank": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "english_blank": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "translation": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "verb_form": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "grammar_choice": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "word_order": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "writing": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+          },
+          "publisherAnnotationCounts": {
+            "english_blank": 0,
+            "korean_blank": 0,
+            "verb_form": 0,
+            "grammar_choice": 0
+          }
+        },
+        {
+          "number": "32",
+          "reviewRequired": true,
+          "pages": [
+            12
+          ],
+          "rawRowCount": 9,
+          "sourceExerciseCounts": {},
+          "canonical": {
+            "count": 9,
+            "digest": "3484cd53926f6c784d18f4f1962cee5f33f8f43b859b2f3c0881618695a3ae1a",
+            "first": [
+              "Of the cognitive motivations, the most fundamental one encourages people to understand their environment to predict what is going to happen in case of uncertainties.",
+              "인지적 동기 중에서, 가장 근본적인 것은 사람들이 불확실성의 경우에서 무엇 이 일어날지 예측하기 위해 자신의 환경을 이해하게 한다."
+            ],
+            "last": [
+              "People lack a shared social understanding, normally developed from membership in a stable group.",
+              "사람들은 안정적인 집단의 구성원 자격으로부터 보통 발전되는 공유된 사회 적 이해가 결여되어 있다."
+            ]
+          },
+          "publisherStages": {
+            "korean_blank": 0,
+            "english_blank": 0,
+            "translation": 0,
+            "verb_form": 0,
+            "grammar_choice": 0,
+            "word_order": 0,
+            "writing": 0
+          },
+          "unresolved": 0,
+          "samples": [],
+          "itemDigests": {
+            "korean_blank": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "english_blank": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "translation": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "verb_form": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "grammar_choice": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "word_order": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "writing": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+          },
+          "publisherAnnotationCounts": {
+            "english_blank": 0,
+            "korean_blank": 0,
+            "verb_form": 0,
+            "grammar_choice": 0
+          }
+        },
+        {
+          "number": "33",
+          "reviewRequired": true,
+          "pages": [
+            13
+          ],
+          "rawRowCount": 8,
+          "sourceExerciseCounts": {},
+          "canonical": {
+            "count": 8,
+            "digest": "f6273cbfb64e6de22845ba3af2ffce2ab036a69feca5d26433b74accea24d5ea",
+            "first": [
+              "Psychological theories across the field agree on the importance of grieving our losses, from the highly personal through to the broadly collective.",
+              "심리학 분야 전반에서 심리학 이론들은 매우 개인적인 것부터 명백히 집단적 인 것에 이르기까지, 우리의 상실을 애도하는 것의 중요성에 동의한다."
+            ],
+            "last": [
+              "Grief can make us both very sad and very motivated to act.",
+              "애도는 우리를 매우 슬프게 만드는 동시에 행동하도록 강하게 동기를 부여할 수 있다."
+            ]
+          },
+          "publisherStages": {
+            "korean_blank": 0,
+            "english_blank": 0,
+            "translation": 0,
+            "verb_form": 0,
+            "grammar_choice": 0,
+            "word_order": 0,
+            "writing": 0
+          },
+          "unresolved": 0,
+          "samples": [],
+          "itemDigests": {
+            "korean_blank": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "english_blank": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "translation": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "verb_form": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "grammar_choice": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "word_order": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "writing": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+          },
+          "publisherAnnotationCounts": {
+            "english_blank": 0,
+            "korean_blank": 0,
+            "verb_form": 0,
+            "grammar_choice": 0
+          }
+        },
+        {
+          "number": "34",
+          "reviewRequired": true,
+          "pages": [
+            14
+          ],
+          "rawRowCount": 10,
+          "sourceExerciseCounts": {},
+          "canonical": {
+            "count": 10,
+            "digest": "bfffe9d2d183f4d2497d749dc668a4226893ed2852ac5a8e42ae1cb60267875c",
+            "first": [
+              "When we focus on the obvious aspects of media, we miss the changes that accumulate over time but are not apparent day to day.",
+              "우리가 매체의 분명한 측면에 집중할 때, 우리는 시간이 흐름에 따라 축적되 지만 하루 하루 뚜렷하게 보이지 않는 변화를 놓친다."
+            ],
+            "last": [
+              "The effects of the microwave oven on family life were not anticipated and would have been difficult to foresee.",
+              "전자레인지가 가정 생활에 미친 영향은 예상되지 못했으며, 예견하기도 어려 웠을 것이다."
+            ]
+          },
+          "publisherStages": {
+            "korean_blank": 0,
+            "english_blank": 0,
+            "translation": 0,
+            "verb_form": 0,
+            "grammar_choice": 0,
+            "word_order": 0,
+            "writing": 0
+          },
+          "unresolved": 0,
+          "samples": [],
+          "itemDigests": {
+            "korean_blank": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "english_blank": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "translation": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "verb_form": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "grammar_choice": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "word_order": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "writing": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+          },
+          "publisherAnnotationCounts": {
+            "english_blank": 0,
+            "korean_blank": 0,
+            "verb_form": 0,
+            "grammar_choice": 0
+          }
+        },
+        {
+          "number": "35",
+          "reviewRequired": true,
+          "pages": [
+            15
+          ],
+          "rawRowCount": 6,
+          "sourceExerciseCounts": {},
+          "canonical": {
+            "count": 6,
+            "digest": "beb53f88f8a35e53f1694f6c072879dcfc2c23c46698608b81f49b72e3696285",
+            "first": [
+              "Digital twins are digital replicas of assets or activities using modeling and sensors to create digital representations.",
+              "디지털 트윈은 디지털 표현을 만들기 위해 모델링과 센서를 사용하는 자산이 나 활동의 디지털 복제본이다."
+            ],
+            "last": [
+              "For instance, digital twins of physical assets such as power- generation turbines, jet engines, and train engines are becoming common when the assets are very valuable and when downtime would be very costly.",
+              "예를 들어, 발전 터빈, 제트 엔진, 기차 엔진과 같은 물리적 자산의 디지털 트 윈은 자산이 매우 가치 있고 가동 중단 비용이 매우 클 때 일반화되고 있다."
+            ]
+          },
+          "publisherStages": {
+            "korean_blank": 0,
+            "english_blank": 0,
+            "translation": 0,
+            "verb_form": 0,
+            "grammar_choice": 0,
+            "word_order": 0,
+            "writing": 0
+          },
+          "unresolved": 0,
+          "samples": [],
+          "itemDigests": {
+            "korean_blank": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "english_blank": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "translation": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "verb_form": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "grammar_choice": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "word_order": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "writing": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+          },
+          "publisherAnnotationCounts": {
+            "english_blank": 0,
+            "korean_blank": 0,
+            "verb_form": 0,
+            "grammar_choice": 0
+          }
+        },
+        {
+          "number": "36",
+          "reviewRequired": true,
+          "pages": [
+            16
+          ],
+          "rawRowCount": 5,
+          "sourceExerciseCounts": {},
+          "canonical": {
+            "count": 5,
+            "digest": "c49dbbc9881565a01394ce4ba14390939d7a3c24e222d7b83df5b875f9bed87c",
+            "first": [
+              "The ability to select a set of surroundings suitable for foraging, shelter from predators, and the availability of mates is one of the most important determinants of biological success ─ measured as survival to reproductive age and the production of offspring.",
+              "먹이 찾아다니기, 천적으로부터의 은신처 그리고 짝을 만날 가능성에 적합한 일련의 환경을 선택하는 능력은 번식 연령까지의 생존과 새끼를 낳는 것으로 측정되는 생물학적 성공의 가장 중요한 결정 요소 중 하나이다."
+            ],
+            "last": [
+              "Somehow, the warbler has been guided to settle in locations that will suit its future parenting needs better than its present ones.",
+              "어떻게든, 그 솔새는 현재의 필요보다 미래의 양육 필요에 더 적합할 장소에 자리를 잡도록 유도되었다."
+            ]
+          },
+          "publisherStages": {
+            "korean_blank": 0,
+            "english_blank": 0,
+            "translation": 0,
+            "verb_form": 0,
+            "grammar_choice": 0,
+            "word_order": 0,
+            "writing": 0
+          },
+          "unresolved": 0,
+          "samples": [],
+          "itemDigests": {
+            "korean_blank": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "english_blank": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "translation": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "verb_form": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "grammar_choice": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "word_order": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "writing": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+          },
+          "publisherAnnotationCounts": {
+            "english_blank": 0,
+            "korean_blank": 0,
+            "verb_form": 0,
+            "grammar_choice": 0
+          }
+        },
+        {
+          "number": "37",
+          "reviewRequired": true,
+          "pages": [
+            17
+          ],
+          "rawRowCount": 9,
+          "sourceExerciseCounts": {},
+          "canonical": {
+            "count": 9,
+            "digest": "2a5fc67b5639d30a80a860825b412206a8eaf44066493c93ed1aba431be24c96",
+            "first": [
+              "Language is a manifestation of culture.",
+              "언어는 문화의 발현이다."
+            ],
+            "last": [
+              "Different words are used to refer to the self, depending on the social situation, the speaker's gender, age, and the other social attributes relative to the listener.",
+              "사회적 상황, 화자의 성별과 나이, 그리고 청자에 대한 여타의 사회적 속성들 에 따라 각기 다른 단어들이 자신을 지칭하는데 사용된다."
+            ]
+          },
+          "publisherStages": {
+            "korean_blank": 0,
+            "english_blank": 0,
+            "translation": 0,
+            "verb_form": 0,
+            "grammar_choice": 0,
+            "word_order": 0,
+            "writing": 0
+          },
+          "unresolved": 0,
+          "samples": [],
+          "itemDigests": {
+            "korean_blank": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "english_blank": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "translation": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "verb_form": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "grammar_choice": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "word_order": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "writing": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+          },
+          "publisherAnnotationCounts": {
+            "english_blank": 0,
+            "korean_blank": 0,
+            "verb_form": 0,
+            "grammar_choice": 0
+          }
+        },
+        {
+          "number": "38",
+          "reviewRequired": true,
+          "pages": [
+            18
+          ],
+          "rawRowCount": 7,
+          "sourceExerciseCounts": {},
+          "canonical": {
+            "count": 7,
+            "digest": "d8d81cfe907a3952be0172bf4a1f924952820eb05c16195e53104f9c7cd0ee24",
+            "first": [
+              "Environmental psychologists make a distinction between the physical measurement of density (how many people are in a particular space) and crowding (the psychological feeling of not having enough space).",
+              "환경심리학자들은 밀도(특정 장소에 얼마나 많은 사람들이 있는가)의 물리적 측정과 혼잡성(공간이 충분치 않다는 심리적 감정)을 구분한다."
+            ],
+            "last": [
+              "Conversely, creating positive social spaces such as parks and pedestrian areas in high-density urban environments may help to lift the general mood and defuse tension.",
+              "반대로 높은 밀도의 도시 환경에 있는 공원이나 보행 구역과 같은 긍정적인 사회적 공간은 전체적인 기분을 올리고 긴장감을 완화하는 것을 도울 수 있 다."
+            ]
+          },
+          "publisherStages": {
+            "korean_blank": 0,
+            "english_blank": 0,
+            "translation": 0,
+            "verb_form": 0,
+            "grammar_choice": 0,
+            "word_order": 0,
+            "writing": 0
+          },
+          "unresolved": 0,
+          "samples": [],
+          "itemDigests": {
+            "korean_blank": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "english_blank": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "translation": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "verb_form": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "grammar_choice": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "word_order": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "writing": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+          },
+          "publisherAnnotationCounts": {
+            "english_blank": 0,
+            "korean_blank": 0,
+            "verb_form": 0,
+            "grammar_choice": 0
+          }
+        },
+        {
+          "number": "39",
+          "reviewRequired": true,
+          "pages": [
+            19
+          ],
+          "rawRowCount": 9,
+          "sourceExerciseCounts": {},
+          "canonical": {
+            "count": 9,
+            "digest": "8935c65b6ba5b3aad179c812d83f0eb0514a319bf8f0e3924af14a0634ae05ba",
+            "first": [
+              "Exclusion is a state that is ignored by the organization psychologists.",
+              "배제는 조직 심리학자들에 의해 간과되는 상태이다."
+            ],
+            "last": [
+              "Precautions need to be taken regarding organizational exclusion, which is very important for business.",
+              "조직 배제에 관한 예방 조치는 취해져야 할 필요가 있는데, 이는 업무에서 매 우 중요하다."
+            ]
+          },
+          "publisherStages": {
+            "korean_blank": 0,
+            "english_blank": 0,
+            "translation": 0,
+            "verb_form": 0,
+            "grammar_choice": 0,
+            "word_order": 0,
+            "writing": 0
+          },
+          "unresolved": 0,
+          "samples": [],
+          "itemDigests": {
+            "korean_blank": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "english_blank": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "translation": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "verb_form": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "grammar_choice": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "word_order": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "writing": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+          },
+          "publisherAnnotationCounts": {
+            "english_blank": 0,
+            "korean_blank": 0,
+            "verb_form": 0,
+            "grammar_choice": 0
+          }
+        },
+        {
+          "number": "40",
+          "reviewRequired": true,
+          "pages": [
+            20
+          ],
+          "rawRowCount": 6,
+          "sourceExerciseCounts": {},
+          "canonical": {
+            "count": 6,
+            "digest": "103c7336e755a50bd51310cb3de7ec415723f2d0f90d1a381eadc32e433e1812",
+            "first": [
+              "Our adult brains retain a preference for perpetuating good, fair behavior.",
+              "우리의 성인 뇌는 선하고 공정한 행동을 영속시키는 것에 대한 선호를 유지한 다."
+            ],
+            "last": [
+              "According to the study, the motivation to do good deeds was more evident in those who recalled their past virtues and those who focused purely on their good deeds than those who recalled their previous bad deeds and those who seemed highly conscious of the appearances of their deeds.",
+              "연구에 따르면 좋은 행위를 하려는 동기는 자신의 이전 나쁜 행위를 회상한 사람과 자신의 행위에 대한 겉모습을 강하게 의식하는 것처럼 보이는 사람보 다 자신의 과거 미덕을 회상한 사람과 자신의 좋은 행위에 순수하게 초점을 둔 사람에게서 더 분명히 나타난다."
+            ]
+          },
+          "publisherStages": {
+            "korean_blank": 0,
+            "english_blank": 0,
+            "translation": 0,
+            "verb_form": 0,
+            "grammar_choice": 0,
+            "word_order": 0,
+            "writing": 0
+          },
+          "unresolved": 0,
+          "samples": [],
+          "itemDigests": {
+            "korean_blank": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "english_blank": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "translation": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "verb_form": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "grammar_choice": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "word_order": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "writing": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+          },
+          "publisherAnnotationCounts": {
+            "english_blank": 0,
+            "korean_blank": 0,
+            "verb_form": 0,
+            "grammar_choice": 0
+          }
+        }
+      ],
+      "reviewedFile": "september-reviewed.json",
+      "reviewedCounts": [
+        9,
+        8,
+        8,
+        8,
+        6,
+        8,
+        13,
+        9,
+        7,
+        7,
+        6,
+        9,
+        8,
+        10,
+        6,
+        5,
+        9,
+        7,
+        9,
+        6
+      ],
+      "reviewed": [
+        {
+          "number": "21",
+          "digest": "f40feb15eb65dc6268226b1fb132ea5e15ed9ea5493ca5f80e58b9ee97bc83e8",
+          "layout": [
+            [
+              "sep-21-1",
+              "SENTENCE",
+              0,
+              1
+            ],
+            [
+              "sep-21-2",
+              "SENTENCE",
+              0,
+              1
+            ],
+            [
+              "sep-21-3",
+              "SENTENCE",
+              0,
+              1
+            ],
+            [
+              "sep-21-4",
+              "SENTENCE",
+              0,
+              1
+            ],
+            [
+              "sep-21-5",
+              "SENTENCE",
+              0,
+              1
+            ],
+            [
+              "sep-21-6",
+              "SENTENCE",
+              0,
+              1
+            ],
+            [
+              "sep-21-7",
+              "SENTENCE",
+              0,
+              1
+            ],
+            [
+              "sep-21-8",
+              "SENTENCE",
+              0,
+              1
+            ],
+            [
+              "sep-21-9",
+              "SENTENCE",
+              0,
+              1
+            ]
+          ]
+        },
+        {
+          "number": "22",
+          "digest": "49a4484608ccaea2fdbb76c51a2ef9ea00e71caa70adf24343c543c7a60d88bc",
+          "layout": [
+            [
+              "sep-22-1",
+              "SENTENCE",
+              0,
+              2
+            ],
+            [
+              "sep-22-2",
+              "SENTENCE",
+              0,
+              2
+            ],
+            [
+              "sep-22-3",
+              "SENTENCE",
+              0,
+              2
+            ],
+            [
+              "sep-22-4",
+              "SENTENCE",
+              0,
+              2
+            ],
+            [
+              "sep-22-5",
+              "SENTENCE",
+              0,
+              2
+            ],
+            [
+              "sep-22-6",
+              "SENTENCE",
+              0,
+              2
+            ],
+            [
+              "sep-22-7",
+              "SENTENCE",
+              0,
+              2
+            ],
+            [
+              "sep-22-8",
+              "SENTENCE",
+              0,
+              2
+            ]
+          ]
+        },
+        {
+          "number": "23",
+          "digest": "c8820657211e0b229ba399fe5131fad0a6a3b0591e023fa8843b825833af9ace",
+          "layout": [
+            [
+              "sep-23-1",
+              "SENTENCE",
+              0,
+              3
+            ],
+            [
+              "sep-23-2",
+              "SENTENCE",
+              0,
+              3
+            ],
+            [
+              "sep-23-3",
+              "SENTENCE",
+              0,
+              3
+            ],
+            [
+              "sep-23-4",
+              "SENTENCE",
+              0,
+              3
+            ],
+            [
+              "sep-23-5",
+              "SENTENCE",
+              0,
+              3
+            ],
+            [
+              "sep-23-6",
+              "SENTENCE",
+              0,
+              3
+            ],
+            [
+              "sep-23-7",
+              "SENTENCE",
+              0,
+              3
+            ],
+            [
+              "sep-23-8",
+              "SENTENCE",
+              0,
+              3
+            ]
+          ]
+        },
+        {
+          "number": "24",
+          "digest": "0b6fbdaf23694cb877cb9c0d094c3a7c29c35d49975b7004445834b59222bc9e",
+          "layout": [
+            [
+              "sep-24-1",
+              "SENTENCE",
+              0,
+              4
+            ],
+            [
+              "sep-24-2",
+              "SENTENCE",
+              0,
+              4
+            ],
+            [
+              "sep-24-3",
+              "SENTENCE",
+              0,
+              4
+            ],
+            [
+              "sep-24-4",
+              "SENTENCE",
+              0,
+              4
+            ],
+            [
+              "sep-24-5",
+              "SENTENCE",
+              0,
+              4
+            ],
+            [
+              "sep-24-6",
+              "SENTENCE",
+              0,
+              4
+            ],
+            [
+              "sep-24-7",
+              "SENTENCE",
+              0,
+              4
+            ],
+            [
+              "sep-24-8",
+              "SENTENCE",
+              0,
+              4
+            ]
+          ]
+        },
+        {
+          "number": "25",
+          "digest": "189b56b973488bf66aed59534b2baba7c0b80f80ea39e88f33eeff69bbd04824",
+          "layout": [
+            [
+              "sep-25-1",
+              "SENTENCE",
+              0,
+              5
+            ],
+            [
+              "sep-25-2",
+              "SENTENCE",
+              0,
+              5
+            ],
+            [
+              "sep-25-3",
+              "SENTENCE",
+              0,
+              5
+            ],
+            [
+              "sep-25-4",
+              "SENTENCE",
+              0,
+              5
+            ],
+            [
+              "sep-25-5",
+              "SENTENCE",
+              0,
+              5
+            ],
+            [
+              "sep-25-6",
+              "SENTENCE",
+              0,
+              5
+            ]
+          ]
+        },
+        {
+          "number": "26",
+          "digest": "f3d3159811ba73158f9800311d80ee8ffeee5f699e61bf616f6510da8051b811",
+          "layout": [
+            [
+              "sep-26-1",
+              "SENTENCE",
+              0,
+              6
+            ],
+            [
+              "sep-26-2",
+              "SENTENCE",
+              0,
+              6
+            ],
+            [
+              "sep-26-3",
+              "SENTENCE",
+              0,
+              6
+            ],
+            [
+              "sep-26-4",
+              "SENTENCE",
+              0,
+              6
+            ],
+            [
+              "sep-26-5",
+              "SENTENCE",
+              0,
+              6
+            ],
+            [
+              "sep-26-6",
+              "SENTENCE",
+              0,
+              6
+            ],
+            [
+              "sep-26-7",
+              "SENTENCE",
+              0,
+              6
+            ],
+            [
+              "sep-26-8",
+              "SENTENCE",
+              0,
+              6
+            ]
+          ]
+        },
+        {
+          "number": "27",
+          "digest": "c699a916c4470d4a154e16489ab3db3e0b8d94dc0d170376934941f7ef022ae2",
+          "layout": [
+            [
+              "sep-27-1",
+              "TITLE",
+              0,
+              7
+            ],
+            [
+              "sep-27-2",
+              "SENTENCE",
+              0,
+              7
+            ],
+            [
+              "sep-27-3",
+              "SENTENCE",
+              0,
+              7
+            ],
+            [
+              "sep-27-4",
+              "SENTENCE",
+              0,
+              7
+            ],
+            [
+              "sep-27-5",
+              "SUBTITLE",
+              1,
+              7
+            ],
+            [
+              "sep-27-6",
+              "SENTENCE",
+              1,
+              7
+            ],
+            [
+              "sep-27-7",
+              "SENTENCE",
+              1,
+              7
+            ],
+            [
+              "sep-27-8",
+              "SENTENCE",
+              1,
+              7
+            ],
+            [
+              "sep-27-9",
+              "SENTENCE",
+              1,
+              7
+            ],
+            [
+              "sep-27-10",
+              "SENTENCE",
+              1,
+              7
+            ],
+            [
+              "sep-27-11",
+              "SENTENCE",
+              1,
+              7
+            ],
+            [
+              "sep-27-12",
+              "SENTENCE",
+              1,
+              7
+            ],
+            [
+              "sep-27-13",
+              "SUBTITLE",
+              2,
+              7
+            ],
+            [
+              "sep-27-14",
+              "SENTENCE",
+              2,
+              7
+            ],
+            [
+              "sep-27-15",
+              "SENTENCE",
+              2,
+              7
+            ],
+            [
+              "sep-27-16",
+              "SENTENCE",
+              2,
+              7
+            ]
+          ]
+        },
+        {
+          "number": "28",
+          "digest": "984cf6268c820ab77f5a05fca3e472ad1ecf1df06db7fd2487be33aa51e4baba",
+          "layout": [
+            [
+              "sep-28-1",
+              "TITLE",
+              0,
+              8
+            ],
+            [
+              "sep-28-2",
+              "SENTENCE",
+              0,
+              8
+            ],
+            [
+              "sep-28-3",
+              "SENTENCE",
+              0,
+              8
+            ],
+            [
+              "sep-28-4",
+              "SENTENCE",
+              0,
+              8
+            ],
+            [
+              "sep-28-5",
+              "SENTENCE",
+              0,
+              8
+            ],
+            [
+              "sep-28-6",
+              "SUBTITLE",
+              1,
+              8
+            ],
+            [
+              "sep-28-7",
+              "SENTENCE",
+              1,
+              8
+            ],
+            [
+              "sep-28-8",
+              "SENTENCE",
+              1,
+              8
+            ],
+            [
+              "sep-28-9",
+              "SENTENCE",
+              1,
+              8
+            ],
+            [
+              "sep-28-10",
+              "SUBTITLE",
+              2,
+              8
+            ],
+            [
+              "sep-28-11",
+              "SENTENCE",
+              2,
+              8
+            ],
+            [
+              "sep-28-12",
+              "SENTENCE",
+              2,
+              8
+            ]
+          ]
+        },
+        {
+          "number": "29",
+          "digest": "b320ebc5c18e32f223951475c5c2746e0b4b56c127b4883075dc025d4cae106f",
+          "layout": [
+            [
+              "sep-29-1",
+              "SENTENCE",
+              0,
+              9
+            ],
+            [
+              "sep-29-2",
+              "SENTENCE",
+              0,
+              9
+            ],
+            [
+              "sep-29-3",
+              "SENTENCE",
+              0,
+              9
+            ],
+            [
+              "sep-29-4",
+              "SENTENCE",
+              0,
+              9
+            ],
+            [
+              "sep-29-5",
+              "SENTENCE",
+              0,
+              9
+            ],
+            [
+              "sep-29-6",
+              "SENTENCE",
+              0,
+              9
+            ],
+            [
+              "sep-29-7",
+              "SENTENCE",
+              0,
+              9
+            ]
+          ]
+        },
+        {
+          "number": "30",
+          "digest": "f8badf155cfd8507a203b2daed3a2cbae6d01c3ebd007f26db3f5c5ef0f6052f",
+          "layout": [
+            [
+              "sep-30-1",
+              "SENTENCE",
+              0,
+              10
+            ],
+            [
+              "sep-30-2",
+              "SENTENCE",
+              0,
+              10
+            ],
+            [
+              "sep-30-3",
+              "SENTENCE",
+              0,
+              10
+            ],
+            [
+              "sep-30-4",
+              "SENTENCE",
+              0,
+              10
+            ],
+            [
+              "sep-30-5",
+              "SENTENCE",
+              0,
+              10
+            ],
+            [
+              "sep-30-6",
+              "SENTENCE",
+              0,
+              10
+            ],
+            [
+              "sep-30-7",
+              "SENTENCE",
+              0,
+              10
+            ]
+          ]
+        },
+        {
+          "number": "31",
+          "digest": "a86b23ca4d3253b308f8771517b343daf57d3b5206e117a62971bd7b453b296a",
+          "layout": [
+            [
+              "sep-31-1",
+              "SENTENCE",
+              0,
+              11
+            ],
+            [
+              "sep-31-2",
+              "SENTENCE",
+              0,
+              11
+            ],
+            [
+              "sep-31-3",
+              "SENTENCE",
+              0,
+              11
+            ],
+            [
+              "sep-31-4",
+              "SENTENCE",
+              0,
+              11
+            ],
+            [
+              "sep-31-5",
+              "SENTENCE",
+              0,
+              11
+            ],
+            [
+              "sep-31-6",
+              "SENTENCE",
+              0,
+              11
+            ]
+          ]
+        },
+        {
+          "number": "32",
+          "digest": "3484cd53926f6c784d18f4f1962cee5f33f8f43b859b2f3c0881618695a3ae1a",
+          "layout": [
+            [
+              "sep-32-1",
+              "SENTENCE",
+              0,
+              12
+            ],
+            [
+              "sep-32-2",
+              "SENTENCE",
+              0,
+              12
+            ],
+            [
+              "sep-32-3",
+              "SENTENCE",
+              0,
+              12
+            ],
+            [
+              "sep-32-4",
+              "SENTENCE",
+              0,
+              12
+            ],
+            [
+              "sep-32-5",
+              "SENTENCE",
+              0,
+              12
+            ],
+            [
+              "sep-32-6",
+              "SENTENCE",
+              0,
+              12
+            ],
+            [
+              "sep-32-7",
+              "SENTENCE",
+              0,
+              12
+            ],
+            [
+              "sep-32-8",
+              "SENTENCE",
+              0,
+              12
+            ],
+            [
+              "sep-32-9",
+              "SENTENCE",
+              0,
+              12
+            ]
+          ]
+        },
+        {
+          "number": "33",
+          "digest": "f6273cbfb64e6de22845ba3af2ffce2ab036a69feca5d26433b74accea24d5ea",
+          "layout": [
+            [
+              "sep-33-1",
+              "SENTENCE",
+              0,
+              13
+            ],
+            [
+              "sep-33-2",
+              "SENTENCE",
+              0,
+              13
+            ],
+            [
+              "sep-33-3",
+              "SENTENCE",
+              0,
+              13
+            ],
+            [
+              "sep-33-4",
+              "SENTENCE",
+              0,
+              13
+            ],
+            [
+              "sep-33-5",
+              "SENTENCE",
+              0,
+              13
+            ],
+            [
+              "sep-33-6",
+              "SENTENCE",
+              0,
+              13
+            ],
+            [
+              "sep-33-7",
+              "SENTENCE",
+              0,
+              13
+            ],
+            [
+              "sep-33-8",
+              "SENTENCE",
+              0,
+              13
+            ]
+          ]
+        },
+        {
+          "number": "34",
+          "digest": "bfffe9d2d183f4d2497d749dc668a4226893ed2852ac5a8e42ae1cb60267875c",
+          "layout": [
+            [
+              "sep-34-1",
+              "SENTENCE",
+              0,
+              14
+            ],
+            [
+              "sep-34-2",
+              "SENTENCE",
+              0,
+              14
+            ],
+            [
+              "sep-34-3",
+              "SENTENCE",
+              0,
+              14
+            ],
+            [
+              "sep-34-4",
+              "SENTENCE",
+              0,
+              14
+            ],
+            [
+              "sep-34-5",
+              "SENTENCE",
+              0,
+              14
+            ],
+            [
+              "sep-34-6",
+              "SENTENCE",
+              0,
+              14
+            ],
+            [
+              "sep-34-7",
+              "SENTENCE",
+              0,
+              14
+            ],
+            [
+              "sep-34-8",
+              "SENTENCE",
+              0,
+              14
+            ],
+            [
+              "sep-34-9",
+              "SENTENCE",
+              0,
+              14
+            ],
+            [
+              "sep-34-10",
+              "SENTENCE",
+              0,
+              14
+            ]
+          ]
+        },
+        {
+          "number": "35",
+          "digest": "beb53f88f8a35e53f1694f6c072879dcfc2c23c46698608b81f49b72e3696285",
+          "layout": [
+            [
+              "sep-35-1",
+              "SENTENCE",
+              0,
+              15
+            ],
+            [
+              "sep-35-2",
+              "SENTENCE",
+              0,
+              15
+            ],
+            [
+              "sep-35-3",
+              "SENTENCE",
+              0,
+              15
+            ],
+            [
+              "sep-35-4",
+              "SENTENCE",
+              0,
+              15
+            ],
+            [
+              "sep-35-5",
+              "SENTENCE",
+              0,
+              15
+            ],
+            [
+              "sep-35-6",
+              "SENTENCE",
+              0,
+              15
+            ]
+          ]
+        },
+        {
+          "number": "36",
+          "digest": "c49dbbc9881565a01394ce4ba14390939d7a3c24e222d7b83df5b875f9bed87c",
+          "layout": [
+            [
+              "sep-36-1",
+              "SENTENCE",
+              0,
+              16
+            ],
+            [
+              "sep-36-2",
+              "SENTENCE",
+              0,
+              16
+            ],
+            [
+              "sep-36-3",
+              "SENTENCE",
+              0,
+              16
+            ],
+            [
+              "sep-36-4",
+              "SENTENCE",
+              0,
+              16
+            ],
+            [
+              "sep-36-5",
+              "SENTENCE",
+              0,
+              16
+            ]
+          ]
+        },
+        {
+          "number": "37",
+          "digest": "2a5fc67b5639d30a80a860825b412206a8eaf44066493c93ed1aba431be24c96",
+          "layout": [
+            [
+              "sep-37-1",
+              "SENTENCE",
+              0,
+              17
+            ],
+            [
+              "sep-37-2",
+              "SENTENCE",
+              0,
+              17
+            ],
+            [
+              "sep-37-3",
+              "SENTENCE",
+              0,
+              17
+            ],
+            [
+              "sep-37-4",
+              "SENTENCE",
+              0,
+              17
+            ],
+            [
+              "sep-37-5",
+              "SENTENCE",
+              0,
+              17
+            ],
+            [
+              "sep-37-6",
+              "SENTENCE",
+              0,
+              17
+            ],
+            [
+              "sep-37-7",
+              "SENTENCE",
+              0,
+              17
+            ],
+            [
+              "sep-37-8",
+              "SENTENCE",
+              0,
+              17
+            ],
+            [
+              "sep-37-9",
+              "SENTENCE",
+              0,
+              17
+            ]
+          ]
+        },
+        {
+          "number": "38",
+          "digest": "d8d81cfe907a3952be0172bf4a1f924952820eb05c16195e53104f9c7cd0ee24",
+          "layout": [
+            [
+              "sep-38-1",
+              "SENTENCE",
+              0,
+              18
+            ],
+            [
+              "sep-38-2",
+              "SENTENCE",
+              0,
+              18
+            ],
+            [
+              "sep-38-3",
+              "SENTENCE",
+              0,
+              18
+            ],
+            [
+              "sep-38-4",
+              "SENTENCE",
+              0,
+              18
+            ],
+            [
+              "sep-38-5",
+              "SENTENCE",
+              0,
+              18
+            ],
+            [
+              "sep-38-6",
+              "SENTENCE",
+              0,
+              18
+            ],
+            [
+              "sep-38-7",
+              "SENTENCE",
+              0,
+              18
+            ]
+          ]
+        },
+        {
+          "number": "39",
+          "digest": "8935c65b6ba5b3aad179c812d83f0eb0514a319bf8f0e3924af14a0634ae05ba",
+          "layout": [
+            [
+              "sep-39-1",
+              "SENTENCE",
+              0,
+              19
+            ],
+            [
+              "sep-39-2",
+              "SENTENCE",
+              0,
+              19
+            ],
+            [
+              "sep-39-3",
+              "SENTENCE",
+              0,
+              19
+            ],
+            [
+              "sep-39-4",
+              "SENTENCE",
+              0,
+              19
+            ],
+            [
+              "sep-39-5",
+              "SENTENCE",
+              0,
+              19
+            ],
+            [
+              "sep-39-6",
+              "SENTENCE",
+              0,
+              19
+            ],
+            [
+              "sep-39-7",
+              "SENTENCE",
+              0,
+              19
+            ],
+            [
+              "sep-39-8",
+              "SENTENCE",
+              0,
+              19
+            ],
+            [
+              "sep-39-9",
+              "SENTENCE",
+              0,
+              19
+            ]
+          ]
+        },
+        {
+          "number": "40",
+          "digest": "103c7336e755a50bd51310cb3de7ec415723f2d0f90d1a381eadc32e433e1812",
+          "layout": [
+            [
+              "sep-40-1",
+              "SENTENCE",
+              0,
+              20
+            ],
+            [
+              "sep-40-2",
+              "SENTENCE",
+              0,
+              20
+            ],
+            [
+              "sep-40-3",
+              "SENTENCE",
+              0,
+              20
+            ],
+            [
+              "sep-40-4",
+              "SENTENCE",
+              0,
+              20
+            ],
+            [
+              "sep-40-5",
+              "SENTENCE",
+              0,
+              20
+            ],
+            [
+              "sep-40-6",
+              "SENTENCE",
+              0,
+              20
+            ]
+          ]
+        }
+      ],
+      "expectedDigests": {
+        "factory": "e5674565f307b76e93e641ee5a708d3c0fb0f2c2db7007747c75e978747ee31c",
+        "student": "9b0d55049c971b8b4b4259a4189493e77d6189266ee96fd976fc21eb1f640f45"
+      }
+    }
+  ]
+}

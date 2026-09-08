@@ -38,7 +38,13 @@ export function inspectStudioDocument(text,metadata={}) {
   return [...groups].map(([label,parts])=>{
     const sourceText=parts.map(p=>`[PAGE ${p.page}]\n${p.text}`).join('\n'),inspected=inspectFullWorkbookText(sourceText.replace(/WORKBOOK/gi,'워크북')),full=inspected.fullWorkbook;
     const rows=full?inspected.rows:bilingualRows(sourceText);
-    const reviewRequired=ambiguous||(full&&inspected.reviewRequired)||rows.length>160||!rows.length||rows.some(r=>!r.translation)||sourceText.length>1000000;
+    // A decoded text layer is not proof of a bilingual sentence boundary.
+    // Vertical marginal text / page furniture may otherwise become a "sentence"
+    // with a Korean translation and incorrectly arrive pre-confirmed in Studio.
+    const invalidSentence=rows.some(r=>!r.translation||!/[A-Za-z]{2,}/.test(r.text)||/^\s*-\s*\d+\s*-/.test(r.text));
+    // Unnumbered bilingual text has no publisher sentence/answer-key evidence.
+    // Keep its proposed rows editable and require the existing boundary review.
+    const reviewRequired=ambiguous||!full||inspected.reviewRequired||rows.length>160||!rows.length||invalidSentence||sourceText.length>1000000;
     return {title:label==='unlabeled'?metadata.title||metadata.documentName: `${metadata.title||'모의고사'} · ${label}번`,number:label==='unlabeled'?'':label,rows,reviewRequired,boundaryConfirmed:!reviewRequired,sourceMetadata:{...metadata,pages:parts.map(p=>p.page)},sourceExercises:full&&sourceText.length<=1000000?inspected.exercises:[],reason:reviewRequired?'지문 경계와 영문·해석을 확인해 주세요.':'지문별 문장쌍을 검토해 주세요.'};
   });
 }
