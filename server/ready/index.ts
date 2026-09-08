@@ -1582,7 +1582,51 @@ async function deleteSavedWord(body:any,session:ReadySession){const student=awai
 async function translationView(body: any, session: ReadySession) { const context = await studyContext(body, session, true); const event = await db.from("ready_sentence_translation_view_events").insert({ student_id: context.student.id, exam_id: context.examId, passage_id: context.passage.id, sentence_id: context.sentence.id }); if (event.error) throw new ApiError(500, event.error.message); return { recorded:true }; }
 const SENTENCE_PROMPT_VERSION="easy-v1",STRUCTURE_PROMPT_VERSION="structure-v1";
 async function readerSentenceContext(body:any,session:ReadySession){const student=await studentForSession(session),examId=required(body.examId,"Exam",80),passageId=required(body.passageId,"지문",80),sentenceId=required(body.sentenceId,"문장",80),passage=await studentPassageAccess(examId,passageId,student),sentenceResult=await db.from("ready_passage_sentences").select("id,text,translation").eq("id",sentenceId).eq("passage_id",passageId).maybeSingle();if(sentenceResult.error)throw new ApiError(500,sentenceResult.error.message);if(!sentenceResult.data)throw new ApiError(404,"현재 지문의 문장을 찾지 못했습니다.");return {student,examId,passage,sentence:sentenceResult.data};}
-async function geminiSentenceJson(prompt:string,maxOutputTokens=500,system=GEMINI_SYSTEM){const provider=(Deno.env.get("AI_PROVIDER")??"").trim().toLowerCase(),key=Deno.env.get("GEMINI_API_KEY");if(provider!=="gemini"||!key)throw new ApiError(503,"Gemini 문장 학습 기능이 아직 연결되지 않았습니다.");let lastStatus=0,lastError="";for(const model of geminiModels()){const url=`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${key}`,response=await fetch(url,{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({system_instruction:{parts:[{text:system}]},contents:[{role:"user",parts:[{text:prompt}]}],generationConfig:{maxOutputTokens,temperature:0.1,responseMimeType:"application/json",thinkingConfig:{thinkingBudget:0}}})});if(response.ok){const payload=await response.json(),parsed=parseJson((payload?.candidates?.[0]?.content?.parts||[]).map((part:any)=>part?.text||"").join(""));if(!parsed)throw new ApiError(502,"Gemini 문장 학습 결과 형식이 올바르지 않습니다.");return parsed;}lastStatus=response.status;lastError=(await response.text()).slice(0,300);if(response.status!==429)break;}console.error("READY Gemini sentence failed:",lastStatus,lastError);throw new ApiError(lastStatus===429?429:502,lastStatus===429?"Gemini 문장 학습 한도를 모두 사용했습니다.":"Gemini 문장 학습 결과를 받을 수 없습니다.");}
+async function geminiSentenceJson(prompt:string,maxOutputTokens=500,system=GEMINI_SYSTEM){
+ const provider=(Deno.env.get("AI_PROVIDER")??"").trim().toLowerCase(),key=Deno.env.get("GEMINI_API_KEY");
+ if(provider!=="gemini"||!key)throw new ApiError(503,"Gemini 문장 학습 기능이 아직 연결되지 않았습니다.");
+ const base={maxOutputTokens,temperature:0.1,responseMimeType:"application/json"};
+ let lastStatus=0;
+ const report=(model:string,status:number,config:string,error:any)=>{
+  // Never log request headers, source prompts, response candidates, or the key.
+  const message=String(error?.message||"Provider response unavailable").replaceAll(key,"[REDACTED]").slice(0,500);
+  console.error("READY Gemini sentence failed:",JSON.stringify({model,status,config,code:error?.code??null,errorStatus:error?.status??null,message}));
+ };
+ for(const model of geminiModels()){
+  for(const thinking of [true,false]){
+   const config=thinking?"thinking_disabled":"base";
+   let response:Response,raw:string;
+   try{
+    response=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`,{
+     method:"POST",headers:{"content-type":"application/json","x-goog-api-key":key},signal:AbortSignal.timeout(30_000),
+     body:JSON.stringify({system_instruction:{parts:[{text:system}]},contents:[{role:"user",parts:[{text:prompt}]}],generationConfig:thinking?{...base,thinkingConfig:{thinkingBudget:0}}:base})
+    });
+    raw=await response.text();
+   }catch(error){
+    lastStatus=0;report(model,0,config,{status:(error as Error)?.name||"NETWORK_ERROR",message:"Gemini network request failed or timed out"});break;
+   }
+   lastStatus=response.status;
+   let payload:any;try{payload=JSON.parse(raw);}catch{payload=null;}
+   if(response.ok){
+    const parsed=parseJson((payload?.candidates?.[0]?.content?.parts||[]).filter((part:any)=>!part?.thought).map((part:any)=>part?.text||"").join(""));
+    if(!parsed||typeof parsed!=="object"||Array.isArray(parsed)){
+     report(model,response.status,config,{status:"INVALID_RESPONSE",message:"Expected a JSON object"});
+     throw new ApiError(502,"Gemini 문장 학습 결과 형식이 올바르지 않습니다.");
+    }
+    return parsed;
+   }
+   const error=payload?.error;
+   report(model,response.status,config,error);
+   const invalidKey=error?.details?.some((detail:any)=>["API_KEY_INVALID","API_KEY_EXPIRED"].includes(detail?.reason));
+   if(response.status===401||response.status===403||invalidKey)throw new ApiError(503,"Gemini API 키 또는 접근 권한을 확인해 주세요.");
+   // A 400 may reject thinkingConfig. Retry once without it, retaining JSON mode.
+   if(response.status===400&&thinking)continue;
+   if([400,404,408,429,500,502,503,504].includes(response.status))break;
+   throw new ApiError(502,"Gemini 문장 학습 요청이 거부되었습니다.");
+  }
+ }
+ throw new ApiError(lastStatus===429?429:502,lastStatus===429?"Gemini 문장 학습 한도를 모두 사용했습니다.":"Gemini 문장 학습 결과를 받을 수 없습니다.");
+}
 async function sentenceCache(context:any,promptVersion:string){const sentenceHash=await sha256Hex(context.sentence.text),result=await db.from("ready_sentence_learning_cache").select("id,easy_translation,structure_chunks").eq("source_kind","reader").eq("source_key",context.sentence.id).eq("passage_revision",context.passage.updated_at).eq("sentence_hash",sentenceHash).eq("prompt_version",promptVersion).maybeSingle();if(result.error)throw new ApiError(500,result.error.message);return {row:result.data,sentenceHash};}
 async function sentenceEasyTranslation(body:any,session:ReadySession){const context=await readerSentenceContext(body,session),cached=await sentenceCache(context,SENTENCE_PROMPT_VERSION);if(cached.row?.easy_translation)return {translation:cached.row.easy_translation,cached:true};const publisher=clean(context.sentence.translation,500);let translation=publisher,source="publisher_reference";if(!translation){const prompt=`한국 중고등학생이 바로 이해할 수 있는 쉬운 한국어로 다음 영어 한 문장만 번역하세요. 원문에 없는 의미를 더하지 마세요. JSON만 반환: {"translation":""}\n영문: ${context.sentence.text}`,result=await geminiSentenceJson(prompt,220);translation=clean(result.translation,500);source="gemini";}if(!translation)throw new ApiError(502,"쉬운 해석 결과가 비어 있습니다.");const saved=await db.from("ready_sentence_learning_cache").upsert({source_kind:"reader",source_key:context.sentence.id,passage_id:context.passage.id,sentence_id:context.sentence.id,passage_revision:context.passage.updated_at,sentence_hash:cached.sentenceHash,prompt_version:SENTENCE_PROMPT_VERSION,easy_translation:translation,updated_at:new Date().toISOString()},{onConflict:"source_kind,source_key,passage_revision,sentence_hash,prompt_version"});if(saved.error)throw new ApiError(500,saved.error.message);return {translation,cached:false,source};}
 function validStructureChunks(chunks:any[],source:string){let cursor=0;if(!Array.isArray(chunks)||chunks.length<2||chunks.length>5)return false;for(const chunk of chunks){const english=clean(chunk?.english,300),korean=clean(chunk?.korean,300),role=clean(chunk?.role,160),at=source.indexOf(english,cursor);if(!english||!korean||!role||at<cursor)return false;cursor=at+english.length;}return cursor>0;}
