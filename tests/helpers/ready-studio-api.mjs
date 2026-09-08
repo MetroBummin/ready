@@ -37,10 +37,10 @@ class Query {
   const result=await pg.query(sql,params),rows=result.rows;
   if(this.required&&rows.length!==1)throw new Error('single row expected');
   return {data:this.singleRow?rows[0]||null:rows,error:null,count:rows.length};
- }catch(error){console.log('DB',this.table,error.message);return {data:null,error:{message:error.message}};}}
+ }catch(error){console.log('DB',this.table,error.message);return {data:null,error:{message:error.message,code:error.code}};}}
  then(resolve,reject){return this.execute().then(resolve,reject);}
 }
-const adapter={from:table=>new Query(table),rpc:async(name,args)=>{try{const keys=Object.keys(args),values=Object.values(args).map(v=>typeof v==='object'&&v!==null?JSON.stringify(v):v);const result=await pg.query(`select public.${qid(name)}(${keys.map((k,i)=>qid(k)+'=> $'+(i+1)).join(',')}) as value`,values);return {data:result.rows[0]?.value,error:null};}catch(error){console.log('RPC',name,error.message);return {data:null,error:{message:error.message}};}}};
+const adapter={from:table=>new Query(table),rpc:async(name,args)=>{try{const keys=Object.keys(args),values=Object.values(args).map(v=>typeof v==='object'&&v!==null?JSON.stringify(v):v);const result=await pg.query(`select public.${qid(name)}(${keys.map((k,i)=>qid(k)+'=> $'+(i+1)).join(',')}) as value`,values);return {data:result.rows[0]?.value,error:null};}catch(error){console.log('RPC',name,error.message);return {data:null,error:{message:error.message,code:error.code}};}}};
 globalThis.__studioDb=adapter;
 const environment={SUPABASE_URL:'http://localhost',SUPABASE_SERVICE_ROLE_KEY:'local-test-only',READY_ADMIN_PASSWORD:'studio-local',AI_PROVIDER:'gemini',GEMINI_API_KEY:'local-stub'};
 let handler;globalThis.Deno={env:{get:k=>environment[k]},serve:fn=>{handler=fn;}};

@@ -66,5 +66,30 @@ const mergeBody={jobId:mergeDrafts[0].job.id,mergeJobId:mergeDrafts[1].job.id,ti
 const merged=await call('studio_split_draft',mergeBody,admin);assert.equal(merged.job.extraction.sourceExercises.length,2);assert.deepEqual(merged.job.source_metadata.pages,[1,2]);
 await pg.query('update ready_workbook_factory_jobs set source_metadata=$1 where id=$2',[JSON.stringify({documentSha256:'different-document'}),mergeDrafts[1].job.id]);
 await assert.rejects(()=>call('studio_split_draft',mergeBody,admin));assert.equal(aiCalls.length,3);
+// Student stability audit: execute real API/SQL, including the unique-index retry path.
+const currentCatalog=(await pg.query('select catalog from ready_workbook_catalogs where passage_id=$1',[passageId])).rows[0].catalog;
+const auditItems=currentCatalog.stages.find(stage=>stage.semanticType==='writing').items.slice(0,3);
+for(const [index,auditItem] of auditItems.entries())await pg.query("insert into ready_workbook_bookmarks(student_id,exam_id,passage_id,workbook_key,item_key,item_type,source,updated_at) values($1,$2,$3,$4,$5,$6,'manual',now()+$7::interval) on conflict do nothing",[studentId,exam,passageId,currentCatalog.workbookKey,auditItem.key,auditItem.kind,`${index} seconds`]);
+const db=globalThis.__studioDb,originalFrom=db.from;let catalogQueries=0;
+db.from=table=>{if(table==='ready_workbook_catalogs')catalogQueries++;return originalFrom(table);};
+let review;
+try{review=await call('student_review',{examId:exam,kind:'workbook'},token);}finally{db.from=originalFrom;}
+assert.equal(catalogQueries,1,'three bookmarks of one passage must read the catalog once');
+assert.deepEqual(review.workbookItems.map(item=>item.itemKey),auditItems.map(item=>item.key).reverse(),'request-local reuse must preserve bookmark order');
+// A second request must see a newly stored catalog; reuse must not be global.
+const temporarilyChanged=structuredClone(currentCatalog);
+const removed=auditItems[0];temporarilyChanged.stages.find(stage=>stage.semanticType==='writing').items=temporarilyChanged.stages.find(stage=>stage.semanticType==='writing').items.filter(item=>item.key!==removed.key);
+await pg.query('update ready_workbook_catalogs set catalog=$1 where passage_id=$2',[JSON.stringify(temporarilyChanged),passageId]);
+assert.equal((await call('student_review',{examId:exam,kind:'workbook'},token)).workbookItems.some(item=>item.itemKey===removed.key),false);
+await pg.query('update ready_workbook_catalogs set catalog=$1 where passage_id=$2',[JSON.stringify(currentCatalog),passageId]);
+const retryItem=auditItems[0],retryBody={examId:exam,passageId,itemKey:retryItem.key,responses:retryItem.answers,clientAttemptId:crypto.randomUUID()};
+const beforeRetry=(await pg.query('select count(*)::int as n from ready_workbook_attempts')).rows[0].n;
+const firstAck=await call('submit_workbook_attempts',{attempts:[retryBody]},token),retryAck=await call('submit_workbook_attempts',{attempts:[retryBody]},token);
+assert.ok(firstAck.results[0].attempt?.id);assert.equal(retryAck.results[0].attempt?.id,firstAck.results[0].attempt.id);
+assert.equal(retryAck.results[0].correctClears,firstAck.results[0].correctClears,'a duplicate transport retry must not count twice');
+assert.equal((await pg.query('select count(*)::int as n from ready_workbook_attempts')).rows[0].n,beforeRetry+1);
+const resumed=await call('student_workbook',{examId:exam,passageId},token);
+assert.equal(resumed.recentStage,7);assert.equal(resumed.stages.find(stage=>stage.stage===7).semanticType,'writing');
+console.log('PASS stability API: 3 bookmarks -> 1 catalog read, fresh next-request catalog, idempotent retry and stage identity/resume.');
 console.log('PASS real API + PostgreSQL: 4 drafts, 7 stages, student attempt, dirty-only AI, stale publication blocked, history retained.');
 await close();
