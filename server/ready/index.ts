@@ -1325,9 +1325,12 @@ async function workbookReviewItems(studentId: string, examId: string) {
   const byPassage = new Map(passages.map(passage => [passage.id, passage]));
   const attempts = rows<any[]>(await db.from("ready_workbook_attempts").select("passage_id,item_key,correct,created_at").eq("student_id", studentId).eq("exam_id", examId).order("created_at", { ascending: false })), latest = new Map<string, boolean>();
   for (const attempt of attempts) { const key = `${attempt.passage_id}:${attempt.item_key}`; if (!latest.has(key)) latest.set(key, attempt.correct === true); }
-  const output:any[]=[];
+  const output:any[]=[], catalogs=new Map<string,any>();
   for (const bookmark of bookmarks) {
-    const passage = byPassage.get(bookmark.passage_id), catalog = await workbookForPassage(passage), item = workbookItem(catalog, bookmark.item_key);
+    const passage = byPassage.get(bookmark.passage_id);
+    if(!passage)continue;
+    if(!catalogs.has(passage.id))catalogs.set(passage.id,await workbookForPassage(passage));
+    const catalog=catalogs.get(passage.id),item=workbookItem(catalog,bookmark.item_key);
     if (passage && catalog && item && catalog.workbookKey === bookmark.workbook_key) output.push({ passageId: passage.id, passageTitle: passage.title, workbookKey: catalog.workbookKey, workbookTitle: catalog.title, itemKey: item.key, stage: item.stage, number: item.number, kind: item.kind, title: catalog.stages.find((stage: any) => stage.stage === item.stage)?.title || `${item.stage}단계`, bookmarked: true, bookmarkSource: bookmark.source, lastResult: latest.get(`${passage.id}:${item.key}`) ?? null });
   }
   return output;
@@ -1336,7 +1339,7 @@ async function studentWorkbook(body: any, session: ReadySession) {
   const student = await studentForSession(session), examId = required(body.examId, "Exam", 80), passageId = required(body.passageId, "지문", 80);
   const passage = await studentPassageAccess(examId, passageId, student), catalog = await workbookForPassage(passage);
   if (!catalog) throw new ApiError(404, "이 지문에는 아직 READY 워크북이 없습니다.");
-  const attempts = rows<any[]>(await db.from("ready_workbook_attempts").select("item_key,correct,created_at").eq("student_id", student.id).eq("exam_id", examId).eq("passage_id", passageId).eq("workbook_key", catalog.workbookKey).order("created_at", { ascending: false }));
+  const attempts = rows<any[]>(await db.from("ready_workbook_attempts").select("item_key,stage,correct,created_at").eq("student_id", student.id).eq("exam_id", examId).eq("passage_id", passageId).eq("workbook_key", catalog.workbookKey).order("created_at", { ascending: false }));
   const bookmarkRows = rows<any[]>(await db.from("ready_workbook_bookmarks").select("item_key").eq("student_id", student.id).eq("exam_id", examId).eq("passage_id", passageId).eq("workbook_key", catalog.workbookKey)), bookmarks = new Set(bookmarkRows.map(row => row.item_key));
   const progressRows = rows<any[]>(await db.from("ready_workbook_stage_progress").select("progress_key,correct_clears,completed_cycles,current_cycle").eq("student_id", student.id).eq("exam_id", examId).eq("passage_id", passageId).eq("workbook_key", catalog.workbookKey).eq("stage_contract_version", catalog.contractVersion || "legacy-v1"));
   const cycleClearRows = rows<any[]>(await db.from("ready_workbook_cycle_item_clears").select("progress_key,cycle_number,item_key").eq("student_id", student.id).eq("exam_id", examId).eq("passage_id", passageId).eq("workbook_key", catalog.workbookKey).eq("stage_contract_version", catalog.contractVersion || "legacy-v1"));
@@ -1346,7 +1349,7 @@ async function studentWorkbook(body: any, session: ReadySession) {
   for (const attempt of attempts) if (!latest.has(attempt.item_key)) latest.set(attempt.item_key, attempt.correct === true);
   const semanticCatalog = catalog.contractVersion === SEMANTIC_WORKBOOK_CONTRACT;
   const stages = await Promise.all(catalog.stages.filter((stage: any) => !semanticCatalog || stage.items.length > 0).map(async (stage: any) => ({
-    stage: stage.stage, title: stage.title, instruction: stage.instruction,
+    stage: stage.stage, semanticType: stage.semanticType || null, title: stage.title, instruction: stage.instruction,
     locked: false, lockReason: "",
     total: stage.items.length,
     attempted: stage.items.filter((item: any) => latest.has(item.key)).length,
