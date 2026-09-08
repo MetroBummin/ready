@@ -649,10 +649,15 @@ async function studioContext(passageIdValue:any) {
   const editor:any=await passageEditor({passageId:passageIdValue}),passageId=editor.passage.id;
   const raw=rows<any>(await db.from('ready_passages').select('studio_state').eq('id',passageId).single());
   const persisted=rows<any>(await db.from('ready_workbook_catalogs').select('catalog,factory_job_id').eq('passage_id',passageId).maybeSingle());
-  const jobId=raw.studio_state?.jobId||persisted?.factory_job_id;
-  const job=jobId?rows<any>(await db.from('ready_workbook_factory_jobs').select('*').eq('id',jobId).maybeSingle()):null;
+  const storedJobId=raw.studio_state?.jobId||persisted?.factory_job_id;
+  let job=storedJobId?rows<any>(await db.from('ready_workbook_factory_jobs').select('*').eq('id',storedJobId).maybeSingle()):null;
+  // Older Studio states may contain empty annotations without retaining jobId.
+  // Recover the immutable publisher source through the job's passage link.
+  if(!job)job=rows<any>(await db.from('ready_workbook_factory_jobs').select('*').eq('passage_id',passageId).order('created_at',{ascending:false}).limit(1).maybeSingle());
+  const jobId=job?.id||storedJobId||null;
   const initial=raw.studio_state?{}:publisherAnnotations(editor.rows,job?.extraction?.sourceExercises||[],job?.source_metadata||{});
   const studio=raw.studio_state||{version:0,published:!!persisted,jobId,annotations:initial};
+  if(!studio.jobId&&jobId)studio.jobId=jobId;
   studio.annotations=syncAnnotations(editor.rows,studio.annotations);
   const publisher=publisherAnnotations(editor.rows,job?.extraction?.sourceExercises||[],job?.source_metadata||{});
   for(const row of studioSentenceRows(editor.rows))for(const step of AUTHORED){

@@ -91,5 +91,15 @@ assert.equal((await pg.query('select count(*)::int as n from ready_workbook_atte
 const resumed=await call('student_workbook',{examId:exam,passageId},token);
 assert.equal(resumed.recentStage,7);assert.equal(resumed.stages.find(stage=>stage.stage===7).semanticType,'writing');
 console.log('PASS stability API: 3 bookmarks -> 1 catalog read, fresh next-request catalog, idempotent retry and stage identity/resume.');
+
+// A legacy Studio state can have empty annotations and no jobId. The passage
+// link must still recover verified Publisher candidates without an AI call.
+const publisherPdf=readFileSync(new URL('../ready/workbooks/ne-minbyeongcheon-lesson-1.pdf',import.meta.url)).toString('base64');
+const publisherImport=await call('studio_import',{title:'Publisher recovery',sourceKind:'pdf',pdfBase64:publisherPdf,documentName:'ne-minbyeongcheon-lesson-1.pdf',sourceType:'TEXTBOOK',grade:'1학년'},admin),publisherDraft=publisherImport.drafts[0];
+const publisherPassage=(await call('studio_create_draft',{jobId:publisherDraft.job.id,title:'Publisher recovery',rows:publisherDraft.rows,boundaryConfirmed:true},admin)).passageId;
+await pg.query("update ready_passages set studio_state=jsonb_build_object('version',0,'published',false,'needsReview',true,'annotations','{}'::jsonb) where id=$1",[publisherPassage]);
+const recovered=await call('studio_open',{passageId:publisherPassage},admin);
+for(const semanticType of ['korean_blank','english_blank','verb_form','grammar_choice'])assert.equal(recovered.rows.filter(row=>recovered.studio.annotations[row.id].steps[semanticType].source==='publisher').length,41,`${semanticType} must recover through factory_jobs.passage_id`);
+assert.equal(recovered.studio.jobId,publisherDraft.job.id);assert.equal(aiCalls.length,3);
 console.log('PASS real API + PostgreSQL: 4 drafts, 7 stages, student attempt, dirty-only AI, stale publication blocked, history retained.');
 await close();
