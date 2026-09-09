@@ -61,8 +61,11 @@ assert.deepEqual(insertContentClaimStage([{semanticType:'translation'},{semantic
 assert.equal(factStale(factB,reloaded.rows),false);
 assert.equal(publicContentClaims([factB],saved.contentBank.claims,reloaded.rows).every(claim=>claim.status!=='draft'),true);
 
-const edge=readFileSync(new URL('../server/ready/index.ts',import.meta.url),'utf8'),app=readFileSync(new URL('../ready/app.js',import.meta.url),'utf8');
+const edge=readFileSync(new URL('../server/ready/index.ts',import.meta.url),'utf8'),app=readFileSync(new URL('../ready/app.js',import.meta.url),'utf8'),studio=readFileSync(new URL('../ready/admin/studio-ui.js',import.meta.url),'utf8');
 assert.doesNotMatch(edge,/contentClaim[\s\S]{0,500}(?:gemini|openai|claude)/i,'Content Claim must not call AI');
 assert.match(app,/gradeContentClaim\(item\.truth,choice\)/,'O/X grading must happen locally');
+assert.match(studio,/data-content-fact-panel/,'Fact cards must use collapsible compact panels');
+assert.match(studio,/content-evidence-picker/,'evidence sentence lists must stay collapsed until requested');
+assert.match(studio,/data-content-filter="review"/,'Claim Bank must expose review-first filtering');
 console.log('READY Content Claim CRUD, stable evidence identity, stale filtering, local O/X grading and evidence rendering passed.');
 await close();
