@@ -103,6 +103,14 @@ assert.equal(selectContentClaimVariant(tierClaim,300,()=>0).variant_key,'en-d3')
 assert.equal(selectContentClaimVariant(tierClaim,300,()=>0.99).variant_key,'en-d2','300%+ may mix en_d2 to avoid repetition');
 assert.equal(contentClaimStage([{...tierClaim,variants:[]}],{},()=>0).items[0].statement,tierClaim.statement,'nearest fallback must end at the parent statement when no Variant exists');
 
+const semanticClaims=Array.from({length:36},(_,index)=>({...tierClaim,id:`semantic-${index}`,factId:`fact-${index}`}));
+const firstCycle=contentClaimStage(semanticClaims,{correctClears:0},()=>0.999),secondCycle=contentClaimStage(semanticClaims,{correctClears:36,completedCycles:1,currentCycle:2},()=>0.999);
+assert.equal(firstCycle.total,36,'Variant wording must not change the semantic Claim denominator');
+assert.equal(secondCycle.total,36,'a new cycle must keep the same semantic Claim denominator');
+assert.deepEqual(new Set(secondCycle.items.map(item=>item.claimId)),new Set(firstCycle.items.map(item=>item.claimId)),'a new Variant tier must preserve semantic Claim identity');
+assert.equal(firstCycle.items.every(item=>item.language==='ko'&&item.difficulty===1),true,'0-100% must use ko d1 when available');
+assert.equal(secondCycle.items.every(item=>item.language==='en'&&item.difficulty===1),true,'100-200% must use the ko d2 / en d1 tier when available');
+
 const bag=contentClaimBag([
   {id:'a1',factId:'a',truth:true},{id:'a2',factId:'a',truth:false},
   {id:'b1',factId:'b',truth:true},{id:'b2',factId:'b',truth:false},
@@ -112,9 +120,19 @@ assert.equal(new Set(bag.map(claim=>claim.id)).size,bag.length,'a Claim must not
 assert.equal(bag.some((claim,index)=>index>0&&claim.factId===bag[index-1].factId),false,'adjacent Claims must avoid the same Fact when possible');
 assert.equal(bag.some((claim,index)=>index>1&&claim.truth===bag[index-1].truth&&claim.truth===bag[index-2].truth),false,'TRUE/FALSE streaks must be bounded when possible');
 
+const naturalRuns=contentClaimBag([
+  {id:'t1',factId:'a',truth:true},{id:'t2',factId:'b',truth:true},
+  {id:'f1',factId:'c',truth:false},{id:'f2',factId:'d',truth:false},
+],()=>0.999);
+assert.deepEqual(naturalRuns.map(claim=>claim.id),['t1','t2','f1','f2'],'Fisher-Yates order must survive when it has no same-Fact or three-Truth violation');
+assert.equal(naturalRuns.some((claim,index)=>index>0&&claim.truth===naturalRuns[index-1].truth),true,'O/O and X/X runs must remain allowed');
+
 const edge=readFileSync(new URL('../server/ready/index.ts',import.meta.url),'utf8'),app=readFileSync(new URL('../ready/app.js',import.meta.url),'utf8'),studio=readFileSync(new URL('../ready/admin/studio-ui.js',import.meta.url),'utf8');
 assert.doesNotMatch(edge,/contentClaim[\s\S]{0,500}(?:gemini|openai|claude)/i,'Content Claim must not call AI');
 assert.match(app,/gradeContentClaim\(item\.truth,choice\)/,'O/X grading must happen locally');
+assert.doesNotMatch(app,/item\.kind===['"]content_claim['"]\?0:workbookCycleMilestone/,'Content Claim must raise the same cycle milestone as every other stage');
+assert.match(app,/stage\.semanticType===['"]content_claim['"]\?'다음 난이도 계속하기'/,'Content Claim milestone must continue to the next Variant tier');
+assert.match(app,/flushWorkbookAttempts\(\)[\s\S]{0,500}student_workbook[\s\S]{0,500}startWorkbookSession\(data,session\.passageId,'','content_claim'\)/,'Content Claim repeat must reload the stage from server progress');
 assert.match(studio,/data-content-fact-panel/,'Fact cards must use collapsible compact panels');
 assert.match(studio,/content-evidence-picker/,'evidence sentence lists must stay collapsed until requested');
 assert.match(studio,/data-content-filter="review"/,'Claim Bank must expose review-first filtering');

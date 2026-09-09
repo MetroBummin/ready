@@ -34,14 +34,21 @@ export function selectContentClaimVariant(claim, progressPercent = 0, random = M
 }
 
 export function contentClaimBag(claims, random = Math.random) {
-  const remaining = shuffled(list(claims), random), output = [];
-  while (remaining.length) {
-    const previous = output.at(-1), repeatedTruth = output.length > 1 && output.at(-2)?.truth === previous?.truth;
-    let index = remaining.findIndex(claim => claim.factId !== previous?.factId && claim.truth !== previous?.truth);
-    if (index < 0) index = remaining.findIndex(claim => claim.factId !== previous?.factId);
-    if (index < 0 && repeatedTruth) index = remaining.findIndex(claim => claim.truth !== previous.truth);
-    if (index < 0) index = 0;
-    output.push(remaining.splice(index, 1)[0]);
+  const output = shuffled(list(claims), random);
+  const score = values => values.reduce((total, claim, index) => total
+    + (index > 0 && claim.factId === values[index - 1]?.factId ? output.length + 1 : 0)
+    + (index > 1 && claim.truth === values[index - 1]?.truth && claim.truth === values[index - 2]?.truth ? 1 : 0), 0);
+  for (let current = score(output), pass = 0; current > 0 && pass < output.length; pass += 1) {
+    let best = current, pair = null;
+    for (let left = 0; left < output.length - 1; left += 1) for (let right = left + 1; right < output.length; right += 1) {
+      [output[left], output[right]] = [output[right], output[left]];
+      const candidate = score(output);
+      [output[left], output[right]] = [output[right], output[left]];
+      if (candidate < best) { best = candidate; pair = [left, right]; }
+    }
+    if (!pair) break;
+    [output[pair[0]], output[pair[1]]] = [output[pair[1]], output[pair[0]]];
+    current = best;
   }
   return output;
 }
