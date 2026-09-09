@@ -51,6 +51,13 @@ workbook=await call('student_workbook',{examId,passageId},token);claimStage=work
 assert.equal(claimStage.items.length,1,'a changed evidence sentence must exclude only its Fact Claims');
 assert.equal((await pg.query('select status from ready_content_facts where id=$1',[factA.id])).rows[0].status,'stale');
 assert.equal((await pg.query('select status from ready_content_facts where id=$1',[factB.id])).rows[0].status,'confirmed','unrelated Facts must remain confirmed');
+await assert.rejects(call('content_claim_bank_publish_all',{passageId},admin),error=>error.status===422&&/근거 재확인/.test(error.message));
+await pg.query("delete from ready_content_claims where passage_id=$1 and status='stale'",[passageId]);
+await pg.query('delete from ready_content_facts where id=$1',[factA.id]);
+const published=await call('content_claim_bank_publish_all',{passageId},admin);
+assert.equal(published.published,true);
+assert.equal(published.contentBank.facts.every(fact=>fact.status==='confirmed'),true);
+assert.equal(published.contentBank.claims.every(claim=>claim.status==='confirmed'),true);
 
 assert.deepEqual(gradeContentClaim(true,'O'),{valid:true,correct:true});
 assert.deepEqual(gradeContentClaim(true,'X'),{valid:true,correct:false});
@@ -67,5 +74,6 @@ assert.match(app,/gradeContentClaim\(item\.truth,choice\)/,'O/X grading must hap
 assert.match(studio,/data-content-fact-panel/,'Fact cards must use collapsible compact panels');
 assert.match(studio,/content-evidence-picker/,'evidence sentence lists must stay collapsed until requested');
 assert.match(studio,/data-content-filter="review"/,'Claim Bank must expose review-first filtering');
+assert.match(studio,/data-content-publish-all/,'Claim Bank must expose one-step review and publish');
 console.log('READY Content Claim CRUD, stable evidence identity, stale filtering, local O/X grading and evidence rendering passed.');
 await close();

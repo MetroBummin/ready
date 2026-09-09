@@ -1,4 +1,4 @@
-import {initStudio,attachStudio,importStudio} from './studio-ui.js?v=claim-compact-1';
+import {initStudio,attachStudio,importStudio} from './studio-ui.js?v=claim-publish-all-1';
 import { readyApi } from '../api.js';
 import { UNGROUPED, addGroup, createScopeLayout, emptyGroupDefinitions, flattenScopeLayout, moveGroup, movePassage, passageIds, removeGroup, removePassage } from './scope-layout.js';
 import { progressAccuracy } from './learning-progress.js';
