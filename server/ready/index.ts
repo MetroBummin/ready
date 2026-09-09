@@ -19,7 +19,7 @@ import { compareCanonicalRows, extractSentenceRows, generatePassageDeterministic
 import { gradeWorkbookCorrectionPairs } from "../../ready/deterministic-grading.js";
 import { normalizeStageEightChips, repairAnswerKeyArtifacts, repairStageNineCatalog } from "./workbook-catalog-qa.mjs";
 import { attemptMetrics, groupAttemptCounts, learningPeriodStart } from "../../ready/admin/learning-progress.js";
-import { evidenceSnapshot, insertContentClaimStage, publicContentClaims, staleFactIds } from "./content-claim.mjs";
+import { contentClaimStage, evidenceSnapshot, publicContentClaims, staleFactIds } from "./content-claim.mjs";
 
 import {compileStudio,publisherAnnotations} from "./studio-authoring.mjs";
 import {inspectStudioDocument,inspectStudioPaste} from "./studio-import.mjs";
@@ -673,11 +673,12 @@ async function contentClaimBank(passageIdValue:any, providedRows:any[]=[]) {
   const staleIds=staleFactIds(facts,sentenceRows);
   if(staleIds.length){const stale=await db.from('ready_content_facts').update({status:'stale'}).in('id',staleIds).eq('passage_id',passageId);if(stale.error)throw new ApiError(500,stale.error.message);facts=facts.map(fact=>staleIds.includes(fact.id)?{...fact,status:'stale'}:fact);}
   const claims=rows<any[]>(await db.from('ready_content_claims').select('*').eq('passage_id',passageId).order('created_at'));
-  return {facts,claims};
+  const claimIds=claims.map(claim=>claim.id),variants=claimIds.length?rows<any[]>(await db.from('ready_content_claim_variants').select('*').in('claim_id',claimIds).order('created_at')):[];
+  return {facts,claims,variants};
 }
 function contentStatus(value:any,allowStale=false){const status=clean(value,20);if(status==='draft'||status==='confirmed'||(allowStale&&status==='stale'))return status;throw new ApiError(400,'상태 값을 확인해 주세요.');}
 async function contentClaimBankSave(body:any){
- const passageId=required(body.passageId,'지문',80),entity=body.entity==='claim'?'claim':'fact';
+ const passageId=required(body.passageId,'지문',80),entity=body.entity==='variant'?'variant':body.entity==='claim'?'claim':'fact';
  const passage=rows<any>(await db.from('ready_passages').select('id').eq('id',passageId).maybeSingle());if(!passage)throw new ApiError(404,'지문을 찾지 못했습니다.');
  if(entity==='fact'){
   const sentenceRows=rows<any[]>(await db.from('ready_passage_sentences').select('id,text,block_type,active').eq('passage_id',passageId).eq('active',true)),snapshot=evidenceSnapshot(body.evidenceSentenceIds,sentenceRows),id=clean(body.id,80),prior=id?rows<any>(await db.from('ready_content_facts').select('fact_key').eq('id',id).eq('passage_id',passageId).maybeSingle()):null;
@@ -685,17 +686,35 @@ async function contentClaimBankSave(body:any){
   const value={passage_id:passageId,fact_key:clean(body.factKey,80)||prior?.fact_key||`fact-${crypto.randomUUID()}`,fact_text:required(body.factText,'핵심 사실',4000),evidence_sentence_ids:snapshot.map(item=>item.sentenceId),evidence_snapshot:snapshot,status:contentStatus(body.status)};
   const result=id?await db.from('ready_content_facts').update(value).eq('id',id).eq('passage_id',passageId).select('*').maybeSingle():await db.from('ready_content_facts').insert(value).select('*').single();
   if(result.error)throw new ApiError(400,result.error.message);if(!result.data)throw new ApiError(404,'Fact를 찾지 못했습니다.');
- }else{
+ }else if(entity==='claim'){
   const factId=required(body.factId,'Fact',80),fact=rows<any>(await db.from('ready_content_facts').select('id').eq('id',factId).eq('passage_id',passageId).maybeSingle());if(!fact)throw new ApiError(400,'현재 Passage의 Fact를 선택해 주세요.');
   const language=clean(body.language,8)||'en';if(!['en','ko'].includes(language))throw new ApiError(400,'Claim 언어를 확인해 주세요.');const difficulty=Math.round(Number(body.difficulty)||1);if(difficulty<1||difficulty>3)throw new ApiError(400,'난이도는 1~3이어야 합니다.');
   const mutationType=clean(body.mutationType,80)||null,metadata=body.mutationMetadata&&typeof body.mutationMetadata==='object'&&!Array.isArray(body.mutationMetadata)?body.mutationMetadata:{};
   const value={passage_id:passageId,fact_id:factId,statement:required(body.statement,'Claim',4000),truth:body.truth===true,language,difficulty,mutation_type:mutationType,mutation_metadata:metadata,status:contentStatus(body.status)},id=clean(body.id,80);
   const result=id?await db.from('ready_content_claims').update(value).eq('id',id).eq('passage_id',passageId).select('*').maybeSingle():await db.from('ready_content_claims').insert(value).select('*').single();
   if(result.error)throw new ApiError(400,result.error.message);if(!result.data)throw new ApiError(404,'Claim을 찾지 못했습니다.');
+ }else{
+  const claimId=required(body.claimId,'Claim',80),claim=rows<any>(await db.from('ready_content_claims').select('id').eq('id',claimId).eq('passage_id',passageId).maybeSingle());if(!claim)throw new ApiError(400,'현재 Passage의 Claim을 선택해 주세요.');
+  const language=clean(body.language,8)||'en';if(!['en','ko'].includes(language))throw new ApiError(400,'Variant 언어를 확인해 주세요.');const difficulty=Math.round(Number(body.difficulty)||1);if(difficulty<1||difficulty>3)throw new ApiError(400,'난이도는 1~3이어야 합니다.');
+  const id=clean(body.id,80),prior=id?rows<any>(await db.from('ready_content_claim_variants').select('id,claim_id,variant_key').eq('id',id).eq('claim_id',claimId).maybeSingle()):null;if(id&&!prior)throw new ApiError(404,'Variant를 찾지 못했습니다.');
+  const value={claim_id:claimId,variant_key:clean(body.variantKey,80)||prior?.variant_key||`variant-${crypto.randomUUID()}`,statement:required(body.statement,'Variant',4000),language,difficulty,status:contentStatus(body.status,true),updated_at:new Date().toISOString()};
+  const result=id?await db.from('ready_content_claim_variants').update(value).eq('id',id).eq('claim_id',claimId).select('*').maybeSingle():await db.from('ready_content_claim_variants').insert(value).select('*').single();
+  if(result.error)throw new ApiError(400,result.error.message);if(!result.data)throw new ApiError(404,'Variant를 찾지 못했습니다.');
+  const touched=await db.from('ready_passages').update({updated_at:new Date().toISOString()}).eq('id',passageId);if(touched.error)throw new ApiError(500,touched.error.message);
  }
  return {contentBank:await contentClaimBank(passageId)};
 }
-async function contentClaimBankDelete(body:any){const passageId=required(body.passageId,'지문',80),id=required(body.id,'삭제 대상',80),table=body.entity==='claim'?'ready_content_claims':'ready_content_facts',result=await db.from(table).delete().eq('id',id).eq('passage_id',passageId).select('id').maybeSingle();if(result.error)throw new ApiError(400,result.error.message);if(!result.data)throw new ApiError(404,'삭제 대상을 찾지 못했습니다.');return {deleted:id,contentBank:await contentClaimBank(passageId)};}
+async function contentClaimBankDelete(body:any){
+ const passageId=required(body.passageId,'지문',80),id=required(body.id,'삭제 대상',80),entity=body.entity==='variant'?'variant':body.entity==='claim'?'claim':'fact';
+ if(entity==='variant'){
+  const variant=rows<any>(await db.from('ready_content_claim_variants').select('id,claim_id').eq('id',id).maybeSingle()),claim=variant?rows<any>(await db.from('ready_content_claims').select('id').eq('id',variant.claim_id).eq('passage_id',passageId).maybeSingle()):null;if(!claim)throw new ApiError(404,'삭제 대상을 찾지 못했습니다.');
+  const result=await db.from('ready_content_claim_variants').delete().eq('id',id).eq('claim_id',claim.id).select('id').maybeSingle();if(result.error)throw new ApiError(400,result.error.message);if(!result.data)throw new ApiError(404,'삭제 대상을 찾지 못했습니다.');
+  const touched=await db.from('ready_passages').update({updated_at:new Date().toISOString()}).eq('id',passageId);if(touched.error)throw new ApiError(500,touched.error.message);
+ }else{
+  const table=entity==='claim'?'ready_content_claims':'ready_content_facts',result=await db.from(table).delete().eq('id',id).eq('passage_id',passageId).select('id').maybeSingle();if(result.error)throw new ApiError(400,result.error.message);if(!result.data)throw new ApiError(404,'삭제 대상을 찾지 못했습니다.');
+ }
+ return {deleted:id,contentBank:await contentClaimBank(passageId)};
+}
 async function contentClaimBankPublishAll(body:any){const passageId=required(body.passageId,'지문',80),bank=await contentClaimBank(passageId);if(!bank.facts.length||!bank.claims.length)throw new ApiError(422,'발행할 Fact와 Claim이 필요합니다.');const staleFact=bank.facts.find(fact=>fact.status==='stale'),staleClaim=bank.claims.find(claim=>claim.status==='stale');if(staleFact||staleClaim)throw new ApiError(422,'근거 재확인이 필요한 항목이 있어 전체 발행할 수 없습니다.');const claimedFactIds=new Set(bank.claims.map(claim=>claim.fact_id)),emptyFact=bank.facts.find(fact=>!claimedFactIds.has(fact.id));if(emptyFact)throw new ApiError(422,'Claim이 없는 Fact가 있어 전체 발행할 수 없습니다.');const published=rows<any[]>(await db.rpc('ready_publish_content_claim_bank',{p_passage_id:passageId}));return {published:true,counts:published?.[0]||{facts_confirmed:bank.facts.length,claims_confirmed:bank.claims.length},contentBank:await contentClaimBank(passageId)};}
 async function studioOpen(body:any){
  const c=await studioContext(body.passageId);
@@ -1351,6 +1370,11 @@ async function workbookForPassage(passage: any) {
 function workbookItem(catalog: any, itemKey: string) {
   return catalog?.stages?.flatMap((stage: any) => stage.items || []).find((item: any) => item.key === itemKey) || null;
 }
+function contentClaimFallbackCatalog(passage:any){return {contractVersion:'content-claim-v1',workbookKey:'content-claims:'+passage.id,revision:Number(passage.canonical_revision)||1,title:passage.title+' · READY 워크북',stages:[]};}
+async function contentClaimAttemptItems(passageId:string){
+  const sentenceRows=rows<any[]>(await db.from('ready_passage_sentences').select('id,sentence_index,text,block_type,active').eq('passage_id',passageId).eq('active',true).order('sentence_index')),bank=await contentClaimBank(passageId,sentenceRows),claims=publicContentClaims(bank.facts,bank.claims,bank.variants,sentenceRows);
+  return claims.map(claim=>({key:`content-claim:${claim.id}`,stage:10,semanticType:'content_claim',kind:'content_claim',answers:[claim.truth?'O':'X'],truth:claim.truth}));
+}
 async function workbookReviewCount(studentId: string, examId: string) {
   const result = await db.from("ready_workbook_bookmarks").select("item_key", { count: "exact", head: true }).eq("student_id", studentId).eq("exam_id", examId);
   if (result.error) throw new ApiError(500, result.error.message);
@@ -1376,9 +1400,9 @@ async function workbookReviewItems(studentId: string, examId: string) {
 async function studentWorkbook(body: any, session: ReadySession) {
   const student = await studentForSession(session), examId = required(body.examId, "Exam", 80), passageId = required(body.passageId, "지문", 80);
   const passage = await studentPassageAccess(examId, passageId, student), storedCatalog = await workbookForPassage(passage);
-  const contentSentences=rows<any[]>(await db.from('ready_passage_sentences').select('id,sentence_index,text,block_type,active').eq('passage_id',passageId).eq('active',true).order('sentence_index')),contentBank=await contentClaimBank(passageId,contentSentences),contentClaims=publicContentClaims(contentBank.facts,contentBank.claims,contentSentences);
+  const contentSentences=rows<any[]>(await db.from('ready_passage_sentences').select('id,sentence_index,text,block_type,active').eq('passage_id',passageId).eq('active',true).order('sentence_index')),contentBank=await contentClaimBank(passageId,contentSentences),contentClaims=publicContentClaims(contentBank.facts,contentBank.claims,contentBank.variants,contentSentences);
   if (!storedCatalog&&!contentClaims.length) throw new ApiError(404, "이 지문에는 아직 READY 워크북이 없습니다.");
-  const catalog=storedCatalog||{contractVersion:'content-claim-v1',workbookKey:'content-claims:'+passageId,revision:Number(passage.canonical_revision)||1,title:passage.title+' · READY 워크북',stages:[]};
+  const catalog=storedCatalog||contentClaimFallbackCatalog(passage);
   const attempts = rows<any[]>(await db.from("ready_workbook_attempts").select("item_key,stage,correct,created_at").eq("student_id", student.id).eq("exam_id", examId).eq("passage_id", passageId).eq("workbook_key", catalog.workbookKey).order("created_at", { ascending: false }));
   const bookmarkRows = rows<any[]>(await db.from("ready_workbook_bookmarks").select("item_key").eq("student_id", student.id).eq("exam_id", examId).eq("passage_id", passageId).eq("workbook_key", catalog.workbookKey)), bookmarks = new Set(bookmarkRows.map(row => row.item_key));
   const progressRows = rows<any[]>(await db.from("ready_workbook_stage_progress").select("progress_key,correct_clears,completed_cycles,current_cycle").eq("student_id", student.id).eq("exam_id", examId).eq("passage_id", passageId).eq("workbook_key", catalog.workbookKey).eq("stage_contract_version", catalog.contractVersion || "legacy-v1"));
@@ -1413,7 +1437,14 @@ async function studentWorkbook(body: any, session: ReadySession) {
       completed: currentCycleClears.get(stage.semanticType || `stage:${stage.stage}`)?.has(item.key) === true, lastResult: latest.get(item.key) ?? null, bookmarked: bookmarks.has(item.key),
     }))),
   })));
-  const stages = insertContentClaimStage(catalogStages, contentClaims);
+  const stages = [...catalogStages];
+  if(contentClaims.length){
+    const progressKey='content_claim',contentProgress=progress.get(progressKey),contentClears=[...(currentCycleClears.get(progressKey)||[])],stage=contentClaimStage(contentClaims,{correctClears:Number(contentProgress?.correct_clears)||0,completedCycles:Number(contentProgress?.completed_cycles)||0,currentCycle:Number(contentProgress?.current_cycle)||1,currentCycleClears:contentClears});
+    stage.attempted=stage.items.filter(item=>latest.has(item.key)).length;
+    for(const item of stage.items){item.lastResult=latest.get(item.key)??null;item.bookmarked=bookmarks.has(item.key);}
+    const koreanBlankIndex=stages.findIndex(candidate=>candidate?.semanticType==='korean_blank');
+    stages.splice(koreanBlankIndex<0?0:koreanBlankIndex,0,stage);
+  }
   const savedWords=await savedWordList(student.id,examId);
   return { contractVersion: catalog.contractVersion || 'legacy-v1', workbookKey: catalog.workbookKey, catalogRevision: Number(catalog.revision)||0, title: catalog.title, recentStage: Number(attempts[0]?.stage)||null, passage: { id: passage.id, title: passage.title, updated_at: passage.updated_at, canonical_revision: Number(passage.canonical_revision)||0 }, savedWords, stages };
 }
@@ -1469,9 +1500,9 @@ async function setWorkbookBookmark(body: any, session: ReadySession) {
 }
 async function submitWorkbookAttempt(body: any, session: ReadySession) {
   const student = await studentForSession(session), examId = required(body.examId, "Exam", 80), passageId = required(body.passageId, "지문", 80), itemKey = required(body.itemKey, "워크북 문제", 120);
-  const passage = await studentPassageAccess(examId, passageId, student), catalog = await workbookForPassage(passage), item = workbookItem(catalog, itemKey);
+  const passage = await studentPassageAccess(examId, passageId, student),storedCatalog=await workbookForPassage(passage),contentItems=itemKey.startsWith('content-claim:')?await contentClaimAttemptItems(passageId):[],catalog=storedCatalog||(contentItems.length?contentClaimFallbackCatalog(passage):null),item=workbookItem(catalog,itemKey)||contentItems.find(candidate=>candidate.key===itemKey);
   if (!catalog || !item) throw new ApiError(404, "현재 풀 수 없는 워크북 문제입니다.");
-  const stageItems = catalog.stages.find((stage: any) => stage.stage === item.stage)?.items || [];
+  const stageItems = item.kind==='content_claim'?contentItems:(catalog.stages.find((stage: any) => stage.stage === item.stage)?.items || []);
   const revealedAnswer = body.revealAnswer === true, rawResponses = Array.isArray(body.responses) ? body.responses : [];
   const responses = Array.from({ length: item.answers.length }, (_, index) => clean(rawResponses[index], 1_000));
   let slotResults = responses.map((response, index) => !!response && normalizeWorkbookAnswer(response) === normalizeWorkbookAnswer(item.answers[index])), resultAnswers=item.answers, correct = !revealedAnswer && slotResults.every(Boolean), aiFeedback = "", aiFeedbackLines: string[] = [], aiScore: number | null = null, gradingPolicy: string | null = null, aiRequestId: string | null = null;
