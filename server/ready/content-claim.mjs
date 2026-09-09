@@ -4,6 +4,48 @@ const list = value => Array.isArray(value) ? value : [];
 export const CONTENT_STATUSES = new Set(['draft', 'confirmed', 'stale']);
 export const CONTENT_LANGUAGES = new Set(['en', 'ko']);
 
+// Ordered preference groups keep the progression adjustable without creating a
+// separate adaptive system. Entries in the first available group are sampled.
+export const CONTENT_VARIANT_TIERS = Object.freeze([
+  { minPercent: 300, preferences: [[['en', 3], ['en', 3], ['en', 2]], [['ko', 3]], [['en', 1]], [['ko', 2]], [['ko', 1]]] },
+  { minPercent: 200, preferences: [[['en', 2]], [['en', 1], ['en', 3]], [['ko', 2], ['ko', 3]], [['ko', 1]]] },
+  { minPercent: 100, preferences: [[['ko', 2], ['en', 1]], [['ko', 1], ['en', 2]], [['ko', 3], ['en', 3]]] },
+  { minPercent: 0, preferences: [[['ko', 1]], [['ko', 2], ['en', 1]], [['en', 2], ['ko', 3]], [['en', 3]]] },
+]);
+
+function shuffled(values, random = Math.random) {
+  const output = [...values];
+  for (let index = output.length - 1; index > 0; index -= 1) {
+    const swap = Math.floor(random() * (index + 1));
+    [output[index], output[swap]] = [output[swap], output[index]];
+  }
+  return output;
+}
+
+export function selectContentClaimVariant(claim, progressPercent = 0, random = Math.random) {
+  const variants = list(claim?.variants).filter(variant => variant?.status === 'confirmed');
+  if (!variants.length) return null;
+  const tier = CONTENT_VARIANT_TIERS.find(candidate => Number(progressPercent) >= candidate.minPercent) || CONTENT_VARIANT_TIERS.at(-1);
+  for (const group of tier.preferences) {
+    const weighted = group.flatMap(([language, difficulty]) => variants.filter(variant => variant.language === language && Number(variant.difficulty) === difficulty));
+    if (weighted.length) return weighted[Math.floor(random() * weighted.length)];
+  }
+  return variants[Math.floor(random() * variants.length)];
+}
+
+export function contentClaimBag(claims, random = Math.random) {
+  const remaining = shuffled(list(claims), random), output = [];
+  while (remaining.length) {
+    const previous = output.at(-1), repeatedTruth = output.length > 1 && output.at(-2)?.truth === previous?.truth;
+    let index = remaining.findIndex(claim => claim.factId !== previous?.factId && claim.truth !== previous?.truth);
+    if (index < 0) index = remaining.findIndex(claim => claim.factId !== previous?.factId);
+    if (index < 0 && repeatedTruth) index = remaining.findIndex(claim => claim.truth !== previous.truth);
+    if (index < 0) index = 0;
+    output.push(remaining.splice(index, 1)[0]);
+  }
+  return output;
+}
+
 export function evidenceSnapshot(sentenceIds, sentenceRows) {
   const byId = new Map(list(sentenceRows).map(row => [String(row.id), row]));
   const unique = [...new Set(list(sentenceIds).map(String).filter(Boolean))];
@@ -28,9 +70,15 @@ export function staleFactIds(facts, sentenceRows) {
   return list(facts).filter(fact => fact.status !== 'stale' && factStale(fact, sentenceRows)).map(fact => fact.id);
 }
 
-export function publicContentClaims(facts, claims, sentenceRows) {
+export function publicContentClaims(facts, claims, variants, sentenceRows) {
   const byFact = new Map(list(facts).filter(fact => fact.status === 'confirmed' && !factStale(fact, sentenceRows)).map(fact => [fact.id, fact]));
   const sentenceById = new Map(list(sentenceRows).map(row => [String(row.id), row]));
+  const variantsByClaim = new Map();
+  for (const variant of list(variants).filter(variant => variant.status === 'confirmed')) {
+    const owned = variantsByClaim.get(variant.claim_id) || [];
+    owned.push(variant);
+    variantsByClaim.set(variant.claim_id, owned);
+  }
   return list(claims).filter(claim => claim.status === 'confirmed' && byFact.has(claim.fact_id)).map(claim => {
     const fact = byFact.get(claim.fact_id);
     return {
@@ -40,6 +88,7 @@ export function publicContentClaims(facts, claims, sentenceRows) {
       truth: claim.truth === true,
       language: claim.language,
       difficulty: Number(claim.difficulty) || 1,
+      variants: variantsByClaim.get(claim.id) || [],
       evidence: list(fact.evidence_sentence_ids).map(id => sentenceById.get(String(id))).filter(Boolean).map(row => ({
         sentenceId: row.id,
         sentenceNumber: Number(row.sentence_index) + 1,
@@ -49,23 +98,31 @@ export function publicContentClaims(facts, claims, sentenceRows) {
   });
 }
 
-export function contentClaimStage(claims) {
-  const items = list(claims).map((claim, index) => ({
+export function contentClaimStage(claims, progress = {}, random = Math.random) {
+  const correctClears = Number(progress.correctClears) || 0, total = list(claims).length;
+  const progressPercent = total ? Math.floor(correctClears * 100 / total) : 0;
+  const items = contentClaimBag(claims, random).map((claim, index) => {
+    const variant = selectContentClaimVariant(claim, progressPercent, random);
+    return {
     key: `content-claim:${claim.id}`,
     stage: 10,
     semanticType: 'content_claim',
     number: index + 1,
     kind: 'content_claim',
-    statement: claim.statement,
+    claimId: claim.id,
+    factId: claim.factId,
+    variantId: variant?.id || null,
+    statement: variant?.statement || claim.statement,
     truth: claim.truth,
-    language: claim.language,
-    difficulty: claim.difficulty,
+    language: variant?.language || claim.language,
+    difficulty: Number(variant?.difficulty || claim.difficulty) || 1,
     evidence: claim.evidence,
     slotCount: 1,
-    completed: false,
+    completed: list(progress.currentCycleClears).includes(`content-claim:${claim.id}`),
     lastResult: null,
     bookmarked: false,
-  }));
+    };
+  });
   return {
     stage: 10,
     semanticType: 'content_claim',
@@ -73,14 +130,14 @@ export function contentClaimStage(claims) {
     instruction: '문장의 내용이 지문과 일치하면 O, 아니면 X를 고르세요.',
     locked: false,
     lockReason: '',
-    total: items.length,
+    total,
     attempted: 0,
-    completed: 0,
-    completedCycles: 0,
-    currentCycle: 1,
-    currentCycleClears: [],
-    correctClears: 0,
-    progressPercent: 0,
+    completed: list(progress.currentCycleClears).length,
+    completedCycles: Number(progress.completedCycles) || 0,
+    currentCycle: Number(progress.currentCycle) || 1,
+    currentCycleClears: [...list(progress.currentCycleClears)],
+    correctClears,
+    progressPercent,
     items,
   };
 }
