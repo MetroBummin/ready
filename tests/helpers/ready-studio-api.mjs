@@ -24,12 +24,12 @@ class Query {
  maybeSingle(){this.singleRow=true;return this;}single(){this.singleRow=true;this.required=true;return this;}
  insert(value){this.op='insert';this.value=value;return this;}update(value){this.op='update';this.value=value;return this;}delete(){this.op='delete';return this;}upsert(value,options={}){this.op='insert';this.value=value;this.conflict=options;return this;}
  async execute(){try{
-  const params=[],bind=v=>{params.push(typeof v==='object'&&v!==null?JSON.stringify(v):v);return '$'+params.length;};
+  const params=[],bind=(v,column='')=>{params.push(Array.isArray(v)&&column==='evidence_sentence_ids'?`{${v.join(',')}}`:typeof v==='object'&&v!==null?JSON.stringify(v):v);return '$'+params.length;};
   let sql='';const table=qid(this.table),cols=this.cols==='*'?'*':this.cols.split(',').map(qid).join(',');
   if(this.op==='insert'){
-   const list=Array.isArray(this.value)?this.value:[this.value],keys=Object.keys(list[0]);sql=`insert into ${table} (${keys.map(qid)}) values ${list.map(row=>'('+keys.map(k=>bind(row[k])).join(',')+')').join(',')}`;
+   const list=Array.isArray(this.value)?this.value:[this.value],keys=Object.keys(list[0]);sql=`insert into ${table} (${keys.map(qid)}) values ${list.map(row=>'('+keys.map(k=>bind(row[k],k)).join(',')+')').join(',')}`;
    if(this.conflict)sql+=` on conflict (${this.conflict.onConflict.split(',').map(qid)}) `+(this.conflict.ignoreDuplicates?'do nothing':'do update set '+keys.map(k=>`${qid(k)}=excluded.${qid(k)}`).join(','));
-  }else if(this.op==='update')sql=`update ${table} set `+Object.entries(this.value).map(([k,v])=>qid(k)+'='+bind(v)).join(',');
+  }else if(this.op==='update')sql=`update ${table} set `+Object.entries(this.value).map(([k,v])=>qid(k)+'='+bind(v,k)).join(',');
   else if(this.op==='delete')sql=`delete from ${table}`;
   else sql=`select ${cols} from ${table}`;
   if(this.filters.length)sql+=' where '+this.filters.map(([k,op,v])=>op==='is'?qid(k)+(v===null?' is null':' is '+v):op==='in'?qid(k)+' in ('+v.map(bind).join(',')+')':qid(k)+op+bind(v)).join(' and ');

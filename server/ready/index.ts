@@ -19,6 +19,7 @@ import { compareCanonicalRows, extractSentenceRows, generatePassageDeterministic
 import { gradeWorkbookCorrectionPairs } from "../../ready/deterministic-grading.js";
 import { normalizeStageEightChips, repairAnswerKeyArtifacts, repairStageNineCatalog } from "./workbook-catalog-qa.mjs";
 import { attemptMetrics, groupAttemptCounts, learningPeriodStart } from "../../ready/admin/learning-progress.js";
+import { evidenceSnapshot, insertContentClaimStage, publicContentClaims, staleFactIds } from "./content-claim.mjs";
 
 import {compileStudio,publisherAnnotations} from "./studio-authoring.mjs";
 import {inspectStudioDocument,inspectStudioPaste} from "./studio-import.mjs";
@@ -35,7 +36,7 @@ function supabaseAdminKey() {
   return Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "";
 }
 const db = createClient(Deno.env.get("SUPABASE_URL") ?? "", supabaseAdminKey(), { auth: { persistSession: false } });
-const adminOps = new Set(["update_student", "studio_split_draft", "studio_open", "studio_author", "studio_confirm_step", "studio_easy_translation", "studio_preview", "studio_publish", "studio_import", "studio_create_draft", "teacher_bootstrap", "admin_workbook_progress", "admin_workbook_progress_detail", "admin_workbook_attempt_replay", "admin_learning_progress", "admin_learning_progress_detail", "admin_attempt_replay", "delete_impact", "assign_scope_passages", "set_scope_layout", "create_passage", "update_passage", "passage_editor", "save_passage_canonical", "regenerate_passage_deterministic", "delete_passage", "create_student", "set_student_code", "delete_student", "import_questions", "import_explanations", "factory_start", "factory_confirm", "factory_regenerate"]);
+const adminOps = new Set(["update_student", "studio_split_draft", "studio_open", "studio_author", "studio_confirm_step", "studio_easy_translation", "studio_preview", "studio_publish", "studio_import", "studio_create_draft", "content_claim_bank_save", "content_claim_bank_delete", "teacher_bootstrap", "admin_workbook_progress", "admin_workbook_progress_detail", "admin_workbook_attempt_replay", "admin_learning_progress", "admin_learning_progress_detail", "admin_attempt_replay", "delete_impact", "assign_scope_passages", "set_scope_layout", "create_passage", "update_passage", "passage_editor", "save_passage_canonical", "regenerate_passage_deterministic", "delete_passage", "create_student", "set_student_code", "delete_student", "import_questions", "import_explanations", "factory_start", "factory_confirm", "factory_regenerate"]);
 const studentOps = new Set(["student_bootstrap_active", "student_bootstrap", "student_passage", "word_lookup_meaning", "save_reader_word", "remove_reader_word", "update_reader_word_meaning", "sentence_easy_translation", "sentence_structure", "student_review", "student_review_export_active", "student_questions", "student_question_filters", "student_question_queue", "student_review_questions", "student_review_export", "set_question_bookmark", "submit_attempt", "student_workbook", "workbook_assistance", "workbook_recall_unlock", "set_workbook_bookmark", "workbook_hint", "submit_workbook_attempt", "submit_workbook_attempts"]);
 const publicOps = new Set(["student_login", "admin_login"]);
 // Match Breeze's free Gemini dictionary defaults. The API key remains a
@@ -666,11 +667,40 @@ async function studioContext(passageIdValue:any) {
   }
   return {...editor,studio,previousCatalog:persisted?.catalog||null,job};
 }
+async function contentClaimBank(passageIdValue:any, providedRows:any[]=[]) {
+  const passageId=required(passageIdValue,'지문',80),sentenceRows=providedRows.length?providedRows:rows<any[]>(await db.from('ready_passage_sentences').select('id,sentence_index,text,block_type,active').eq('passage_id',passageId).eq('active',true).order('sentence_index'));
+  let facts=rows<any[]>(await db.from('ready_content_facts').select('*').eq('passage_id',passageId).order('created_at'));
+  const staleIds=staleFactIds(facts,sentenceRows);
+  if(staleIds.length){const stale=await db.from('ready_content_facts').update({status:'stale'}).in('id',staleIds).eq('passage_id',passageId);if(stale.error)throw new ApiError(500,stale.error.message);facts=facts.map(fact=>staleIds.includes(fact.id)?{...fact,status:'stale'}:fact);}
+  const claims=rows<any[]>(await db.from('ready_content_claims').select('*').eq('passage_id',passageId).order('created_at'));
+  return {facts,claims};
+}
+function contentStatus(value:any,allowStale=false){const status=clean(value,20);if(status==='draft'||status==='confirmed'||(allowStale&&status==='stale'))return status;throw new ApiError(400,'상태 값을 확인해 주세요.');}
+async function contentClaimBankSave(body:any){
+ const passageId=required(body.passageId,'지문',80),entity=body.entity==='claim'?'claim':'fact';
+ const passage=rows<any>(await db.from('ready_passages').select('id').eq('id',passageId).maybeSingle());if(!passage)throw new ApiError(404,'지문을 찾지 못했습니다.');
+ if(entity==='fact'){
+  const sentenceRows=rows<any[]>(await db.from('ready_passage_sentences').select('id,text,block_type,active').eq('passage_id',passageId).eq('active',true)),snapshot=evidenceSnapshot(body.evidenceSentenceIds,sentenceRows),id=clean(body.id,80),prior=id?rows<any>(await db.from('ready_content_facts').select('fact_key').eq('id',id).eq('passage_id',passageId).maybeSingle()):null;
+  if(id&&!prior)throw new ApiError(404,'Fact를 찾지 못했습니다.');
+  const value={passage_id:passageId,fact_key:clean(body.factKey,80)||prior?.fact_key||`fact-${crypto.randomUUID()}`,fact_text:required(body.factText,'핵심 사실',4000),evidence_sentence_ids:snapshot.map(item=>item.sentenceId),evidence_snapshot:snapshot,status:contentStatus(body.status)};
+  const result=id?await db.from('ready_content_facts').update(value).eq('id',id).eq('passage_id',passageId).select('*').maybeSingle():await db.from('ready_content_facts').insert(value).select('*').single();
+  if(result.error)throw new ApiError(400,result.error.message);if(!result.data)throw new ApiError(404,'Fact를 찾지 못했습니다.');
+ }else{
+  const factId=required(body.factId,'Fact',80),fact=rows<any>(await db.from('ready_content_facts').select('id').eq('id',factId).eq('passage_id',passageId).maybeSingle());if(!fact)throw new ApiError(400,'현재 Passage의 Fact를 선택해 주세요.');
+  const language=clean(body.language,8)||'en';if(!['en','ko'].includes(language))throw new ApiError(400,'Claim 언어를 확인해 주세요.');const difficulty=Math.round(Number(body.difficulty)||1);if(difficulty<1||difficulty>3)throw new ApiError(400,'난이도는 1~3이어야 합니다.');
+  const mutationType=clean(body.mutationType,80)||null,metadata=body.mutationMetadata&&typeof body.mutationMetadata==='object'&&!Array.isArray(body.mutationMetadata)?body.mutationMetadata:{};
+  const value={passage_id:passageId,fact_id:factId,statement:required(body.statement,'Claim',4000),truth:body.truth===true,language,difficulty,mutation_type:mutationType,mutation_metadata:metadata,status:contentStatus(body.status)},id=clean(body.id,80);
+  const result=id?await db.from('ready_content_claims').update(value).eq('id',id).eq('passage_id',passageId).select('*').maybeSingle():await db.from('ready_content_claims').insert(value).select('*').single();
+  if(result.error)throw new ApiError(400,result.error.message);if(!result.data)throw new ApiError(404,'Claim을 찾지 못했습니다.');
+ }
+ return {contentBank:await contentClaimBank(passageId)};
+}
+async function contentClaimBankDelete(body:any){const passageId=required(body.passageId,'지문',80),id=required(body.id,'삭제 대상',80),table=body.entity==='claim'?'ready_content_claims':'ready_content_facts',result=await db.from(table).delete().eq('id',id).eq('passage_id',passageId).select('id').maybeSingle();if(result.error)throw new ApiError(400,result.error.message);if(!result.data)throw new ApiError(404,'삭제 대상을 찾지 못했습니다.');return {deleted:id,contentBank:await contentClaimBank(passageId)};}
 async function studioOpen(body:any){
  const c=await studioContext(body.passageId);
  let previewCatalog=null;
  try{previewCatalog=compileStudio({rows:c.rows,annotations:c.studio.annotations,title:c.passage.title,workbookKey:c.previousCatalog?.workbookKey||`factory-${c.passage.id}`,previousCatalog:c.previousCatalog,revision:c.passage.canonical_revision,provenance:{...(c.job?.source_metadata||{}),factoryJobId:c.studio.jobId||null}});}catch{/* Editor remains available even while authoring is incomplete. */}
- return {passage:c.passage,rows:c.rows,studio:c.studio,previewCatalog};
+ return {passage:c.passage,rows:c.rows,studio:c.studio,previewCatalog,contentBank:await contentClaimBank(c.passage.id,c.rows)};
 }
 async function studioStore(c:any,state:any,catalog:any=null){
  const result=await db.rpc('ready_save_studio_state',{p_passage_id:c.passage.id,p_expected_revision:c.passage.canonical_revision,p_expected_version:c.studio.version||0,p_state:state,p_catalog:catalog});
@@ -852,6 +882,7 @@ async function attemptedQuestionIds(studentId: string, examId: string) {
   const attempts = rows<any[]>(await db.from("ready_attempts").select("question_id").eq("student_id", studentId).eq("exam_id", examId));
   return new Set(attempts.map(attempt => attempt.question_id));
 }
+async function confirmedClaimPassageIds(passageIds:string[]){if(!passageIds.length)return new Set<string>();const facts=rows<any[]>(await db.from('ready_content_facts').select('id,passage_id').in('passage_id',passageIds).eq('status','confirmed'));if(!facts.length)return new Set<string>();const claims=rows<any[]>(await db.from('ready_content_claims').select('fact_id').in('fact_id',facts.map(fact=>fact.id)).eq('status','confirmed')),claimed=new Set(claims.map(claim=>claim.fact_id));return new Set(facts.filter(fact=>claimed.has(fact.id)).map(fact=>fact.passage_id));}
 async function scopePassages(examId: string, studentId: string, scope: any) {
   const links = rows<any[]>(await db.from("ready_exam_passages").select("passage_id,position,group_key,group_label").eq("exam_id", examId).order("position"));
   const linkedIds = links.map(item => item.passage_id);
@@ -860,6 +891,7 @@ async function scopePassages(examId: string, studentId: string, scope: any) {
   const availableQuestions = linkedIds.length ? rows<any[]>(await db.from("ready_questions").select("id,passage_id,type,status,payload").in("passage_id", linkedIds).in("type", ["multiple_choice", "written_response"]).eq("status", "available")) : [];
   const factoryCatalogs = linkedIds.length ? rows<any[]>(await db.from("ready_workbook_catalogs").select("passage_id").in("passage_id", linkedIds)) : [];
   const factoryPassageIds = new Set(factoryCatalogs.map(row => row.passage_id));
+  const claimPassageIds=await confirmedClaimPassageIds(linkedIds);
   const attempted = await attemptedQuestionIds(studentId, examId);
   const questionCounts = new Map<string, number>();
   const byId = new Map(sourcePassages.map(item => [item.id, item]));
@@ -871,7 +903,7 @@ async function scopePassages(examId: string, studentId: string, scope: any) {
   });
   const passages = links.map(link => {
     const passage = byId.get(link.passage_id);
-    return passage ? { ...passage, position: link.position, groupKey: link.group_key, groupLabel: link.group_label, question_count: questionCounts.get(link.passage_id) || 0, has_workbook: !!codeWorkbookForPassage(passage) || factoryPassageIds.has(passage.id) } : null;
+    return passage ? { ...passage, position: link.position, groupKey: link.group_key, groupLabel: link.group_label, question_count: questionCounts.get(link.passage_id) || 0, has_workbook: !!codeWorkbookForPassage(passage) || factoryPassageIds.has(passage.id) || claimPassageIds.has(passage.id) } : null;
   }).filter(Boolean);
   return passages;
 }
@@ -893,8 +925,8 @@ async function activeScopePassages(examId: string) {
     sourcePassages = rows<any[]>(sourceResult);
     factoryCatalogs = rows<any[]>(catalogResult);
   }
-  const factoryByPassage = new Map(factoryCatalogs.map(row => [row.passage_id,row.catalog])), byId = new Map(sourcePassages.map(item => [item.id, item]));
-  return links.map(link => { const passage = byId.get(link.passage_id),catalog=factoryByPassage.get(link.passage_id); return passage ? { ...passage, position: link.position, groupKey: link.group_key, groupLabel: link.group_label, workbookRevision: Number(catalog?.revision)||Number(passage.deterministic_catalog_revision)||0, has_workbook: !!codeWorkbookForPassage(passage) || factoryByPassage.has(passage.id) } : null; }).filter(Boolean);
+  const factoryByPassage = new Map(factoryCatalogs.map(row => [row.passage_id,row.catalog])), byId = new Map(sourcePassages.map(item => [item.id, item])),claimPassageIds=await confirmedClaimPassageIds(linkedIds);
+  return links.map(link => { const passage = byId.get(link.passage_id),catalog=factoryByPassage.get(link.passage_id); return passage ? { ...passage, position: link.position, groupKey: link.group_key, groupLabel: link.group_label, workbookRevision: Number(catalog?.revision)||Number(passage.deterministic_catalog_revision)||0, has_workbook: !!codeWorkbookForPassage(passage) || factoryByPassage.has(passage.id) || claimPassageIds.has(passage.id) } : null; }).filter(Boolean);
 }
 async function studentBootstrapActive(session: ReadySession) {
   const student = await studentForSession(session), scope = rows<any>(await db.from("ready_exams").select("id,school,grade").eq("school", student.school).eq("grade", student.grade).eq("is_current", true).maybeSingle());
@@ -1342,8 +1374,10 @@ async function workbookReviewItems(studentId: string, examId: string) {
 }
 async function studentWorkbook(body: any, session: ReadySession) {
   const student = await studentForSession(session), examId = required(body.examId, "Exam", 80), passageId = required(body.passageId, "지문", 80);
-  const passage = await studentPassageAccess(examId, passageId, student), catalog = await workbookForPassage(passage);
-  if (!catalog) throw new ApiError(404, "이 지문에는 아직 READY 워크북이 없습니다.");
+  const passage = await studentPassageAccess(examId, passageId, student), storedCatalog = await workbookForPassage(passage);
+  const contentSentences=rows<any[]>(await db.from('ready_passage_sentences').select('id,sentence_index,text,block_type,active').eq('passage_id',passageId).eq('active',true).order('sentence_index')),contentBank=await contentClaimBank(passageId,contentSentences),contentClaims=publicContentClaims(contentBank.facts,contentBank.claims,contentSentences);
+  if (!storedCatalog&&!contentClaims.length) throw new ApiError(404, "이 지문에는 아직 READY 워크북이 없습니다.");
+  const catalog=storedCatalog||{contractVersion:'content-claim-v1',workbookKey:'content-claims:'+passageId,revision:Number(passage.canonical_revision)||1,title:passage.title+' · READY 워크북',stages:[]};
   const attempts = rows<any[]>(await db.from("ready_workbook_attempts").select("item_key,stage,correct,created_at").eq("student_id", student.id).eq("exam_id", examId).eq("passage_id", passageId).eq("workbook_key", catalog.workbookKey).order("created_at", { ascending: false }));
   const bookmarkRows = rows<any[]>(await db.from("ready_workbook_bookmarks").select("item_key").eq("student_id", student.id).eq("exam_id", examId).eq("passage_id", passageId).eq("workbook_key", catalog.workbookKey)), bookmarks = new Set(bookmarkRows.map(row => row.item_key));
   const progressRows = rows<any[]>(await db.from("ready_workbook_stage_progress").select("progress_key,correct_clears,completed_cycles,current_cycle").eq("student_id", student.id).eq("exam_id", examId).eq("passage_id", passageId).eq("workbook_key", catalog.workbookKey).eq("stage_contract_version", catalog.contractVersion || "legacy-v1"));
@@ -1353,7 +1387,7 @@ async function studentWorkbook(body: any, session: ReadySession) {
   const latest = new Map<string, boolean>();
   for (const attempt of attempts) if (!latest.has(attempt.item_key)) latest.set(attempt.item_key, attempt.correct === true);
   const semanticCatalog = catalog.contractVersion === SEMANTIC_WORKBOOK_CONTRACT;
-  const stages = await Promise.all(catalog.stages.filter((stage: any) => !semanticCatalog || stage.items.length > 0).map(async (stage: any) => ({
+  const catalogStages = await Promise.all(catalog.stages.filter((stage: any) => !semanticCatalog || stage.items.length > 0).map(async (stage: any) => ({
     stage: stage.stage, semanticType: stage.semanticType || null, title: stage.title, instruction: stage.instruction,
     locked: false, lockReason: "",
     total: stage.items.length,
@@ -1378,6 +1412,7 @@ async function studentWorkbook(body: any, session: ReadySession) {
       completed: currentCycleClears.get(stage.semanticType || `stage:${stage.stage}`)?.has(item.key) === true, lastResult: latest.get(item.key) ?? null, bookmarked: bookmarks.has(item.key),
     }))),
   })));
+  const stages = insertContentClaimStage(catalogStages, contentClaims);
   const savedWords=await savedWordList(student.id,examId);
   return { contractVersion: catalog.contractVersion || 'legacy-v1', workbookKey: catalog.workbookKey, catalogRevision: Number(catalog.revision)||0, title: catalog.title, recentStage: Number(attempts[0]?.stage)||null, passage: { id: passage.id, title: passage.title, updated_at: passage.updated_at, canonical_revision: Number(passage.canonical_revision)||0 }, savedWords, stages };
 }
@@ -1645,7 +1680,7 @@ async function dispatch(op: string, body: any, session: ReadySession | null) {
   switch (op) {
     case "student_login": return studentLogin(body); case "admin_login": return adminLogin(body); case "logout": return revokeSession(session as ReadySession);
     case "teacher_bootstrap": return teacherBootstrap(); case "admin_workbook_progress": return adminWorkbookProgress(body); case "admin_workbook_progress_detail": return adminWorkbookProgressDetail(body); case "admin_workbook_attempt_replay": return adminWorkbookAttemptReplay(required(body.attemptId, "Attempt", 80)); case "admin_learning_progress": return adminLearningProgress(body); case "admin_learning_progress_detail": return adminLearningProgressDetail(body); case "admin_attempt_replay": return adminAttemptReplay(body); case "delete_impact": return deleteImpact(body); case "create_student": return createStudent(body); case "set_student_code": return setStudentCode(body); case "delete_student": return deleteStudent(body);
-    case "assign_scope_passages": return setScopePassages(body, false); case "set_scope_layout": return setScopeLayout(body); case "create_passage": return createPassage(body); case "update_passage": return updatePassage(body); case "passage_editor": return passageEditor(body); case "save_passage_canonical": return savePassageCanonical(body); case "regenerate_passage_deterministic": return regenerateDeterministicPassage(body.passageId); case "delete_passage": return deletePassage(body); case "import_questions": return importQuestions(body); case "import_explanations": return importExplanations(body); case "update_student": return updateStudent(body); case "studio_split_draft": return studioSplitDraft(body); case "studio_open": return studioOpen(body); case "studio_author": return studioAuthor(body); case "studio_confirm_step": return studioConfirmStep(body); case "studio_easy_translation": return studioEasyTranslation(body); case "studio_preview": return studioPreviewPublish(body); case "studio_publish": return studioPreviewPublish(body,true); case "studio_import": return studioImport(body); case "studio_create_draft": return studioCreateDraft(body); case "factory_start": return factoryStart(body); case "factory_confirm": return factoryConfirm(body); case "factory_regenerate": return factoryRegenerate(body);
+    case "assign_scope_passages": return setScopePassages(body, false); case "set_scope_layout": return setScopeLayout(body); case "create_passage": return createPassage(body); case "update_passage": return updatePassage(body); case "passage_editor": return passageEditor(body); case "save_passage_canonical": return savePassageCanonical(body); case "regenerate_passage_deterministic": return regenerateDeterministicPassage(body.passageId); case "delete_passage": return deletePassage(body); case "import_questions": return importQuestions(body); case "import_explanations": return importExplanations(body); case "update_student": return updateStudent(body); case "studio_split_draft": return studioSplitDraft(body); case "studio_open": return studioOpen(body); case "studio_author": return studioAuthor(body); case "studio_confirm_step": return studioConfirmStep(body); case "studio_easy_translation": return studioEasyTranslation(body); case "studio_preview": return studioPreviewPublish(body); case "studio_publish": return studioPreviewPublish(body,true); case "studio_import": return studioImport(body); case "studio_create_draft": return studioCreateDraft(body); case "content_claim_bank_save": return contentClaimBankSave(body); case "content_claim_bank_delete": return contentClaimBankDelete(body); case "factory_start": return factoryStart(body); case "factory_confirm": return factoryConfirm(body); case "factory_regenerate": return factoryRegenerate(body);
     case "student_bootstrap_active": return studentBootstrapActive(session as ReadySession); case "student_bootstrap": return studentBootstrap(session as ReadySession); case "student_passage": return studentPassage(body, session as ReadySession); case "word_lookup_meaning": return readerInlineGloss(body, session as ReadySession); case "save_reader_word": return saveReaderWord(body, session as ReadySession); case "remove_reader_word": return removeReaderWord(body, session as ReadySession); case "update_reader_word_meaning": return updateReaderWordMeaning(body, session as ReadySession); case "sentence_easy_translation": return sentenceEasyTranslation(body, session as ReadySession); case "sentence_structure": return sentenceStructure(body, session as ReadySession); case "student_review": return studentReview(body, session as ReadySession); case "student_review_export_active": return studentReviewExportActive(body, session as ReadySession); case "student_questions": return studentQuestions(body, session as ReadySession); case "student_question_filters": return studentQuestionFilters(body, session as ReadySession); case "student_question_queue": return studentQuestionQueue(body, session as ReadySession); case "student_review_questions": return studentReviewQuestions(body, session as ReadySession); case "student_review_export": return studentReviewExport(body, session as ReadySession); case "set_question_bookmark": return setQuestionBookmark(body, session as ReadySession); case "submit_attempt": return submitAttempt(body, session as ReadySession); case "student_workbook": return studentWorkbook(body, session as ReadySession); case "workbook_assistance": return workbookAssistance(body, session as ReadySession); case "workbook_recall_unlock": return workbookRecallUnlock(body, session as ReadySession); case "set_workbook_bookmark": return setWorkbookBookmark(body, session as ReadySession); case "workbook_hint": return workbookHint(body, session as ReadySession); case "submit_workbook_attempt": return submitWorkbookAttempt(body, session as ReadySession); case "submit_workbook_attempts": return submitWorkbookAttempts(body, session as ReadySession);
     default: throw new ApiError(404, "알 수 없는 READY 작업입니다.");
   }

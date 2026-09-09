@@ -119,10 +119,10 @@ test('idle prefetch and completed prefetch retain identity and catalog revision'
 test('background Workbook reconciliation cannot overwrite a different stage',async()=>{
   const h=harness(),stage=(number,clears)=>({stage:number,total:5,items:[],correctClears:clears,completedCycles:0,currentCycle:1,currentCycleClears:[],progressPercent:clears*20});
   const stages=[stage(1,0),stage(2,0)];h.api.state.workbookSession={passageId:'passage',data:{stages}};
-  const token=h.api.state.token;h.storage.set(`ready-workbook-cache-v2:${token}:scope:passage:0-0`,JSON.stringify({stages}));
+  const token=h.api.state.token;h.storage.set(`ready-workbook-cache-v2:${token}:scope:passage:0-0-`,JSON.stringify({stages}));
   // Skip mounting the cached session; this test isolates the actual response reconciliation.
   // Empty stages make startWorkbookSession return without replacing our mounted fixture.
-  h.storage.set(`ready-workbook-cache-v2:${token}:scope:passage:0-0`,JSON.stringify({stages:[]}));
+  h.storage.set(`ready-workbook-cache-v2:${token}:scope:passage:0-0-`,JSON.stringify({stages:[]}));
   const p=h.api.openWorkbook('passage');h.requests[0].resolve({stages:[stage(1,1),stage(2,4)]});await p;
   assert.equal(stages[0].correctClears,1);assert.equal(stages[1].correctClears,4);
 });
