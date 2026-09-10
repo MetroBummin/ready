@@ -35,6 +35,11 @@ for(const stage of AUTHORED)contractionAnnotations[contractionRow.id].steps[stag
 contractionAnnotations[contractionRow.id].steps.verb_form={status:'confirmed',source:'teacher',targets:[{span:makeSpan(contractionRow.text,1,12,contractionRow.id),hint:'be, stand',answer:'am standing'}]};
 const contractionCatalog=compileStudio({rows:[contractionRow],annotations:contractionAnnotations,title:'Contraction',workbookKey:'contraction',requireConfirmed:true,publishStep:'verb_form'});
 const contractionItem=contractionCatalog.stages.find(stage=>stage.semanticType==='verb_form').items[0];
+const letsRow={id:'lets-row',blockType:'SENTENCE',text:"Let's find out whether it works.",translation:'그것이 작동하는지 알아보자.'};
+const letsSource=[{type:'verb_form',number:1,prompt:'______________ us ______________ out whether it ______________.',answers:['Let','find','works'],hints:['Let','find','work'],canonicalStart:1,canonicalEnd:1,provenance:{origin:'publisher_answer_key'}}];
+const letsAudit=publisherAnnotationAudit([letsRow],letsSource,{documentName:'Expanded contraction'});
+assert.deepEqual(letsAudit.drops,[],'Expanded publisher Let us must align to canonical Let\'s without losing the verb-form row.');
+assert.equal(letsAudit.annotations[letsRow.id].steps.verb_form.targets.length,3);
 assert.equal(contractionItem.prompt,'I _____ here.');assert.deepEqual(contractionItem.answers,['am standing']);
 const removed=syncAnnotations([rows[0],rows[1],rows[3]],annotations);assert.equal(removed['sentence-2'].retired,true);assert.deepEqual(removed['sentence-1'],annotations['sentence-1']);
 const split=syncAnnotations([rows[0],rows[1],{...rows[2],id:'new-split'},rows[3]],annotations);assert.equal(split['new-split'].steps.english_blank.status,'needed');assert.equal(split['sentence-2'].retired,true);
