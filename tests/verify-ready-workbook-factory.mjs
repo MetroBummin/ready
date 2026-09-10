@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { FACTORY_STAGES, SEMANTIC_WORKBOOK_CONTRACT, generateWorkbookCatalog, inspectFullWorkbookText, readyStageForSemanticType, semanticWorkbookType } from '../server/ready/workbook-factory.mjs';
+import { FACTORY_STAGES, SEMANTIC_WORKBOOK_CONTRACT, generateWorkbookCatalog, inspectFullWorkbookText, publisherGrammarCandidate, readyStageForSemanticType, semanticWorkbookType } from '../server/ready/workbook-factory.mjs';
 
 const root=resolve(dirname(fileURLToPath(import.meta.url)),'..');
 const fixture=name=>readFileSync(resolve(root,'tests/fixtures',name),'utf8');
@@ -31,4 +31,17 @@ const absent=generateWorkbookCatalog({title:'Absent',workbookKey:'absent',rows,s
 assert.equal(absent.stages.reduce((sum,stage)=>sum+stage.items.length,0),0,'SOURCE ABSENT means ITEM ABSENT.');
 const paragraph=generateWorkbookCatalog({title:'Paragraph',workbookKey:'paragraph',rows,sourceExercises:[{type:'paragraph_ordering',number:1,prompt:'(A)-(B)-(C)',answer:'(C)-(A)-(B)',provenance:{sourceWorkbookNumber:9}}]});
 assert.equal(paragraph.stages.find(stage=>stage.stage===6).items.length,0,'Paragraph order must never contaminate Stage 6.');
+
+const partialPublisher=publisherGrammarCandidate(5,[
+  {number:1,prompt:'Alpha (work).'},
+  {number:2,prompt:'Beta (run).'},
+],[
+  {number:1,answer:'works'},
+  {number:2,answer:'runs / extra'},
+],[
+  {text:'Alpha works.',translation:'알파가 작동한다.'},
+  {text:'Beta runs.',translation:'베타가 달린다.'},
+]);
+assert.equal(partialPublisher.length,1,'One malformed publisher row must not discard the other valid verb-form rows.');
+assert.equal(partialPublisher[0].number,1);
 console.log('READY semantic Workbook Factory verified.');

@@ -310,27 +310,27 @@ function uniqueCanonicalSpan(value, rows) {
   return matches.length === 1 ? matches[0] : null;
 }
 function spanText(rows, span, field = 'text') { return span ? rows.slice(span.start - 1, span.end).map(row => clean(row?.[field])).join(' ') : ''; }
-function publisherGrammarCandidate(stage, sources, answers, rows) {
+export function publisherGrammarCandidate(stage, sources, answers, rows) {
   const answerByNumber = new Map(answers.map(row => [row.number, row.answer])), exercises = [];
   for (const source of sources) {
     const publisherAnswers = answerByNumber.get(source.number)?.split('/').map(value => clean(value)).filter(Boolean) || [];
-    if (!publisherAnswers.length) return [];
+    if (!publisherAnswers.length) continue;
     if (stage === 5) {
       const hints = [...source.prompt.matchAll(/\(([^()]*)\)/g)].map(match => clean(match[1])), prompt = clean(source.prompt.replace(/\([^()]*\)/g, '______________'));
-      if (hints.length !== publisherAnswers.length) return [];
+      if (hints.length !== publisherAnswers.length) continue;
       const rebuilt = restoreBlanks(prompt, publisherAnswers), span = uniqueCanonicalSpan(rebuilt, rows);
-      if (!span || span.start !== span.end) return [];
+      if (!span || span.start !== span.end) continue;
       exercises.push({ type: 'verb_form', number: source.number, prompt, hints, answers: publisherAnswers, answer: publisherAnswers.join(' / '), canonicalStart: span.start, canonicalEnd: span.end, page: null, label: '워크북 5 동사형 연습', provenance: { origin: 'publisher_answer_key' } });
       continue;
     }
     const groups = [...source.prompt.matchAll(/\[([^\[\]]+)\]/g)].map(match => match[1].split('/').map(value => clean(value)).filter(Boolean));
-    if (groups.length !== publisherAnswers.length || groups.some(group => group.length < 2 || group.some(option => /,/.test(option)))) return [];
+    if (groups.length !== publisherAnswers.length || groups.some(group => group.length < 2 || group.some(option => /,/.test(option)))) continue;
     const answersFromOptions = groups.map((group, index) => group.find(option => sameOption(option, publisherAnswers[index])) || '');
-    if (answersFromOptions.some(answer => !answer)) return [];
+    if (answersFromOptions.some(answer => !answer)) continue;
     let group = 0, prompt = clean(source.prompt.replace(/\[[^\[\]]+\]/g, () => `⟦CHOICE:${group++}⟧`)), rebuilt = prompt;
     answersFromOptions.forEach((answer, index) => { rebuilt = rebuilt.replace(`⟦CHOICE:${index}⟧`, answer); });
     const span = uniqueCanonicalSpan(rebuilt, rows);
-    if (!span) return [];
+    if (!span) continue;
     exercises.push({ type: 'grammar_vocab_choice', number: source.number, prompt, groups, answers: answersFromOptions, answer: answersFromOptions.join(' / '), canonicalStart: span.start, canonicalEnd: span.end, page: null, label: '워크북 6 어법 선택형 연습', provenance: { origin: 'publisher_answer_key' } });
   }
   return exercises;
@@ -341,10 +341,15 @@ function publisherGrammarExercises(text, rows) {
     const candidates = [];
     for (const sources of pairedNumberedRowSets(text, stage)) for (const answers of answerStageCandidates(text, stage, sources.length)) {
       const parsed = publisherGrammarCandidate(stage, sources, answers, rows);
-      if (parsed.length === sources.length) candidates.push(parsed);
+      if (parsed.length) candidates.push(parsed);
     }
-    const signatures = new Map(candidates.map(items => [JSON.stringify(items.map(item => [item.number, item.canonicalStart, item.canonicalEnd, item.answers])), items]));
-    if (signatures.size === 1) exercises.push(...signatures.values().next().value);
+    const byNumber = new Map();
+    for (const items of candidates) for (const item of items) {
+      const signature = JSON.stringify([item.prompt, item.answers, item.canonicalStart, item.canonicalEnd]);
+      const matches = byNumber.get(item.number) || new Map();
+      matches.set(signature, item); byNumber.set(item.number, matches);
+    }
+    for (const matches of byNumber.values()) if (matches.size === 1) exercises.push(matches.values().next().value);
   }
   return exercises;
 }
