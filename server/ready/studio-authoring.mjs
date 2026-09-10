@@ -24,6 +24,7 @@ export function publisherAnnotationAudit(rows,sourceExercises,metadata={}) {
     for(let i=0;i<item.answers.length;i++){
       const answer=item.answers[i],fixed=parts[i]||'',nextFixed=parts[i+1]||'';
       if(startsPublisherFrame(text,fixed,cursor))cursor+=fixed.length;
+      else if(stage.stage===4&&i>0&&publisherFrame(item.answers[i-1]).toLowerCase()==='let'&&/^\s+us\s*$/i.test(fixed)&&/^['’]s\b/i.test(text.slice(cursor)))cursor+=text.slice(cursor).match(/^['’]s\s*/i)?.[0].length||0;
       else if(stage.stage===4&&fixed.trimEnd()!==fixed&&text.startsWith(fixed.trimEnd()+"'",cursor))cursor+=fixed.trimEnd().length;
       else {drops.push({stage:stage.semanticType,number:item.number,canonicalStart:start,canonicalEnd:end,reason:'prompt_fixed_mismatch',target:i+1});valid=false;break;}
       const exactAnswer=startsPublisherFrame(text,answer,cursor),targetEnd=exactAnswer?cursor+answer.length:nextFixed?indexPublisherFrame(text,nextFixed,cursor):text.length;
