@@ -40,6 +40,12 @@ const letsSource=[{type:'verb_form',number:1,prompt:'______________ us _________
 const letsAudit=publisherAnnotationAudit([letsRow],letsSource,{documentName:'Expanded contraction'});
 assert.deepEqual(letsAudit.drops,[],'Expanded publisher Let us must align to canonical Let\'s without losing the verb-form row.');
 assert.equal(letsAudit.annotations[letsRow.id].steps.verb_form.targets.length,3);
+const apostropheSRow={id:'apostrophe-s-row',blockType:'SENTENCE',text:"It's absolutely ready for the final review.",translation:'그것은 최종 검토를 위해 완전히 준비되었다.'};
+const apostropheSAnnotations=syncAnnotations([apostropheSRow],{});
+for(const stage of AUTHORED)apostropheSAnnotations[apostropheSRow.id].steps[stage]={status:'confirmed',source:'teacher',targets:[]};
+apostropheSAnnotations[apostropheSRow.id].steps.verb_form={status:'confirmed',source:'teacher',targets:[{span:makeSpan(apostropheSRow.text,2,4,apostropheSRow.id),hint:'be',answer:'is'}]};
+const apostropheSCatalog=compileStudio({rows:[apostropheSRow],annotations:apostropheSAnnotations,title:'Apostrophe S',workbookKey:'apostrophe-s',requireConfirmed:true,publishStep:'verb_form'});
+assert.equal(apostropheSCatalog.stages.find(stage=>stage.semanticType==='verb_form').items[0].prompt,'It _____ absolutely ready for the final review.');
 assert.equal(contractionItem.prompt,'I _____ here.');assert.deepEqual(contractionItem.answers,['am standing']);
 const removed=syncAnnotations([rows[0],rows[1],rows[3]],annotations);assert.equal(removed['sentence-2'].retired,true);assert.deepEqual(removed['sentence-1'],annotations['sentence-1']);
 const split=syncAnnotations([rows[0],rows[1],{...rows[2],id:'new-split'},rows[3]],annotations);assert.equal(split['new-split'].steps.english_blank.status,'needed');assert.equal(split['sentence-2'].retired,true);
