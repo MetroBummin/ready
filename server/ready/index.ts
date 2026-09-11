@@ -1613,12 +1613,13 @@ async function wordLookupContext(body:any,session:ReadySession){
 async function readerDictionaryCandidates(body:any,session:ReadySession){
   const context=await wordLookupContext(body,session),sentence=String(context.sentence.text||""),start=Number(body.start),end=Number(body.end),sourceText=required(body.sourceText,"선택 단어",100);
   if(!Number.isInteger(start)||!Number.isInteger(end)||start<0||end<=start||end>sentence.length||sentence.slice(start,end)!==sourceText||!/^[A-Za-z]+(?:[’'][A-Za-z]+)*$/.test(sourceText))throw new ApiError(400,"선택한 단어 범위가 현재 문장과 맞지 않습니다.");
-  try{
-    const query=new URLSearchParams({client:"gtx",sl:"en",tl:"ko",q:lemma(sourceText)});query.append("dt","t");query.append("dt","bd");
-    const response=await fetch(`https://translate.googleapis.com/translate_a/single?${query}`,{headers:{accept:"application/json"},signal:AbortSignal.timeout(4_000)});
-    if(!response.ok)return {meanings:[]};
-    return {meanings:googleKoreanDictionaryCandidates(await response.json(),sourceText)};
-  }catch{return {meanings:[]};}
+  const transports=[{origin:"https://translate.googleapis.com",client:"gtx"},{origin:"https://clients5.google.com",client:"dict-chrome-ex"}];
+  for(const transport of transports)try{
+    const query=new URLSearchParams({client:transport.client,sl:"en",tl:"ko",q:lemma(sourceText)});query.append("dt","t");query.append("dt","bd");
+    const response=await fetch(`${transport.origin}/translate_a/single?${query}`,{headers:{accept:"application/json"},signal:AbortSignal.timeout(3_000)});
+    if(!response.ok)continue;const meanings=googleKoreanDictionaryCandidates(await response.json(),sourceText);if(meanings.length)return {meanings};
+  }catch{/* Google transports are independent of the AI request. */}
+  return {meanings:[]};
 }
 async function progressSavedWordMemory(saved:any,context:any,root:string,occurrenceKey:string){
   if(!saved||!occurrenceKey||occurrenceKey===saved.origin_occurrence_key)return saved;

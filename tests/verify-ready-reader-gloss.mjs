@@ -59,7 +59,8 @@ assert.match(module,/function closePanel\(\{animate=false\}=\{\}\)\{sequence\+=1
 assert.match(module,/wordDraftSaveAction\(active\)!==['"]save['"][\s\S]*wordDraftSaveAction\(active\)===['"]delete['"]/, 'Saving zero selected meanings deletes only an existing item.');
 assert.match(edge,/surfaceKind!==['"]reader['"]\)throw new ApiError\(403/,'Server lookup context must reject Question and Workbook surfaces.');
 assert.match(edge,/word_dictionary_candidates[\s\S]*readerDictionaryCandidates/,'Free dictionary candidates must use an authenticated Reader-only server path.');
-assert.match(edge,/translate\.googleapis\.com\/translate_a\/single/,'READY must use the same Korean dictionary source as Breeze.');
+assert.match(edge,/translate\.googleapis\.com[\s\S]*translate_a\/single/,'READY must use the same Korean dictionary source as Breeze.');
+assert.match(edge,/clients5\.google\.com[\s\S]*dict-chrome-ex/,'The same Google dictionary response must have a Google fallback when the Breeze transport is rate-limited.');
 assert.doesNotMatch(edge,/api\.dictionaryapi\.dev/,'The Reader candidate path must not return English-only DictionaryAPI definitions.');
 assert.match(edge,/phraseLemma[\s\S]*resolved&&kind===['"]phrase['"]\?phraseLemma:root/,'Phrases must keep a separate lexical identity.');
 assert.match(edge,/body\.meanings[\s\S]*primaryMeaning[\s\S]*ready_saved_word_senses/,'Save must apply the final draft, not mutate storage on selection.');
