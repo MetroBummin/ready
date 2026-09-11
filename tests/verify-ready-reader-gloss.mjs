@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
-import {addDictionaryMeanings,applyAiMeaning,createWordDraft,READER_GESTURE_SLOP,READER_LONG_PRESS_MS,readerGestureDecision,readerSentenceMarkup,readerSentenceTokens,removeWordMeaning,selectWordMeaning,shouldBecomeScroll,wordDraftSaveAction} from '../ready/reader-inline-gloss.js';
+import {addDictionaryMeanings,applyAiMeaning,createWordDraft,READER_GESTURE_SLOP,READER_LONG_PRESS_MS,readerGestureDecision,readerScrimClickShouldClose,readerSentenceMarkup,readerSentenceTokens,removeWordMeaning,selectWordMeaning,shouldBecomeScroll,wordDraftSaveAction} from '../ready/reader-inline-gloss.js';
+import {googleKoreanDictionaryCandidates} from '../server/ready/dictionary-candidates.mjs';
 
 const read=path=>readFileSync(path,'utf8'),target={surfaceKind:'reader',passageId:'p',sentenceId:'s',start:0,end:4,sourceText:'Take',lemma:'take',kind:'word'};
 const markup=readerSentenceMarkup({id:'sentence-1',text:'The students had been waiting outside.'});
@@ -10,6 +11,12 @@ assert.deepEqual(readerSentenceTokens('Take part in it.').map(item=>item.text),[
 assert.equal(READER_GESTURE_SLOP,10);assert.equal(READER_LONG_PRESS_MS,750);
 assert.equal(shouldBecomeScroll({distance:10}),false);assert.equal(shouldBecomeScroll({distance:11}),true);
 assert.equal(readerGestureDecision({maxDistance:3,released:true}),'WORD');assert.equal(readerGestureDecision({maxDistance:11,released:true}),'SCROLL');assert.equal(readerGestureDecision({heldMs:750}),'SENTENCE');
+assert.equal(readerScrimClickShouldClose({ownedPointer:false,keyboard:false}),false,'The opening gesture tail must not be reused as a scrim close.');
+assert.equal(readerScrimClickShouldClose({ownedPointer:true}),true,'A fresh pointerdown on the scrim owns its close.');
+assert.equal(readerScrimClickShouldClose({keyboard:true}),true,'Keyboard activation may close the scrim button.');
+
+const googleCandidates=googleKoreanDictionaryCandidates([[["가져가다","take"]],[["동사",["취하다","가져가다","take"]],["명사",["테이크"]]]],'take');
+assert.deepEqual(googleCandidates.map(item=>item.meaning),['가져가다','취하다','테이크'],'Google translation and dictionary groups must become unique Korean candidates.');
 
 let draft=createWordDraft({target});
 assert.equal(draft.aiLoading,true);assert.equal(draft.primaryId,null);assert.equal(draft.userTouched,false);
@@ -26,6 +33,13 @@ draft=selectWordMeaning(draft,draft.candidates.find(item=>item.source==='ai').id
 assert.equal(draft.selected.length,2,'Selecting AI keeps the former primary selected.');assert.equal(draft.selected.find(item=>item.id===draft.primaryId)?.gloss,'현재 문맥의 뜻','Gloss follows meaning identity.');
 draft=removeWordMeaning(draft,draft.primaryId);assert.equal(draft.selected.length,1,'Selected chips can be removed.');
 
+let aiFirst=applyAiMeaning(createWordDraft({target}),{resolved:true,eventId:'event-ai-first',sentenceId:'s',start:0,end:4,sourceText:'Take',meaning:'가져가다',gloss:'현재 문맥의 뜻',lemma:'take',kind:'word',confidence:.98});
+aiFirst=addDictionaryMeanings(aiFirst,[{meaning:'가져가다',source:'dictionary'},{meaning:'취하다',source:'dictionary'}]);
+assert.equal(aiFirst.primaryId,aiFirst.selected[0].id,'AI remains primary when it arrives first.');assert.deepEqual(aiFirst.candidates.map(item=>item.meaning),['취하다'],'Late dictionary results remain independent and deduplicated.');
+let dictionaryFirst=addDictionaryMeanings(createWordDraft({target}),[{meaning:'취하다',source:'dictionary'}]);
+dictionaryFirst=applyAiMeaning(dictionaryFirst,{resolved:true,eventId:'event-ai-second',sentenceId:'s',start:0,end:4,sourceText:'Take',meaning:'가져가다',gloss:'현재 문맥의 뜻',lemma:'take',kind:'word',confidence:.98});
+assert.equal(dictionaryFirst.selected[0].source,'ai','Untouched AI becomes primary even after dictionary candidates arrive.');assert.equal(dictionaryFirst.candidates[0].meaning,'취하다');
+
 const untouched=applyAiMeaning(createWordDraft({target}),{resolved:true,eventId:'event-phrase',sentenceId:'s',start:0,end:12,sourceText:'Take care of',meaning:'돌보다',gloss:'구동사',lemma:'take care of',kind:'phrase',confidence:.97});
 assert.equal(untouched.target.sourceText,'Take care of');assert.equal(untouched.primaryId,untouched.selected[0].id,'Untouched AI becomes primary and may conservatively own a phrase target.');
 const touchedPhrase=applyAiMeaning(selectWordMeaning(addDictionaryMeanings(createWordDraft({target}),[{id:'dict',meaning:'take',source:'dictionary'}]),'dict'),{resolved:true,eventId:'event-phrase',sentenceId:'s',start:0,end:12,sourceText:'Take care of',meaning:'돌보다',lemma:'take care of',kind:'phrase',confidence:.97});
@@ -41,12 +55,21 @@ assert.match(module,/reader-word-panel-layer[\s\S]*reader-word-panel/,'One share
 assert.match(css,/@media \(min-width:900px\)[^{]*\{\.reader-word-panel-layer/,'The same word panel must become a right panel on wide screens.');
 assert.match(css,/\.reader-word-chip\.is-ai/,'AI chips must have distinct accent styling.');
 assert.match(css,/\.reader-word-chip\{[^}]*var\(--ready-canvas-quiet\)/,'Dictionary chips must remain neutral.');
-assert.match(module,/function closePanel\(\)\{sequence\+=1[\s\S]*draft=null/,'Close must discard the draft and invalidate async work.');
+assert.match(module,/function closePanel\(\{animate=false\}=\{\}\)\{sequence\+=1[\s\S]*draft=null/,'Close must discard the draft and invalidate async work.');
 assert.match(module,/wordDraftSaveAction\(active\)!==['"]save['"][\s\S]*wordDraftSaveAction\(active\)===['"]delete['"]/, 'Saving zero selected meanings deletes only an existing item.');
 assert.match(edge,/surfaceKind!==['"]reader['"]\)throw new ApiError\(403/,'Server lookup context must reject Question and Workbook surfaces.');
 assert.match(edge,/word_dictionary_candidates[\s\S]*readerDictionaryCandidates/,'Free dictionary candidates must use an authenticated Reader-only server path.');
+assert.match(edge,/translate\.googleapis\.com\/translate_a\/single/,'READY must use the same Korean dictionary source as Breeze.');
+assert.doesNotMatch(edge,/api\.dictionaryapi\.dev/,'The Reader candidate path must not return English-only DictionaryAPI definitions.');
 assert.match(edge,/phraseLemma[\s\S]*resolved&&kind===['"]phrase['"]\?phraseLemma:root/,'Phrases must keep a separate lexical identity.');
 assert.match(edge,/body\.meanings[\s\S]*primaryMeaning[\s\S]*ready_saved_word_senses/,'Save must apply the final draft, not mutate storage on selection.');
 assert.doesNotMatch(lookupHandler,/ready_saved_words"\)\.update/,'Opening a lookup must not mutate an existing saved word before Save.');
 assert.match(build,/reader-inline-gloss\.js/,'Pages build must include the word panel runtime.');
+const saveHandler=module.slice(module.indexOf('async function saveDraft'),module.indexOf('async function deleteDraft'));
+const deleteHandler=module.slice(module.indexOf('async function deleteDraft'),module.indexOf('function openPanel'));
+assert.doesNotMatch(saveHandler+deleteHandler,/closePanel\(/,'Save and delete completion must keep the current panel open.');
+assert.match(module,/scrimPointerId=event\.pointerId/,'Scrim close must require ownership from its own pointerdown.');
+assert.match(css,/\.reader-inline-source\.is-selected\{[^}]*color:inherit[^}]*opacity:1/,'Selected Reader text must preserve readable foreground in light and dark themes.');
+assert.match(css,/reader-word-panel-up[\s\S]*translateY\(16px\)/,'Mobile panel motion must be a short quiet translation.');
+assert.match(css,/@media \(prefers-reduced-motion:reduce\)[^{]*\{[^}]*reader-word-panel/,'Panel motion must respect reduced-motion preferences.');
 console.log('READY Reader-only word panel, draft ownership, and phrase contracts verified');

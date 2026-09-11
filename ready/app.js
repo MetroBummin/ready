@@ -1,6 +1,6 @@
 import { readyApi } from './api.js';
 import { koreanRecallCompositionState, livePrefixState, verifierMatches, workbookRecallCue, workbookRecallIsPendingJamo, workbookSlotCh } from './workbook-assistance.js?v=workbook-composition-1';
-import { createReaderInlineGloss, readerGestureDecision, readerSentenceMarkup } from './reader-inline-gloss.js?v=reader-word-panel-1';
+import { createReaderInlineGloss, readerGestureDecision, readerSentenceMarkup } from './reader-inline-gloss.js?v=reader-word-panel-followup-2';
 import { gradeLocalWorkbook, gradeWorkbookCorrectionPairs, revealLocalWorkbook } from './deterministic-grading.js?v=workbook-local-first-1';
 import { reviewExportDocumentHtml } from './review-export.js?v=review-pdf-1';
 import { workbookWritingHtml, renderWritingPrefixState } from './workbook-writing-ui.js?v=workbook-keyboard-1';
