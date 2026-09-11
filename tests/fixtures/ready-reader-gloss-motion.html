@@ -8,30 +8,23 @@
   <title>READY Word Lookup motion fixture</title>
 </head>
 <body data-ready-mode="student">
-  <main id="fixture" data-reader-passage-id="motion-fixture" style="width:min(760px,calc(100% - 32px));margin:48px auto">
+  <main id="student-reader" data-reader-passage-id="motion-fixture" style="width:min(760px,calc(100% - 32px));margin:48px auto">
     <p class="reading-passage"><span class="reader-inline-sentence" data-reader-sentence-id="reader-1"></span></p>
-    <section class="question-answer-area" style="margin-top:32px">
-      <div class="question-choice" role="radio" aria-checked="false">
-        <span class="question-choice-mark">①</span>
-        <span class="question-choice-copy"><span class="reader-inline-sentence" data-reader-sentence-id="choice-1"></span></span>
-      </div>
-    </section>
     <p class="reader-inline-notice" data-reader-gloss-notice hidden></p>
     <span class="sr-only" data-reader-gloss-live aria-live="polite"></span>
   </main>
   <script type="module">
-    import {createReaderInlineGloss,readerSentenceMarkup} from '/ready/reader-inline-gloss.js?v=inline-reader-2';
+    import {createReaderInlineGloss,readerSentenceMarkup} from '/ready/reader-inline-gloss.js?v=reader-word-panel-1';
     const sentences=[
-      {id:'reader-1',text:'She enjoys discovering new songs by subscribing to the service and will take part in the project.'},
-      {id:'choice-1',text:'The subscription provides extraordinarily detailed recommendations for every student.'}
+      {id:'reader-1',text:'She enjoys discovering new songs by subscribing to the service and will take part in the project.'}
     ];
-    const root=document.querySelector('#fixture');
+    const root=document.querySelector('#student-reader');
     for(const sentence of sentences)root.querySelector(`[data-reader-sentence-id="${sentence.id}"]`).innerHTML=readerSentenceMarkup(sentence);
     const firstSentence=root.querySelector('[data-reader-sentence-id="reader-1"]'),stableFirst=firstSentence.firstChild;
     stableFirst.dataset.qaStable='yes';
     const meaningFor=({sentenceId,start,end,sourceText})=>{
       const sentence=sentences.find(item=>item.id===sentenceId),clicked=sourceText.toLowerCase();
-      if(clicked==='part'){const phrase='take part in',phraseStart=sentence.text.indexOf(phrase);return {start:phraseStart,end:phraseStart+phrase.length,sourceText:phrase,meaning:'참여하다',lemma:'part',kind:'phrase'};}
+      if(clicked==='part'){const phrase='take part in',phraseStart=sentence.text.indexOf(phrase);return {start:phraseStart,end:phraseStart+phrase.length,sourceText:phrase,meaning:'참여하다',gloss:'하나의 고정 표현',lemma:'take part in',kind:'phrase'};}
       const meanings={discovering:['발견하다','새롭게 찾아내다'],subscription:['매우 상세한 정기 구독 서비스'],provides:['제공하다'],extraordinarily:['이례적으로']},meaning=(meanings[clicked]||[`${clicked} 뜻`])[0];
       return {start,end,sourceText,meaning,lemma:clicked.replace(/ing$/,'').replace(/s$/,''),kind:'word'};
     };
@@ -39,7 +32,7 @@
     try{
       let sentenceRequests=0;
       const params=new URLSearchParams(location.search),fixtureRevision=params.get('revision')||'v1';
-      createReaderInlineGloss({root,passage:{id:'motion-fixture',updated_at:fixtureRevision},sentences,savedWords:[{id:'saved-subscribe',lemma:'subscribe',meaning:'구독하다',memoryLevel:2,senses:[]}],request:data=>new Promise(resolve=>setTimeout(()=>{const result=meaningFor(data);if(data.retry&&result.lemma==='discover')result.meaning=++retryCount%2?'새롭게 찾아내다':'발견하다';resolve({resolved:true,eventId:`event-${Date.now()}`,sentenceId:data.sentenceId,confidence:.99,...result});},650)),saveWord:async({lemma})=>({saved:true,savedWordId:`saved-${lemma}`,lemma,meaning:'발견하다',memoryLevel:1,senses:[{meaning:'발견하다'}]}),removeWord:async()=>({saved:false}),requestSentence:async()=>{sentenceRequests+=1;return {translation:'그녀는 새로운 노래를 발견하고 프로젝트에 참여하는 것을 즐깁니다.'};},sentenceReturnMs:1200});
+      createReaderInlineGloss({root,passage:{id:'motion-fixture',updated_at:fixtureRevision},sentences,savedWords:[{id:'saved-subscribe',lemma:'subscribe',meaning:'구독하다',memoryLevel:2,senses:[]}],requestDictionary:()=>new Promise(resolve=>setTimeout(()=>resolve({meanings:[{id:'dict-1',meaning:'find something',source:'dictionary',gloss:'verb'}]}),120)),request:data=>new Promise(resolve=>setTimeout(()=>{const result=meaningFor(data);if(data.retry&&result.lemma==='discover')result.meaning=++retryCount%2?'새롭게 찾아내다':'발견하다';resolve({resolved:true,eventId:`event-${Date.now()}`,sentenceId:data.sentenceId,confidence:.99,...result});},1500)),saveWord:async data=>({saved:true,savedWordId:`saved-${data.lemma}`,lemma:data.lemma,meaning:data.primaryMeaning,memoryLevel:1,senses:data.meanings}),removeWord:async()=>({saved:false}),requestSentence:async()=>{sentenceRequests+=1;return {translation:'그녀는 새로운 노래를 발견하고 프로젝트에 참여하는 것을 즐깁니다.'};},sentenceReturnMs:1200});
       root.dataset.qaReady='true';
       window.__readyGlossQA={sentence:()=>firstSentence,stableNode:()=>stableFirst,identityPreserved:()=>firstSentence.firstChild===stableFirst,overflow:()=>document.documentElement.scrollWidth-document.documentElement.clientWidth,sentenceRequests:()=>sentenceRequests};
       if(params.has('sentence')){
