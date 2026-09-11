@@ -5,6 +5,7 @@ import {koreanRecallCompositionState} from '../ready/workbook-assistance.js';
 
 const app=readFileSync(new URL('../ready/app.js',import.meta.url),'utf8');
 const writing=readFileSync(new URL('../ready/workbook-writing-ui.js',import.meta.url),'utf8');
+const mismatchHandler=app.slice(app.indexOf('function flashRecallWrong'),app.indexOf('async function verifyWorkbookRecallInput'));
 
 assert.match(app,/WORKBOOK_AUTOFOCUS_TYPES=new Set\(\['korean_blank','english_blank','verb_form','translation','writing'\]\)/,'Only the five requested typing stages should opt into automatic focus');
 assert.match(app,/function workbookFocusFirstSlot[\s\S]{0,700}setAttribute\('autofocus',''\)[\s\S]{0,300}focus\(\{preventScroll:true\}\)/,'Typing stages must mark and focus their first available field immediately');
@@ -25,18 +26,18 @@ assert.match(app,/composition\.state==='partial'\|\|composition\.state==='empty'
 assert.deepEqual(koreanRecallCompositionState('ㅅ','숙련된'),{state:'partial'},'A partial Korean jamo must not unlock');
 assert.deepEqual(koreanRecallCompositionState('숙','숙련된'),{state:'exact'},'A completed matching Korean syllable must unlock');
 assert.deepEqual(koreanRecallCompositionState('ㅇ','숙련된'),{state:'mismatch'},'An impossible first Korean jamo must reject');
-assert.match(app,/composition\.state==='mismatch'\)\{input\.dataset\.recallRejected='true';return flashRecallWrong\(input,session,item,index,sequence,input\.value,\{lockInput:true\}\)/,'An impossible Korean composition must show wrong feedback and temporarily lock its IME buffer');
+assert.match(app,/composition\.state==='mismatch'\)return flashRecallWrong\(input,session,item,index,sequence,input\.value,\{rejectComposition:true\}\)/,'An impossible Korean composition must show wrong feedback without changing editability');
 assert.match(app,/if\(workbookRecallIsPendingJamo\(raw,mode\)\)return;\s*verifyWorkbookRecallInput\(input,session,item,index,mode,sequence,input\.value,\{allowComposing:true\}\)/,'English recall must verify its first letter even during active composition');
 assert.doesNotMatch(app,/KOREAN_RECALL_STABILIZE|RecallValidationTimers/,'Korean recall correctness must not depend on a timer');
 assert.match(app,/assistance\.recallSequence\?\.\[index\]===sequence&&input\.value===snapshot/,'Recall callbacks must ignore stale input values and sequences');
 assert.match(app,/clearWorkbookRecallTimers\(input\)[\s\S]{0,300}updateWorkbookSlot\(index,input\.value\)/,'Every recall value change must cancel older wrong feedback');
 assert.doesNotMatch(app,/flashRecallWrong[\s\S]{0,900}input\.focus\(/,'A delayed wrong callback must never reclaim focus from a newer slot');
 assert.match(app,/const ownsFocus=document\.activeElement===input&&session\.focusedSlot===index[\s\S]{0,550}if\(ownsFocus&&next\)/,'Only the latest focus owner may transfer focus after recall completion');
-assert.match(app,/event\?\.type==='compositionend'&&input\.dataset\.recallRejected==='true'\)return/,'A stale compositionend after a rejected Korean value must not revive it');
-assert.match(app,/input\.dataset\.recallRejecting==='true'\|\|event\?\.type==='compositionend'&&input\.dataset\.recallRejected==='true'\)return/,'IME events arriving while the rejected composition is being cleared must not append to it');
-assert.match(app,/if\(lockInput\)\{input\.dataset\.recallRejecting='true';input\.readOnly=true;\}/,'A rejected Korean composition must temporarily lock the native input, not just add visual feedback');
-assert.match(app,/input\.value='';updateWorkbookSlot\(index,''\);input\.classList\.remove\('recall-wrong'\);if\(lockInput\)\{delete input\.dataset\.recallRejecting;input\.readOnly=false;\}/,'The input must clear and unlock together so the next Korean syllable starts from an empty native field');
-assert.match(app,/event\?\.type==='input'&&input\.dataset\.recallRejected==='true'\)delete input\.dataset\.recallRejected/,'The first new input after the guard clears must be able to validate normally');
+assert.doesNotMatch(mismatchHandler,/(?:readOnly|disabled)\s*=\s*true/,'A Korean mismatch must never sever the native editable target');
+assert.match(app,/input\.dataset\.recallRejecting==='true'[\s\S]{0,260}event\?\.type!=='input'\|\|!event\.data[\s\S]{0,220}input\.value=String\(event\.data\)/,'Fresh IME data must replace, not append to, a rejected native buffer');
+assert.match(app,/workbookRecallIsCurrent\(input,session,item,index,sequence,snapshot\)[\s\S]{0,180}input\.value=''/,'The delayed clear must be sequence and value guarded');
+assert.match(app,/event\?\.type==='compositionend'&&input\.dataset\.recallRejected==='true'\)\{input\.value='';updateWorkbookSlot/,'A stale compositionend after rejection must be discarded from both DOM and session state');
+assert.match(app,/input\.classList\.add\('recall-wrong'\)[\s\S]{0,650}input\.classList\.remove\('recall-wrong'\)/,'Red mismatch feedback and the delayed clear must remain');
 assert.doesNotMatch(app,/compositionstart[\s\S]{0,180}delete event\.target\.dataset\.recallRejected/,'Starting a new composition must not reopen the stale compositionend path');
 assert.match(app,/slot\?\.dataset\.workbookRecall==='korean_syllable'[\s\S]{0,260}handleWorkbookRecallInput\(slot,event\);return/,'Enter on an unfinished Korean recall must commit recall validation instead of submitting the workbook');
 assert.match(app,/enterkeyhint="done"/,'Blank and translation controls must expose a mobile completion key');
