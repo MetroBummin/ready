@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <link rel="stylesheet" href="/design-tokens.css">
-  <link rel="stylesheet" href="/ready/design.css">
+  <link rel="stylesheet" href="/ready/design.css?v=reader-word-panel-followup-2">
   <title>READY Word Lookup motion fixture</title>
 </head>
 <body data-ready-mode="student">
@@ -14,7 +14,7 @@
     <span class="sr-only" data-reader-gloss-live aria-live="polite"></span>
   </main>
   <script type="module">
-    import {createReaderInlineGloss,readerSentenceMarkup} from '/ready/reader-inline-gloss.js?v=reader-word-panel-1';
+    import {createReaderInlineGloss,readerSentenceMarkup} from '/ready/reader-inline-gloss.js?v=reader-word-panel-followup-2';
     const sentences=[
       {id:'reader-1',text:'She enjoys discovering new songs by subscribing to the service and will take part in the project.'}
     ];
@@ -32,7 +32,9 @@
     try{
       let sentenceRequests=0;
       const params=new URLSearchParams(location.search),fixtureRevision=params.get('revision')||'v1';
-      createReaderInlineGloss({root,passage:{id:'motion-fixture',updated_at:fixtureRevision},sentences,savedWords:[{id:'saved-subscribe',lemma:'subscribe',meaning:'구독하다',memoryLevel:2,senses:[]}],requestDictionary:()=>new Promise(resolve=>setTimeout(()=>resolve({meanings:[{id:'dict-1',meaning:'find something',source:'dictionary',gloss:'verb'}]}),120)),request:data=>new Promise(resolve=>setTimeout(()=>{const result=meaningFor(data);if(data.retry&&result.lemma==='discover')result.meaning=++retryCount%2?'새롭게 찾아내다':'발견하다';resolve({resolved:true,eventId:`event-${Date.now()}`,sentenceId:data.sentenceId,confidence:.99,...result});},1500)),saveWord:async data=>({saved:true,savedWordId:`saved-${data.lemma}`,lemma:data.lemma,meaning:data.primaryMeaning,memoryLevel:1,senses:data.meanings}),removeWord:async()=>({saved:false}),requestSentence:async()=>{sentenceRequests+=1;return {translation:'그녀는 새로운 노래를 발견하고 프로젝트에 참여하는 것을 즐깁니다.'};},sentenceReturnMs:1200});
+      if(params.has('dark'))document.body.classList.add('dark');
+      const fast=params.has('fast'),aiFirst=params.get('race')==='ai-first',dictionaryDelay=fast?20:aiFirst?1500:120,aiDelay=fast?30:aiFirst?120:1500;
+      createReaderInlineGloss({root,passage:{id:'motion-fixture',updated_at:fixtureRevision},sentences,savedWords:[{id:'saved-subscribe',lemma:'subscribe',meaning:'구독하다',memoryLevel:2,senses:[]}],requestDictionary:()=>new Promise((resolve,reject)=>setTimeout(()=>params.has('fail-dictionary')?reject(new Error('dictionary failed')):resolve({meanings:[{id:'dict-1',meaning:'발견하다',source:'dictionary'},{id:'dict-2',meaning:'찾아내다',source:'dictionary'}]}),dictionaryDelay)),request:data=>new Promise((resolve,reject)=>setTimeout(()=>{if(params.has('fail-ai'))return reject(new Error('AI failed'));const result=meaningFor(data);if(data.retry&&result.lemma==='discover')result.meaning=++retryCount%2?'새롭게 찾아내다':'발견하다';resolve({resolved:true,eventId:`event-${Date.now()}`,sentenceId:data.sentenceId,confidence:.99,...result});},aiDelay)),saveWord:async data=>({saved:true,savedWordId:`saved-${data.lemma}`,lemma:data.lemma,meaning:data.primaryMeaning,memoryLevel:1,senses:data.meanings}),removeWord:async()=>({saved:false}),requestSentence:async()=>{sentenceRequests+=1;return {translation:'그녀는 새로운 노래를 발견하고 프로젝트에 참여하는 것을 즐깁니다.'};},sentenceReturnMs:1200});
       root.dataset.qaReady='true';
       window.__readyGlossQA={sentence:()=>firstSentence,stableNode:()=>stableFirst,identityPreserved:()=>firstSentence.firstChild===stableFirst,overflow:()=>document.documentElement.scrollWidth-document.documentElement.clientWidth,sentenceRequests:()=>sentenceRequests};
       if(params.has('sentence')){
