@@ -24,10 +24,10 @@
     <link rel="stylesheet" href="../../styles/base.css" />
     <link rel="stylesheet" href="../../design-tokens.css?v=passage-mastery-1" />
     <link rel="stylesheet" href="../ready.css?v=passage-mastery-1" />
-    <link rel="stylesheet" href="../design.css?v=passage-mastery-2" />
-    <link rel="stylesheet" href="studio.css?v=content-claim-variant-production-1" />
+    <link rel="stylesheet" href="../design.css?v=admin-fast-progress-1" />
+    <link rel="stylesheet" href="studio.css?v=admin-fast-progress-1" />
     <script defer src="../config.js"></script>
-    <script type="module" src="app.js?v=content-claim-variant-production-1"></script>
+    <script type="module" src="app.js?v=admin-fast-progress-1"></script>
   </head>
   <body data-ready-mode="admin">
     <div id="app">
@@ -41,7 +41,7 @@
           <img src="../../assets/favicon/icon-192.png" alt=""><span class="mark">READY</span><span class="family">Admin</span>
         </button>
         <nav id="admin-nav" hidden>
-          <button class="navbtn on" type="button" data-route="students">학생 관리</button>
+          <button class="navbtn on" type="button" data-route="students">학생 현황</button>
           <button class="navbtn" type="button" data-route="passages">Studio</button>
           <button class="navbtn" type="button" data-route="scopes">시험범위</button>
         </nav>
@@ -131,19 +131,14 @@
           <div class="page-head">
             <div>
               <p class="eyebrow">STUDENTS</p>
-              <h1>학생 관리</h1>
+              <h1>학생 학습 현황</h1>
             </div>
             <button id="refresh-admin" class="button quiet" type="button">
               새로고침
             </button>
           </div>
-          <section class="card form-card">
-            <div class="card-head">
-              <div>
-                <span class="step">+</span>
-                <h2>학생 추가</h2>
-              </div>
-            </div>
+          <details class="student-create-panel">
+            <summary>+ 학생 추가</summary>
             <form
               id="create-student-form"
               class="form-grid student-create-school"
@@ -182,38 +177,7 @@
                   required /></label
               ><button class="button primary" type="submit">학생 추가</button>
             </form>
-          </section>
-          <div class="filter-toolbar">
-            <label
-              >학교<select id="student-school-filter">
-                <option value="">전체</option>
-                <option>신흥고</option>
-                <option>동고</option>
-                <option>중앙고</option>
-                <option>한빛고</option>
-                <option>test</option>
-                <option>test2</option>
-              </select></label
-            ><label
-              >학년<select id="student-grade-filter">
-                <option value="">전체</option>
-                <option>1학년</option>
-                <option>2학년</option>
-                <option>3학년</option>
-              </select></label
-            >
-          </div>
-          <div id="admin-students"></div>
-        </section>
-        <section class="view" id="v-progress">
-          <div class="page-head">
-            <div>
-              <p class="eyebrow">LEARNING PROGRESS</p>
-              <h1>학생 학습 현황</h1>
-              <p class="lead">실제 제출된 Workbook attempt를 집계합니다.</p>
-            </div>
-            <button id="refresh-progress" class="button quiet" type="button">새로고침</button>
-          </div>
+          </details>
           <div class="learning-toolbar">
             <div class="learning-periods" role="group" aria-label="학습 기간">
               <button type="button" data-learning-period="today">오늘</button>
@@ -224,7 +188,7 @@
             <label>학년<select id="learning-grade-filter"><option value="">전체 학년</option></select></label>
             <label>정렬<select id="learning-sort"><option value="oldest">오래된 순</option><option value="recent">최근 학습순</option></select></label>
           </div>
-          <div id="learning-progress-summary"><div class="empty">학습 현황을 불러오는 중입니다.</div></div>
+          <div id="learning-progress-summary"><div class="empty">학생 현황을 불러오는 중입니다.</div></div>
           <div id="learning-progress-detail" hidden></div>
         </section>
         <section class="view" id="v-factory">

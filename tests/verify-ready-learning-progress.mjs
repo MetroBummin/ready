@@ -38,6 +38,8 @@ assert.match(fallback,/saved answer/);
 
 const server=fs.readFileSync(new URL('../server/ready/index.ts',import.meta.url),'utf8');
 const adminApp=fs.readFileSync(new URL('../ready/admin/app.js',import.meta.url),'utf8');
+const adminHtml=fs.readFileSync(new URL('../ready/admin/index.html',import.meta.url),'utf8');
+const studentApp=fs.readFileSync(new URL('../ready/app.js',import.meta.url),'utf8');
 const dormantAdminApp=fs.readFileSync(new URL('../ready/dormant/questions/admin-runtime.js',import.meta.url),'utf8');
 const adminSet=server.match(/const adminOps = new Set\(\[([^\]]+)\]\)/)?.[1]||'',studentSet=server.match(/const studentOps = new Set\(\[([^\]]+)\]\)/)?.[1]||'';
 for(const op of ['admin_learning_progress','admin_learning_progress_detail','admin_attempt_replay'])assert.ok(adminSet.includes(op),`${op} must require Admin auth`);
@@ -52,7 +54,14 @@ assert.match(server,/workbookAttempts\.filter\(attempt => attempt\.correct === f
 assert.match(dormantAdminApp,/admin_learning_progress[\s\S]*school:learning\.school,grade:learning\.grade/,'Dormant Question analytics must retain its filtered summary request');
 assert.match(adminApp,/admin_workbook_progress[\s\S]*school:learning\.school,grade:learning\.grade/,'Active Workbook summary request must carry school and grade filters');
 assert.doesNotMatch(adminApp,/admin_learning_progress|admin_attempt_replay/,'Active Admin must not call dormant Question analytics');
-assert.match(adminApp,/선택한 기간에 학습 기록이 없습니다/,'students without period attempts need a clear empty state');
+assert.match(adminApp,/전체 진행[\s\S]*현재 오답/,'student overview must lead with cumulative progress and unresolved wrong answers');
+assert.match(adminApp,/지문별 Workbook[\s\S]*passageProgressHtml/,'student detail must drill down by passage and workbook stage');
+assert.match(server,/latest\.values\(\)\]\.filter\(attempt => attempt\.correct === false\)/,'Admin wrong list must use each item latest result instead of repeating wrong attempt history');
+assert.match(studentApp,/오답 다시 보기[\s\S]*내 답[\s\S]*정답/,'Student Review must show wrong answers with the submitted and correct values');
+assert.match(studentApp,/function openReview\(\)[\s\S]*reviewKind='workbook'/,'Student Review must open on wrong Workbook items');
+assert.match(server,/for\(const attempt of latest\.values\(\)\)if\(attempt\.correct===false/,'Student wrong-answer Review must recover from Attempts even without a bookmark row');
+assert.doesNotMatch(adminHtml,/id="v-progress"/,'student management and progress must not be separate views');
+assert.equal((adminApp.match(/변경사항 저장/g)||[]).length,1,'scope editor must expose one save action');
 
 const migration=fs.readFileSync(new URL('../supabase/migrations/20260904062636_admin_learning_progress_summary.sql',import.meta.url),'utf8');
 assert.match(migration,/security invoker/i);
