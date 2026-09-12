@@ -90,6 +90,16 @@ assert.equal(retryAck.results[0].correctClears,firstAck.results[0].correctClears
 assert.equal((await pg.query('select count(*)::int as n from ready_workbook_attempts')).rows[0].n,beforeRetry+1);
 const resumed=await call('student_workbook',{examId:exam,passageId},token);
 assert.equal(resumed.recentStage,7);assert.equal(resumed.stages.find(stage=>stage.stage===7).semanticType,'writing');
+const wrongItem=auditItems[1],wrongResult=await call('submit_workbook_attempt',{examId:exam,passageId,itemKey:wrongItem.key,responses:wrongItem.answers.map(()=> '__wrong__')},token);
+const overview=await call('admin_workbook_progress',{period:'7d',school:'test2',grade:'2학년'},admin),studentOverview=overview.students.find(item=>item.id===studentId);
+assert.ok(studentOverview.workbook.available>studentOverview.workbook.attempted,'Admin overview denominator must include untouched current-catalog items');
+assert.equal(studentOverview.workbook.unresolvedWrong,1,'Admin overview must count only latest unresolved Workbook items');
+const detail=await call('admin_workbook_progress_detail',{studentId,period:'7d'},admin);
+assert.ok(detail.passages.some(passage=>passage.id===passageId&&passage.stages.some(stage=>stage.stage===7)),'Admin detail must group current progress by passage and stage');
+assert.deepEqual(detail.wrongWorkbooks.map(item=>item.id),[wrongResult.attempt.id],'Admin detail must not repeat historical wrong attempts for one item');
+await pg.query('delete from ready_workbook_bookmarks where student_id=$1 and exam_id=$2 and passage_id=$3 and item_key=$4',[studentId,exam,passageId,wrongItem.key]);
+const wrongReview=await call('student_review',{examId:exam,kind:'workbook'},token),wrongReviewEntry=wrongReview.workbookItems.find(item=>item.itemKey===wrongItem.key);
+assert.deepEqual(wrongReviewEntry.studentResponses,['__wrong__']);assert.deepEqual(wrongReviewEntry.answers,wrongItem.answers);assert.equal(wrongReviewEntry.lastResult,false);
 console.log('PASS stability API: 3 bookmarks -> 1 catalog read, fresh next-request catalog, idempotent retry and stage identity/resume.');
 
 // A legacy Studio state can have empty annotations and no jobId. The passage

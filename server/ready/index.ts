@@ -372,6 +372,35 @@ async function adminLearningProgressDetail(body: any) {
   });
   return { period, since, student, question: attemptMetrics(questionAttempts), workbook: attemptMetrics(workbookAttempts), wrongQuestions, wrongWorkbooks };
 }
+async function adminWorkbookScopeContext(students: any[]) {
+  const currentExams = rows<any[]>(await db.from("ready_exams").select("id,school,grade").eq("is_current", true));
+  const examBySchoolGrade = new Map(currentExams.map(exam => [`${exam.school}\u0000${exam.grade}`, exam.id])), examByStudent = new Map(students.map(student => [student.id, examBySchoolGrade.get(`${student.school}\u0000${student.grade}`) || null]));
+  const examIds = [...new Set([...examByStudent.values()].filter(Boolean))];
+  if (!examIds.length) return { examByStudent, allowedByExam: new Map(), passagesByExam: new Map() };
+  const links = rows<any[]>(await db.from("ready_exam_passages").select("exam_id,passage_id,position").in("exam_id", examIds).order("position")), passageIds = [...new Set(links.map(link => link.passage_id))];
+  if (!passageIds.length) return { examByStudent, allowedByExam: new Map(examIds.map(id => [id, new Map()])), passagesByExam: new Map(examIds.map(id => [id, []])) };
+  const [passageResult, catalogResult, factResult] = await Promise.all([
+    db.from("ready_passages").select("id,title,source_type,source_label").in("id", passageIds),
+    db.from("ready_workbook_catalogs").select("passage_id,workbook_key,catalog").in("passage_id", passageIds),
+    db.from("ready_content_facts").select("id,passage_id").in("passage_id", passageIds).eq("status", "confirmed"),
+  ]);
+  const passages = rows<any[]>(passageResult), catalogs = rows<any[]>(catalogResult), facts = rows<any[]>(factResult), claims = facts.length ? rows<any[]>(await db.from("ready_content_claims").select("id,fact_id,passage_id").in("fact_id", facts.map(fact => fact.id)).eq("status", "confirmed")) : [];
+  const passageById = new Map(passages.map(passage => [passage.id, passage])), catalogByPassage = new Map(catalogs.map(row => [row.passage_id, row.catalog])), claimKeysByPassage = new Map<string, string[]>();
+  for (const claim of claims) { const itemKeys = claimKeysByPassage.get(claim.passage_id) || []; itemKeys.push(`content-claim:${claim.id}`); claimKeysByPassage.set(claim.passage_id, itemKeys); }
+  const passageDefinition = (passageId: string) => {
+    const passage = passageById.get(passageId), catalog = catalogByPassage.get(passageId) || codeWorkbookForPassage(passage), stages = (catalog?.stages || []).filter((stage: any) => (stage.items || []).length).map((stage: any) => ({ stage: Number(stage.stage), title: clean(stage.title, 120) || `${Number(stage.stage)}단계`, itemKeys: (stage.items || []).map((item: any) => item.key), items: stage.items || [] })), claimKeys = claimKeysByPassage.get(passageId) || [];
+    if (claimKeys.length) stages.push({ stage: 10, title: "내용 일치", itemKeys: claimKeys, items: claimKeys.map(key => ({ key, stage: 10, kind: "content_claim", prompt: "" })) });
+    return passage ? { id: passage.id, title: passage.title, workbookKey: catalog?.workbookKey || (claimKeys.length ? `content-claims:${passage.id}` : ""), stages } : null;
+  };
+  const allowedByExam = new Map<string, Map<string, any>>(), passagesByExam = new Map<string, any[]>();
+  for (const examId of examIds) {
+    const definitions = links.filter(link => link.exam_id === examId).map(link => passageDefinition(link.passage_id)).filter(definition => definition?.stages.length);
+    const allowed = new Map<string, any>();
+    for (const passage of definitions) for (const stage of passage.stages) for (const item of stage.items) allowed.set(`${passage.id}:${item.key}`, { passageTitle: passage.title, stageTitle: stage.title, stage: stage.stage, number: item.number || null, kind: item.kind || "", prompt: item.prompt || "" });
+    allowedByExam.set(examId, allowed); passagesByExam.set(examId, definitions);
+  }
+  return { examByStudent, allowedByExam, passagesByExam };
+}
 async function adminWorkbookProgress(body: any) {
   const { period, since } = adminProgressPeriod(body), school = clean(body.school, 80), grade = clean(body.grade, 40);
   let studentQuery = db.from("ready_students").select("id,name,school,grade");
@@ -379,26 +408,34 @@ async function adminWorkbookProgress(body: any) {
   if (grade) studentQuery = studentQuery.eq("grade", grade);
   const students = rows<any[]>(await studentQuery.order("name"));
   if (!students.length) return { period, since, students: [] };
-  const attempts = rows<any[]>(await db.from("ready_workbook_attempts").select("student_id,correct,created_at").in("student_id", students.map(student => student.id)).gte("created_at", since).order("created_at", { ascending: false }));
+  const context = await adminWorkbookScopeContext(students), examIds = [...new Set([...context.examByStudent.values()].filter(Boolean))];
+  const attempts = examIds.length ? rows<any[]>(await db.from("ready_workbook_attempts").select("student_id,exam_id,passage_id,workbook_key,item_key,stage,correct,created_at").in("student_id", students.map(student => student.id)).in("exam_id", examIds).order("created_at", { ascending: false })) : [];
   const byStudent = new Map<string, any[]>();
   for (const attempt of attempts) { const list = byStudent.get(attempt.student_id) || []; list.push(attempt); byStudent.set(attempt.student_id, list); }
-  return { period, since, students: students.map(student => { const items = byStudent.get(student.id) || []; return { ...student, lastActivityAt: items[0]?.created_at || null, workbook: attemptMetrics(items) }; }) };
+  return { period, since, students: students.map(student => {
+    const examId = context.examByStudent.get(student.id), allowed = context.allowedByExam.get(examId) || new Map(), all = (byStudent.get(student.id) || []).filter(attempt => attempt.exam_id === examId && allowed.has(`${attempt.passage_id}:${attempt.item_key}`)), periodItems = all.filter(attempt => Date.parse(attempt.created_at) >= Date.parse(since)), latest = new Map<string, any>();
+    for (const attempt of all) { const key = `${attempt.passage_id}:${attempt.item_key}`; if (!latest.has(key)) latest.set(key, attempt); }
+    const metrics = attemptMetrics(periodItems), available = allowed.size, attempted = latest.size, unresolvedWrong = [...latest.values()].filter(attempt => attempt.correct === false).length;
+    return { ...student, lastActivityAt: periodItems[0]?.created_at || null, workbook: { ...metrics, attempted, available, progress: available ? Math.round(attempted / available * 100) : null, unresolvedWrong } };
+  }) };
 }
 async function adminWorkbookProgressDetail(body: any) {
   const studentId = required(body.studentId, "학생", 80), { period, since } = adminProgressPeriod(body);
   const student = rows<any>(await db.from("ready_students").select("id,name,school,grade").eq("id", studentId).maybeSingle());
   if (!student) throw new ApiError(404, "학생을 찾지 못했습니다.");
-  const workbookAttempts = rows<any[]>(await db.from("ready_workbook_attempts").select("id,passage_id,workbook_key,item_key,stage,response,correct,hint_count,used_full_answer_hint,completed_after_hint,created_at").eq("student_id", studentId).gte("created_at", since).order("created_at", { ascending: false }));
-  const passageIds = [...new Set(workbookAttempts.map(attempt => attempt.passage_id))];
-  const passages = passageIds.length ? rows<any[]>(await db.from("ready_passages").select("id,title,source_type,source_label").in("id", passageIds)) : [];
-  const factoryCatalogs = passageIds.length ? rows<any[]>(await db.from("ready_workbook_catalogs").select("passage_id,workbook_key,catalog").in("passage_id", passageIds)) : [];
-  const passageById = new Map(passages.map(passage => [passage.id, passage])), factoryByPassage = new Map(factoryCatalogs.map(row => [row.passage_id, row]));
-  const workbookGroups = groupAttemptCounts(workbookAttempts, attempt => `${attempt.passage_id}:${attempt.workbook_key}:${attempt.item_key}`);
-  const wrongWorkbooks = workbookAttempts.filter(attempt => attempt.correct === false).map(attempt => {
-    const passage = passageById.get(attempt.passage_id), persisted = factoryByPassage.get(attempt.passage_id), catalog = codeWorkbookForPassage(passage) || persisted?.catalog || null, item = catalog?.workbookKey === attempt.workbook_key ? workbookItem(catalog, attempt.item_key) : null, group = workbookGroups.get(`${attempt.passage_id}:${attempt.workbook_key}:${attempt.item_key}`) || { attempts: 1, wrong: 1 };
-    return { id: attempt.id, passageTitle: passage?.title || "현재 지문 정보 없음", stage: Number(attempt.stage), itemKey: attempt.item_key, kind: item?.kind || "", number: item?.number || null, createdAt: attempt.created_at, attemptCount: group.attempts, wrongCount: group.wrong, replayAvailable: !!item };
+  const context = await adminWorkbookScopeContext([student]), examId = context.examByStudent.get(student.id), allowed = context.allowedByExam.get(examId) || new Map(), workbookAttempts = examId ? rows<any[]>(await db.from("ready_workbook_attempts").select("id,exam_id,passage_id,workbook_key,item_key,stage,response,correct,hint_count,used_full_answer_hint,completed_after_hint,created_at").eq("student_id", studentId).eq("exam_id", examId).order("created_at", { ascending: false })) : [];
+  const currentAttempts = workbookAttempts.filter(attempt => allowed.has(`${attempt.passage_id}:${attempt.item_key}`)), latest = new Map<string, any>();
+  for (const attempt of currentAttempts) { const key = `${attempt.passage_id}:${attempt.item_key}`; if (!latest.has(key)) latest.set(key, attempt); }
+  const workbookGroups = groupAttemptCounts(currentAttempts, attempt => `${attempt.passage_id}:${attempt.item_key}`), passages = (context.passagesByExam.get(examId) || []).map((passage: any) => {
+    const stages = passage.stages.map((stage: any) => { const attempts = stage.itemKeys.map((itemKey: string) => latest.get(`${passage.id}:${itemKey}`)).filter(Boolean), wrong = attempts.filter((attempt: any) => attempt.correct === false).length; return { stage: stage.stage, title: stage.title, attempted: attempts.length, total: stage.itemKeys.length, progress: stage.itemKeys.length ? Math.round(attempts.length / stage.itemKeys.length * 100) : 0, wrong }; });
+    const attempted = stages.reduce((sum: number, stage: any) => sum + stage.attempted, 0), total = stages.reduce((sum: number, stage: any) => sum + stage.total, 0), wrong = stages.reduce((sum: number, stage: any) => sum + stage.wrong, 0);
+    return { id: passage.id, title: passage.title, attempted, total, progress: total ? Math.round(attempted / total * 100) : 0, wrong, stages };
   });
-  return { period, since, student, workbook: attemptMetrics(workbookAttempts), wrongWorkbooks };
+  const wrongWorkbooks = [...latest.values()].filter(attempt => attempt.correct === false).map(attempt => {
+    const item = allowed.get(`${attempt.passage_id}:${attempt.item_key}`), group = workbookGroups.get(`${attempt.passage_id}:${attempt.item_key}`) || { attempts: 1, wrong: 1 };
+    return { id: attempt.id, passageId: attempt.passage_id, passageTitle: item?.passageTitle || "현재 지문 정보 없음", stage: Number(attempt.stage), stageTitle: item?.stageTitle || `${Number(attempt.stage)}단계`, itemKey: attempt.item_key, kind: item?.kind || "", number: item?.number || null, prompt: item?.prompt || "", createdAt: attempt.created_at, attemptCount: group.attempts, wrongCount: group.wrong, replayAvailable: !!item };
+  });
+  return { period, since, student, workbook: { ...attemptMetrics(currentAttempts), attempted: latest.size, available: allowed.size, progress: allowed.size ? Math.round(latest.size / allowed.size * 100) : null, unresolvedWrong: wrongWorkbooks.length }, passages, wrongWorkbooks };
 }
 async function adminQuestionAttemptReplay(attemptId: string) {
   const attempt = rows<any>(await db.from("ready_attempts").select("id,student_id,question_id,exam_id,response,correct,elapsed_ms,created_at").eq("id", attemptId).maybeSingle());
@@ -1375,7 +1412,7 @@ function workbookItem(catalog: any, itemKey: string) {
 function contentClaimFallbackCatalog(passage:any){return {contractVersion:'content-claim-v1',workbookKey:'content-claims:'+passage.id,revision:Number(passage.canonical_revision)||1,title:passage.title+' · READY 워크북',stages:[]};}
 async function contentClaimAttemptItems(passageId:string){
   const sentenceRows=rows<any[]>(await db.from('ready_passage_sentences').select('id,sentence_index,text,block_type,active').eq('passage_id',passageId).eq('active',true).order('sentence_index')),bank=await contentClaimBank(passageId,sentenceRows),claims=publicContentClaims(bank.facts,bank.claims,bank.variants,sentenceRows);
-  return claims.map(claim=>({key:`content-claim:${claim.id}`,stage:10,semanticType:'content_claim',kind:'content_claim',answers:[claim.truth?'O':'X'],truth:claim.truth}));
+  return claims.map(claim=>({key:`content-claim:${claim.id}`,stage:10,semanticType:'content_claim',kind:'content_claim',prompt:claim.statement||'',source:(claim.evidence||[]).map((row:any)=>row.text).filter(Boolean).join(' '),answers:[claim.truth?'O':'X'],truth:claim.truth}));
 }
 async function workbookReviewCount(studentId: string, examId: string) {
   const result = await db.from("ready_workbook_bookmarks").select("item_key", { count: "exact", head: true }).eq("student_id", studentId).eq("exam_id", examId);
@@ -1383,19 +1420,28 @@ async function workbookReviewCount(studentId: string, examId: string) {
   return result.count || 0;
 }
 async function workbookReviewItems(studentId: string, examId: string) {
-  const bookmarks = rows<any[]>(await db.from("ready_workbook_bookmarks").select("passage_id,workbook_key,item_key,item_type,source,updated_at").eq("student_id", studentId).eq("exam_id", examId).order("updated_at", { ascending: false }));
+  const [bookmarkResult,attemptResult]=await Promise.all([
+    db.from("ready_workbook_bookmarks").select("passage_id,workbook_key,item_key,item_type,source,updated_at").eq("student_id", studentId).eq("exam_id", examId).order("updated_at", { ascending: false }),
+    db.from("ready_workbook_attempts").select("id,passage_id,workbook_key,item_key,response,correct,ai_grading_request_id,created_at").eq("student_id", studentId).eq("exam_id", examId).order("created_at", { ascending: false }),
+  ]);
+  const savedBookmarks=rows<any[]>(bookmarkResult),attempts=rows<any[]>(attemptResult), latest = new Map<string, any>();
+  for (const attempt of attempts) { const key = `${attempt.passage_id}:${attempt.item_key}`; if (!latest.has(key)) latest.set(key, attempt); }
+  const bookmarks=savedBookmarks.filter(bookmark=>bookmark.source!=='wrong_answer'||latest.get(`${bookmark.passage_id}:${bookmark.item_key}`)?.correct===false),known=new Set(bookmarks.map(bookmark=>`${bookmark.passage_id}:${bookmark.item_key}`));
+  for(const attempt of latest.values())if(attempt.correct===false&&!known.has(`${attempt.passage_id}:${attempt.item_key}`))bookmarks.push({passage_id:attempt.passage_id,workbook_key:attempt.workbook_key,item_key:attempt.item_key,item_type:'',source:'wrong_answer',updated_at:attempt.created_at});
   if (!bookmarks.length) return [];
+  bookmarks.sort((a,b)=>Date.parse(b.updated_at)-Date.parse(a.updated_at));
   const passageIds = [...new Set(bookmarks.map(bookmark => bookmark.passage_id))], passages = rows<any[]>(await db.from("ready_passages").select("id,title,source_label").in("id", passageIds));
   const byPassage = new Map(passages.map(passage => [passage.id, passage]));
-  const attempts = rows<any[]>(await db.from("ready_workbook_attempts").select("passage_id,item_key,correct,created_at").eq("student_id", studentId).eq("exam_id", examId).order("created_at", { ascending: false })), latest = new Map<string, boolean>();
-  for (const attempt of attempts) { const key = `${attempt.passage_id}:${attempt.item_key}`; if (!latest.has(key)) latest.set(key, attempt.correct === true); }
-  const output:any[]=[], catalogs=new Map<string,any>();
+  const gradingIds = [...new Set([...latest.values()].map(attempt => attempt.ai_grading_request_id).filter(Boolean))], gradingRows = gradingIds.length ? rows<any[]>(await db.from("ready_workbook_ai_grading_requests").select("id,result").in("id", gradingIds)) : [], gradingById = new Map(gradingRows.map(row => [row.id, row.result]));
+  const output:any[]=[], catalogs=new Map<string,any>(),contentItemsByPassage=new Map<string,any[]>();
   for (const bookmark of bookmarks) {
     const passage = byPassage.get(bookmark.passage_id);
     if(!passage)continue;
     if(!catalogs.has(passage.id))catalogs.set(passage.id,await workbookForPassage(passage));
-    const catalog=catalogs.get(passage.id),item=workbookItem(catalog,bookmark.item_key);
-    if (passage && catalog && item && catalog.workbookKey === bookmark.workbook_key) output.push({ passageId: passage.id, passageTitle: passage.title, workbookKey: catalog.workbookKey, workbookTitle: catalog.title, itemKey: item.key, stage: item.stage, number: item.number, kind: item.kind, title: catalog.stages.find((stage: any) => stage.stage === item.stage)?.title || `${item.stage}단계`, bookmarked: true, bookmarkSource: bookmark.source, lastResult: latest.get(`${passage.id}:${item.key}`) ?? null });
+    if(bookmark.item_key.startsWith('content-claim:')&&!contentItemsByPassage.has(passage.id))contentItemsByPassage.set(passage.id,await contentClaimAttemptItems(passage.id));
+    const catalog=catalogs.get(passage.id),contentItems=contentItemsByPassage.get(passage.id)||[],item=workbookItem(catalog,bookmark.item_key)||contentItems.find(candidate=>candidate.key===bookmark.item_key),workbookKey=catalog?.workbookKey||(contentItems.length?`content-claims:${passage.id}`:'');
+    const attempt=latest.get(`${passage.id}:${item?.key}`),grading=attempt?.ai_grading_request_id?gradingById.get(attempt.ai_grading_request_id):null;
+    if (passage && item && workbookKey === bookmark.workbook_key) output.push({ passageId: passage.id, passageTitle: passage.title, workbookKey, workbookTitle: catalog?.title||`${passage.title} · READY 워크북`, itemKey: item.key, stage: item.stage, number: item.number, kind: item.kind, title: item.kind==='content_claim'?'내용 일치':catalog?.stages.find((stage: any) => stage.stage === item.stage)?.title || `${item.stage}단계`, prompt:item.prompt||"",sourceText:item.source||"",studentResponses:Array.isArray(attempt?.response?.responses)?attempt.response.responses:[],answers:Array.isArray(item.answers)?item.answers:[],gradingFeedback:Array.isArray(grading?.feedback_lines)?grading.feedback_lines:[],lastAttemptAt:attempt?.created_at||null,bookmarked: true, bookmarkSource: bookmark.source, lastResult: typeof attempt?.correct==='boolean'?attempt.correct:null });
   }
   return output;
 }
