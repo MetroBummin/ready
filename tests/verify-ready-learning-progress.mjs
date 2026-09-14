@@ -57,6 +57,10 @@ assert.doesNotMatch(adminApp,/admin_learning_progress|admin_attempt_replay/,'Act
 assert.match(adminApp,/전체 진행[\s\S]*현재 오답/,'student overview must lead with cumulative progress and unresolved wrong answers');
 assert.match(adminApp,/지문별 Workbook[\s\S]*passageProgressHtml/,'student detail must drill down by passage and workbook stage');
 assert.match(server,/latest\.values\(\)\]\.filter\(attempt => attempt\.correct === false\)/,'Admin wrong list must use each item latest result instead of repeating wrong attempt history');
+const workbookScopeContext=server.match(/async function adminWorkbookScopeContext[\s\S]*?\n}\nasync function adminWorkbookProgress/)?.[0]||'';
+assert.match(workbookScopeContext,/ready_content_claims[\s\S]*?\.in\("passage_id", passageIds\)/,'Admin progress must bound confirmed Claim lookup by Passage IDs');
+assert.doesNotMatch(workbookScopeContext,/ready_content_claims[\s\S]*?\.in\("fact_id", facts\.map/,'Admin progress must not put every Fact UUID into one PostgREST URL');
+assert.match(workbookScopeContext,/claims\.filter\(claim => confirmedFactIds\.has\(claim\.fact_id\)\)/,'Admin progress must still exclude Claims whose parent Fact is not confirmed');
 assert.match(studentApp,/오답 다시 보기[\s\S]*내 답[\s\S]*정답/,'Student Review must show wrong answers with the submitted and correct values');
 assert.match(studentApp,/function openReview\(\)[\s\S]*reviewKind='workbook'/,'Student Review must open on wrong Workbook items');
 assert.match(server,/for\(const attempt of latest\.values\(\)\)if\(attempt\.correct===false/,'Student wrong-answer Review must recover from Attempts even without a bookmark row');

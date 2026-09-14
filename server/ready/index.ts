@@ -407,9 +407,9 @@ async function adminWorkbookScopeContext(students: any[]) {
     db.from("ready_workbook_catalogs").select("passage_id,workbook_key,catalog").in("passage_id", passageIds),
     db.from("ready_content_facts").select("id,passage_id").in("passage_id", passageIds).eq("status", "confirmed"),
   ]);
-  const passages = rows<any[]>(passageResult), catalogs = rows<any[]>(catalogResult), facts = rows<any[]>(factResult), claims = facts.length ? rows<any[]>(await db.from("ready_content_claims").select("id,fact_id,passage_id").in("fact_id", facts.map(fact => fact.id)).eq("status", "confirmed")) : [];
-  const passageById = new Map(passages.map(passage => [passage.id, passage])), catalogByPassage = new Map(catalogs.map(row => [row.passage_id, row.catalog])), claimKeysByPassage = new Map<string, string[]>();
-  for (const claim of claims) { const itemKeys = claimKeysByPassage.get(claim.passage_id) || []; itemKeys.push(`content-claim:${claim.id}`); claimKeysByPassage.set(claim.passage_id, itemKeys); }
+  const passages = rows<any[]>(passageResult), catalogs = rows<any[]>(catalogResult), facts = rows<any[]>(factResult), claims = facts.length ? rows<any[]>(await db.from("ready_content_claims").select("id,fact_id,passage_id").in("passage_id", passageIds).eq("status", "confirmed")) : [];
+  const confirmedFactIds = new Set(facts.map(fact => fact.id)), passageById = new Map(passages.map(passage => [passage.id, passage])), catalogByPassage = new Map(catalogs.map(row => [row.passage_id, row.catalog])), claimKeysByPassage = new Map<string, string[]>();
+  for (const claim of claims.filter(claim => confirmedFactIds.has(claim.fact_id))) { const itemKeys = claimKeysByPassage.get(claim.passage_id) || []; itemKeys.push(`content-claim:${claim.id}`); claimKeysByPassage.set(claim.passage_id, itemKeys); }
   const passageDefinition = (passageId: string) => {
     const passage = passageById.get(passageId), catalog = catalogByPassage.get(passageId) || codeWorkbookForPassage(passage), stages = (catalog?.stages || []).filter((stage: any) => (stage.items || []).length).map((stage: any) => ({ stage: Number(stage.stage), title: clean(stage.title, 120) || `${Number(stage.stage)}단계`, itemKeys: (stage.items || []).map((item: any) => item.key), items: stage.items || [] })), claimKeys = claimKeysByPassage.get(passageId) || [];
     if (claimKeys.length) stages.push({ stage: 10, title: "내용 일치", itemKeys: claimKeys, items: claimKeys.map(key => ({ key, stage: 10, kind: "content_claim", prompt: "" })) });
