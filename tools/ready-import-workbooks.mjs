@@ -5,14 +5,14 @@ const args=process.argv.slice(2),value=name=>{const at=args.indexOf(name);return
 if(!manifestPath)throw new Error('사용법: npm run workbook:import -- --manifest <json> [--apply]');
 const manifest=JSON.parse(readFileSync(resolve(manifestPath),'utf8')),entries=Array.isArray(manifest)?manifest:manifest.entries;
 if(!Array.isArray(entries)||!entries.length)throw new Error('manifest.entries에 PDF 작업을 한 개 이상 넣어 주세요.');
-const apiUrl=process.env.READY_API_URL||'https://fqvhlyocdkwiyioiokte.supabase.co/functions/v1/ready',password=process.env.READY_ADMIN_PASSWORD;
-if(!password)throw new Error('READY_ADMIN_PASSWORD가 필요합니다.');
+const apiUrl=process.env.READY_API_URL||'https://fqvhlyocdkwiyioiokte.supabase.co/functions/v1/ready',password=process.env.READY_ADMIN_PASSWORD,serviceKey=process.env.READY_IMPORT_SERVICE_KEY;
+if(!password&&!serviceKey)throw new Error('READY_ADMIN_PASSWORD 또는 READY_IMPORT_SERVICE_KEY가 필요합니다.');
 async function post(payload,token=''){
   const response=await fetch(apiUrl,{method:'POST',headers:{'content-type':'application/json',...(token?{authorization:`Bearer ${token}`}:{})},body:JSON.stringify(payload)}),body=await response.json();
   if(!response.ok)throw Object.assign(new Error(body.error||`HTTP ${response.status}`),{status:response.status,detail:body.detail});
   return body;
 }
-const token=(await post({op:'admin_login',password})).session.token;
+const token=serviceKey||(await post({op:'admin_login',password})).session.token;
 const requests=entries.map((entry,index)=>{
   const file=realpathSync(resolve(String(entry.file||''))),pdfBase64=readFileSync(file).toString('base64'),passageId=String(entry.passageId||'').trim();
   if(!passageId&&!entry.title)throw new Error(`${index+1}번: 기존 passageId 또는 새 Passage title이 필요합니다.`);

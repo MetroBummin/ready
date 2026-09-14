@@ -223,9 +223,10 @@ async function studentForSession(session: ReadySession): Promise<Student> {
   }
   return result.data as Student;
 }
-async function authenticate(req: Request, actor?: "student" | "admin"): Promise<ReadySession> {
+async function authenticate(req: Request, actor?: "student" | "admin", allowServiceImport=false): Promise<ReadySession> {
   const token = bearerToken(req.headers.get("authorization"));
   if (!token) throw new ApiError(401, "로그인이 필요합니다.");
+  if(allowServiceImport&&actor==='admin'&&token===Deno.env.get('SUPABASE_SERVICE_ROLE_KEY'))return {id:'service-workbook-import',actor_type:'admin',student_id:null,remembered:false,expires_at:new Date(Date.now()+60_000).toISOString()} as ReadySession;
   const tokenHash = await sha256Hex(token);
   const result = await db.from("ready_sessions").select("id,actor_type,student_id,remembered,expires_at").eq("token_hash", tokenHash).is("revoked_at", null).gt("expires_at", new Date().toISOString()).maybeSingle();
   if (result.error) throw new ApiError(500, result.error.message);
@@ -1840,6 +1841,6 @@ async function dispatch(op: string, body: any, session: ReadySession | null) {
 }
 Deno.serve(async req => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: CORS }); if (req.method !== "POST") return json({ error: "POST만 받습니다." }, 405);
-  try { const body = await req.json(), op = clean(body?.op, 60); let session: ReadySession | null = null; if (adminOps.has(op)) session = await authenticate(req, "admin"); else if (studentOps.has(op)) session = await authenticate(req, "student"); else if (op === "logout") session = await authenticate(req); else if (!publicOps.has(op)) throw new ApiError(404, "알 수 없는 READY 작업입니다."); return json(await dispatch(op, body, session)); }
+  try { const body = await req.json(), op = clean(body?.op, 60); let session: ReadySession | null = null; if (adminOps.has(op)) session = await authenticate(req, "admin",op==='studio_publisher_import'); else if (studentOps.has(op)) session = await authenticate(req, "student"); else if (op === "logout") session = await authenticate(req); else if (!publicOps.has(op)) throw new ApiError(404, "알 수 없는 READY 작업입니다."); return json(await dispatch(op, body, session)); }
   catch (error) { console.error(error); return error instanceof ApiError ? json({ error: error.message, detail: error.detail }, error.status) : json({ error: "READY 서버에서 요청을 처리하지 못했습니다." }, 500); }
 });

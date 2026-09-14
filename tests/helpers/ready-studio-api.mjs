@@ -42,7 +42,7 @@ class Query {
 }
 const adapter={from:table=>new Query(table),rpc:async(name,args)=>{try{const keys=Object.keys(args),values=Object.values(args).map(v=>typeof v==='object'&&v!==null?JSON.stringify(v):v);const result=await pg.query(`select public.${qid(name)}(${keys.map((k,i)=>qid(k)+'=> $'+(i+1)).join(',')}) as value`,values);return {data:result.rows[0]?.value,error:null};}catch(error){console.log('RPC',name,error.message);return {data:null,error:{message:error.message,code:error.code}};}}};
 globalThis.__studioDb=adapter;
-const environment={SUPABASE_URL:'http://localhost',SUPABASE_SERVICE_ROLE_KEY:'local-test-only',READY_ADMIN_PASSWORD:'studio-local',AI_PROVIDER:'gemini',GEMINI_API_KEY:'local-stub'};
+const environment={SUPABASE_URL:'http://localhost',SUPABASE_SERVICE_ROLE_KEY:'local-test-only-service-role-key-0001',READY_ADMIN_PASSWORD:'studio-local',AI_PROVIDER:'gemini',GEMINI_API_KEY:'local-stub'};
 let handler;globalThis.Deno={env:{get:k=>environment[k]},serve:fn=>{handler=fn;}};
 export const aiCalls=[];const originalFetch=globalThis.fetch;
 globalThis.fetch=async(url,options)=>{

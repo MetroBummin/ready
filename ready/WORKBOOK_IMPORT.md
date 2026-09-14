@@ -106,6 +106,10 @@ READY_ADMIN_PASSWORD='...' npm run workbook:import -- --manifest /absolute/path/
 READY_ADMIN_PASSWORD='...' npm run workbook:import -- --manifest /absolute/path/import.json --apply
 ```
 
+자동 배포 환경에서는 관리자 비밀번호 대신 별도 process 환경의 `READY_IMPORT_SERVICE_KEY`
+(Supabase service role key)를 사용할 수 있다. 이 자격은 `studio_publisher_import`에만 허용되며
+manifest와 출력에 기록하지 않는다.
+
 운영 반영 전 `npm run workbook:check`를 실행한다. 적용 후에는 API/DB를 다시 읽어 각 stage의 문항,
 빈칸 수, 힌트, 선택지, 정답과 provenance를 확인한다.
 # Deterministic semantic import
