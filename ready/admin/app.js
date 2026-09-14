@@ -1,7 +1,7 @@
 import {initStudio,attachStudio,importStudio} from './studio-ui.js?v=studio-workbook-dashboard-3';
 import { readyApi } from '../api.js';
 import { UNGROUPED, addGroup, createScopeLayout, emptyGroupDefinitions, flattenScopeLayout, moveGroup, movePassage, passageIds, removeGroup, removePassage } from './scope-layout.js';
-import { workbookAttemptReplayHtml } from './attempt-replay.js?v=admin-progress-1';
+import { workbookAttemptReplayHtml } from './attempt-replay.js?v=word-order-numeric-1';
 import { WORKBOOK_SECTIONS } from './workbook-sections.js';
 
 const $ = s => document.querySelector(s), $$ = s => [...document.querySelectorAll(s)];

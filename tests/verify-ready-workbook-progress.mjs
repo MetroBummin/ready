@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import {readFile} from 'node:fs/promises';
 import {clearWorkbookCycleItem,reconcileWorkbookProgress,workbookCycleMilestone,workbookProgressPercent,workbookProgressVisual} from '../ready/workbook-progress.js';
-import {gradeLocalWorkbook,gradeWorkbookCorrectionPairs} from '../ready/deterministic-grading.js';
+import {gradeLocalWorkbook,gradeWorkbookCorrectionPairs,normalizeWorkbookOrderAnswer,revealLocalWorkbook} from '../ready/deterministic-grading.js';
 import {workbookOrderModeAtProblemStart} from '../ready/workbook-order-practice.js';
 
 assert.equal(workbookProgressPercent(0,41),0);
@@ -49,6 +49,12 @@ assert.equal(empty.correct,false);
 const pair=gradeWorkbookCorrectionPairs(['moving','to move'],['',''],{allowIncomplete:true});
 assert.equal(pair.valid,true);
 assert.equal(pair.correct,false);
+assert.notEqual(normalizeWorkbookOrderAnswer('1.5'),normalizeWorkbookOrderAnswer('15'),'Order normalization must retain a decimal point.');
+assert.notEqual(normalizeWorkbookOrderAnswer('10,000'),normalizeWorkbookOrderAnswer('10000'),'Order normalization must retain a thousands separator.');
+const numericOrderContract={mode:'deterministic',kind:'word_order',answers:['1.5 15']};
+assert.equal(gradeLocalWorkbook(numericOrderContract,['15 1.5']).correct,false,'Reversed decimal and integer tokens must fail local order grading.');
+assert.equal(gradeLocalWorkbook(numericOrderContract,['1.5 15']).correct,true,'The exact numeric order must pass local grading.');
+assert.deepEqual(revealLocalWorkbook(numericOrderContract,['15 1.5']).slotResults,[false],'Reveal feedback must use the same numeric-safe order comparison.');
 
 const [app,edge,factory,studio,css,designCss,migration]=await Promise.all([
   readFile(new URL('../ready/app.js',import.meta.url),'utf8'),

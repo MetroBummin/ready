@@ -66,8 +66,14 @@ const comparableEnglish = value => fold(value)
 const sameEnglish = (left, right) => comparableEnglish(left) === comparableEnglish(right);
 const sameOption = (left, right) => fold(left) === fold(right);
 const words = value => clean(value).match(/[A-Za-z]+(?:[’'][A-Za-z]+)*/g) || [];
+// Ordering chips need to retain the source spelling of number-bearing terms
+// (for example, 10,000, 1.5, 15–20%, and CO₂). Keep this separate from the
+// shared alphabetic words() helper because its callers intentionally have a
+// narrower contract.
+const orderTokenParts = value => clean(value).match(/(?:[$€£₩¥#])?[\p{L}\p{M}\p{N}]+(?:[’'][\p{L}\p{M}\p{N}]+|[.,/‐‑‒–—−-][\p{L}\p{M}\p{N}]+)*%?/gu) || [];
 const koWords = value => clean(value).match(/[가-힣]+(?:[·ㆍ][가-힣]+)*/g) || [];
 export const SEMANTIC_WORKBOOK_CONTRACT = 'semantic-v2';
+export const PASSAGE_ORDER_TOKENIZER_VERSION = 'order-tokens-v2';
 const stageMeta = {
   1: ['1단계 · 우리말 빈칸', '영문을 보고 우리말 해석의 빈칸을 완성하세요.', 'korean_blank'],
   2: ['2단계 · 영어 빈칸', '우리말 해석을 보고 영문의 빈칸을 완성하세요.', 'english_blank'],
@@ -554,7 +560,15 @@ function restoreBlank(value, answer) { return clean(value).replace(/_{5,}/, answ
 function restoreBlanks(value, answers) { let index = 0; return clean(value).replace(/_{5,}/g, () => clean(answers?.[index++])); }
 function chooseEnglish(sentence) { return words(sentence).filter(word => word.length >= 4).sort((a, b) => b.length - a.length)[0] || words(sentence)[0] || ''; }
 function chooseKorean(sentence) { return koWords(sentence).filter(word => word.length >= 2).sort((a, b) => b.length - a.length)[0] || koWords(sentence)[0] || ''; }
-function orderTokens(sentence) { const tokens = words(sentence); return tokens.length >= 2 ? tokens : []; }
+function orderTokens(sentence) { const tokens = orderTokenParts(sentence); return tokens.length >= 2 ? tokens : []; }
+function orderTokenKey(value) { return clean(value).normalize('NFC').toLowerCase().replace(/[‐‑‒–—−]/g, '-'); }
+function sameOrderTokenBag(left, right) {
+  if (left.length !== right.length) return false;
+  const remaining = new Map();
+  for (const token of left) { const key = orderTokenKey(token), count = remaining.get(key) || 0; remaining.set(key, count + 1); }
+  for (const token of right) { const key = orderTokenKey(token), count = remaining.get(key) || 0; if (!count) return false; remaining.set(key, count - 1); }
+  return true;
+}
 function item(stage, number, key, fields) { return { key, stage, number, ...fields }; }
 function factoryKey(prefix, stage, number) { return `${prefix}-s${stage}-${String(number).padStart(2, '0')}`; }
 function canonicalItemKey(prefix, stage, row, number, previousCatalog) {
@@ -633,7 +647,7 @@ function fullWorkbookItems(sourceExercises, rows, prefix) {
       const span = sourceSpan(source, clean(source?.canonicalText) || answer || prompt, rows) || uniqueCanonicalSpan(prompt, rows);
       if (span && span.start === span.end) {
         const tokens = orderTokens(spanText(rows, span)), shuffled = factoryOrderBank(tokens, `${prefix}:${key}:${number}`);
-        if (shuffled.length) byStage.get(6).push(item(6, number, key, { kind: 'reorder_groups', semanticType, source: spanText(rows, span, 'translation'), prompt: '⟦ORDER:0⟧.', groups: [shuffled], answers: [tokens.join(' ').toLowerCase()], canonicalStart: span.start, canonicalEnd: span.end, provenance }));
+        if (shuffled.length) byStage.get(6).push(item(6, number, key, { kind: 'reorder_groups', semanticType, source: spanText(rows, span, 'translation'), prompt: '⟦ORDER:0⟧', groups: [shuffled], answers: [tokens.join(' ').toLowerCase()], canonicalStart: span.start, canonicalEnd: span.end, provenance }));
       }
     }
     if (stage === 7) {
@@ -661,8 +675,8 @@ export function validateSemanticWorkbookItem(stage, candidate, rowByNumber, cano
     return candidate.kind === 'choice_groups' && answers.length >= 1 && groups.length === answers.length && groups.every((group, index) => group.length >= 2 && group.some(option => sameOption(option, answers[index])) && group.every(option => !/,/.test(option))) && canonical && sameEnglish(rebuilt, canonical) ? '' : 'stage5_round_trip';
   }
   if (stage === 6) {
-    const span = { start: Number(candidate.canonicalStart), end: Number(candidate.canonicalEnd) }, canonical = spanText(canonicalRows, span), chips = candidate.groups?.[0] || [];
-    return candidate.kind === 'reorder_groups' && span.start === span.end && chips.length >= 2 && chips.every(chip => words(chip).length === 1 && !/\s/.test(clean(chip))) && candidate.answers?.[0] && fold(candidate.answers[0]) === fold(words(canonical).join(' ')) ? '' : 'stage6_word_order';
+    const span = { start: Number(candidate.canonicalStart), end: Number(candidate.canonicalEnd) }, canonical = spanText(canonicalRows, span), chips = candidate.groups?.[0] || [], canonicalTokens = orderTokens(canonical);
+    return candidate.kind === 'reorder_groups' && span.start === span.end && chips.length >= 2 && chips.every(chip => orderTokenParts(chip).length === 1 && !/\s/.test(clean(chip))) && sameOrderTokenBag(chips, canonicalTokens) && candidate.answers?.[0] && orderTokenKey(candidate.answers[0]) === orderTokenKey(canonicalTokens.join(' ')) ? '' : 'stage6_word_order';
   }
   if (stage === 7) return candidate.kind === 'full_sentence_input' && !clean(candidate.prompt) && !candidate.wordBank?.length && candidate.answers?.length === 1 && candidate.source === ko && sameEnglish(candidate.answers[0], en) ? '' : 'stage7_whole_sentence';
   return 'unsupported_stage';
@@ -685,6 +699,11 @@ export function generateWorkbookCatalog({ title, workbookKey, rows, sourceExerci
   return { contractVersion: SEMANTIC_WORKBOOK_CONTRACT, workbookKey: prefix, title: clean(title, 120) || 'READY Workbook', source, importReport: { factory: true, metrics, drops }, stages, metrics };
 }
 
+export function passageOrderNeedsRefresh(catalog) {
+  return (catalog?.stages || []).some(stage => Number(stage?.stage) === 6 && (stage?.items || []).some(item =>
+    item?.kind === 'reorder_groups' && item?.provenance?.generator === 'passage-core-v2' && item?.provenance?.origin === 'canonical_passage' && item?.provenance?.orderTokenizer !== PASSAGE_ORDER_TOKENIZER_VERSION));
+}
+
 // Passage-only deterministic core. It deliberately consumes canonical rows
 // only and never PDF geometry, publisher numbering, or an AI provider.
 export function generatePassageDeterministicCatalog({ title, workbookKey, rows, previousCatalog = null, provenance = {} }) {
@@ -697,13 +716,14 @@ export function generatePassageDeterministicCatalog({ title, workbookKey, rows, 
     const shared = { snapshot: JSON.stringify([row.text,row.translation]), generator: 'passage-core-v2', origin: 'canonical_passage', canonicalSentenceId: clean(row.id, 80) || null, canonicalRevision: Number(provenance.canonicalRevision) || null };
     generated.get(3).push(item(3, row.index, canonicalItemKey(prefix, 3, row, row.index, previousCatalog), { kind: 'translation_ai', semanticType: 'translation', source: row.text, prompt: '우리말 해석을 입력하세요.', answers: [row.translation], provenance: shared }));
     const tokens = orderTokens(row.text), shuffled = factoryOrderBank(tokens, `${prefix}:${row.id || row.index}:word-order`);
-    if (shuffled.length) generated.get(6).push(item(6, row.index, canonicalItemKey(prefix, 6, row, row.index, previousCatalog), { kind: 'reorder_groups', semanticType: 'word_order', source: row.translation, prompt: '⟦ORDER:0⟧.', groups: [shuffled], answers: [tokens.join(' ').toLowerCase()], canonicalStart: row.index, canonicalEnd: row.index, provenance: shared }));
+    if (shuffled.length) generated.get(6).push(item(6, row.index, canonicalItemKey(prefix, 6, row, row.index, previousCatalog), { kind: 'reorder_groups', semanticType: 'word_order', source: row.translation, prompt: '⟦ORDER:0⟧', groups: [shuffled], answers: [tokens.join(' ').toLowerCase()], canonicalStart: row.index, canonicalEnd: row.index, provenance: { ...shared, orderTokenizer: PASSAGE_ORDER_TOKENIZER_VERSION } }));
     else drops.push({ stage: 6, number: row.index, reason: 'stage6_word_order' });
     generated.get(7).push(item(7, row.index, canonicalItemKey(prefix, 7, row, row.index, previousCatalog), { kind: 'full_sentence_input', semanticType: 'writing', source: row.translation, prompt: '', answers: [row.text], canonicalStart: row.index, canonicalEnd: row.index, provenance: shared }));
   }
   for(const stage of [3,6,7])for(let index=0;index<generated.get(stage).length;index++){
     const next=generated.get(stage)[index],prior=previousCatalog?.stages?.find(s=>Number(s.stage)===stage)?.items?.find(item=>item.key===next.key);
-    if(prior?.provenance?.generator==='passage-core-v2'&&prior.provenance.snapshot===next.provenance.snapshot&&prior.number===next.number)generated.get(stage)[index]=structuredClone(prior);
+    const reusable=prior?.provenance?.generator==='passage-core-v2'&&prior.provenance.snapshot===next.provenance.snapshot&&prior.number===next.number;
+    if(reusable&&(stage!==6||prior.provenance.orderTokenizer===PASSAGE_ORDER_TOKENIZER_VERSION))generated.get(stage)[index]=structuredClone(prior);
   }
   const rowByNumber = new Map(canonical.map(row => [row.index, row]));
   for (const stage of [3, 6, 7]) for (const candidate of generated.get(stage)) {

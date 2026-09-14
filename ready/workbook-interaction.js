@@ -1,6 +1,13 @@
-import { normalizeDeterministicAnswer } from './deterministic-grading.js';
+import { normalizeWorkbookOrderAnswer } from './deterministic-grading.js?v=word-order-numeric-1';
 
-const clean=value=>normalizeDeterministicAnswer(value);
+const clean=value=>normalizeWorkbookOrderAnswer(value);
+
+// Legacy generated catalogs used a standalone marker followed by a forced
+// period. Remove only that presentation artifact, never source punctuation
+// adjacent to a marker or punctuation inside a numeric chip.
+export function workbookOrderDisplayPrompt(prompt=''){
+  return String(prompt??'').replace(/^(\s*⟦ORDER:\d+⟧)\.(\s*)$/u,'$1$2');
+}
 
 export function workbookEnterAction(values=[],currentIndex=0,result=null){
   if(result)return result.correct?{type:'next'}:{type:'retry'};

@@ -114,8 +114,16 @@ def numbered_answers(value: str) -> list[list[str]]:
     return rows
 
 
+ORDER_TOKEN_CHARS = r"A-Za-z0-9\u00C0-\u024F\u0370-\u1FFF\u2070-\u209F"
+ORDER_TOKEN = re.compile(rf"(?:[$€£₩¥#])?[{ORDER_TOKEN_CHARS}]+(?:[’'][{ORDER_TOKEN_CHARS}]+|[.,/‐‑‒–—−-][{ORDER_TOKEN_CHARS}]+)*%?")
+
+
+def order_tokens(sentence: str) -> list[str]:
+    return ORDER_TOKEN.findall(sentence)
+
+
 def shuffled_words(sentence: str, seed: str) -> list[str]:
-    tokens = re.findall(r"[A-Za-z]+(?:[’'][A-Za-z]+)*", sentence)
+    tokens = order_tokens(sentence)
     if len(tokens) < 2:
         return []
     rng = random.Random(hashlib.sha256(seed.encode()).digest())
@@ -171,7 +179,7 @@ def compile_question(question: int, stage_pages: dict[int, str], answer_block: s
         except Exception as error: invalid(3, index, str(error))
         publish(4, index, {"kind": "translation_ai", "source": en, "prompt": "우리말 해석을 입력하세요.", "answers": [ko]})
         bank = shuffled_words(en, f"{prefix}:{index}")
-        if bank: publish(8, index, {"kind": "reorder_groups", "source": ko, "prompt": "⟦ORDER:0⟧.", "groups": [bank], "answers": [" ".join(re.findall(r"[A-Za-z]+(?:[’'][A-Za-z]+)*", en)).lower()]})
+        if bank: publish(8, index, {"kind": "reorder_groups", "source": ko, "prompt": "⟦ORDER:0⟧", "groups": [bank], "answers": [" ".join(order_tokens(en)).lower()]})
         try:
             frame, word_bank = BASE.writing_frame(raw[10][index - 1][1], en); answers = BASE.cloze(frame, en)
             publish(9, index, {"kind": "blank_input", "source": raw[10][index - 1][0], "prompt": frame, "wordBank": word_bank, "answers": answers})

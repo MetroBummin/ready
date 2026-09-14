@@ -1,3 +1,5 @@
+import { workbookOrderDisplayPrompt } from '../workbook-interaction.js?v=word-order-numeric-1';
+
 const list=value=>Array.isArray(value)?value:[ ];
 
 function workbookBlankReplay(item,values,answers,slotResults,escape){
@@ -15,7 +17,7 @@ function workbookCorrectionReplay(item,values,answers,slotResults,escape){
 
 function workbookOrderReplay(item,values,answers,slotResults,escape){
   let slot=0;
-  return `<div class="workbook-prompt order-task" lang="en">${String(item.prompt||'').split(/(⟦ORDER:\d+⟧)/).map(part=>{const marker=part.match(/^⟦ORDER:(\d+)⟧$/);if(!marker)return escape(part);const index=slot++;return `<span class="workbook-order-group ${slotResults[index]?'correct':'wrong'}"><span class="workbook-order-built">${escape(values[index]||'응답 없음')}</span><small>정답: ${escape(answers[index]||'—')}</small></span>`;}).join('')}</div>`;
+  return `<div class="workbook-prompt order-task" lang="en">${workbookOrderDisplayPrompt(item.prompt).split(/(⟦ORDER:\d+⟧)/).map(part=>{const marker=part.match(/^⟦ORDER:(\d+)⟧$/);if(!marker)return escape(part);const index=slot++;return `<span class="workbook-order-group ${slotResults[index]?'correct':'wrong'}"><span class="workbook-order-built">${escape(values[index]||'응답 없음')}</span><small>정답: ${escape(answers[index]||'—')}</small></span>`;}).join('')}</div>`;
 }
 
 export function workbookAttemptReplayHtml(data,escape){

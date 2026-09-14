@@ -1,11 +1,12 @@
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
-import {progressiveOrderState,shuffleWorkbookOrderBatch,workbookEnterAction,workbookOrderAnswerIndexes,workbookOrderClick,workbookOrderTokenMatches} from '../ready/workbook-interaction.js';
+import {progressiveOrderState,shuffleWorkbookOrderBatch,workbookEnterAction,workbookOrderAnswerIndexes,workbookOrderClick,workbookOrderDisplayPrompt,workbookOrderTokenMatches} from '../ready/workbook-interaction.js';
 import {koreanRecallCompositionState} from '../ready/workbook-assistance.js';
 import {captureWorkbookOrderMode,workbookOrderModeAtProblemStart,workbookSemanticType} from '../ready/workbook-order-practice.js';
 
 const app=readFileSync(new URL('../ready/app.js',import.meta.url),'utf8');
 const writing=readFileSync(new URL('../ready/workbook-writing-ui.js',import.meta.url),'utf8');
+const design=readFileSync(new URL('../ready/design.css',import.meta.url),'utf8');
 const mismatchHandler=app.slice(app.indexOf('function flashRecallWrong'),app.indexOf('async function verifyWorkbookRecallInput'));
 
 assert.match(app,/WORKBOOK_AUTOFOCUS_TYPES=new Set\(\['korean_blank','english_blank','verb_form','translation','writing'\]\)/,'Only the five requested typing stages should opt into automatic focus');
@@ -70,6 +71,18 @@ assert.deepEqual(practiceState,{type:'correct',chosen:[0,1,2,3],consumed:[0,1,2,
 const strictMistake=workbookOrderClick(practiceGroup,practiceAnswer,[0,1],[0,1],3);
 assert.deepEqual(strictMistake,{type:'wrong',chosen:[0,1,3],consumed:[0,1,3]},'Real mode must retain the immediate-wrong attempt contract');
 
+const numericGroup=['15','1.5','2014','10,000','2014','CO₂','15–20%'],numericAnswer='1.5 2014 15 10,000 2014 CO₂ 15–20%';
+assert.deepEqual(workbookOrderAnswerIndexes(numericGroup,numericAnswer),[1,2,0,3,4,5,6],'Numeric chips, including repeated numbers, must keep their physical identities.');
+assert.equal(workbookOrderTokenMatches(numericGroup,1,0),false,'A decimal chip must not match the same digits without its decimal point.');
+assert.deepEqual(workbookOrderClick(numericGroup,numericAnswer,[],[],0),{type:'wrong',chosen:[0],consumed:[0]},'Real mode must reject 15 when the required chip is 1.5.');
+assert.deepEqual(workbookOrderClick(numericGroup,numericAnswer,[],[],0,{practice:true}),{type:'practice-wrong',chosen:[],consumed:[],chipIndex:0},'Practice mode must keep its non-consuming numeric mismatch behavior.');
+let numericState={chosen:[],consumed:[]};
+for(const chipIndex of [1,2,0,3,4,5,6])numericState=workbookOrderClick(numericGroup,numericAnswer,numericState.chosen,numericState.consumed,chipIndex);
+assert.deepEqual(numericState,{type:'correct',chosen:[1,2,0,3,4,5,6],consumed:[1,2,0,3,4,5,6]},'A full numeric ordering run must preserve decimal, amount, percentage, subscript, and repeated-year chip identities.');
+assert.equal(workbookOrderDisplayPrompt('⟦ORDER:0⟧.'),'⟦ORDER:0⟧','Only the legacy standalone marker period may be removed.');
+assert.equal(workbookOrderDisplayPrompt('In 2014, ⟦ORDER:0⟧.'),'In 2014, ⟦ORDER:0⟧.','Source punctuation beside an embedded marker must remain.');
+assert.equal(workbookOrderDisplayPrompt('⟦ORDER:0⟧ 1.5.'),'⟦ORDER:0⟧ 1.5.','A decimal or other prompt punctuation must remain untouched.');
+
 const duplicateGroup=['to','learn','to','read','well','today','fast'];
 assert.deepEqual(workbookOrderAnswerIndexes(duplicateGroup,'to learn to read well today fast'),[0,1,2,3,4,5,6],'Repeated chips must retain identity by index');
 const twoDuplicates=['the','cat','the'],twoDuplicateAnswer='the cat the';
@@ -112,6 +125,9 @@ assert.match(app,/aria-invalid="\$\{wrong\?'true':'false'\}"/,'A feedback chip m
 assert.match(app,/workbook-order-feedback" role="status">다시 골라보세요/,'Practice mistakes must provide text feedback as well as color');
 assert.match(app,/workbookMilestoneCopy[\s\S]{0,420}200% 완료! 이제 실전 모드예요/,'The existing 200% milestone must announce the switch once');
 assert.match(app,/orderModeSnapshot:null/,'Each Workbook session must begin with a fresh per-problem mode snapshot');
+assert.match(app,/workbookOrderDisplayPrompt\(item\.prompt\)/,'The student order renderer must clean the legacy standalone prompt artifact.');
+assert.match(design,/\.workbook-order-mode\{display:inline-block;padding:0;border:0;color:var\(--ready-muted\);background:transparent/,'The mode indicator must remain compact status text, not a button-like capsule.');
+assert.match(design,/\.workbook-order-mode\[data-workbook-order-mode="real"\]\{color:var\(--ready-body\)\}/,'The real-mode status text must use a defined theme color.');
 assert.match(app,/hintUsed\?'힌트 사용함':'힌트 보기'/,'Writing hint must become visibly exhausted after its one use');
 assert.match(app,/data-workbook-submit[\s\S]{0,300}data-workbook-hint[\s\S]{0,300}data-submit-workbook/,'Writing hint must live beside submit');
 

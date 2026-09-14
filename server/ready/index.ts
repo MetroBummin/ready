@@ -15,8 +15,8 @@ import { WORKBOOK_TRANSLATION_GRADING_POLICY, workbookTranslationPass } from "./
 import { normalizeWorkbookAnswer, publicWorkbookAssistance, workbookAssistanceMode, workbookRecallCue } from "./workbook-assistance.mjs";
 import { CURRENT_QUESTION_PUBLICATION_VERSION } from "./question-pipeline.mjs";
 import { QUESTION_DIFFICULTIES, isQuestionQaScope, normalizeQuestionDifficulty, questionVisibleInScope } from "./question-difficulty.mjs";
-import { compareCanonicalRows, extractSentenceRows, generatePassageDeterministicCatalog, generateWorkbookCatalog, inspectFullWorkbookText, PUBLISHER_VALIDATOR_VERSION, SEMANTIC_WORKBOOK_CONTRACT } from "./workbook-factory.mjs";
-import { gradeWorkbookCorrectionPairs } from "../../ready/deterministic-grading.js";
+import { compareCanonicalRows, extractSentenceRows, generatePassageDeterministicCatalog, generateWorkbookCatalog, inspectFullWorkbookText, passageOrderNeedsRefresh, PUBLISHER_VALIDATOR_VERSION, SEMANTIC_WORKBOOK_CONTRACT } from "./workbook-factory.mjs";
+import { gradeWorkbookCorrectionPairs, normalizeWorkbookOrderAnswer } from "../../ready/deterministic-grading.js";
 import { normalizeStageEightChips, repairAnswerKeyArtifacts, repairStageNineCatalog } from "./workbook-catalog-qa.mjs";
 import { attemptMetrics, groupAttemptCounts, learningPeriodStart } from "../../ready/admin/learning-progress.js";
 import { contentClaimStage, evidenceSnapshot, publicContentClaims, staleFactIds } from "./content-claim.mjs";
@@ -57,6 +57,7 @@ function clean(value: unknown, max = 10_000) { return String(value ?? "").replac
 function required(value: unknown, name: string, max = 10_000) { const out = clean(value, max); if (!out) throw new ApiError(400, `${name} 값이 필요합니다.`); return out; }
 function rows<T>(result: { data: T | null; error: { message: string } | null }): T { if (result.error) throw new ApiError(500, result.error.message); return result.data as T; }
 function cleanList(value: unknown, count: number, max: number) { return (Array.isArray(value) ? value : []).map(item => clean(item, max)).filter(Boolean).slice(0, count); }
+function normalizeWorkbookItemAnswer(item: any, value: unknown) { return item?.kind === "reorder_groups" ? normalizeWorkbookOrderAnswer(value) : normalizeWorkbookAnswer(value); }
 function parseJson(raw: string) { try { return JSON.parse(raw); } catch { /* Gemini occasionally adds a wrapper despite JSON mode. */ } const found = raw.match(/\{[\s\S]*\}/); if (!found) return null; try { return JSON.parse(found[0]); } catch { return null; } }
 function geminiModels() {
   const configured = clean(Deno.env.get("GEMINI_MODEL"), 80), fallback = clean(Deno.env.get("GEMINI_FALLBACK_MODEL"), 80) || GEMINI_FALLBACK_MODEL;
@@ -487,7 +488,7 @@ async function adminWorkbookAttemptReplay(attemptId: string) {
   const catalog = await workbookForPassage(passage), item = catalog?.workbookKey === attempt.workbook_key ? workbookItem(catalog, attempt.item_key) : null;
   if (!catalog || !item || Number(item.stage) !== Number(attempt.stage)) return { kind: "workbook", replayable: false, message: "현재 문항 버전과 일치하지 않아 완전 재현할 수 없습니다.", attempt, passage, snapshot: { exactHistoricalItem: false } };
   const responses = Array.isArray(attempt.response?.responses) ? attempt.response.responses : [], answers = Array.isArray(item.answers) ? item.answers : [];
-  const slotResults = item.kind === "correction_pairs" ? gradeWorkbookCorrectionPairs(answers, responses).slotResults : responses.map((response: string, index: number) => normalizeWorkbookAnswer(response) === normalizeWorkbookAnswer(answers[index]));
+  const slotResults = item.kind === "correction_pairs" ? gradeWorkbookCorrectionPairs(answers, responses).slotResults : responses.map((response: string, index: number) => normalizeWorkbookItemAnswer(item, response) === normalizeWorkbookItemAnswer(item, answers[index]));
   return { kind: "workbook", replayable: true, attempt, passage, workbook: { title: catalog.title, workbookKey: catalog.workbookKey }, item: { key: item.key, stage: item.stage, number: item.number, kind: item.kind || "blank_input", subtype: clean(item.subtype, 40), source: item.source || "", prompt: item.prompt, groups: item.groups || [], pairCount: Number(item.pairCount) || 0, slotCount: answers.length }, response: responses, answers, slotResults, snapshot: { exactHistoricalItem: false, matchedCurrentCatalog: true } };
 }
 async function adminAttemptReplay(body: any) {
@@ -1453,11 +1454,29 @@ function codeWorkbookForPassage(passage: any) {
   if(/(?:동아|이병민)/i.test(identity)&&/4\s*과/i.test(identity))return DONGA_LEEBYEONGMIN_L4_WORKBOOK;
   return null;
 }
+async function repairLegacyPassageOrderCatalog(passage: any, catalog: any) {
+  if (!passageOrderNeedsRefresh(catalog)) return catalog;
+  const sentenceResult = await db.from("ready_passage_sentences").select("id,sentence_index,text,translation,block_type,paragraph_index,active").eq("passage_id", passage.id).eq("active", true).order("sentence_index");
+  if (sentenceResult.error) throw new ApiError(500, sentenceResult.error.message);
+  const canonicalRows = rows<any[]>(sentenceResult).map(row => ({ ...row, blockType: row.block_type, paragraphIndex: row.paragraph_index }));
+  const refreshed = generatePassageDeterministicCatalog({
+    title: catalog.title || `${clean(passage?.title, 120)} · READY 워크북`,
+    workbookKey: catalog.workbookKey,
+    rows: canonicalRows,
+    previousCatalog: catalog,
+    provenance: { ...(catalog.source || {}), canonicalRevision: Number(passage?.canonical_revision) || Number(catalog?.source?.canonicalRevision) || null, deterministicGenerator: "passage-core-v1", geminiCallCount: 0 },
+  });
+  const repaired = structuredClone(catalog), stage = repaired.stages?.find((candidate: any) => Number(candidate.stage) === 6), refreshedStage = refreshed.stages.find((candidate: any) => Number(candidate.stage) === 6);
+  if (!stage || !refreshedStage) return catalog;
+  const retained = (stage.items || []).filter((item: any) => !(item?.kind === "reorder_groups" && item?.provenance?.generator === "passage-core-v2" && item?.provenance?.origin === "canonical_passage"));
+  stage.items = [...retained, ...refreshedStage.items].sort((left: any, right: any) => Number(left.number) - Number(right.number) || String(left.key).localeCompare(String(right.key)));
+  return repaired;
+}
 async function workbookForPassage(passage: any) {
   if (clean(passage?.id, 80)) {
     const stored = await db.from("ready_workbook_catalogs").select("catalog").eq("passage_id", passage.id).maybeSingle();
     if (stored.error) throw new ApiError(500, stored.error.message);
-    if (stored.data?.catalog) return normalizeStageEightChips(stored.data.catalog).catalog;
+    if (stored.data?.catalog) return repairLegacyPassageOrderCatalog(passage, normalizeStageEightChips(stored.data.catalog).catalog);
   }
   const codeCatalog = codeWorkbookForPassage(passage);
   if(codeCatalog){
@@ -1543,7 +1562,7 @@ async function studentWorkbook(body: any, session: ReadySession) {
       assistance: await publicWorkbookAssistance(item, sha256Hex),
       grading: item.kind === "translation_ai" || item.semanticType === "translation"
         ? { mode: "ai" }
-        : { mode: "deterministic", kind: item.kind === "correction_pairs" ? "correction_pairs" : "exact", answers: item.answers },
+        : { mode: "deterministic", kind: item.kind === "correction_pairs" ? "correction_pairs" : item.kind === "reorder_groups" ? "word_order" : "exact", answers: item.answers },
       completed: currentCycleClears.get(stage.semanticType || `stage:${stage.stage}`)?.has(item.key) === true, lastResult: latest.get(item.key) ?? null, bookmarked: bookmarks.has(item.key),
     }))),
   })));
@@ -1615,7 +1634,7 @@ async function submitWorkbookAttempt(body: any, session: ReadySession) {
   const stageItems = item.kind==='content_claim'?contentItems:(catalog.stages.find((stage: any) => stage.stage === item.stage)?.items || []);
   const revealedAnswer = body.revealAnswer === true, rawResponses = Array.isArray(body.responses) ? body.responses : [];
   const responses = Array.from({ length: item.answers.length }, (_, index) => clean(rawResponses[index], 1_000));
-  let slotResults = responses.map((response, index) => !!response && normalizeWorkbookAnswer(response) === normalizeWorkbookAnswer(item.answers[index])), resultAnswers=item.answers, correct = !revealedAnswer && slotResults.every(Boolean), aiFeedback = "", aiFeedbackLines: string[] = [], aiScore: number | null = null, gradingPolicy: string | null = null, aiRequestId: string | null = null;
+  let slotResults = responses.map((response, index) => !!response && normalizeWorkbookItemAnswer(item, response) === normalizeWorkbookItemAnswer(item, item.answers[index])), resultAnswers=item.answers, correct = !revealedAnswer && slotResults.every(Boolean), aiFeedback = "", aiFeedbackLines: string[] = [], aiScore: number | null = null, gradingPolicy: string | null = null, aiRequestId: string | null = null;
   if(item.kind==="correction_pairs"){const pairGrade=gradeWorkbookCorrectionPairs(item.answers,responses,{allowIncomplete:true});if(!pairGrade.valid)throw new ApiError(400,"고침 쌍 형식을 확인해 주세요.");slotResults=pairGrade.slotResults;resultAnswers=pairGrade.alignedAnswers;correct=!revealedAnswer&&pairGrade.correct;}
   let hintCount = 0, usedFullAnswerHint = false, completedAfterHint = false;
   if ((item.semanticType === "writing" || Number(item.stage) === 9) && body.hintReceipt) {

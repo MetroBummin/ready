@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { extractSentenceRows, generatePassageDeterministicCatalog } from '../server/ready/workbook-factory.mjs';
+import { PASSAGE_ORDER_TOKENIZER_VERSION, extractSentenceRows, generatePassageDeterministicCatalog, passageOrderNeedsRefresh } from '../server/ready/workbook-factory.mjs';
 
 const visualImageryTsv = `Humans excel at visual imagery.\t인간은 시각적 심상에 뛰어나다.
 Our brains evolved this ability to create an internal mental picture or model of the world in which we can rehearse forthcoming actions, without the risks or the penalties of doing them in the real world.\t우리의 뇌는 실제 세계에서 그것들을 행하는 위험이나 불이익 없이, 다가올 행동들을 예행 연습할 수 있는 세계의 내적 정신적 그림 혹은 모델을 만들어내는 이 능력을 진화시켰다.
@@ -32,11 +32,33 @@ for(const item of catalog.stages.find(stage=>stage.stage===6).items)assert.ok(it
 for(const item of catalog.stages.find(stage=>stage.stage===7).items)assert.equal(item.answers.length,1);
 const regenerated=generatePassageDeterministicCatalog({title:'Fixture',workbookKey:'fixture',rows:[rows[0],rows[1],rows[4],rows[2],rows[3]],previousCatalog:catalog,provenance:{canonicalRevision:3}});
 assert.equal(regenerated.stages.find(stage=>stage.stage===7).items.find(item=>item.provenance.canonicalSentenceId==='sentence-1').key,catalog.stages.find(stage=>stage.stage===7).items[0].key,'stable sentence identity preserves progress keys after reorder.');
+
+const numericRows=[{id:'numeric-sentence',blockType:'SENTENCE',paragraphIndex:0,text:'In 2014, CO₂ cost 10,000 at 1.5 after a 15–20% rise.',translation:'수치가 있는 문장이다.'}];
+const numericCatalog=generatePassageDeterministicCatalog({title:'Numeric',workbookKey:'numeric',rows:numericRows,provenance:{canonicalRevision:1}});
+const legacyNumericCatalog=structuredClone(numericCatalog),legacyOrder=legacyNumericCatalog.stages.find(stage=>stage.stage===6).items[0];
+delete legacyOrder.provenance.orderTokenizer;
+legacyOrder.prompt='⟦ORDER:0⟧.';
+legacyOrder.groups=[['In','CO','cost','at','after','a','rise']];
+legacyOrder.answers=['in co cost at after a rise'];
+legacyNumericCatalog.stages.find(stage=>stage.stage===4).items=[{key:'authored-stage-four',stage:4,number:1,kind:'verb_form',provenance:{origin:'publisher'}}];
+const legacyStageThree=structuredClone(legacyNumericCatalog.stages.find(stage=>stage.stage===3)),legacyStageSeven=structuredClone(legacyNumericCatalog.stages.find(stage=>stage.stage===7)),legacyStageFour=structuredClone(legacyNumericCatalog.stages.find(stage=>stage.stage===4));
+assert.equal(passageOrderNeedsRefresh(legacyNumericCatalog),true,'Only a legacy deterministic Stage 6 must be selected for numeric-token repair.');
+const refreshedNumericCatalog=generatePassageDeterministicCatalog({title:'Numeric',workbookKey:'numeric',rows:numericRows,previousCatalog:legacyNumericCatalog,provenance:{canonicalRevision:1}});
+const refreshedOrder=refreshedNumericCatalog.stages.find(stage=>stage.stage===6).items[0];
+assert.equal(refreshedOrder.key,legacyOrder.key,'Refreshing numeric order chips must retain the existing item key.');
+assert.deepEqual([...refreshedOrder.groups[0]].sort(),['In','2014','CO₂','cost','10,000','at','1.5','after','a','15–20%','rise'].sort(),'Refreshing a legacy order item must restore every numeric expression.');
+assert.equal(refreshedOrder.prompt,'⟦ORDER:0⟧','Refreshing a legacy order item must remove only the detached prompt period.');
+assert.equal(refreshedOrder.provenance.orderTokenizer,PASSAGE_ORDER_TOKENIZER_VERSION);
+assert.equal(passageOrderNeedsRefresh(refreshedNumericCatalog),false);
+assert.deepEqual(refreshedNumericCatalog.stages.find(stage=>stage.stage===3),legacyStageThree,'Stage 3 must be reused unchanged during an order-only refresh.');
+assert.deepEqual(refreshedNumericCatalog.stages.find(stage=>stage.stage===7),legacyStageSeven,'Stage 7 must be reused unchanged during an order-only refresh.');
+assert.deepEqual(refreshedNumericCatalog.stages.find(stage=>stage.stage===4),legacyStageFour,'Non-deterministic workbook stages must remain untouched during an order-only refresh.');
 const admin = readFileSync(new URL('../ready/admin/app.js', import.meta.url), 'utf8');
 const adminHtml = readFileSync(new URL('../ready/admin/index.html', import.meta.url), 'utf8');
 const studioUi = readFileSync(new URL('../ready/admin/studio-ui.js', import.meta.url), 'utf8');
 const workbookSections = readFileSync(new URL('../ready/admin/workbook-sections.js', import.meta.url), 'utf8');
 const student = readFileSync(new URL('../ready/app.js', import.meta.url), 'utf8');
+const attemptReplay = readFileSync(new URL('../ready/admin/attempt-replay.js', import.meta.url), 'utf8');
 const edge = readFileSync(new URL('../server/ready/index.ts', import.meta.url), 'utf8');
 const migration = readFileSync(new URL('../supabase/migrations/20260906114040_ready_live_passage_editor.sql', import.meta.url), 'utf8');
 for (const control of ['data-canonical-add','data-canonical-delete','data-canonical-kind','data-easy-translation']) assert.match(admin,new RegExp(control));
@@ -52,6 +74,11 @@ assert.match(admin,/data-delete-selected-passages/,'Studio selection must expose
 assert.match(admin,/data-open-workbook-section/,'Workbook section counts must be direct navigation links');
 assert.match(edge,/savePassageCanonical[\s\S]*regenerateDeterministicPassage/);
 assert.doesNotMatch(edge.match(/async function regenerateDeterministicPassage[\s\S]*?async function savePassageCanonical/)?.[0]||'',/Gemini|callGemini|geminiSentenceJson/);
+assert.match(edge,/async function repairLegacyPassageOrderCatalog[\s\S]*passageOrderNeedsRefresh/,'Stored legacy deterministic catalogs must receive an in-memory Stage 6-only repair.');
+assert.match(edge,/const retained = \(stage\.items \|\| \[\]\)\.filter\(\(item: any\) => !\(item\?\.kind === "reorder_groups" && item\?\.provenance\?\.generator === "passage-core-v2" && item\?\.provenance\?\.origin === "canonical_passage"\)\)/,'The runtime repair must retain any non-deterministic Stage 6 items.');
+assert.match(edge,/item\.kind === "reorder_groups" \? "word_order" : "exact"/,'Student order items must receive the order-specific grading contract.');
+assert.match(edge,/normalizeWorkbookItemAnswer\(item, response\)/,'Server submit and replay must use the order-specific numeric comparator.');
+assert.match(attemptReplay,/workbookOrderDisplayPrompt\(item\.prompt\)/,'Admin replay must hide the legacy standalone order-marker period too.');
 assert.match(migration,/canonical_revision[\s\S]*ai_regeneration_required[\s\S]*ready_publish_deterministic_catalog/);
 assert.doesNotMatch(student,/오늘도 한 지문씩/);
 assert.match(student,/state\.resume\?`<section class="student-resume"/);

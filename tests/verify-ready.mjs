@@ -115,7 +115,7 @@ assert.doesNotMatch(studentApp,/list_students|set_student_pin|selectedStudent/);
 assert.match(adminApp,/set_student_code/);
 assert.match(edgeLoginSource,/ready_verify_student_code/);
 assert.match(edgeLoginSource,/READY_STUDENT_CODE_PEPPER/,'student code lookup fingerprint must use a dedicated deployment secret');
-assert.match(edgeLoginSource,/grading: item\.kind === "translation_ai" \|\| item\.semanticType === "translation"[\s\S]*kind: item\.kind === "correction_pairs" \? "correction_pairs" : "exact"/,'Assigned Workbook items must carry one explicit grading contract');
+assert.match(edgeLoginSource,/grading: item\.kind === "translation_ai" \|\| item\.semanticType === "translation"[\s\S]*kind: item\.kind === "correction_pairs" \? "correction_pairs" : item\.kind === "reorder_groups" \? "word_order" : "exact"/,'Assigned Workbook items must carry one explicit grading contract');
 assert.match(edgeLoginSource,/gradeWorkbookCorrectionPairs\(item\.answers,responses,\{allowIncomplete:true\}\)/,'Correction grading and incomplete submissions must compare pairs as a multiset');
 assert.match(edgeLoginSource,/Subscription Economy[\s\S]*YBM_PARKJUNEON_L2_WORKBOOK/,'Legacy code workbooks must match their actual passage identity, not every same-publisher lesson number');
 assert.doesNotMatch(edgeLoginSource,/lesson===2\?YBM_PARKJUNEON_L2_WORKBOOK/,'A mislabeled YBM lesson must not receive an unrelated static workbook');

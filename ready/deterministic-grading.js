@@ -6,11 +6,21 @@ export function normalizeDeterministicAnswer(value){
     .replace(/\s+/g,' ').trim();
 }
 
+// Ordering answers come from source-faithful chips. Unlike generic text
+// answers, their internal punctuation is semantic: 1.5 must not match 15,
+// and 10,000 must not match 10000.
+export function normalizeWorkbookOrderAnswer(value){
+  return String(value??'').trim().normalize('NFC').toLowerCase()
+    .replace(/[‐‑‒–—−]/g,'-')
+    .replace(/\s+/g,' ').trim();
+}
+
 export function gradeLocalWorkbook(contract={},responses=[],{usedFullAnswerHint=false}={}){
   if(contract.mode!=='deterministic')return {valid:false,needsServer:true};
   const answers=list(contract.answers),values=list(responses);
   if(!answers.length||values.length!==answers.length)return {valid:false,needsServer:false};
-  const slotResults=values.map((value,index)=>normalizeDeterministicAnswer(value)===normalizeDeterministicAnswer(answers[index]));
+  const normalize=contract.kind==='word_order'?normalizeWorkbookOrderAnswer:normalizeDeterministicAnswer;
+  const slotResults=values.map((value,index)=>normalize(value)===normalize(answers[index]));
   const completed=slotResults.every(Boolean),correct=completed&&!usedFullAnswerHint;
   return {valid:true,correct,completedAfterHint:completed&&usedFullAnswerHint,answers:correct?[]:answers,slotResults,needsServer:false};
 }
@@ -40,6 +50,7 @@ export function revealLocalWorkbook(contract={},responses=[]){
   if(contract.mode!=='deterministic')return {valid:false,needsServer:true};
   const answers=list(contract.answers),values=list(responses);
   if(!answers.length)return {valid:false,needsServer:false};
-  const slotResults=answers.map((answer,index)=>!!String(values[index]??'').trim()&&normalizeDeterministicAnswer(values[index])===normalizeDeterministicAnswer(answer));
+  const normalize=contract.kind==='word_order'?normalizeWorkbookOrderAnswer:normalizeDeterministicAnswer;
+  const slotResults=answers.map((answer,index)=>!!String(values[index]??'').trim()&&normalize(values[index])===normalize(answer));
   return {valid:true,correct:false,revealedAnswer:true,answers,slotResults,needsServer:false};
 }
