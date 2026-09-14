@@ -30,14 +30,16 @@ export function workbookOrderTokenMatches(group=[],expectedIndex=-1,clickedIndex
   return Boolean(expected)&&expected===clicked;
 }
 
-export function workbookOrderClick(group=[],answer='',chosen=[],consumed=[],chipIndex=-1){
+export function workbookOrderClick(group=[],answer='',chosen=[],consumed=[],chipIndex=-1,{practice=false}={}){
   const progressive=progressiveOrderState(group,answer,chosen),nextChosen=[...chosen],nextConsumed=[...consumed];
   if(!Number.isInteger(chipIndex)||chipIndex<0||chipIndex>=group.length||nextConsumed.includes(chipIndex)||progressive.nextExpected<0)return {type:'ignore',chosen:nextChosen,consumed:nextConsumed};
-  nextConsumed.push(chipIndex);
   if(!workbookOrderTokenMatches(group,progressive.nextExpected,chipIndex)){
+    if(practice)return {type:'practice-wrong',chosen:nextChosen,consumed:nextConsumed,chipIndex};
+    nextConsumed.push(chipIndex);
     nextChosen.push(chipIndex);
     return {type:'wrong',chosen:nextChosen,consumed:nextConsumed};
   }
+  nextConsumed.push(chipIndex);
   nextChosen.push(progressive.nextExpected);
   return {type:'correct',chosen:nextChosen,consumed:nextConsumed};
 }
