@@ -1,0 +1,292 @@
+{
+  "21": {
+    "passageId": "86fcf508-771c-4155-9f7f-b429698d648e",
+    "rows": [
+      {
+        "id": "6449d14e-57f6-4458-9373-0f74f1ed9227",
+        "text": "We are wonderfully made, yet we don't allow ourselves to participate in the wonder for which we were created.",
+        "translation": "우리는 경이롭게 만들어졌지만, 우리가 창조된 목적인 그 경이로움에 우리 자신이 참여하게 하지 않는다.",
+        "block_type": "SENTENCE",
+        "paragraph_index": 0,
+        "active": true,
+        "sentence_index": 0,
+        "blockType": "SENTENCE",
+        "paragraphIndex": 0
+      },
+      {
+        "id": "9ca5e66c-0622-40b5-9c98-9d00c841fcb7",
+        "text": "Instead of moving anywhere and everywhere, most of us spend our time moving nowhere.",
+        "translation": "어디로든 사방으로 움직이는 대신에, 우리의 대부분은 어디로도 움직이지 않은 채 우리의 시간을 보낸다.",
+        "block_type": "SENTENCE",
+        "paragraph_index": 0,
+        "active": true,
+        "sentence_index": 1,
+        "blockType": "SENTENCE",
+        "paragraphIndex": 0
+      },
+      {
+        "id": "9e594807-2d3a-4b94-b03a-26a797c9a4fa",
+        "text": "We occupy the same square footage of a chair for hours and hours every day.",
+        "translation": "우리는 매일 몇 시간이고 의자와 동일한 제곱 피트수를 차지한다.",
+        "block_type": "SENTENCE",
+        "paragraph_index": 0,
+        "active": true,
+        "sentence_index": 2,
+        "blockType": "SENTENCE",
+        "paragraphIndex": 0
+      },
+      {
+        "id": "57569fe6-d2d4-4daa-8321-1a68df15dd82",
+        "text": "Many kids today are being held captive by 'smart' devices like phones and tablets.",
+        "translation": "오늘날 많은 아이들은 폰과 태블릿 같은 '스마트' 기기들에 사로 잡혀 있는 중이다.",
+        "block_type": "SENTENCE",
+        "paragraph_index": 0,
+        "active": true,
+        "sentence_index": 3,
+        "blockType": "SENTENCE",
+        "paragraphIndex": 0
+      },
+      {
+        "id": "fc926c8c-05f1-4867-a13b-c00e90fa6434",
+        "text": "They are not going outside to play, they are not learning how to socialize and read physical cues from others.",
+        "translation": "그들은 놀기 위해 밖으로 나가지 않고 있으며, 그들은 사회화하는 법과 타인으로부터 신체적 신호를 읽는 법을 배우고 있지 않다.",
+        "block_type": "SENTENCE",
+        "paragraph_index": 0,
+        "active": true,
+        "sentence_index": 4,
+        "blockType": "SENTENCE",
+        "paragraphIndex": 0
+      },
+      {
+        "id": "c677a5a1-5387-4bc0-8609-5a0641ac4d78",
+        "text": "As a result they are not learning or building their movement repertoire, the very thing that will help them learn, communicate, create, and become emotionally mature.",
+        "translation": "그 결과 그들은 그들의 움직임 레퍼토리, 즉 그들이 학습하고 소통하고 창조하며 정서적으로 성숙해지도록 도와줄 바로 그것을 배우거나 형성하지 않고 있다.",
+        "block_type": "SENTENCE",
+        "paragraph_index": 0,
+        "active": true,
+        "sentence_index": 5,
+        "blockType": "SENTENCE",
+        "paragraphIndex": 0
+      },
+      {
+        "id": "648c7a61-db68-4906-858e-1cad6067c223",
+        "text": "They are not even learning how to run, how to skip, or how to climb.",
+        "translation": "그들은 심지어 달리는 법, 깡충 뛰는 법, 혹은 기어오르는 법조차 배우고 있지 않다.",
+        "block_type": "SENTENCE",
+        "paragraph_index": 0,
+        "active": true,
+        "sentence_index": 6,
+        "blockType": "SENTENCE",
+        "paragraphIndex": 0
+      },
+      {
+        "id": "25d7f060-7fee-4bff-9b75-c0dc1ca831cb",
+        "text": "Instead, they are learning how to live with anxiety, depression, and even diseases they were never meant to have.",
+        "translation": "대신에 그들은 결코 가지기로 되어 있지 않았던 불안, 우울, 그리고 심지어 질병들과 사는 법을 배우고 있다.",
+        "block_type": "SENTENCE",
+        "paragraph_index": 0,
+        "active": true,
+        "sentence_index": 7,
+        "blockType": "SENTENCE",
+        "paragraphIndex": 0
+      },
+      {
+        "id": "4e10f351-a4fd-48c2-ba18-dd7389bc0a74",
+        "text": "The point is we are getting further and further away from our design.",
+        "translation": "요점은 우리가 우리의 설계로부터 점점 더 멀어지고 있는 중이라는 것이다.",
+        "block_type": "SENTENCE",
+        "paragraph_index": 0,
+        "active": true,
+        "sentence_index": 8,
+        "blockType": "SENTENCE",
+        "paragraphIndex": 0
+      },
+      {
+        "id": "e0134162-b6dd-4418-8571-9a30324220e5",
+        "text": "We were made to move — and through movement, we are meant to live extraordinary lives.",
+        "translation": "우리는 움직이도록 만들어졌으며, 움직임을 통해 특별한 삶을 살도록 되어있다.",
+        "block_type": "SENTENCE",
+        "paragraph_index": 0,
+        "active": true,
+        "sentence_index": 9,
+        "blockType": "SENTENCE",
+        "paragraphIndex": 0
+      },
+      {
+        "id": "ce3815d5-e295-40d2-a716-eb2f5c88aa01",
+        "text": "Movement is life to us.",
+        "translation": "움직임은 우리에게 삶'이다.'",
+        "block_type": "SENTENCE",
+        "paragraph_index": 0,
+        "active": true,
+        "sentence_index": 10,
+        "blockType": "SENTENCE",
+        "paragraphIndex": 0
+      }
+    ]
+  },
+  "22": {
+    "passageId": "7ad6930b-9862-4eb9-ade5-3c90bebc4f58",
+    "rows": [
+      {
+        "id": "64e6194e-8327-471c-a8c6-2d05da85b2d5",
+        "text": "Perhaps you have heard of the Law of Attraction, which states that 'like attracts like' and that by focusing on positive or negative thoughts, one can bring about positive or negative results.",
+        "translation": "아마 당신은 끌어당김의 법칙을 들어본 적이 있을 텐데, 이는 '같은 것은 같은 것을 끌어당긴다' 그리고 긍정적 혹은 부정적 생각에 집중함으로써 사람은 긍정적 혹은 부정적 결과를 가져올 수 있다고 말한다.",
+        "block_type": "SENTENCE",
+        "paragraph_index": 0,
+        "active": true,
+        "sentence_index": 0,
+        "blockType": "SENTENCE",
+        "paragraphIndex": 0
+      },
+      {
+        "id": "e70a430b-697a-473e-9a78-f6741521fc01",
+        "text": "The common flaw in our understanding of this law is that we believe all we have to do is think about or visualize something to manifest it.",
+        "translation": "이 법칙에 대한 우리의 이해에서 흔한 오류는 그것을 명백히 하기 위해 우리가 할 일은 어떤 것을 생각하거나 시각화하는 것이라 믿는 것이다.",
+        "block_type": "SENTENCE",
+        "paragraph_index": 0,
+        "active": true,
+        "sentence_index": 1,
+        "blockType": "SENTENCE",
+        "paragraphIndex": 0
+      },
+      {
+        "id": "07e9115e-e736-4b1f-93d5-d282edcfc380",
+        "text": "It is true that we attract at the level of our own vibration and that our thoughts and words are extremely magnetic.",
+        "translation": "우리가 자신의 진동 수준에 따라 끌어당기며, 우리의 생각과 말이 매우 강한 자기력을 지니고 있다는 점은 사실이다.",
+        "block_type": "SENTENCE",
+        "paragraph_index": 0,
+        "active": true,
+        "sentence_index": 2,
+        "blockType": "SENTENCE",
+        "paragraphIndex": 0
+      },
+      {
+        "id": "51e301ac-5f8c-4a56-94da-aa76218f83b7",
+        "text": "But the most powerful attractor is our belief system.",
+        "translation": "그러나 가장 강력한 끌어당기는 것은 우리의 신념 체계이다.",
+        "block_type": "SENTENCE",
+        "paragraph_index": 0,
+        "active": true,
+        "sentence_index": 3,
+        "blockType": "SENTENCE",
+        "paragraphIndex": 0
+      },
+      {
+        "id": "cf97b29e-b91a-491b-8b58-d66b634318fa",
+        "text": "You can create beautiful poster boards full of images of what you want and affirm every day that you are available for an incredibly successful, passionate career or a loving relationship; but if you don't truly believe you are enough, worthy, lovable, and deserving, then attracting a great career or relationship into your life may be more challenging.",
+        "translation": "당신이 원하는 것들의 이미지로 가득 찬 아름다운 포스터 보드를 만들고, 놀라울 만큼 성공적이고 열정적인 경력 혹은 사랑하고 있는 관계를 누릴만하다고 매일 확언할 수 있다. 하지만 스스로가 충분하고, 가치 있고, 사랑받을 만하고, 그럴 자격이 있다고 진정으로 믿지 않는다면, 훌륭한 경력이나 관계를 당신의 삶 속으로 끌어들이는 일은 더 어려울 수도 있다.",
+        "block_type": "SENTENCE",
+        "paragraph_index": 0,
+        "active": true,
+        "sentence_index": 4,
+        "blockType": "SENTENCE",
+        "paragraphIndex": 0
+      },
+      {
+        "id": "f9e3250a-46e3-4d89-9720-f022af91bb00",
+        "text": "Consider what limiting beliefs you have that contradict your desires and upgrade them to beliefs that are in line with what you want to attract.",
+        "translation": "당신의 욕구와 모순되는 어떤 제한적인 신념들을 당신이 가졌는지를 숙고하고, 당신이 끌어당기고자 하는 것과 일치하는 신념으로 그것들을 업그레이드하라.",
+        "block_type": "SENTENCE",
+        "paragraph_index": 0,
+        "active": true,
+        "sentence_index": 5,
+        "blockType": "SENTENCE",
+        "paragraphIndex": 0
+      }
+    ]
+  },
+  "23": {
+    "passageId": "2c341699-43cd-4f05-8d9b-35774fa84288",
+    "rows": [
+      {
+        "id": "986b5ba9-0aca-4e0b-bb4c-ba29094a5e3f",
+        "text": "It's important for humans to have many kinds of minds, because variation is critical for the survival of a species.",
+        "translation": "인간이 다양한 유형의 마음을 갖는 것은 중요한데, 변이는 종의 생존에 결정적이기 때문이다.",
+        "block_type": "SENTENCE",
+        "paragraph_index": 0,
+        "active": true,
+        "sentence_index": 0,
+        "blockType": "SENTENCE",
+        "paragraphIndex": 0
+      },
+      {
+        "id": "3ffae2c9-d1a7-482d-b501-4c152773f913",
+        "text": "One of Charles Darwin's greatest insights was that variation is a prerequisite for natural selection to work.",
+        "translation": "Charles Darwin의 가장 위대한 통찰 중 하나는 변이가 자연 선택이 작동하기 위한 선행 조건이라는 점이었다.",
+        "block_type": "SENTENCE",
+        "paragraph_index": 0,
+        "active": true,
+        "sentence_index": 1,
+        "blockType": "SENTENCE",
+        "paragraphIndex": 0
+      },
+      {
+        "id": "45596cd3-3559-48ec-b0a3-0480697d5837",
+        "text": "Think about it: If there's a huge change in the environment, like a catastrophic drop in the food supply or a big increase in temperature, a species without much variation might be completely wiped out.",
+        "translation": "생각해 보라. 만약에 식량 공급에서의 재앙적 감소나 기온에서의 큰 상승과 같은 환경에 거대한 변화가 있다면, 많은 변이가 없는 종은 완전히 사라질 수도 있다.",
+        "block_type": "SENTENCE",
+        "paragraph_index": 0,
+        "active": true,
+        "sentence_index": 2,
+        "blockType": "SENTENCE",
+        "paragraphIndex": 0
+      },
+      {
+        "id": "10b4fec0-6a60-44ea-9ebc-425e4256e43f",
+        "text": "A species with great variation will more likely have some survivors after any catastrophe — the members who are well suited for the new environment.",
+        "translation": "변이가 큰 종은 어떤 재앙 이후에도 몇몇 생존자들 즉 새로운 환경에 잘 적응한 구성원들을 가질 가능성이 더 크다.",
+        "block_type": "SENTENCE",
+        "paragraph_index": 0,
+        "active": true,
+        "sentence_index": 3,
+        "blockType": "SENTENCE",
+        "paragraphIndex": 0
+      },
+      {
+        "id": "8d33d4b7-8c6b-4442-8323-4929a5d411d0",
+        "text": "Darwin observed variation in the bodies of animals, and the same principle applies to human minds.",
+        "translation": "Darwin은 동물의 몸에서 변이를 관찰했으며, 동일한 원리는 인간의 마음에도 적용된다.",
+        "block_type": "SENTENCE",
+        "paragraph_index": 0,
+        "active": true,
+        "sentence_index": 4,
+        "blockType": "SENTENCE",
+        "paragraphIndex": 0
+      },
+      {
+        "id": "06460173-be03-4a89-b09b-680679694d94",
+        "text": "If we all had the same kind of mind — if there were only one human nature — then when disaster struck, we might become extinct.",
+        "translation": "만약 우리가 모두 같은 유형의 마음을 가지고 있고 인간 본성이 하나뿐이라면, 재난이 닥쳤을 때 우리는 멸종할지도 모른다.",
+        "block_type": "SENTENCE",
+        "paragraph_index": 0,
+        "active": true,
+        "sentence_index": 5,
+        "blockType": "SENTENCE",
+        "paragraphIndex": 0
+      },
+      {
+        "id": "e9b8445a-b1a9-4dc5-b4bb-00066b722053",
+        "text": "Thankfully, our species has many kinds of minds, both within a single culture and across cultures, so we're less likely to be wiped out.",
+        "translation": "다행히도 우리 종은 단일 문화 내와 문화 간 둘 다에서 다양한 유형의 마음을 지니고 있어서 우리는 사라질 가능성이 더 낮다.",
+        "block_type": "SENTENCE",
+        "paragraph_index": 0,
+        "active": true,
+        "sentence_index": 6,
+        "blockType": "SENTENCE",
+        "paragraphIndex": 0
+      },
+      {
+        "id": "bede4ecb-7933-45cf-ba79-e3200a032526",
+        "text": "This variation preserves the evolvability of our species.",
+        "translation": "이러한 변이는 우리 종의 진화 가능성을 보존한다.",
+        "block_type": "SENTENCE",
+        "paragraph_index": 0,
+        "active": true,
+        "sentence_index": 7,
+        "blockType": "SENTENCE",
+        "paragraphIndex": 0
+      }
+    ]
+  }
+}

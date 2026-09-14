@@ -8,11 +8,28 @@ function indexPublisherFrame(text,expected,from){
   for(let at=from;at<=text.length-expected.length;at++)if(startsPublisherFrame(text,expected,at))return at;
   return -1;
 }
+function consumePublisherFixed(text,expected,from,ignoreWhitespace=false){
+  if(!ignoreWhitespace)return startsPublisherFrame(text,expected,from)?from+expected.length:-1;
+  let at=from;
+  for(const character of expected){
+    if(/\s/u.test(character))continue;
+    while(/\s/u.test(text[at]||''))at++;
+    if(!startsPublisherFrame(text,character,at))return -1;
+    at+=character.length;
+  }
+  while(/\s/u.test(text[at]||''))at++;
+  return at;
+}
 export function publisherAnnotationAudit(rows,sourceExercises,metadata={}) {
   const canonical=sentenceRows(rows),annotations=syncAnnotations(rows,{});
   const drops=[];
   if(!sourceExercises?.length)return {annotations,drops};
   const catalog=generateWorkbookCatalog({title:'Publisher candidates',workbookKey:'publisher',rows:canonical,sourceExercises,provenance:metadata});
+  drops.push(...(catalog.importReport?.drops||[]).map(drop=>({stage:catalog.stages.find(candidate=>candidate.stage===drop.stage)?.semanticType||drop.stage,number:drop.number,reason:drop.reason})));
+  const requirements=sourceExercises.filter(source=>STAGE[source.type]||source.type==='grammar_vocab_choice').map(source=>({semanticType:source.type==='grammar_vocab_choice'?'grammar_choice':source.type,sourceExerciseId:source.provenance?.sourceExerciseId||null,number:Number(source.number),targets:Array.isArray(source.answers)?source.answers.length:0}));
+  const candidates=new Map();
+  for(const stage of catalog.stages.filter(item=>AUTHORED.includes(item.semanticType)))for(const item of stage.items){const id=item.provenance?.sourceExerciseId||`${stage.semanticType}:${item.number}`,key=`${stage.semanticType}:${id}`;candidates.set(key,(candidates.get(key)||0)+(item.answers?.length||0));}
+  for(const requirement of requirements){const id=requirement.sourceExerciseId||`${requirement.semanticType}:${requirement.number}`,actual=candidates.get(`${requirement.semanticType}:${id}`)||0;if(actual!==requirement.targets)drops.push({stage:requirement.semanticType,number:requirement.number,reason:'publisher_source_coverage',sourceExerciseId:requirement.sourceExerciseId,expectedTargets:requirement.targets,readyTargets:actual});}
   for(const stage of catalog.stages.filter(s=>AUTHORED.includes(s.semanticType)))for(const item of stage.items){
     const start=Number(item.canonicalStart)||Number(item.number),end=Number(item.canonicalEnd)||start,spanRows=canonical.slice(start-1,end);
     if(start<1||end<start||spanRows.length!==end-start+1){drops.push({stage:stage.semanticType,number:item.number,canonicalStart:start,canonicalEnd:end,reason:'wrong_canonical_row'});continue;}
@@ -23,7 +40,8 @@ export function publisherAnnotationAudit(rows,sourceExercises,metadata={}) {
     const parts=item.prompt.split(/_{5,}|⟦CHOICE:\d+⟧/);
     for(let i=0;i<item.answers.length;i++){
       const answer=item.answers[i],fixed=parts[i]||'',nextFixed=parts[i+1]||'';
-      if(startsPublisherFrame(text,fixed,cursor))cursor+=fixed.length;
+      const fixedEnd=consumePublisherFixed(text,fixed,cursor,stage.stage===1);
+      if(fixedEnd>=0)cursor=fixedEnd;
       else if(stage.stage===4&&i>0&&publisherFrame(item.answers[i-1]).toLowerCase()==='let'&&/^\s+us\s*$/i.test(fixed)&&/^['’]s\b/i.test(text.slice(cursor)))cursor+=text.slice(cursor).match(/^['’]s\s*/i)?.[0].length||0;
       else if(stage.stage===4&&fixed.trimEnd()!==fixed&&text.startsWith(fixed.trimEnd()+"'",cursor))cursor+=fixed.trimEnd().length;
       else {drops.push({stage:stage.semanticType,number:item.number,canonicalStart:start,canonicalEnd:end,reason:'prompt_fixed_mismatch',target:i+1});valid=false;break;}
@@ -34,7 +52,8 @@ export function publisherAnnotationAudit(rows,sourceExercises,metadata={}) {
       targets.push({start:cursor,end:targetEnd,quote,...(stage.stage===4?{hint:item.hints[i],answer}:{}),...(stage.stage===5?{correct:quote,distractor:item.groups[i].find(v=>publisherFrame(v)!==publisherFrame(answer))}:{})});cursor=targetEnd;
     }
     const tail=parts.at(-1)||'';
-    if(valid&&(!startsPublisherFrame(text,tail,cursor)||cursor+tail.length!==text.length)){drops.push({stage:stage.semanticType,number:item.number,canonicalStart:start,canonicalEnd:end,reason:'prompt_tail_mismatch'});valid=false;}
+    const tailEnd=consumePublisherFixed(text,tail,cursor,stage.stage===1);
+    if(valid&&(tailEnd<0||tailEnd!==text.length)){drops.push({stage:stage.semanticType,number:item.number,canonicalStart:start,canonicalEnd:end,reason:'prompt_tail_mismatch'});valid=false;}
     if(valid){
       const grouped=new Map();
       for(let i=0;i<targets.length;i++){
@@ -60,7 +79,7 @@ export function verifiedPublisherAnnotations(rows,sourceExercises,metadata={}) {
   }
   return audit.annotations;
 }
-export function compileStudio({rows,annotations,title,workbookKey,previousCatalog=null,revision=1,requireConfirmed=false,publishStep=null,provenance={}}) {
+export function compileStudio({rows,annotations,title,workbookKey,previousCatalog=null,revision=1,requireConfirmed=false,publishStep=null,provenance={},publisherRequirements=[]}) {
   const synced=syncAnnotations(rows,annotations),canonical=sentenceRows(rows),errors=[];
   const catalog=generatePassageDeterministicCatalog({title,workbookKey,rows,previousCatalog,provenance:{...provenance,canonicalRevision:revision,studio:true}});
   for(const stage of catalog.stages.filter(s=>AUTHORED.includes(s.semanticType))){
@@ -71,7 +90,7 @@ export function compileStudio({rows,annotations,title,workbookKey,previousCatalo
     try{
       const targets=validateTargets(row,stage.semanticType,record.targets);if(!targets.length)continue; // explicitly confirmed: no suitable target
       const text=row[fieldFor(stage.semanticType)];let cursor=0,prompt='';
-      targets.forEach((t,index)=>{const p=locateSpan(text,t.span),before=text.slice(cursor,p.start),expandedContraction=stage.stage===4&&/^['’](?:m|re|ve|ll|d|s)\b/i.test(t.span.quote)&&!/[\s]$/.test(before);prompt+=before+(expandedContraction?' ':'')+(stage.stage===5?`⟦CHOICE:${index}⟧`:'_____');cursor=p.end;});prompt+=text.slice(cursor);
+      targets.forEach((t,index)=>{const p=locateSpan(text,t.span),before=text.slice(cursor,p.start),expandedContraction=stage.stage===4&&/^['’](?:m|re|ve|ll|d|s)\b/i.test(t.span.quote)&&!/[\s]$/.test(before),adjacentBlank=index>0&&p.start===cursor&&stage.stage!==5;prompt+=before+(expandedContraction||adjacentBlank?' ':'')+(stage.stage===5?`⟦CHOICE:${index}⟧`:'_____');cursor=p.end;});prompt+=text.slice(cursor);
       const old=previousCatalog?.stages?.find(s=>s.stage===stage.stage)?.items?.find(item=>item.provenance?.canonicalSentenceId===row.id||(!item.provenance?.canonicalSentenceId&&item.semanticType===stage.semanticType&&item.number===i+1));
       const publisherVerified=record.source==='publisher_verified',item={key:old?.key||`${workbookKey}-s${stage.stage}-${row.id.replace(/[^a-z0-9]/gi,'').slice(-12)}`,stage:stage.stage,number:i+1,semanticType:stage.semanticType,kind:stage.stage===5?'choice_groups':stage.stage===4?'verb_form':'blank_input',source:stage.stage===1?row.text:row.translation,prompt,answers:targets.map(t=>stage.stage===4?t.answer:stage.stage===5?t.correct:t.span.quote),canonicalStart:i+1,canonicalEnd:i+1,provenance:{...(record.provenance||{}),origin:publisherVerified?'publisher_system_verified':'confirmed_annotation',annotationSource:record.source,canonicalSentenceId:row.id,snapshot:snapshot(row),canonicalRevision:revision}};
       if(stage.stage===4)item.hints=targets.map(t=>t.hint);
@@ -80,7 +99,12 @@ export function compileStudio({rows,annotations,title,workbookKey,previousCatalo
       stage.items.push(item);
     }catch(error){errors.push({sentenceId:row.id,number:i+1,step:stage.semanticType,message:error.message});}
   }}
-  catalog.metrics.stageCoverage=Object.fromEntries(catalog.stages.map(s=>[s.stage,{ready:s.items.length,expected:s.items.length}]));
+  if(publisherRequirements.length){
+    const compiled=new Map();
+    for(const stage of catalog.stages.filter(item=>AUTHORED.includes(item.semanticType)))for(const item of stage.items){const id=item.provenance?.sourceExerciseId||`${stage.semanticType}:${item.number}`,key=`${stage.semanticType}:${id}`;compiled.set(key,(compiled.get(key)||0)+(item.answers?.length||0));}
+    for(const requirement of publisherRequirements){const id=requirement.sourceExerciseId||`${requirement.semanticType}:${requirement.number}`,readyTargets=compiled.get(`${requirement.semanticType}:${id}`)||0;if(readyTargets!==requirement.targets)errors.push({step:requirement.semanticType,number:requirement.number,sourceExerciseId:requirement.sourceExerciseId,message:'publisher_catalog_coverage',expectedTargets:requirement.targets,readyTargets});}
+  }
+  catalog.metrics.stageCoverage=Object.fromEntries(catalog.stages.map(s=>[s.stage,{ready:s.items.length,expected:publisherRequirements.length&&AUTHORED.includes(s.semanticType)?publisherRequirements.filter(item=>item.semanticType===s.semanticType).length:s.items.length}]));
   catalog.metrics.unresolved=errors.length;catalog.metrics.validatorPass=catalog.stages.reduce((n,s)=>n+s.items.length,0);
   if(errors.length){const error=new Error('문장별 Authoring 검토가 필요합니다.');error.details=errors;throw error;}
   return catalog;

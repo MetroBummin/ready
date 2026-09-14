@@ -856,6 +856,7 @@ async function studioImport(body:any){
  }return {drafts:result,aiCallCount:0};
 }
 function publisherCatalogSummary(catalog:any){return Object.fromEntries((catalog?.stages||[]).map((stage:any)=>[stage.semanticType,{items:(stage.items||[]).length,targets:(stage.items||[]).reduce((count:number,item:any)=>count+(item.answers?.length||0),0)}]));}
+function publisherCatalogContent(catalog:any){return (catalog?.stages||[]).map((stage:any)=>({semanticType:stage.semanticType,items:stage.items||[]}));}
 async function publisherPassageFromFilename(documentName:string){
  const match=documentName.normalize('NFC').match(/(20\d{2})\D+고\s*(\d)\D+(\d{1,2})월[\s\S]*?workbook[_\s-]*(\d{1,2})번/i);
  if(!match)throw new ApiError(422,'파일명에서 연도·학년·월·문항 번호를 확인하지 못했습니다.');
@@ -873,14 +874,14 @@ async function studioPublisherImport(body:any){
  let context:any=null,canonicalRows:any[]=[],title='';
  if(createNew){title=required(body.title,'지문 제목',120);if(body.sourceType!=='MOCK_EXAM'&&body.sourceType!=='TEXTBOOK')throw new ApiError(400,'지문 종류를 확인해 주세요.');if(!clean(body.grade,40))throw new ApiError(400,'학년을 확인해 주세요.');if(body.sourceType==='MOCK_EXAM'&&(!Number(body.sourceYear)||!Number(body.sourceMonth)))throw new ApiError(400,'모의고사는 연도와 월이 필요합니다.');}
  else{context=await studioContext(passageId);canonicalRows=context.rows;title=context.passage.title;}
- const sourceIdentity=`${documentSha256}:${createNew?'single':passageId}`,priorJobs=rows<any[]>(await db.from('ready_workbook_factory_jobs').select('id,status,passage_id,source_metadata').order('created_at',{ascending:false}).limit(2000)),priorJob=priorJobs.find(job=>job.source_metadata?.sourceIdentity===sourceIdentity&&job.status==='ready');
- if(priorJob)return {dryRun:body.apply!==true,applied:false,noChange:true,passageId:priorJob.passage_id,documentSha256,sourceIdentity,aiCallCount:0};
+ const sourceIdentity=`${documentSha256}:${createNew?'single':passageId}`,priorJobs=rows<any[]>(await db.from('ready_workbook_factory_jobs').select('id,status,passage_id,source_metadata').order('created_at',{ascending:false}).limit(2000)),priorJob=priorJobs.find(job=>job.source_metadata?.sourceIdentity===sourceIdentity&&job.status==='ready'&&job.source_metadata?.validatorVersion===PUBLISHER_VALIDATOR_VERSION);
  const {extractUnicodePdfText}=await import('./pdf-text-extract.mjs');let prepared:any;
  const metadata={documentName,documentSha256,documentSizeBytes:bytes.length,sourceLocator,sourceIdentity,validatorVersion:PUBLISHER_VALIDATOR_VERSION};
  try{prepared=preparePublisherImport(await extractUnicodePdfText(encoded),canonicalRows,metadata);}catch(error){throw new ApiError(422,(error as Error).message,(error as any).details||{});}
  const revision=createNew?1:Number(context.passage.canonical_revision)||1,version=createNew?0:Number(context.studio.version)||0,previousCatalog=createNew?null:context.previousCatalog,workbookKey=previousCatalog?.workbookKey||`factory-${passageId}`,provenance={...metadata,sourceType:createNew?body.sourceType:context.passage.source_type,grade:createNew?body.grade:context.passage.grade,sourceYear:createNew?Number(body.sourceYear)||null:context.passage.source_year,sourceMonth:createNew?Number(body.sourceMonth)||null:context.passage.source_month,sourceLabel:createNew?clean(body.sourceLabel,120):context.passage.source_label,semanticContract:SEMANTIC_WORKBOOK_CONTRACT,approvalAuthority:'publisher_system_validation',geminiCallCount:0};
- let catalog:any;try{catalog=compileStudio({rows:prepared.rows,annotations:prepared.annotations,title,workbookKey,previousCatalog,revision,requireConfirmed:true,provenance});}catch(error){throw new ApiError(422,(error as Error).message,(error as any).details||[]);}
+ let catalog:any;try{catalog=compileStudio({rows:prepared.rows,annotations:prepared.annotations,title,workbookKey,previousCatalog,revision,requireConfirmed:true,provenance,publisherRequirements:prepared.publisherRequirements});}catch(error){throw new ApiError(422,(error as Error).message,(error as any).details||[]);}
  const before=publisherCatalogSummary(previousCatalog),after=publisherCatalogSummary(catalog),diff={before,after,changed:JSON.stringify(before)!==JSON.stringify(after),unresolved:catalog.metrics?.unresolved||0};
+ if(priorJob&&!diff.changed&&JSON.stringify(publisherCatalogContent(previousCatalog))===JSON.stringify(publisherCatalogContent(catalog)))return {dryRun:body.apply!==true,applied:false,noChange:true,passageId:priorJob.passage_id,documentSha256,sourceIdentity,validationVersion:PUBLISHER_VALIDATOR_VERSION,inspection:prepared.inspection,diff,aiCallCount:0};
  const preview={dryRun:body.apply!==true,applied:false,noChange:false,canApply:true,passageId:createNew?null:passageId,title,documentName,documentSha256,sourceIdentity,sourceLocator,validationVersion:PUBLISHER_VALIDATOR_VERSION,inspection:prepared.inspection,diff,catalog,aiCallCount:0};
  if(body.apply!==true)return preview;
  const backup=createNew?null:{passageId,studioState:context.studio,catalog:context.previousCatalog,canonicalRevision:revision},jobMetadata={...provenance,sourceIdentity};

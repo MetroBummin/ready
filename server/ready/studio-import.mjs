@@ -51,12 +51,16 @@ export function inspectStudioPaste(text,metadata={}) {
 export function preparePublisherImport(text,canonicalRows=null,metadata={}) {
   const existing=Array.isArray(canonicalRows)&&canonicalRows.length?canonicalRows:null,inspected=inspectFullWorkbookText(text,existing);
   if(!inspected.fullWorkbook)throw Object.assign(new Error('전체 Workbook과 정답표를 찾지 못했습니다.'),{details:{reason:'full_workbook_missing'}});
+  let consistency=null;
   if(existing){
-    const consistency=compareCanonicalRows(existing,inspected.rows);
+    consistency=compareCanonicalRows(existing,inspected.rows);
     if(!consistency.consistent)throw Object.assign(new Error('기존 canonical 본문·해석과 PDF가 일치하지 않습니다.'),{details:{reason:'canonical_mismatch',consistency}});
   }
   if(inspected.reviewRequired||inspected.incompleteStages?.length)throw Object.assign(new Error('출판사 문제와 정답표의 완전한 연결을 검증하지 못했습니다.'),{details:{reason:inspected.reason,incompleteStages:inspected.incompleteStages||[]}});
   const rows=(existing||inspected.rows.map(row=>({...row,id:crypto.randomUUID(),blockType:'SENTENCE',paragraphIndex:0}))).map(row=>({...row,blockType:row.blockType||row.block_type||'SENTENCE',paragraphIndex:Number(row.paragraphIndex??row.paragraph_index)||0}));
-  const annotations=verifiedPublisherAnnotations(rows,inspected.exercises,metadata);
-  return {rows,annotations,sourceExercises:inspected.exercises,inspection:{fullWorkbook:true,reviewRequired:false,pairing:inspected.pairing,headings:inspected.headings,incompleteStages:[],sentenceCount:rows.filter(row=>row.blockType==='SENTENCE').length,sourceExerciseCount:inspected.exercises.length}};
+  const mapping=consistency?.mapping||inspected.rows.map((_row,index)=>({sourceNumber:index+1,canonicalStart:index+1,canonicalEnd:index+1})),bySource=new Map(mapping.map(item=>[item.sourceNumber,item]));
+  const sourceExercises=inspected.exercises.map(exercise=>{const first=bySource.get(Number(exercise.canonicalStart)||Number(exercise.number)),last=bySource.get(Number(exercise.canonicalEnd)||Number(exercise.canonicalStart)||Number(exercise.number));return first&&last?{...exercise,canonicalStart:first.canonicalStart,canonicalEnd:last.canonicalEnd}:exercise;});
+  const publisherRequirements=sourceExercises.filter(exercise=>['korean_blank','english_blank','verb_form','grammar_choice','grammar_vocab_choice'].includes(exercise.type)).map(exercise=>({semanticType:exercise.type==='grammar_vocab_choice'?'grammar_choice':exercise.type,sourceExerciseId:exercise.provenance?.sourceExerciseId||null,number:Number(exercise.number),targets:Array.isArray(exercise.answers)?exercise.answers.length:0}));
+  const annotations=verifiedPublisherAnnotations(rows,sourceExercises,metadata);
+  return {rows,annotations,sourceExercises,publisherRequirements,inspection:{fullWorkbook:true,reviewRequired:false,pairing:inspected.pairing,headings:inspected.headings,incompleteStages:[],sentenceCount:rows.filter(row=>row.blockType==='SENTENCE').length,sourceExerciseCount:sourceExercises.length,publisherRequirements}};
 }
