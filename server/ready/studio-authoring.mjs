@@ -27,7 +27,7 @@ export function publisherAnnotationAudit(rows,sourceExercises,metadata={}) {
       else if(stage.stage===4&&i>0&&publisherFrame(item.answers[i-1]).toLowerCase()==='let'&&/^\s+us\s*$/i.test(fixed)&&/^['’]s\b/i.test(text.slice(cursor)))cursor+=text.slice(cursor).match(/^['’]s\s*/i)?.[0].length||0;
       else if(stage.stage===4&&fixed.trimEnd()!==fixed&&text.startsWith(fixed.trimEnd()+"'",cursor))cursor+=fixed.trimEnd().length;
       else {drops.push({stage:stage.semanticType,number:item.number,canonicalStart:start,canonicalEnd:end,reason:'prompt_fixed_mismatch',target:i+1});valid=false;break;}
-      const exactAnswer=startsPublisherFrame(text,answer,cursor),targetEnd=exactAnswer?cursor+answer.length:nextFixed?indexPublisherFrame(text,nextFixed,cursor):text.length;
+      const contraction=stage.stage===4?text.slice(cursor).match(/^['’](m|re|ve|ll|d|s)\b/i):null,contractionAnswers={m:'am',re:'are',ve:'have',ll:'will',d:'would',s:'is'},contractedAnswer=contraction&&publisherFrame(answer).toLowerCase()===contractionAnswers[contraction[1].toLowerCase()],exactAnswer=startsPublisherFrame(text,answer,cursor),targetEnd=exactAnswer?cursor+answer.length:contractedAnswer?cursor+contraction[0].length:nextFixed?indexPublisherFrame(text,nextFixed,cursor):text.length;
       if(targetEnd<cursor){drops.push({stage:stage.semanticType,number:item.number,canonicalStart:start,canonicalEnd:end,reason:'prompt_next_fixed_missing',target:i+1});valid=false;break;}
       const quote=text.slice(cursor,targetEnd);
       if(stage.stage!==4&&publisherFrame(quote)!==publisherFrame(answer)){drops.push({stage:stage.semanticType,number:item.number,canonicalStart:start,canonicalEnd:end,reason:'answer_quote_mismatch',target:i+1});valid=false;break;}
@@ -51,6 +51,15 @@ export function publisherAnnotationAudit(rows,sourceExercises,metadata={}) {
   }return {annotations,drops};
 }
 export function publisherAnnotations(rows,sourceExercises,metadata={}) {return publisherAnnotationAudit(rows,sourceExercises,metadata).annotations;}
+export function verifiedPublisherAnnotations(rows,sourceExercises,metadata={}) {
+  const audit=publisherAnnotationAudit(rows,sourceExercises,metadata),canonical=sentenceRows(rows);
+  if(audit.drops.length){const error=new Error('Publisher annotation conversion is incomplete.');error.details=audit.drops;throw error;}
+  for(const row of canonical)for(const step of AUTHORED){
+    const record=audit.annotations[row.id].steps[step],provenance={...(record.provenance||{}),documentName:metadata.documentName||null,documentSha256:metadata.documentSha256||null,sourceLocator:metadata.sourceLocator||null,approvalAuthority:'publisher_system_validation'};
+    audit.annotations[row.id].steps[step]={status:'confirmed',source:'publisher_verified',targets:record.targets||[],provenance};
+  }
+  return audit.annotations;
+}
 export function compileStudio({rows,annotations,title,workbookKey,previousCatalog=null,revision=1,requireConfirmed=false,publishStep=null,provenance={}}) {
   const synced=syncAnnotations(rows,annotations),canonical=sentenceRows(rows),errors=[];
   const catalog=generatePassageDeterministicCatalog({title,workbookKey,rows,previousCatalog,provenance:{...provenance,canonicalRevision:revision,studio:true}});
@@ -64,7 +73,7 @@ export function compileStudio({rows,annotations,title,workbookKey,previousCatalo
       const text=row[fieldFor(stage.semanticType)];let cursor=0,prompt='';
       targets.forEach((t,index)=>{const p=locateSpan(text,t.span),before=text.slice(cursor,p.start),expandedContraction=stage.stage===4&&/^['’](?:m|re|ve|ll|d|s)\b/i.test(t.span.quote)&&!/[\s]$/.test(before);prompt+=before+(expandedContraction?' ':'')+(stage.stage===5?`⟦CHOICE:${index}⟧`:'_____');cursor=p.end;});prompt+=text.slice(cursor);
       const old=previousCatalog?.stages?.find(s=>s.stage===stage.stage)?.items?.find(item=>item.provenance?.canonicalSentenceId===row.id||(!item.provenance?.canonicalSentenceId&&item.semanticType===stage.semanticType&&item.number===i+1));
-      const item={key:old?.key||`${workbookKey}-s${stage.stage}-${row.id.replace(/[^a-z0-9]/gi,'').slice(-12)}`,stage:stage.stage,number:i+1,semanticType:stage.semanticType,kind:stage.stage===5?'choice_groups':stage.stage===4?'verb_form':'blank_input',source:stage.stage===1?row.text:row.translation,prompt,answers:targets.map(t=>stage.stage===4?t.answer:stage.stage===5?t.correct:t.span.quote),canonicalStart:i+1,canonicalEnd:i+1,provenance:{origin:'confirmed_annotation',canonicalSentenceId:row.id,snapshot:snapshot(row),canonicalRevision:revision}};
+      const publisherVerified=record.source==='publisher_verified',item={key:old?.key||`${workbookKey}-s${stage.stage}-${row.id.replace(/[^a-z0-9]/gi,'').slice(-12)}`,stage:stage.stage,number:i+1,semanticType:stage.semanticType,kind:stage.stage===5?'choice_groups':stage.stage===4?'verb_form':'blank_input',source:stage.stage===1?row.text:row.translation,prompt,answers:targets.map(t=>stage.stage===4?t.answer:stage.stage===5?t.correct:t.span.quote),canonicalStart:i+1,canonicalEnd:i+1,provenance:{...(record.provenance||{}),origin:publisherVerified?'publisher_system_verified':'confirmed_annotation',annotationSource:record.source,canonicalSentenceId:row.id,snapshot:snapshot(row),canonicalRevision:revision}};
       if(stage.stage===4)item.hints=targets.map(t=>t.hint);
       if(stage.stage===5)item.groups=targets.map((t,index)=>index%2?[t.distractor,t.correct]:[t.correct,t.distractor]);
       const error=validateSemanticWorkbookItem(stage.stage,item,new Map(canonical.map((r,n)=>[n+1,r])),canonical);if(error)throw new Error(error);

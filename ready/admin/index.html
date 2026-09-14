@@ -194,7 +194,8 @@
         <section class="view" id="v-factory">
           <div class="page-head"><div><button type="button" class="back-link" data-route="passages"><span aria-hidden="true">‹</span> Studio</button><p class="eyebrow">NEW PASSAGE</p><h1>새 Passage</h1><p class="lead">종류와 범위를 고르면 제목은 자동으로 만들어집니다.</p></div></div>
           <form id="factory-start-form" class="card form-card">
-            <label hidden><span>생성 방식</span><select name="factoryMode" id="factory-mode"><option value="new_passage">새 Passage + Workbook</option><option value="existing_passage">기존 Passage에 Workbook 추가</option></select></label>
+            <label><span>등록 대상</span><select name="factoryMode" id="factory-mode"><option value="new_passage">새 Passage</option><option value="existing_passage">기존 Passage 1개 복구</option><option value="batch_existing">파일명으로 기존 Passage 일괄 복구</option></select></label>
+            <label><span>자료 종류</span><select name="importKind" id="factory-import-kind"><option value="publisher_workbook">전체 Workbook · 출판사 원본 검증</option><option value="passage_only">본문·해석만</option></select><small>전체 Workbook은 원본 문제를 검증해 등록하며 AI 문제를 만들지 않습니다.</small></label>
             <label id="factory-existing-field" hidden><span>기존 READY Passage</span><select name="existingPassageId" id="factory-existing-passage"><option value="">Passage를 선택하세요</option></select><small>기존 문장·문제·시험범위·풀이 기록은 변경하지 않습니다.</small></label>
             <div id="factory-new-fields">
               <div id="factory-source-builder" class="source-builder"></div>

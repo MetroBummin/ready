@@ -118,7 +118,11 @@ const publisherImport=await call('studio_import',{title:'Publisher recovery',sou
 const publisherPassage=(await call('studio_create_draft',{jobId:publisherDraft.job.id,title:'Publisher recovery',rows:publisherDraft.rows,boundaryConfirmed:true},admin)).passageId;
 await pg.query("update ready_passages set studio_state=jsonb_build_object('version',0,'published',false,'needsReview',true,'annotations','{}'::jsonb) where id=$1",[publisherPassage]);
 const recovered=await call('studio_open',{passageId:publisherPassage},admin);
-for(const semanticType of ['korean_blank','english_blank','verb_form','grammar_choice'])assert.equal(recovered.rows.filter(row=>recovered.studio.annotations[row.id].steps[semanticType].source==='publisher').length,41,`${semanticType} must recover through factory_jobs.passage_id`);
+for(const semanticType of ['korean_blank','english_blank','verb_form','grammar_choice']){
+  const sourceType=semanticType==='grammar_choice'?'grammar_vocab_choice':semanticType;
+  const expected=new Set((publisherDraft.job.extraction.sourceExercises||[]).filter(item=>item.type===sourceType).map(item=>item.canonicalStart)).size;
+  assert.equal(recovered.rows.filter(row=>recovered.studio.annotations[row.id].steps[semanticType].source==='publisher').length,expected,`${semanticType} must recover every publisher-backed sentence through factory_jobs.passage_id`);
+}
 assert.equal(recovered.studio.jobId,publisherDraft.job.id);assert.equal(aiCalls.length,3);
 console.log('PASS real API + PostgreSQL: 4 drafts, 7 stages, student attempt, dirty-only AI, stale publication blocked, history retained.');
 await close();

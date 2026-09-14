@@ -1,4 +1,5 @@
-import {extractSentenceRows,inspectFullWorkbookText} from './workbook-factory.mjs';
+import {compareCanonicalRows,extractSentenceRows,inspectFullWorkbookText} from './workbook-factory.mjs';
+import {verifiedPublisherAnnotations} from './studio-authoring.mjs';
 // Page labels are provenance. Only an explicit passage label creates a boundary.
 export function bilingualRows(text) {
   const rows=[];let en='',ko='';
@@ -45,4 +46,17 @@ export function inspectStudioDocument(text,metadata={}) {
 export function inspectStudioPaste(text,metadata={}) {
   const extracted=extractSentenceRows(text);if(extracted.pairing!=='tsv_two_column')throw new Error('English<TAB>Korean 2열을 붙여 넣어 주세요.');
   return [{title:metadata.title,rows:extracted.rows.map(r=>({...r,blockType:'SENTENCE'})),boundaryConfirmed:true,sourceMetadata:metadata,sourceExercises:[]}];
+}
+
+export function preparePublisherImport(text,canonicalRows=null,metadata={}) {
+  const existing=Array.isArray(canonicalRows)&&canonicalRows.length?canonicalRows:null,inspected=inspectFullWorkbookText(text,existing);
+  if(!inspected.fullWorkbook)throw Object.assign(new Error('전체 Workbook과 정답표를 찾지 못했습니다.'),{details:{reason:'full_workbook_missing'}});
+  if(existing){
+    const consistency=compareCanonicalRows(existing,inspected.rows);
+    if(!consistency.consistent)throw Object.assign(new Error('기존 canonical 본문·해석과 PDF가 일치하지 않습니다.'),{details:{reason:'canonical_mismatch',consistency}});
+  }
+  if(inspected.reviewRequired||inspected.incompleteStages?.length)throw Object.assign(new Error('출판사 문제와 정답표의 완전한 연결을 검증하지 못했습니다.'),{details:{reason:inspected.reason,incompleteStages:inspected.incompleteStages||[]}});
+  const rows=(existing||inspected.rows.map(row=>({...row,id:crypto.randomUUID(),blockType:'SENTENCE',paragraphIndex:0}))).map(row=>({...row,blockType:row.blockType||row.block_type||'SENTENCE',paragraphIndex:Number(row.paragraphIndex??row.paragraph_index)||0}));
+  const annotations=verifiedPublisherAnnotations(rows,inspected.exercises,metadata);
+  return {rows,annotations,sourceExercises:inspected.exercises,inspection:{fullWorkbook:true,reviewRequired:false,pairing:inspected.pairing,headings:inspected.headings,incompleteStages:[],sentenceCount:rows.filter(row=>row.blockType==='SENTENCE').length,sourceExerciseCount:inspected.exercises.length}};
 }

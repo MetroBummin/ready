@@ -87,6 +87,14 @@ assert.equal(publisherAudit.annotations['publisher-1'].steps.korean_blank.target
 assert.equal(publisherAudit.annotations['publisher-1'].steps.verb_form.source,'publisher','Smart apostrophes in the publisher frame must match canonical punctuation.');
 assert.equal(publisherAudit.annotations['publisher-1'].steps.grammar_choice.targets.length,1,'A multi-sentence publisher item must map its first target to the first canonical sentence.');
 assert.equal(publisherAudit.annotations['publisher-2'].steps.grammar_choice.targets.length,1,'A multi-sentence publisher item must map its second target to the second canonical sentence.');
+const deletedAnswer=publisherAnnotationAudit(publisherRows,[{...publisherSource[0],answers:['이야기는'],answer:'이야기는'}]);
+assert.notEqual(deletedAnswer.annotations['publisher-1'].steps.korean_blank.source,'publisher','Deleting one publisher answer must not produce a validated item.');
+const mutatedChoice=structuredClone(publisherSource[2]);mutatedChoice.groups[0]=["man's",'unrelated'];mutatedChoice.answers[0]='unrelated';
+assert.notEqual(publisherAnnotationAudit(publisherRows,[mutatedChoice]).annotations['publisher-1'].steps.grammar_choice.source,'publisher','A mutated choice/answer pair must not produce a validated item.');
+const wrongLink={...publisherSource[1],canonicalStart:2,canonicalEnd:2};
+assert.ok(publisherAnnotationAudit(publisherRows,[wrongLink]).drops.length,'An answer linked to another source item must fail.');
+const noPublisher=publisherAnnotationAudit(publisherRows,[]);
+assert.equal([...Object.values(noPublisher.annotations)].some(annotation=>AUTHORED.some(name=>annotation.steps[name].source==='publisher')),false,'Zero source problems must never become authored publisher items.');
 console.log('READY Studio: real September batch, spans, confirmations, dirty scope, stable keys and AI boundaries passed.');
 
 const {selectToken}=await import('../ready/admin/studio-selection.js');

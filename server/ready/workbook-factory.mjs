@@ -4,6 +4,26 @@
 
 const clean = (value, max = 6000) => String(value ?? '').replace(/\u0000|[\uD800-\uDFFF]/g, '').replace(/\u00a0/g, ' ').trim().slice(0, max);
 const canonicalText = value => clean(value).normalize('NFKC').replace(/[‘’]/g, "'").replace(/[“”]/g, '"').replace(/[‐‑‒–—]/g, '-').replace(/\s+/g, ' ').trim();
+export const PUBLISHER_VALIDATOR_VERSION = 'publisher-source-v3';
+const answerKeyHeading = /^(?:10단계\s*)?(?:workbook|워크북)\s*정답(?:\s|$).*$|^answer\s*key(?=\s|lesson\b|$).*$|^정답(?:\s*(?:표|및\s*해설))?(?:\s|$).*$/im;
+const normalizeWorkbookLabels = value => String(value ?? '').replace(/WORKBOOK/gi, '워크북');
+function answerKeyStart(value) { const match = normalizeWorkbookLabels(value).match(answerKeyHeading); return match ? match.index : -1; }
+function pageAt(value, offset) {
+  const pages = [...String(value).slice(0, offset).matchAll(/\[PAGE\s+(\d+)\]/gi)];
+  return Number(pages.at(-1)?.[1]) || null;
+}
+function stripPageArtifacts(value) {
+  return String(value ?? '')
+    .replace(/\[PAGE\s+\d+\]/gi, ' ')
+    .replace(/(?:^|\n)\s*-\s*\d+\s*-\s*(?=\n|$)/g, ' ')
+    .replace(/(?:^|\n)\s*[^\n]*(?:lesson[^\n]*워크북|워크북[^\n]*lesson)[^\n]*/gi, ' ')
+    .replace(/(?:^|\n)\s*answer\s*key(?:lesson\b)?[^\n]*/gi, ' ')
+    .replace(/(?:^|\n)\s*(?:교과서\s*본문|본문)\s*(?=\n|$)/gi, ' ')
+    .replace(/(?:^|\n)\s*(?:10단계\s*)?워크북\s*정답[^\n]*/gi, ' ')
+    .replace(/(?:^|\n)\s*워크북[^\n]*/gi, ' ')
+    .replace(/(?:^|\n)\s*\d+번\s*(?=\n|$)/g, ' ')
+    .replace(/(?:^|\n)\s*본 자료는 이그잼포유에서[\s\S]*?(?=(?:^|\n)\s*\d+번\s*$)/gim, '\n');
+}
 
 export function compareCanonicalRows(existingRows, extractedRows) {
   const existing = Array.isArray(existingRows) ? existingRows : [], extracted = Array.isArray(extractedRows) ? extractedRows : [];
@@ -12,7 +32,10 @@ export function compareCanonicalRows(existingRows, extractedRows) {
   if (existing.length !== extracted.length) return { consistent: false, reason: 'sentence_count_mismatch', expectedCount: existing.length, actualCount: extracted.length, mismatches: [] };
   const mismatches = [];
   existing.forEach((row, index) => {
-    const fields = ['text', 'translation'].filter(field => canonicalText(row?.[field]) !== canonicalText(extracted[index]?.[field]));
+    const fields = ['text', 'translation'].filter(field => {
+      const left = canonicalText(row?.[field]), right = canonicalText(extracted[index]?.[field]);
+      return field === 'translation' ? left.replace(/\s/g, '') !== right.replace(/\s/g, '') : left !== right;
+    });
     if (fields.length) mismatches.push({ sentenceIndex: index + 1, fields });
   });
   return { consistent: mismatches.length === 0, reason: mismatches.length ? 'canonical_text_mismatch' : '', expectedCount: existing.length, actualCount: extracted.length, mismatches: mismatches.slice(0, 8) };
@@ -22,6 +45,8 @@ const comparableEnglish = value => fold(value)
   .replace(/\b(i)'m\b/g, '$1 am')
   .replace(/\b(you|we|they)'re\b/g, '$1 are')
   .replace(/\b(he|she|it)'s\b/g, '$1 is')
+  .replace(/\b(that|who|what|where|when|how)'s\b/g, '$1 is')
+  .replace(/\bthere's\b/g, 'there is')
   .replace(/\blet's\b/g, 'let us')
   .replace(/\b([a-z]+)n't\b/g, (_, word) => word === 'ca' ? 'cannot' : word === 'wo' ? 'will not' : `${word} not`)
   .replace(/\b([a-z]+)'ve\b/g, '$1 have')
@@ -121,15 +146,16 @@ function numberedPairs(lines) {
 }
 
 function workbookStagePages(text, stage) {
-  return clean(text, 1_000_000).split(/(?=\[PAGE\s+\d+\])/i).filter(page => !/Answer\s*Key/i.test(page) && new RegExp(`워크북\\s*${stage}(?:\\D|$)`).test(page));
+  const normalized = normalizeWorkbookLabels(clean(text, 1_000_000)), answerAt = answerKeyStart(normalized), source = answerAt < 0 ? normalized : normalized.slice(0, answerAt);
+  return source.split(/(?=\[PAGE\s+\d+\])/i).filter(page => new RegExp(`워크북\\s*${stage}(?:\\D|$)`).test(page));
 }
 function parsedPairedNumberedRows(text, stage) {
   const value = workbookStagePages(text, stage).join('\n'), starts = [...value.matchAll(/(?:^|\n)(\d+)\.\s*/g)], rows = [];
   for (let index = 0; index < starts.length; index += 1) {
     const number = Number(starts[index][1]), from = starts[index].index + starts[index][0].length, to = index + 1 < starts.length ? starts[index + 1].index : value.length, block = value.slice(from, to), marker = block.match(new RegExp(`${number}\\)\\s*`));
     if (!marker) continue;
-    const source = clean(block.slice(0, marker.index).replace(/\[PAGE\s+\d+\][\s\S]*$/i, '')).replace(/\s+/g, ' '), prompt = clean(block.slice(marker.index + marker[0].length).replace(/\[PAGE\s+\d+\][\s\S]*$/i, '')).replace(/\s+/g, ' ');
-    if (source) rows.push({ number, source, prompt });
+    const source = clean(stripPageArtifacts(block.slice(0, marker.index))).replace(/\s+/g, ' '), prompt = clean(stripPageArtifacts(block.slice(marker.index + marker[0].length))).replace(/\s+/g, ' ');
+    if (source) rows.push({ number, source, prompt, page: pageAt(value, starts[index].index) });
   }
   return rows;
 }
@@ -168,14 +194,14 @@ function chooseCanonicalWorkbookRows(text, expectedRows) {
   return { rows: candidates.length ? candidates[0] : [], candidateCount: candidates.length, matchedCount: candidates.length === 1 ? 1 : 0 };
 }
 function answerStageCandidates(text, stage, expectedCount) {
-  const answerAt = text.search(/Answer\s*Key/i); if (answerAt < 0) return [];
-  const answerText = text.slice(answerAt), headings = [...answerText.matchAll(/워크북\s*([2-9])[^\n]*/g)], candidates = [];
+  const normalized = normalizeWorkbookLabels(text), answerAt = answerKeyStart(normalized); if (answerAt < 0) return [];
+  const answerText = normalized.slice(answerAt), answerBasePage = pageAt(normalized, answerAt), headings = [...answerText.matchAll(/워크북\s*([2-9])[^\n]*/g)], candidates = [];
   for (let headingIndex = 0; headingIndex < headings.length; headingIndex += 1) {
     if (Number(headings[headingIndex][1]) !== stage) continue;
     const from = headings[headingIndex].index + headings[headingIndex][0].length, to = headingIndex + 1 < headings.length ? headings[headingIndex + 1].index : answerText.length, section = answerText.slice(from, to), starts = [...section.matchAll(/(?:^|\n)(\d+)\)\s*/g)], rows = [];
     for (let index = 0; index < starts.length; index += 1) {
-      const number = Number(starts[index][1]), start = starts[index].index + starts[index][0].length, end = index + 1 < starts.length ? starts[index + 1].index : section.length, answer = clean(section.slice(start, end).replace(/\[PAGE\s+\d+\][\s\S]*$/i, '')).replace(/\s+/g, ' ');
-      if (answer) rows.push({ number, answer });
+      const number = Number(starts[index][1]), start = starts[index].index + starts[index][0].length, end = index + 1 < starts.length ? starts[index + 1].index : section.length, answer = clean(stripPageArtifacts(section.slice(start, end))).replace(/\s+/g, ' ');
+      if (answer) rows.push({ number, answer, page: pageAt(answerText, from + starts[index].index) || answerBasePage });
     }
     if (rows.length === expectedCount && rows.every((row, index) => row.number === index + 1)) candidates.push(rows);
   }
@@ -189,33 +215,41 @@ function answerStageRows(text, stage, expectedCount) {
 export function alignPublisherBlankPrompt(sourcePrompt, answers, canonical) {
   const originalPrompt = canonicalText(sourcePrompt), target = canonicalText(canonical);
   const slots = Array.isArray(answers) ? answers.map(value => canonicalText(value)).filter(Boolean) : [];
-  const individualCount = (originalPrompt.match(/_{5,}/g) || []).length;
-  const groupedPrompt = originalPrompt.replace(/_{5,}(?:\s+_{5,})+/g, '______________');
-  const groupedCount = (groupedPrompt.match(/_{5,}/g) || []).length;
-  const prompt = individualCount === slots.length ? originalPrompt : groupedCount === slots.length ? groupedPrompt : '';
-  if (!prompt) return '';
-  const parts = prompt.split(/_{5,}/g);
-  if (!target || !slots.length || parts.length !== slots.length + 1) return '';
-
   const compact = value => Array.from(canonicalText(value)).filter(char => !/\s/u.test(char));
-  const restored = [];
+  const matches = [...originalPrompt.matchAll(/_{5,}/g)], fixed = [];
+  let cursor = 0;
+  for (const match of matches) { fixed.push(originalPrompt.slice(cursor, match.index)); cursor = match.index + match[0].length; }
+  fixed.push(originalPrompt.slice(cursor));
+  if (!target || !slots.length || matches.length < slots.length) return '';
+  const candidates = [];
+  const assign = (blankIndex, answerIndex, parts) => {
+    if (answerIndex === slots.length) {
+      if (blankIndex === matches.length) candidates.push([...parts, fixed.at(-1)]);
+      return;
+    }
+    const remainingAnswers = slots.length - answerIndex - 1;
+    for (let end = blankIndex; end < matches.length - remainingAnswers; end += 1) {
+      if (end > blankIndex && !/^\s*$/.test(fixed[end])) break;
+      assign(end + 1, answerIndex + 1, [...parts, fixed[blankIndex], slots[answerIndex]]);
+    }
+  };
+  assign(0, 0, []);
+  const targetCompact = compact(target).join('').toLocaleLowerCase('en-US');
+  const valid = candidates.filter(parts => compact(parts.join('')).join('').toLocaleLowerCase('en-US') === targetCompact);
+  if (!valid.length) return '';
+  // More than one underline grouping is acceptable only when it produces the
+  // same answer spans in the canonical sentence.
+  const restoredParts = valid[0];
   const compactSpans = [];
   let compactOffset = 0;
   for (let index = 0; index < slots.length; index += 1) {
-    restored.push(parts[index]);
-    compactOffset += compact(parts[index]).length;
+    const fixedPart = restoredParts[index * 2] || '';
+    compactOffset += compact(fixedPart).length;
     const start = compactOffset;
-    restored.push(slots[index]);
     compactOffset += compact(slots[index]).length;
     compactSpans.push({ start, end: compactOffset });
   }
-  restored.push(parts.at(-1));
-
-  const restoredCompact = compact(restored.join('')).join('').toLocaleLowerCase('en-US');
   const targetChars = Array.from(target);
-  const targetCompact = targetChars.filter(char => !/\s/u.test(char)).join('').toLocaleLowerCase('en-US');
-  if (restoredCompact !== targetCompact) return '';
-
   const compactPositions = [];
   targetChars.forEach((char, index) => { if (!/\s/u.test(char)) compactPositions.push(index); });
   let aligned = targetChars;
@@ -241,7 +275,7 @@ function publisherBlankExercises(text, rows) {
         const restored = restoreBlanks(prompt, answerSlots);
         const valid = sourceStage === 2 ? restored === clean(row?.translation) : sameEnglish(restored, row?.text);
         if (!valid) continue;
-        const item = {
+        const answerRow = answers.find(row => row.number === source.number), item = {
           type: sourceStage === 2 ? 'korean_blank' : 'english_blank',
           number: source.number,
           prompt,
@@ -249,9 +283,9 @@ function publisherBlankExercises(text, rows) {
           answer,
           canonicalStart: source.number,
           canonicalEnd: source.number,
-          page: null,
+          page: source.page,
           label: sourceStage === 2 ? '워크북 2 빈칸 연습(우리말)' : '워크북 3 빈칸 연습(영문)',
-          provenance: { origin: 'publisher_answer_key', sourceWorkbookNumber: sourceStage },
+          provenance: { origin: 'publisher_answer_key', sourceWorkbookNumber: sourceStage, sourcePage: source.page, answerPage: answerRow?.page || null, sourceExerciseId: `workbook-${sourceStage}-${source.number}`, validatorVersion: PUBLISHER_VALIDATOR_VERSION },
         };
         const signature=JSON.stringify([item.prompt,item.answers]),candidates=byNumber.get(item.number)||new Map();
         candidates.set(signature,item);byNumber.set(item.number,candidates);
@@ -320,7 +354,7 @@ export function publisherGrammarCandidate(stage, sources, answers, rows) {
       if (hints.length !== publisherAnswers.length) continue;
       const rebuilt = restoreBlanks(prompt, publisherAnswers), span = uniqueCanonicalSpan(rebuilt, rows);
       if (!span || span.start !== span.end) continue;
-      exercises.push({ type: 'verb_form', number: source.number, prompt, hints, answers: publisherAnswers, answer: publisherAnswers.join(' / '), canonicalStart: span.start, canonicalEnd: span.end, page: null, label: '워크북 5 동사형 연습', provenance: { origin: 'publisher_answer_key' } });
+      exercises.push({ type: 'verb_form', number: source.number, prompt, hints, answers: publisherAnswers, answer: publisherAnswers.join(' / '), canonicalStart: span.start, canonicalEnd: span.end, page: source.page, label: '워크북 5 동사형 연습', provenance: { origin: 'publisher_answer_key', sourceWorkbookNumber: 5, sourcePage: source.page, answerPage: answers.find(row => row.number === source.number)?.page || null, sourceExerciseId: `workbook-5-${source.number}`, validatorVersion: PUBLISHER_VALIDATOR_VERSION } });
       continue;
     }
     const groups = [...source.prompt.matchAll(/\[([^\[\]]+)\]/g)].map(match => match[1].split('/').map(value => clean(value)).filter(Boolean));
@@ -331,7 +365,7 @@ export function publisherGrammarCandidate(stage, sources, answers, rows) {
     answersFromOptions.forEach((answer, index) => { rebuilt = rebuilt.replace(`⟦CHOICE:${index}⟧`, answer); });
     const span = uniqueCanonicalSpan(rebuilt, rows);
     if (!span) continue;
-    exercises.push({ type: 'grammar_vocab_choice', number: source.number, prompt, groups, answers: answersFromOptions, answer: answersFromOptions.join(' / '), canonicalStart: span.start, canonicalEnd: span.end, page: null, label: '워크북 6 어법 선택형 연습', provenance: { origin: 'publisher_answer_key' } });
+    exercises.push({ type: 'grammar_vocab_choice', number: source.number, prompt, groups, answers: answersFromOptions, answer: answersFromOptions.join(' / '), canonicalStart: span.start, canonicalEnd: span.end, page: source.page, label: '워크북 6 어법 선택형 연습', provenance: { origin: 'publisher_answer_key', sourceWorkbookNumber: 6, sourcePage: source.page, answerPage: answers.find(row => row.number === source.number)?.page || null, sourceExerciseId: `workbook-6-${source.number}`, validatorVersion: PUBLISHER_VALIDATOR_VERSION } });
   }
   return exercises;
 }
@@ -481,8 +515,9 @@ function publisherStage7Exercises(text, rows) {
 // source rows and every grammar stage required for publication are backed by
 // exact answer-key round trips. Nothing is inferred from page coordinates.
 export function inspectFullWorkbookText(text, expectedRows = null) {
+  text = normalizeWorkbookLabels(text);
   const { blocks, headings } = pageBlocks(text), semantic = headings.map(item => item.type);
-  const answerKey = /answer\s*key|정답\s*(및|표|해설)?/i.test(text);
+  const answerKey = answerKeyStart(text) >= 0;
   const fullWorkbook = answerKey && new Set(semantic.filter(type => !['unknown', 'check_mixed', 'paragraph_ordering'].includes(type))).size >= 3;
   const translationBlocks = blocks.filter(block => semanticWorkbookType(block.title) === 'translation');
   const candidate = translationBlocks.flatMap(block => numberedPairs(block.body));
@@ -490,12 +525,17 @@ export function inspectFullWorkbookText(text, expectedRows = null) {
   const prose = clean(text, 1_000_000).split(/\r?\n/).filter(line => !/^\s*\d+[.)]/.test(line) && semanticWorkbookType(line) === 'unknown' && !/answer\s*key|정답\s*(및|표|해설)?/i.test(line)).join('\n');
   const extracted = extractSentenceRows(prose), canonicalSelection = chooseCanonicalWorkbookRows(text, expectedRows), canonicalRows = canonicalSelection.rows, initialRows = canonicalRows.length ? canonicalRows : stageFourPairs.length ? stageFourPairs : extracted.rows, rows = canonicalRows.length ? publisherAlignedCanonicalRows(text, initialRows) : initialRows;
   const inlineExercises = blocks.flatMap(block => numberedPairs(block.body).map(item => ({ ...item, type: semanticWorkbookType(block.title), page: block.page, label: block.title, provenance: { origin: 'publisher_answer_key', sourceWorkbookNumber: Number(block.title.match(/(?:workbook|stage|워크북)\s*(\d+)/i)?.[1]) || null } }))), publisherExercises = canonicalRows.length ? [...publisherBlankExercises(text, rows), ...publisherGrammarExercises(text, rows)] : [], publisherStages = new Set(publisherExercises.map(item => readyStageForSemanticType(item.type)).filter(Boolean)), exercises = [...publisherExercises, ...inlineExercises.filter(item => { const stage = readyStageForSemanticType(item.type); return stage && !publisherStages.has(stage); })], answeredExercises = exercises.filter(item => clean(item.answer) || (Array.isArray(item.answers) && item.answers.length));
+  const requiredPublisherStages = [[2, 'korean_blank'], [3, 'english_blank'], [5, 'verb_form'], [6, 'grammar_vocab_choice']];
+  const incompleteStages = canonicalRows.length ? requiredPublisherStages.flatMap(([sourceWorkbookNumber, type]) => {
+    const promptSets = pairedNumberedRowSets(text, sourceWorkbookNumber), sourcePairs = promptSets.flatMap(prompts => answerStageCandidates(text, sourceWorkbookNumber, prompts.length).map(answers => ({ prompts, answers }))), ready = publisherExercises.filter(item => item.type === type).length, expected = sourcePairs.length === 1 ? sourcePairs[0].prompts.length : null;
+    return sourcePairs.length === 1 && ready === expected ? [] : [{ sourceWorkbookNumber, type, expected, ready, promptCandidates: promptSets.length, sourceAnswerCandidates: sourcePairs.length }];
+  }) : [];
   const sectionAmbiguous = !Array.isArray(expectedRows) && canonicalSelection.candidateCount > 1;
-  const confident = fullWorkbook && !sectionAmbiguous && rows.length >= 2 && (canonicalRows.length === rows.length || stageFourPairs.length === rows.length) && answeredExercises.every(item => readyStageForSemanticType(item.type) > 0);
+  const confident = fullWorkbook && !sectionAmbiguous && rows.length >= 2 && (canonicalRows.length === rows.length || stageFourPairs.length === rows.length) && incompleteStages.length === 0 && answeredExercises.every(item => readyStageForSemanticType(item.type) > 0);
   return {
     fullWorkbook, reviewRequired: !confident, rows, headings,
     exercises,
-    incompleteStages: [],
+    incompleteStages,
     reason: confident ? 'numbered bilingual source and answer-key evidence agree' : sectionAmbiguous ? 'human review required: multiple workbook passage sections found' : 'human review required: canonical pairs or publisher answer links are incomplete',
     pairing: canonicalRows.length ? (canonicalSelection.candidateCount > 1 ? 'publisher_section_match' : 'publisher_numbered') : extracted.pairing,
   };

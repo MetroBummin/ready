@@ -15,7 +15,7 @@ export function tokenSpan(text,tokenStart,tokenEnd,sentenceId='') {
   return {sentenceId,tokenStart,tokenEnd,quote:text.slice(start,end),prefix:text.slice(Math.max(0,start-24),start),suffix:text.slice(end,end+24)};
 }
 export function makeSpan(text,start,end,sentenceId='') {
-  const tokens=spanTokens(text),first=tokens.findIndex(t=>t.start<=start&&t.end>start),last=tokens.findIndex(t=>t.start<end&&t.end>=end);
+  const tokens=spanTokens(text),first=tokens.findIndex(t=>t.end>start&&t.start<end),last=tokens.findLastIndex(t=>t.start<end&&t.end>start);
   if(first<0||last<first||start<0||end<=start||end>String(text).length)throw new Error('선택 범위를 확인해 주세요.');
   return {sentenceId,tokenStart:first,tokenEnd:last+1,start,end,quote:text.slice(start,end),prefix:text.slice(Math.max(0,start-24),start),suffix:text.slice(end,end+24)};
 }

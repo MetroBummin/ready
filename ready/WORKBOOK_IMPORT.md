@@ -6,12 +6,13 @@
 2. PDF 텍스트층에서 단계별 exercise를 추출한다.
 3. 출판사가 제공한 영문·우리말·정답을 source of truth로 계약을 만든다.
 4. frame을 정답으로 다시 채웠을 때 출판사 원문이 재현되는지 검증한다.
-5. 검증 성공 exercise만 `READY` catalog에 넣는다.
-6. 현재 interaction이 없으면 `UNSUPPORTED`, 원문/정답 연결을 증명하지 못하면 `INVALID`로 기록하고 학생에게 보내지 않는다.
+5. 요청된 Authoring 4종 전체가 검증된 지문만 `READY` catalog에 원자적으로 넣는다.
+6. 원문/정답 연결을 증명하지 못한 지문은 기존 학생용 catalog를 유지하고 보류한다.
 
-PDF 전체를 폐기하지 않는다. `unpublishedExercises`에는 INVALID exercise의 stage, number,
-source, prompt, reason을 남긴다. 현재 학생 학습 범위는 2~9단계이며, 이 범위의 모든 단계는
-공통 contract로 지원한다. 1단계 읽기 원본과 10단계 mixed Check는 현재 범위 밖이다.
+원본 PDF 바이트, SHA-256, 파일/보존 위치, 문제·정답 페이지, source exercise ID,
+추출 결과와 validator 버전을 private Factory job에 함께 보존한다. 현재 import 범위는
+Authoring 4종(한글 빈칸, 영어 빈칸, 동사형, 어법선택)과 deterministic AUTO 3종
+(해석, 어순배열, 영작)이다. 문단배열·어색한 곳 찾기 등은 새 학습 유형으로 만들지 않는다.
 
 ## Contract rules
 
@@ -24,18 +25,21 @@ source, prompt, reason을 남긴다. 현재 학생 학습 범위는 2~9단계이
 - 해석은 출판사 해석을 비공개 semantic reference로 사용한다.
 - 특정 교재명이나 문항 번호를 위한 repair rule은 추가하지 않는다.
 
-일반 추출기: `tools/ready-extract-workbook-contract.py`
+공통 추출/검증기는 `server/ready/workbook-factory.mjs`, 공통 변환기는
+`server/ready/studio-import.mjs`, 공통 저장 endpoint는 `studio_publisher_import`이다.
+CLI와 Admin은 모두 이 endpoint를 사용한다.
 
 새 PDF에서 기존 규칙으로 충분한 READY exercise를 얻지 못하면 importer를 즉시 확장하지
 말고 실패 이유를 먼저 분류한다. 여러 문서에 반복되는 일반 패턴일 때만 계약을 확장한다.
 
 ## Workbook Factory input
 
-Admin Factory의 공식 입력은 다음 두 가지뿐이며, 둘 다 게시 전에 Passage Editor의
-`Passage Draft` 단계로 모인다.
+Admin Factory의 공식 입력은 자료 종류에 따라 분리된다.
 
-- 텍스트층이 있는 전체 Workbook PDF
-- 영문 본문과 출판사 해석이 함께 있는 PDF
+- `전체 Workbook · 출판사 원본 검증`: 텍스트층이 있는 전체 Workbook PDF를 즉시 dry-run하고,
+  검증 통과 결과만 시스템 승인으로 발행한다.
+- `본문·해석만`: 영문 본문과 출판사 해석이 있는 PDF 또는 TSV를 Passage Draft로 가져오며
+  Authoring을 자동 생성하지 않는다.
 - `English<TAB>Korean` 두 열 TSV
 
 CSV/HWP/DOCX, 교대 줄 텍스트, 영문-only paste는 공식 입력이 아니다.
@@ -48,11 +52,10 @@ Factory에는 두 target mode가 있다.
   PDF가 있으면 exercise와 Answer Key만 추출하고 PDF 본문은 canonical rows와의 일치 검사에만
   사용한다. 기존 factory catalog 또는 code-backed workbook이 있으면 시작과 확정 시점 모두 막는다.
 
-이미 게시된 Factory catalog는 일반 생성 mode로 덮어쓰지 않는다. Admin의 명시적 `factory_regenerate`
-경로만 원본 factory job, 현재 canonical sentence snapshot, 최신 validator를 다시 확인한 뒤 같은
-`passage_id`의 catalog row를 원자적으로 update한다. 검증 중에는 기존 catalog를 삭제하지 않으며,
-5·6·7단계 coverage가 불완전하면 기존 catalog를 유지한 채 재생성을 중단한다. code-backed workbook은
-이 경로에서도 변경할 수 없다.
+전체 Workbook 복구는 기존 `passage_id`를 명시한다. importer는 현재 canonical 행의 ID·순서·본문·해석을
+읽어 PDF와 대조하지만 이를 수정하지 않는다. 성공 시 Studio annotation과 학생용 catalog를 한 트랜잭션으로
+교체하며, 실패 시 둘 다 기존 상태를 유지한다. PDF SHA-256과 Passage ID의 source identity가 같은 성공
+작업은 재실행해도 새 지문·문항을 만들지 않는다.
 
 게시된 Passage도 Passage Editor에서 계속 수정한다. TITLE/SUBTITLE/SENTENCE와 문단 번호는
 구조 metadata이며 TITLE/SUBTITLE은 Workbook item이 아니다. 기존 row는 id를 유지하고,
@@ -65,11 +68,10 @@ generator 코드가 바뀌면 Admin의 지문별 또는 전체 deterministic 재
 독립적으로 검증·교체되며 AI 전체 재생성 경로는 존재하지 않는다. `npm run workbook:check`는
 DB/AI/publish 없이 동일 generator의 contract만 검사한다.
 
-Full PDF의 publisher exercise는 Answer Key와 canonical round-trip이 검증된 경우에만 별도
-source exercise로 보존한다. PDF의 괄호, slash, correction span, printed stage 번호를 근거로
-canonical 문장을 다시 추측하지 않는다. 검증하지 못한 exercise는 INVALID로 남기며 AI로
-채우지 않는다. PDF에서 추출한 전체 `sourceExercises`는 Factory job에만 보존하고 catalog
-provenance에는 문서 해시·파일명·추출 수량 등 재현에 필요한 요약만 둔다.
+Full PDF의 publisher exercise는 문제틀·선택지/힌트·Answer Key·완성 canonical의 round-trip이 모두
+검증된 경우에만 보존한다. 밑줄 수와 slash 수가 다를 수 있으므로 인접 밑줄은 완성 문장으로 유일하게
+증명되는 경우에만 묶거나 나눈다. `It's` 같은 축약형 동사 문제는 `It`을 고정하고 `is`를 정답으로 둔다.
+검증 실패를 AI 또는 canonical 기반 임의 출제로 채우지 않는다.
 
 PDF는 PDF.js의 표준 Unicode text layer로 읽고 페이지 표지만 보존한다. 출판사명, 파일명,
 페이지 좌표, 폰트명 또는 임의 x 좌표로 열을 추측하지 않는다. 스캔 PDF나 손상된 문자맵은
@@ -79,9 +81,33 @@ PDF는 PDF.js의 표준 Unicode text layer로 읽고 페이지 표지만 보존�
 출판사 문제와 Answer Key는 같은 source identity로 연결한다. 원문을 복원하는 round-trip이
 성공한 source exercise만 재사용하며, 부족한 source exercise를 AI나 추측으로 채우지 않는다.
 
-Factory는 문장쌍이나 정답 연결이 불완전한 상태에서 일부 catalog를 publish하지 않는다.
-각 exercise validator 실패만 INVALID로 남기며, 기존 학생 Attempt/Review 데이터는 append-only
-정책을 그대로 따른다.
+Factory는 문장쌍이나 요청된 Authoring 4종의 정답 연결이 불완전한 지문을 일부 성공으로 publish하지
+않는다. 여러 PDF 중 정상 지문은 계속 처리하며 실패 지문은 기존 데이터를 유지한다. 승인 출처는
+`publisher_verified` / `publisher_system_validation`이고 teacher/manual 확정으로 기록하지 않는다.
+
+## 공식 일괄 명령
+
+먼저 JSON manifest에 각 PDF와 기존 Passage를 명시한다.
+
+```json
+{
+  "entries": [
+    {"file": "/absolute/path/21.pdf", "passageId": "existing-passage-uuid"},
+    {"file": "/absolute/path/new.pdf", "title": "새 지문 제목", "sourceType": "MOCK_EXAM", "grade": "1학년", "sourceYear": 2026, "sourceMonth": 9}
+  ]
+}
+```
+
+```bash
+# 모든 파일 추출·검증 및 변경 내역만 출력
+READY_ADMIN_PASSWORD='...' npm run workbook:import -- --manifest /absolute/path/import.json
+
+# 먼저 전 파일 dry-run 후, 통과한 지문만 지문별 원자 적용
+READY_ADMIN_PASSWORD='...' npm run workbook:import -- --manifest /absolute/path/import.json --apply
+```
+
+운영 반영 전 `npm run workbook:check`를 실행한다. 적용 후에는 API/DB를 다시 읽어 각 stage의 문항,
+빈칸 수, 힌트, 선택지, 정답과 provenance를 확인한다.
 # Deterministic semantic import
 
 The only publication path is:
@@ -93,11 +119,11 @@ structure, Answer Key structure, then canonical alignment. A printed Workbook
 number never determines a READY stage. Unknown or ambiguous source remains
 private. No canonical-derived filler and no Gemini fallback are allowed.
 
-Before replacing an active production catalog, all 13 production sources must
-be present, dry-run diffs must be reviewed, semantic validation and golden
-regression must pass, and unresolved must equal zero. Missing source blocks the
-entire replacement. Passage/sentence identity, Questions, exam links, attempts,
-bookmarks and history are never rewritten by catalog regeneration.
+Before replacing an active production catalog, that passage's complete source
+PDF must be present, its dry-run diff must be reviewed, semantic validation and
+golden regression must pass, and unresolved must equal zero. Missing source
+blocks that passage only. Passage/sentence identity, Questions, exam links,
+attempts, bookmarks and history are never rewritten by catalog regeneration.
 
 ## Passage Studio (current authoring path)
 
@@ -108,12 +134,13 @@ legacy Factory imports, while Studio uses the teacher-confirmed annotation as
 publication authority.
 
 PDFs can contain multiple Passages; multiple files are imported independently.
-Explicit passage labels separate source pages and answer sections. Ambiguous
-boundaries remain review-required and can be split, merged within one document,
-reordered, or renamed before creating independent Drafts. The import screen also
-allows correcting extracted English/Korean rows. PDF byte SHA-256, filename,
-pages, and publisher exercises stay in the original Factory job. Import never
-calls an AI provider. TSV remains the only paste format.
+Explicit passage labels separate source pages and answer sections. In the
+passage-only path, ambiguous boundaries remain review-required and can be split,
+merged within one document, reordered, or renamed before creating independent
+Drafts. The full-Workbook path never permits correcting canonical rows as an
+import shortcut. PDF byte SHA-256, filename, pages, and publisher exercises stay
+in the original Factory job. Import never calls an AI provider. TSV remains the
+only paste format.
 
 Each active SENTENCE owns four annotation records: english_blank, korean_blank,
 verb_form, grammar_choice. Each target stores the sentence ID and a zero-based

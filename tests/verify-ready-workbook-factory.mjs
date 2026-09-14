@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { FACTORY_STAGES, SEMANTIC_WORKBOOK_CONTRACT, generateWorkbookCatalog, inspectFullWorkbookText, publisherGrammarCandidate, readyStageForSemanticType, semanticWorkbookType } from '../server/ready/workbook-factory.mjs';
+import { FACTORY_STAGES, SEMANTIC_WORKBOOK_CONTRACT, alignPublisherBlankPrompt, generateWorkbookCatalog, inspectFullWorkbookText, publisherGrammarCandidate, readyStageForSemanticType, semanticWorkbookType } from '../server/ready/workbook-factory.mjs';
 
 const root=resolve(dirname(fileURLToPath(import.meta.url)),'..');
 const fixture=name=>readFileSync(resolve(root,'tests/fixtures',name),'utf8');
@@ -44,4 +44,8 @@ const partialPublisher=publisherGrammarCandidate(5,[
 ]);
 assert.equal(partialPublisher.length,1,'One malformed publisher row must not discard the other valid verb-form rows.');
 assert.equal(partialPublisher[0].number,1);
+assert.equal(alignPublisherBlankPrompt('The process is called ____________ ____________.',['natural selection'],'The process is called natural selection.'),'The process is called ______________.','Adjacent printed underlines may represent one multi-word answer.');
+assert.equal(alignPublisherBlankPrompt('그것은 ____________의 ____________이다.',['진화','결과'],'그것은 진화의 결과이다.'),'그것은 ______________의 ______________이다.','Korean particles outside each underline must remain fixed.');
+assert.equal(alignPublisherBlankPrompt('The process is called ____________ ____________.',['natural','selection'],'The process is called natural selection.'),'The process is called ______________ ______________.','Two answer slots may map to adjacent printed underlines when the source proves both slots.');
+assert.equal(alignPublisherBlankPrompt('The process is called ____________.',['random drift'],'The process is called natural selection.'),'','A wrong answer must not round-trip merely because a blank exists.');
 console.log('READY semantic Workbook Factory verified.');
