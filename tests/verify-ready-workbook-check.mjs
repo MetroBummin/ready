@@ -35,6 +35,7 @@ assert.equal(regenerated.stages.find(stage=>stage.stage===7).items.find(item=>it
 const admin = readFileSync(new URL('../ready/admin/app.js', import.meta.url), 'utf8');
 const adminHtml = readFileSync(new URL('../ready/admin/index.html', import.meta.url), 'utf8');
 const studioUi = readFileSync(new URL('../ready/admin/studio-ui.js', import.meta.url), 'utf8');
+const workbookSections = readFileSync(new URL('../ready/admin/workbook-sections.js', import.meta.url), 'utf8');
 const student = readFileSync(new URL('../ready/app.js', import.meta.url), 'utf8');
 const edge = readFileSync(new URL('../server/ready/index.ts', import.meta.url), 'utf8');
 const migration = readFileSync(new URL('../supabase/migrations/20260906114040_ready_live_passage_editor.sql', import.meta.url), 'utf8');
@@ -43,8 +44,12 @@ for (const removed of ['data-canonical-split','data-canonical-merge','data-canon
 assert.match(adminHtml,/data-route="students"[^]*data-route="passages"[^]*data-route="scopes"/,'Admin navigation order must be Students, Studio, Scope');
 assert.match(adminHtml,/id="v-passage-editor"/);assert.doesNotMatch(adminHtml,/id="passage-modal"/,'Passage editing must own a full page');
 for(const marker of ['data-source-kind','data-source-chip','factoryTitle'])assert.match(admin,new RegExp(marker),'New Passage metadata must be chip-first and derive its title');
-assert.match(studioUi,/Auto[^]*Authoring[^]*data-studio-publish-step/);assert.doesNotMatch(studioUi,/현재 단계 검수 완료/);
-assert.match(admin,/모든 지문 Deterministic 다시 생성/);
+assert.match(workbookSections,/label: 'AUTO'[^]*label: 'AUTHORING'[^]*label: 'COMPREHENSION'/);
+assert.match(studioUi,/workbookSectionRows\(\)[^]*data-studio-publish-step/);assert.doesNotMatch(studioUi,/현재 단계 검수 완료/);
+assert.doesNotMatch(admin,/모든 지문 Deterministic 다시 생성/);
+assert.doesNotMatch(admin,/data-delete-passage/,'Studio rows must not expose individual deletion');
+assert.match(admin,/data-delete-selected-passages/,'Studio selection must expose one bulk delete action');
+assert.match(admin,/data-open-workbook-section/,'Workbook section counts must be direct navigation links');
 assert.match(edge,/savePassageCanonical[\s\S]*regenerateDeterministicPassage/);
 assert.doesNotMatch(edge.match(/async function regenerateDeterministicPassage[\s\S]*?async function savePassageCanonical/)?.[0]||'',/Gemini|callGemini|geminiSentenceJson/);
 assert.match(migration,/canonical_revision[\s\S]*ai_regeneration_required[\s\S]*ready_publish_deterministic_catalog/);

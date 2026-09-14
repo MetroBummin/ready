@@ -11,6 +11,8 @@ for(const d of imported.drafts){const saved=await call('studio_create_draft',{jo
 const passageId=passageIds[0];let context=await call('studio_open',{passageId},admin);
 const callContext=(op,data={})=>call(op,{passageId,revision:context.passage.canonical_revision,version:context.studio.version,...data},admin);
 assert.equal((await pg.query('select * from ready_workbook_catalogs')).rows.length,0);
+let dashboard=(await call('admin_passage_workbook_status',{passageIds:[passageId]},admin)).passages[0];
+assert.deepEqual(dashboard.sections.map(section=>[section.key,section.published,section.total]),[['auto',0,3],['authoring',0,3],['comprehension',0,1]]);
 let result=await callContext('studio_author');context.studio=result.studio;assert.equal(aiCalls.length,2);assert.equal(aiCalls[0].length,8);assert.equal(aiCalls[1].length,1);
 const stateBefore=structuredClone(context.studio);
 await assert.rejects(()=>callContext('studio_confirm_step',{step:'english_blank',confirmations:[{sentenceId:context.rows[0].id,targets:[]},{sentenceId:'missing',targets:[]}]}));
@@ -19,6 +21,13 @@ for(const step of ['english_blank','korean_blank','verb_form','grammar_choice'])
 await assert.rejects(()=>call('studio_confirm_step',{passageId,revision:0,version:0,sentenceId:context.rows[0].id,step:'english_blank',targets:[]},admin));
 result=await callContext('studio_publish');context.studio=result.studio;
 assert.equal(result.catalog.stages.length,7);
+dashboard=(await call('admin_passage_workbook_status',{passageIds:[passageId]},admin)).passages[0];
+assert.deepEqual(dashboard.sections.map(section=>section.published),[3,3,0],'Catalog and published Studio types must count once per type, never once per item.');
+const factResult=await call('content_claim_bank_save',{passageId,entity:'fact',factText:'A verified fact.',evidenceSentenceIds:[context.rows[0].id],status:'draft'},admin),factId=factResult.contentBank.facts[0].id;
+await call('content_claim_bank_save',{passageId,entity:'claim',factId,statement:'A verified claim.',truth:true,language:'en',difficulty:1,status:'draft'},admin);
+await call('content_claim_bank_publish_all',{passageId},admin);
+dashboard=(await call('admin_passage_workbook_status',{passageIds:[passageId]},admin)).passages[0];
+assert.deepEqual(dashboard.sections.map(section=>section.published),[3,3,1]);
 const before=structuredClone(context.studio.annotations),catalog=result.catalog;
 const studentId=crypto.randomUUID(),examId=crypto.randomUUID();
 await pg.query("insert into ready_students(id,name,school,grade) values($1,'Studio QA','test2','2학년')",[studentId]);
