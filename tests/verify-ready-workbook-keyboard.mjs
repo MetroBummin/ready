@@ -75,6 +75,7 @@ assert.match(app,/workbookOrderClick\(words,answer,current,consumed\[group\],chi
 assert.match(app,/verifyWorkbookRecallInput\(input,session,item,index,mode,sequence,input\.value,\{allowComposing:true\}\)/,'A complete Korean syllable must unlock without waiting for compositionend');
 assert.match(app,/workbook-order-built-sizer[\s\S]{0,180}workbook-order-built-text/,'Ordering must reserve the completed sentence geometry while rendering selected words as plain text');
 assert.doesNotMatch(app,/data-workbook-order-remove=/,'The assembled sentence must not render selected words as removable chips');
+assert.match(app,/const used=consumedSet\.has\(chipIndex\)[\s\S]{0,220}aria-pressed="\$\{used\}"[\s\S]{0,80}\$\{used\|\|result\?'disabled':''\}/,'Consumed ordering chips must stay rendered in their original slots as disabled pressed controls');
 assert.match(app,/hintUsed\?'힌트 사용함':'힌트 보기'/,'Writing hint must become visibly exhausted after its one use');
 assert.match(app,/data-workbook-submit[\s\S]{0,300}data-workbook-hint[\s\S]{0,300}data-submit-workbook/,'Writing hint must live beside submit');
 
