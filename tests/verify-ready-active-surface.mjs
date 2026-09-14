@@ -38,6 +38,11 @@ assert.doesNotMatch(admin,/sessionStorage/,'Admin session must not be tab-lifeti
 assert.doesNotMatch(admin,/data-paragraph-break|문단 나누기/,'Published Passage editor must not expose the removed manual paragraph-break control');
 assert.match(admin,/call\('studio_open'/,'Passage Editor and Authoring must load through one shared bundle request');
 assert.match(studio,/initialResult\|\|await api\('studio_open'/,'Authoring must reuse the already loaded Passage bundle');
+assert.doesNotMatch(admin,/data-regenerate-all|data-delete-passage/,'Passage list must not repeat regeneration or row deletion actions');
+assert.match(admin,/선택한 지문 \$\{passageIds\.length\}개를 정말 삭제할까요\?/,'Bulk passage deletion must use one concise confirmation');
+assert.match(admin,/Promise\.allSettled\(passageIds\.map/,'One selection must support deleting multiple passages');
+assert.match(admin,/state\.route==='passages'&&state\.data\)renderPassages/,'Studio navigation must reveal already loaded Workbook status instead of stale loading placeholders');
+assert.match(admin,/if\(state\.route==='passages'\)void loadPassageWorkbookStatus/,'Hidden Studio rows must not fetch status during the Student dashboard first load');
 assert.doesNotMatch(student,/\$\{stage\.stage\}단계/,'Student Workbook choices must not expose numeric stage labels');
 assert.match(student,/workbook-stage-copy"><strong>\$\{esc\(label\)\}/,'Student Workbook choices must lead with the semantic learning name');
 assert.match(student,/function workbookStageLabel\(stage\)[\s\S]*replace\(\/\^\\s\*\\d\+\\s\*단계/,'Legacy numeric prefixes must be stripped from Student Workbook labels');

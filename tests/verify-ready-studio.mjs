@@ -1,9 +1,16 @@
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {AUTHORED,spanTokens,makeSpan,locateSpan,snapshot,syncAnnotations,dirtyRows,applyCandidates,validateTargets} from '../ready/admin/studio-contract.js';
+import {WORKBOOK_SECTIONS,studioStepForSection,workbookPublicationSummary} from '../ready/admin/workbook-sections.js';
 import {compileStudio,publisherAnnotationAudit} from '../server/ready/studio-authoring.mjs';
 import {inspectStudioDocument} from '../server/ready/studio-import.mjs';
 const text=readFileSync(new URL('./fixtures/studio/september-2026.txt',import.meta.url),'utf8');
+const emptyPublication=workbookPublicationSummary(),partialPublication=workbookPublicationSummary({catalog:{stages:[{semanticType:'translation',items:[{}]},{semanticType:'writing',items:[{}]}]}}),fullPublication=workbookPublicationSummary({catalog:{stages:[{semanticType:'translation',items:[{}]},{semanticType:'writing',items:[{}]},{semanticType:'word_order',items:[{}]}]},publishedSteps:['english_blank','korean_blank','verb_form','grammar_choice'],publishedContentTypes:['content_claim']});
+assert.deepEqual(emptyPublication.map(section=>[section.key,section.published,section.total]),[['auto',0,3],['authoring',0,3],['comprehension',0,1]]);
+assert.deepEqual(partialPublication.map(section=>section.published),[2,0,0]);
+assert.deepEqual(fullPublication.map(section=>section.published),[3,3,1]);
+assert.deepEqual(WORKBOOK_SECTIONS.map(section=>section.types.length),fullPublication.map(section=>section.total),'List denominators must come from the shared Studio type definitions.');
+assert.equal(studioStepForSection('auto'),'translation');assert.equal(studioStepForSection('authoring'),'blank_pair');assert.equal(studioStepForSection('comprehension'),'content_claim');
 const drafts=inspectStudioDocument(text,{title:'2026년 9월 고2',documentSha256:'file-a'});
 assert.equal(drafts.length,4);assert.deepEqual(drafts.map(d=>d.rows.length),[9,8,8,8]);
 assert.deepEqual(drafts.map(d=>d.number),['21','22','23','24']);
@@ -58,7 +65,8 @@ const backend=readFileSync(new URL('../server/ready/index.ts',import.meta.url),'
 assert.doesNotMatch(backend.match(/async function studioImport[\s\S]*?async function studioSplitDraft/)[0],/geminiSentenceJson/);
 assert.doesNotMatch(backend.match(/async function regenerateDeterministicPassage[\s\S]*?async function savePassageCanonical/)[0],/geminiSentenceJson/);
 const studioUi=readFileSync(new URL('../ready/admin/studio-ui.js',import.meta.url),'utf8');
-assert.match(studioUi,/\['blank_pair','verb_form','grammar_choice'\]/,'English and Korean blank review must share one UI step');
+assert.match(studioUi,/WORKBOOK_SECTIONS\.map/,'Studio navigation and list denominators must share one section definition');
+assert.match(studioUi,/initialSection&&PURE\.includes\(step\)[^]*renderPreview/,'A direct AUTO link must render its student Preview immediately.');
 assert.match(studioUi,/if\(PURE\.includes\(step\)\)[\s\S]*studio_preview/,'AUTO chips must open Student Preview directly');
 assert.match(studioUi,/workbookWritingHtml/,'Writing Preview must reuse the production writing component');
 assert.doesNotMatch(studioUi,/PURE\.includes\(step\)\?['"]<p class="empty"/,'AUTO must not show an intermediate explanation screen');
