@@ -8,7 +8,7 @@ if(!Array.isArray(entries)||!entries.length)throw new Error('manifest.entries에
 const apiUrl=process.env.READY_API_URL||'https://fqvhlyocdkwiyioiokte.supabase.co/functions/v1/ready',password=process.env.READY_ADMIN_PASSWORD,serviceKey=process.env.READY_IMPORT_SERVICE_KEY;
 if(!password&&!serviceKey)throw new Error('READY_ADMIN_PASSWORD 또는 READY_IMPORT_SERVICE_KEY가 필요합니다.');
 async function post(payload,token=''){
-  const response=await fetch(apiUrl,{method:'POST',headers:{'content-type':'application/json',...(token?{authorization:`Bearer ${token}`}:{})},body:JSON.stringify(payload)}),body=await response.json();
+  const response=await fetch(apiUrl,{method:'POST',headers:{'content-type':'application/json',...(token?(serviceKey?{'x-ready-import-key':token}:{authorization:`Bearer ${token}`}):{})},body:JSON.stringify(payload)}),body=await response.json();
   if(!response.ok)throw Object.assign(new Error(body.error||`HTTP ${response.status}`),{status:response.status,detail:body.detail});
   return body;
 }

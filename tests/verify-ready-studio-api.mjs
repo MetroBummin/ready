@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';import {readFileSync,readdirSync} from 'node:fs';
-import {pg,call,admin,aiCalls,close,repo} from './helpers/ready-studio-api.mjs';
+import {pg,call,serviceCall,admin,aiCalls,close,repo} from './helpers/ready-studio-api.mjs';
 import {livePrefixState} from '../ready/workbook-assistance.js';
 import {inspectStudioDocument} from '../server/ready/studio-import.mjs';
 const source=readFileSync(new URL('./fixtures/studio/september-2026.txt',import.meta.url),'utf8');
@@ -114,7 +114,7 @@ console.log('PASS stability API: 3 bookmarks -> 1 catalog read, fresh next-reque
 // A legacy Studio state can have empty annotations and no jobId. The passage
 // link must still recover verified Publisher candidates without an AI call.
 const publisherPdf=readFileSync(new URL('../ready/workbooks/ne-minbyeongcheon-lesson-1.pdf',import.meta.url)).toString('base64');
-const serviceDryRun=await call('studio_publisher_import',{pdfBase64:publisherPdf,documentName:'ne-minbyeongcheon-lesson-1.pdf',sourceLocator:'fixture:ne-lesson-1',title:'Publisher service import',sourceType:'TEXTBOOK',grade:'1학년',apply:false},'local-test-only-service-role-key-0001');
+const serviceDryRun=await serviceCall('studio_publisher_import',{pdfBase64:publisherPdf,documentName:'ne-minbyeongcheon-lesson-1.pdf',sourceLocator:'fixture:ne-lesson-1',title:'Publisher service import',sourceType:'TEXTBOOK',grade:'1학년',apply:false});
 assert.equal(serviceDryRun.canApply,true);assert.equal(serviceDryRun.aiCallCount,0);assert.equal(serviceDryRun.validationVersion,'publisher-source-v3');
 const publisherImport=await call('studio_import',{title:'Publisher recovery',sourceKind:'pdf',pdfBase64:publisherPdf,documentName:'ne-minbyeongcheon-lesson-1.pdf',sourceType:'TEXTBOOK',grade:'1학년'},admin),publisherDraft=publisherImport.drafts[0];
 const publisherPassage=(await call('studio_create_draft',{jobId:publisherDraft.job.id,title:'Publisher recovery',rows:publisherDraft.rows,boundaryConfirmed:true},admin)).passageId;

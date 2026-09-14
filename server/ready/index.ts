@@ -224,9 +224,10 @@ async function studentForSession(session: ReadySession): Promise<Student> {
   return result.data as Student;
 }
 async function authenticate(req: Request, actor?: "student" | "admin", allowServiceImport=false): Promise<ReadySession> {
+  const importKey=req.headers.get('x-ready-import-key')||'';
+  if(allowServiceImport&&actor==='admin'&&importKey&&secureEqual(importKey,Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')||''))return {id:'service-workbook-import',actor_type:'admin',student_id:null,remembered:false,expires_at:new Date(Date.now()+60_000).toISOString()} as ReadySession;
   const token = bearerToken(req.headers.get("authorization"));
   if (!token) throw new ApiError(401, "로그인이 필요합니다.");
-  if(allowServiceImport&&actor==='admin'&&token===Deno.env.get('SUPABASE_SERVICE_ROLE_KEY'))return {id:'service-workbook-import',actor_type:'admin',student_id:null,remembered:false,expires_at:new Date(Date.now()+60_000).toISOString()} as ReadySession;
   const tokenHash = await sha256Hex(token);
   const result = await db.from("ready_sessions").select("id,actor_type,student_id,remembered,expires_at").eq("token_hash", tokenHash).is("revoked_at", null).gt("expires_at", new Date().toISOString()).maybeSingle();
   if (result.error) throw new ApiError(500, result.error.message);

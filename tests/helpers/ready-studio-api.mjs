@@ -56,7 +56,8 @@ let source=readFileSync(repo+'/server/ready/index.ts','utf8').replace(/import \{
 source=source.replace(/(from\s*|import\()(["'])(\.[^"']+)\2/g,(_,lead,quote,path)=>lead+quote+pathToFileURL(resolve(repo+'/server/ready',path)).href+quote);
 source+='\nexport {dispatch,geminiSentenceJson};';writeFileSync(resolve(scratch,'edge.mjs'),stripTypeScriptTypes(source,{mode:'transform'}));
 export const {dispatch,geminiSentenceJson}=await import(pathToFileURL(resolve(scratch,'edge.mjs')).href);
-export async function request(op,data={},token='') {return handler(new Request('http://localhost/api',{method:'POST',headers:{'content-type':'application/json',authorization:'Bearer '+token},body:JSON.stringify({op,...data})}));}
+export async function request(op,data={},token='',service=false) {return handler(new Request('http://localhost/api',{method:'POST',headers:{'content-type':'application/json',...(service?{'x-ready-import-key':token}:{authorization:'Bearer '+token})},body:JSON.stringify({op,...data})}));}
 export async function call(op,data={},token=''){const res=await request(op,data,token),body=await res.json();if(!res.ok)throw Object.assign(new Error(body.error),{body,status:res.status});return body;}
+export async function serviceCall(op,data={},token='local-test-only-service-role-key-0001'){const res=await request(op,data,token,true),body=await res.json();if(!res.ok)throw Object.assign(new Error(body.error),{body,status:res.status});return body;}
 export const admin=(await call('admin_login',{password:'studio-local'})).session.token;
 export async function close(){await pg.close();globalThis.fetch=originalFetch;delete globalThis.Deno;delete globalThis.__studioDb;rmSync(scratch,{recursive:true,force:true});}
