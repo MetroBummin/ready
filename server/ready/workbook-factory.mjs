@@ -249,16 +249,10 @@ function publisherBlankAlignment(sourcePrompt, answers, canonical) {
   if (!valid.length) return null;
   // More than one underline grouping is acceptable only when it produces the
   // same answer spans in the canonical sentence.
-  const restoredParts = valid[0];
-  const compactSpans = [];
-  let compactOffset = 0;
-  for (let index = 0; index < slots.length; index += 1) {
-    const fixedPart = restoredParts[index * 2] || '';
-    compactOffset += compact(fixedPart).length;
-    const start = compactOffset;
-    compactOffset += compact(slots[index]).length;
-    compactSpans.push({ start, end: compactOffset });
-  }
+  const spansFor=parts=>{const spans=[];let offset=0;for(let index=0;index<slots.length;index++){offset+=compact(parts[index*2]||'').length;const start=offset;offset+=compact(slots[index]).length;spans.push({start,end:offset});}return spans;};
+  const spanCandidates=new Map(valid.map(parts=>{const spans=spansFor(parts);return [JSON.stringify(spans),spans];}));
+  if(spanCandidates.size!==1)return null;
+  const compactSpans=spanCandidates.values().next().value;
   const compactPositions = [];
   Array.from(target).forEach((char, index) => { if (!/\s/u.test(char)) compactPositions.push(index); });
   const ranges = compactSpans.map(span => {
