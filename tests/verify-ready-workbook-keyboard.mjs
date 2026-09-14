@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {progressiveOrderState,shuffleWorkbookOrderBatch,workbookEnterAction,workbookOrderAnswerIndexes,workbookOrderClick,workbookOrderTokenMatches} from '../ready/workbook-interaction.js';
 import {koreanRecallCompositionState} from '../ready/workbook-assistance.js';
+import {captureWorkbookOrderMode,workbookOrderModeAtProblemStart,workbookSemanticType} from '../ready/workbook-order-practice.js';
 
 const app=readFileSync(new URL('../ready/app.js',import.meta.url),'utf8');
 const writing=readFileSync(new URL('../ready/workbook-writing-ui.js',import.meta.url),'utf8');
@@ -44,6 +45,31 @@ assert.match(app,/enterkeyhint="done"/,'Blank and translation controls must expo
 assert.match(writing,/enterkeyhint="done"/,'Writing must expose a mobile completion key');
 assert.doesNotMatch(app,/WORKBOOK_AUTOFOCUS_TYPES[^\n]*(grammar_choice|word_order)/,'Choice and ordering stages must not opt into autofocus');
 
+const practiceStage={semanticType:'word_order',total:4,correctClears:7,completedCycles:1,progressPercent:175};
+assert.equal(workbookOrderModeAtProblemStart(practiceStage,{kind:'reorder_groups'}),'practice','The 200% finishing problem must begin in practice mode');
+assert.equal(workbookOrderModeAtProblemStart({...practiceStage,correctClears:8,completedCycles:2,progressPercent:200},{kind:'reorder_groups'}),'real','The problem after 200% must begin in real mode');
+assert.equal(workbookOrderModeAtProblemStart({...practiceStage,correctClears:8,completedCycles:1,progressPercent:200},{kind:'reorder_groups'}),'practice','A retained cycle count must win over a catalog-size recalculation');
+assert.equal(workbookOrderModeAtProblemStart({semanticType:'word_order',total:4,correctClears:8,progressPercent:200},{kind:'reorder_groups'}),'real','Legacy payloads without a cycle count must retain the existing 200% fallback');
+assert.equal(workbookOrderModeAtProblemStart({semanticType:'word_order',total:4,correctClears:8,completedCycles:null,progressPercent:200},{kind:'reorder_groups'}),'real','A null legacy cycle count must use the existing 200% fallback');
+assert.equal(workbookOrderModeAtProblemStart({semanticType:'grammar_choice',total:4,completedCycles:0},{kind:'reorder_groups'}),null,'Only the word_order semantic type gets the mode split');
+assert.equal(workbookSemanticType({}, {kind:'reorder_groups'}),'word_order','An unannotated legacy ordering task must resolve by its semantic task contract, not its stage number');
+const practiceItem={key:'last-practice-item',kind:'reorder_groups'},practiceSnapshot=captureWorkbookOrderMode(null,practiceStage,practiceItem);
+Object.assign(practiceStage,{correctClears:8,completedCycles:2,progressPercent:200});
+assert.equal(captureWorkbookOrderMode(practiceSnapshot,practiceStage,practiceItem).mode,'practice','A problem must keep its start mode even after it reaches 200%');
+assert.equal(captureWorkbookOrderMode(practiceSnapshot,practiceStage,{key:'next-real-item',kind:'reorder_groups'}).mode,'real','The following problem must take a new strict-mode snapshot');
+assert.equal(captureWorkbookOrderMode(null,practiceStage,practiceItem).mode,'real','Re-entering the same item for the next cycle must take a fresh strict-mode snapshot');
+
+const practiceGroup=['I','want','to','go'],practiceAnswer=practiceGroup.join(' ');
+let practiceState={chosen:[],consumed:[]};
+for(const chipIndex of [0,1])practiceState=workbookOrderClick(practiceGroup,practiceAnswer,practiceState.chosen,practiceState.consumed,chipIndex,{practice:true});
+const practiceMistake=workbookOrderClick(practiceGroup,practiceAnswer,practiceState.chosen,practiceState.consumed,3,{practice:true});
+assert.deepEqual(practiceMistake,{type:'practice-wrong',chosen:[0,1],consumed:[0,1],chipIndex:3},'A practice mistake must preserve the confirmed prefix and leave its chip available');
+practiceState=workbookOrderClick(practiceGroup,practiceAnswer,practiceMistake.chosen,practiceMistake.consumed,2,{practice:true});
+practiceState=workbookOrderClick(practiceGroup,practiceAnswer,practiceState.chosen,practiceState.consumed,3,{practice:true});
+assert.deepEqual(practiceState,{type:'correct',chosen:[0,1,2,3],consumed:[0,1,2,3]},'The learner must be able to correct the same position and finish once');
+const strictMistake=workbookOrderClick(practiceGroup,practiceAnswer,[0,1],[0,1],3);
+assert.deepEqual(strictMistake,{type:'wrong',chosen:[0,1,3],consumed:[0,1,3]},'Real mode must retain the immediate-wrong attempt contract');
+
 const duplicateGroup=['to','learn','to','read','well','today','fast'];
 assert.deepEqual(workbookOrderAnswerIndexes(duplicateGroup,'to learn to read well today fast'),[0,1,2,3,4,5,6],'Repeated chips must retain identity by index');
 const twoDuplicates=['the','cat','the'],twoDuplicateAnswer='the cat the';
@@ -70,12 +96,22 @@ assert.deepEqual(progressiveOrderState(twentyChipGroup,answer,expected.slice(0,5
 assert.match(app,/if\(!orders\[progressive\.batchIndex\]\)orders\[progressive\.batchIndex\]=shuffleWorkbookOrderBatch/,'Each ordering batch must be shuffled once and cached on entry');
 assert.match(app,/delete session\.orderBatchOrders\?\.\[item\.key\]/,'Retry must discard stored batch shuffles and restart from batch one');
 assert.match(app,/if\(item\.kind==='reorder_groups'\)\{session\.orderSelections\[item\.key\]=Array\.from[\s\S]{0,180}next=Array\(item\.slotCount\)\.fill\(''\)/,'Ordering retry must clear every group and response in the problem');
-assert.match(app,/if\(remove&&position>=0\)\{current\.splice\(position\);consumed\[group\]\.splice\(position\)/,'Removing a built chip must rewind the confirmed prefix from that position');
-assert.match(app,/workbookOrderClick\(words,answer,current,consumed\[group\],chipIndex\)[\s\S]{0,260}click\.type==='wrong'\)return submitWorkbook\(\)/,'Only a normalized token-text mismatch must immediately finalize the local attempt');
+assert.match(app,/if\(remove&&position>=0\)\{\s*clearWorkbookOrderWrongChip\(session,item,group\);\s*current\.splice\(position\);consumed\[group\]\.splice\(position\)/,'Removing a built chip must rewind the confirmed prefix from that position');
+assert.match(app,/const practice=workbookOrderMode\(session,stage,item\)==='practice',click=workbookOrderClick\(words,answer,current,consumed\[group\],chipIndex,\{practice\}\)/,'The student card must snapshot the word-order mode before handling a chip');
+assert.match(app,/if\(click\.type==='practice-wrong'\)return flashWorkbookOrderWrongChip\(session,item,group,click\.chipIndex\)/,'Practice mistakes must show transient feedback without submitting an attempt');
+assert.match(app,/if\(click\.type==='wrong'\)return submitWorkbook\(\)/,'Real-mode mistakes must retain immediate final submission');
+assert.match(app,/sequence=\(Number\(session\.orderWrongSequence\)\|\|0\)\+1;\s*session\.orderWrongSequence=sequence/,'Each transient wrong-chip timer must use a session-wide monotonic token');
+assert.match(app,/if\(session\.milestone\)return renderWorkbook\(\);return renderScope\(\)/,'A final-stage 200% completion must render its milestone before leaving Workbook');
+assert.match(app,/function chooseOtherWorkbook\(\)\{[^}]*session\.milestone=null;session\.orderModeSnapshot=null/,'Leaving a milestone must discard its prior card mode before the next cycle starts');
+assert.match(app,/!workbookOrderInteractionStarted\(session,current\.item\)\)\{\s*session\.orderModeSnapshot=null;\s*refreshCurrentOrderMode=true/,'A fresh server progress update must replace an untouched cached card mode');
 assert.match(app,/verifyWorkbookRecallInput\(input,session,item,index,mode,sequence,input\.value,\{allowComposing:true\}\)/,'A complete Korean syllable must unlock without waiting for compositionend');
 assert.match(app,/workbook-order-built-sizer[\s\S]{0,180}workbook-order-built-text/,'Ordering must reserve the completed sentence geometry while rendering selected words as plain text');
 assert.doesNotMatch(app,/data-workbook-order-remove=/,'The assembled sentence must not render selected words as removable chips');
-assert.match(app,/const used=consumedSet\.has\(chipIndex\)[\s\S]{0,220}aria-pressed="\$\{used\}"[\s\S]{0,80}\$\{used\|\|result\?'disabled':''\}/,'Consumed ordering chips must stay rendered in their original slots as disabled pressed controls');
+assert.match(app,/const used=consumedSet\.has\(chipIndex\)[\s\S]{0,240}aria-pressed="\$\{used\}"[\s\S]{0,120}\$\{used\|\|result\?'disabled':''\}/,'Consumed ordering chips must stay rendered in their original slots as disabled pressed controls');
+assert.match(app,/aria-invalid="\$\{wrong\?'true':'false'\}"/,'A feedback chip must announce its current invalid state without becoming consumed');
+assert.match(app,/workbook-order-feedback" role="status">다시 골라보세요/,'Practice mistakes must provide text feedback as well as color');
+assert.match(app,/workbookMilestoneCopy[\s\S]{0,420}200% 완료! 이제 실전 모드예요/,'The existing 200% milestone must announce the switch once');
+assert.match(app,/orderModeSnapshot:null/,'Each Workbook session must begin with a fresh per-problem mode snapshot');
 assert.match(app,/hintUsed\?'힌트 사용함':'힌트 보기'/,'Writing hint must become visibly exhausted after its one use');
 assert.match(app,/data-workbook-submit[\s\S]{0,300}data-workbook-hint[\s\S]{0,300}data-submit-workbook/,'Writing hint must live beside submit');
 

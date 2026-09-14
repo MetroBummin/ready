@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import {readFile} from 'node:fs/promises';
 import {clearWorkbookCycleItem,reconcileWorkbookProgress,workbookCycleMilestone,workbookProgressPercent,workbookProgressVisual} from '../ready/workbook-progress.js';
 import {gradeLocalWorkbook,gradeWorkbookCorrectionPairs} from '../ready/deterministic-grading.js';
+import {workbookOrderModeAtProblemStart} from '../ready/workbook-order-practice.js';
 
 assert.equal(workbookProgressPercent(0,41),0);
 assert.equal(workbookProgressPercent(41,41),100);
@@ -21,6 +22,9 @@ assert.equal(workbookCycleMilestone(40,41,41),100);
 assert.equal(workbookCycleMilestone(41,42,41),0);
 assert.equal(workbookCycleMilestone(81,82,41),200);
 assert.equal(workbookCycleMilestone(82,83,41),0);
+const wordOrderBefore200={semanticType:'word_order',total:41,correctClears:81,completedCycles:1,progressPercent:198};
+assert.equal(workbookOrderModeAtProblemStart(wordOrderBefore200,{kind:'reorder_groups'}),'practice','The 200% completion item must remain in practice mode');
+assert.equal(workbookOrderModeAtProblemStart({...wordOrderBefore200,correctClears:82,completedCycles:2,progressPercent:200},{kind:'reorder_groups'}),'real','Only the next problem after the second cycle may enter real mode');
 
 let cycle={completedCycles:0,currentCycle:1,currentCycleClears:[]};
 for(let index=0;index<41;index++)cycle=clearWorkbookCycleItem(cycle,'same-item',41);
