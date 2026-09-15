@@ -1,3 +1,5 @@
+import { workbookProgressPercent } from '../../ready/workbook-progress.js';
+
 const text = (value, limit = 4000) => String(value ?? '').trim().slice(0, limit);
 const list = value => Array.isArray(value) ? value : [];
 
@@ -107,7 +109,7 @@ export function publicContentClaims(facts, claims, variants, sentenceRows) {
 
 export function contentClaimStage(claims, progress = {}, random = Math.random) {
   const correctClears = Number(progress.correctClears) || 0, total = list(claims).length;
-  const progressPercent = total ? Math.floor(correctClears * 100 / total) : 0;
+  const progressPercent = workbookProgressPercent(correctClears, total);
   const items = contentClaimBag(claims, random).map((claim, index) => {
     const variant = selectContentClaimVariant(claim, progressPercent, random);
     return {

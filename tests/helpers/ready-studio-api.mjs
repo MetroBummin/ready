@@ -20,7 +20,7 @@ class Query {
  select(cols='*',options={}){this.cols=cols;this.options=options;return this;}
  eq(k,v){this.filters.push([k,'=',v]);return this;}neq(k,v){this.filters.push([k,'<>',v]);return this;}gte(k,v){this.filters.push([k,'>=',v]);return this;}gt(k,v){this.filters.push([k,'>',v]);return this;}lt(k,v){this.filters.push([k,'<',v]);return this;}lte(k,v){this.filters.push([k,'<=',v]);return this;}
  is(k,v){this.filters.push([k,'is',v]);return this;}in(k,v){this.filters.push([k,'in',v]);return this;}
- order(k,opt={}){this.sort.push(qid(k)+(opt.ascending===false?' desc':' asc'));return this;}limit(n){this.max=n;return this;}
+ order(k,opt={}){this.sort.push(qid(k)+(opt.ascending===false?' desc':' asc'));return this;}limit(n){this.max=n;return this;}range(from,to){this.offset=Math.max(0,Number(from)||0);this.max=Math.max(0,(Number(to)||0)-this.offset+1);return this;}
  maybeSingle(){this.singleRow=true;return this;}single(){this.singleRow=true;this.required=true;return this;}
  insert(value){this.op='insert';this.value=value;return this;}update(value){this.op='update';this.value=value;return this;}delete(){this.op='delete';return this;}upsert(value,options={}){this.op='insert';this.value=value;this.conflict=options;return this;}
  async execute(){try{
@@ -33,7 +33,7 @@ class Query {
   else if(this.op==='delete')sql=`delete from ${table}`;
   else sql=`select ${cols} from ${table}`;
   if(this.filters.length)sql+=' where '+this.filters.map(([k,op,v])=>op==='is'?qid(k)+(v===null?' is null':' is '+v):op==='in'?qid(k)+' in ('+v.map(bind).join(',')+')':qid(k)+op+bind(v)).join(' and ');
-  if(this.op==='select'){if(this.sort.length)sql+=' order by '+this.sort.join(',');if(this.max)sql+=' limit '+Number(this.max);}else sql+=' returning '+cols;
+  if(this.op==='select'){if(this.sort.length)sql+=' order by '+this.sort.join(',');if(this.max)sql+=' limit '+Number(this.max);if(this.offset)sql+=' offset '+Number(this.offset);}else sql+=' returning '+cols;
   const result=await pg.query(sql,params),rows=result.rows;
   if(this.required&&rows.length!==1)throw new Error('single row expected');
   return {data:this.singleRow?rows[0]||null:rows,error:null,count:rows.length};

@@ -8,6 +8,8 @@ assert.equal(workbookProgressPercent(0,41),0);
 assert.equal(workbookProgressPercent(41,41),100);
 assert.equal(workbookProgressPercent(43,41),104);
 assert.equal(workbookProgressPercent(82,41),200);
+assert.equal(workbookProgressPercent(27,10),270,'cumulative progress must retain the student-facing floor without a 100% cap');
+assert.equal(workbookProgressPercent(60,10),600,'six completed cycles must remain visible as 600%');
 assert.deepEqual(reconcileWorkbookProgress(43,42,41),{correctClears:43,progressPercent:104});
 assert.deepEqual(reconcileWorkbookProgress(43,44,41),{correctClears:44,progressPercent:107});
 assert.deepEqual(workbookProgressVisual(100),{percent:100,fill:100,cycle:1});
