@@ -21,9 +21,10 @@ function harness(storage=new Map()){
     localStorage:{getItem:key=>storage.get(key)||null,setItem:(key,value)=>storage.set(key,value),removeItem:key=>storage.delete(key)},
     readyApi:(op,body,token,options)=>{const d=deferred();requests.push({op,body,token,options,...d});return d.promise;},
   });
-  vm.runInContext(source+`\nupdateStudentNav=()=>{};showStudentLogin=()=>{};renderReview=()=>{};renderScope=()=>{};call=(op,data,token)=>readyApi(op,data,token);
+  vm.runInContext(source+`\nupdateStudentNav=()=>{};showStudentLogin=()=>{};renderReview=()=>{};renderScope=()=>{};renderWorkbook=()=>{};renderWorkbookStages=()=>{};refreshWorkbookSubmit=()=>{};call=(op,data,token)=>readyApi(op,data,token);
     globalThis.test={state,clearSession,restoreWorkbookAttempts,queueWorkbookAttempt,flushWorkbookAttempts,workbookAttemptStorageKey,
       loadReviewKind,invalidateReviewKind,removeReviewWord,updateReviewWordMeaning,ensureReviewData,prefetchWorkbooks,prefetchReview,openWorkbook,cacheWorkbook,
+      repeatWorkbookCycle,chooseOtherWorkbook,setWorkbookStage,requestWorkbookHint,
       get queue(){return workbookAttemptQueue;}};`,context);
   const api=context.test;
   const login=(token='student-A-token-000000000001')=>{api.state.token=token;api.state.student={id:token};api.state.scope={id:'scope'};};login();
@@ -32,6 +33,13 @@ function harness(storage=new Map()){
 const body=id=>({clientAttemptId:id,itemKey:'item',passageId:'passage',examId:'scope',responses:['answer']});
 const ack=id=>({attempt:{id},correct:true,correctClears:1,reviewCount:0});
 const tests=[];const test=(name,run)=>tests.push({name,run});
+function completedCycleFixture(h){
+  const first={key:'first',stage:9,slotCount:1,completed:true,lastResult:true,bookmarked:true},second={key:'second',stage:9,slotCount:1,completed:true,lastResult:true,bookmarked:false};
+  const stage={stage:9,semanticType:'writing',total:2,correctClears:6,completedCycles:3,currentCycle:4,currentCycleClears:[],progressPercent:300,items:[first,second]};
+  const session={data:{stages:[stage]},passageId:'passage',stageIndex:0,itemIndex:1,responses:{first:['old first'],second:['old second']},results:{first:{correct:true,persistenceSequence:7},second:{correct:true,persistenceSequence:8}},orderSelections:{first:[[0]],second:[[1]]},orderConsumedChips:{first:[[0]],second:[[1]]},orderWrongChips:{first:[{chipIndex:0,sequence:1}],second:[null]},orderBatchOrders:{first:[[0]],second:[[1]]},orderModeSnapshot:{stage,item:second,mode:'practice'},assistance:{first:{hintUsed:true,hintReceipt:'old',hints:{0:'old'},live:{0:{valid:false}},requestSequence:{0:1}},second:{hintUsed:true,hintReceipt:'old',hints:{}}},aiPending:{first:true},aiErrors:{second:'old error'},persistenceSequence:{first:7,second:8},milestone:{stageIndex:0,percent:300},acknowledgedMilestones:{writing:300},focusedSlot:1};
+  h.api.state.workbookSession=session;h.api.state.reviewCount=9;
+  return {session,stage,first,second};
+}
 test('in-flight reload keeps the same durable ID and overlapping flush sends once',async()=>{
   const h=harness();h.api.queueWorkbookAttempt(null,null,body('one'),0);const key=h.api.workbookAttemptStorageKey();
   const pending=h.api.flushWorkbookAttempts(),overlap=h.api.flushWorkbookAttempts({keepalive:true});
@@ -125,6 +133,63 @@ test('background Workbook reconciliation cannot overwrite a different stage',asy
   h.storage.set(`ready-workbook-cache-v3:${token}:scope:passage:0-0-`,JSON.stringify({stages:[]}));
   const p=h.api.openWorkbook('passage');h.requests[0].resolve({stages:[stage(1,1),stage(2,4)]});await p;
   assert.equal(stages[0].correctClears,1);assert.equal(stages[1].correctClears,4);
+});
+test('completed-cycle re-entry clears only transient card state and rejects late queue UI writes',async()=>{
+  const h=harness(),{session,stage,first,second}=completedCycleFixture(h);
+  h.api.queueWorkbookAttempt(session,first,body('prior-cycle'),7);
+  h.api.chooseOtherWorkbook();
+  assert.equal(session.milestone,null,'Other learning must dismiss the completed cycle.');
+  assert.equal(session.orderModeSnapshot,null,'The old word-order mode must not leak into the next cycle.');
+  assert.equal(session.focusedSlot,0);
+  for(const item of [first,second]){
+    assert.equal(item.completed,false,'The next cycle must not inherit completed cards.');
+    assert.equal('lastResult' in item,false,'The prior grading result must be removed.');
+    assert.equal(item.bookmarked,item===first,'Manual bookmarks must survive a visual reset.');
+    assert.equal(session.responses[item.key],undefined,'Prior answers must not prefill the next cycle.');
+    assert.equal(session.results[item.key],undefined,'Prior grading feedback must not reappear.');
+    assert.equal(session.assistance[item.key],undefined,'Hints and live-input state must reset.');
+  }
+  assert.equal(session.aiPending.first,undefined);assert.equal(session.aiErrors.second,undefined);
+  assert.equal(session.persistenceSequence.first,7,'The old sequence must remain to reject late persistence responses.');
+  assert.equal(stage.correctClears,6);assert.equal(stage.completedCycles,3);assert.equal(stage.currentCycle,4);assert.equal(stage.progressPercent,300,'Stored progress must not be reset.');
+  assert.equal(h.api.queue.length,1,'A completed-cycle reset must not discard durable submissions.');
+  h.api.setWorkbookStage(0);assert.equal(session.itemIndex,0,'Re-entry must begin at a blank first card.');
+  const flush=h.api.flushWorkbookAttempts();
+  h.requests.at(-1).resolve({results:[{...ack('prior-cycle'),correctClears:7,completedCycles:3,currentCycle:4,currentCycleClears:['first'],progressPercent:350,bookmarked:false,reviewCount:3}]});
+  await flush;
+  assert.equal(session.results.first,undefined,'A late prior-cycle acknowledgement must not restore feedback.');
+  assert.equal(first.bookmarked,true,'A late prior-cycle acknowledgement must not overwrite a manual bookmark.');
+  assert.equal(stage.correctClears,6,'A late prior-cycle acknowledgement must not overwrite next-cycle progress.');
+  assert.equal(h.api.state.reviewCount,9,'A late prior-cycle acknowledgement must not overwrite the active UI count.');
+});
+test('repeat starts a completed non-claim stage with the same fresh-cycle reset',async()=>{
+  const h=harness(),{session,stage,first,second}=completedCycleFixture(h);
+  await h.api.repeatWorkbookCycle();
+  assert.equal(session.milestone,null);assert.equal(session.stageIndex,0);assert.equal(session.itemIndex,0);
+  for(const item of [first,second]){assert.equal(item.completed,false);assert.equal(session.responses[item.key],undefined);assert.equal(session.results[item.key],undefined);assert.equal(session.assistance[item.key],undefined);}
+  assert.equal(stage.correctClears,6);assert.equal(stage.completedCycles,3);assert.equal(session.persistenceSequence.first,7);
+});
+test('selecting a stage after the milestone back action also starts fresh',()=>{
+  const h=harness(),{session,stage,first,second}=completedCycleFixture(h);
+  h.api.setWorkbookStage(0);
+  assert.equal(session.milestone,null);assert.equal(session.itemIndex,0);
+  for(const item of [first,second]){assert.equal(item.completed,false);assert.equal(session.responses[item.key],undefined);assert.equal(session.results[item.key],undefined);}
+  assert.equal(stage.correctClears,6);assert.equal(session.persistenceSequence.second,8);
+});
+test('a late writing hint cannot reappear after its completed cycle resets',async()=>{
+  const h=harness(),item={key:'writing',stage:9,semanticType:'writing',slotCount:1,completed:false},stage={stage:9,semanticType:'writing',total:1,items:[item]},session={data:{stages:[stage]},passageId:'passage',stageIndex:0,itemIndex:0,responses:{},results:{},orderSelections:{},orderConsumedChips:{},orderWrongChips:{},orderBatchOrders:{},assistance:{},aiPending:{},aiErrors:{},persistenceSequence:{},milestone:null};
+  h.api.state.workbookSession=session;const hint=h.api.requestWorkbookHint();
+  session.results.writing={correct:true,persistenceSequence:1};item.completed=true;session.milestone={stageIndex:0,percent:100};h.api.chooseOtherWorkbook();
+  h.requests[0].resolve({answer:'old answer',hintReceipt:'old',hintCount:1,visibleForMs:5000});await hint;
+  assert.equal(session.assistance.writing,undefined,'A delayed hint must not recreate prior-cycle assistance state.');
+  assert.equal(session.results.writing,undefined);assert.equal(item.completed,false);
+});
+test('changing stages during an unfinished cycle preserves that cycle state',()=>{
+  const h=harness(),first={key:'first',stage:2,slotCount:1,completed:false},second={key:'second',stage:3,slotCount:1,completed:false};
+  const firstStage={stage:2,total:1,items:[first]},secondStage={stage:3,total:1,items:[second]};
+  const session={data:{stages:[firstStage,secondStage]},passageId:'passage',stageIndex:0,itemIndex:0,responses:{first:['in progress']},results:{},orderSelections:{},orderConsumedChips:{},orderWrongChips:{},orderBatchOrders:{},assistance:{first:{hintUsed:true}},aiPending:{},aiErrors:{},persistenceSequence:{first:4},milestone:null};
+  h.api.state.workbookSession=session;h.api.setWorkbookStage(1);
+  assert.deepEqual(session.responses.first,['in progress']);assert.equal(session.assistance.first.hintUsed,true);assert.equal(session.persistenceSequence.first,4);
 });
 let failed=0;for(const {name,run} of tests){try{await run();console.log('PASS',name);}catch(error){failed++;console.error('FAIL',name,error);}}
 assert.equal(failed,0,`${failed} stability regression scenarios failed`);

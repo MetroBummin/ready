@@ -115,7 +115,12 @@ assert.match(app,/if\(click\.type==='practice-wrong'\)return flashWorkbookOrderW
 assert.match(app,/if\(click\.type==='wrong'\)return submitWorkbook\(\)/,'Real-mode mistakes must retain immediate final submission');
 assert.match(app,/sequence=\(Number\(session\.orderWrongSequence\)\|\|0\)\+1;\s*session\.orderWrongSequence=sequence/,'Each transient wrong-chip timer must use a session-wide monotonic token');
 assert.match(app,/if\(session\.milestone\)return renderWorkbook\(\);return renderScope\(\)/,'A final-stage 200% completion must render its milestone before leaving Workbook');
-assert.match(app,/function chooseOtherWorkbook\(\)\{[^}]*session\.milestone=null;session\.orderModeSnapshot=null/,'Leaving a milestone must discard its prior card mode before the next cycle starts');
+const cycleReset=app.match(/function resetWorkbookCycleState\([\s\S]*?\nfunction startWorkbookCycle/)?.[0]||'';
+assert.match(cycleReset,/delete session\.responses\?\.\[item\.key\];delete session\.results\?\.\[item\.key\]/,'A completed cycle reset must clear prior answers and grading feedback.');
+assert.match(cycleReset,/delete session\.assistance\?\.\[item\.key\];delete session\.aiPending\?\.\[item\.key\];delete session\.aiErrors\?\.\[item\.key\]/,'A completed cycle reset must clear hint and asynchronous grading UI state.');
+assert.doesNotMatch(cycleReset,/delete session\.persistenceSequence/,'Late persistence acknowledgements need their prior sequence guard after a visual reset.');
+assert.match(app,/function chooseOtherWorkbook\(\)\{[^}]*if\(session\.milestone\)startWorkbookCycle\(session,session\.milestone\.stageIndex\)/,'Leaving a milestone must share the completed-cycle reset before returning to the picker.');
+assert.match(app,/function setWorkbookStage\(index\)\{[^}]*if\(session\.milestone\)startWorkbookCycle\(session,session\.milestone\.stageIndex\)/,'The picker back path must also start a completed stage as a fresh cycle.');
 assert.match(app,/!workbookOrderInteractionStarted\(session,current\.item\)\)\{\s*session\.orderModeSnapshot=null;\s*refreshCurrentOrderMode=true/,'A fresh server progress update must replace an untouched cached card mode');
 assert.match(app,/verifyWorkbookRecallInput\(input,session,item,index,mode,sequence,input\.value,\{allowComposing:true\}\)/,'A complete Korean syllable must unlock without waiting for compositionend');
 assert.match(app,/workbook-order-built-sizer[\s\S]{0,180}workbook-order-built-text/,'Ordering must reserve the completed sentence geometry while rendering selected words as plain text');
