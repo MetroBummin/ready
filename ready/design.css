@@ -710,6 +710,16 @@ body[data-ready-mode] #toast.on{opacity:1;transform:translate(-50%,0)}
   .workbook-actions .button{width:auto}
 }
 
+/* Mock exams show their confirmed source question, never the passage-list index. */
+body[data-ready-mode="student"] .passage-row-mock .passage-open{min-width:0}
+body[data-ready-mode="student"] .passage-row-mock .passage-exam-number{overflow:visible;font-size:18px;line-height:1.15;text-overflow:clip;white-space:nowrap}
+body[data-ready-mode="student"] .passage-row-mock .passage-exam-meta{display:block;overflow:visible;text-overflow:clip;white-space:normal}
+body[data-ready-mode="student"] .passage-open .passage-title-wrap{overflow:visible;text-overflow:clip;white-space:normal;overflow-wrap:anywhere}
+@media(max-width:480px){
+  body[data-ready-mode="student"] .passage-row-mock .passage-exam-meta{display:block;white-space:normal}
+  body[data-ready-mode="student"] .passage-row-mock .passage-actions{flex:none}
+}
+
 @media(prefers-reduced-motion:reduce){
   *,*::before,*::after{animation:none!important;scroll-behavior:auto!important;transition:none!important}
 }

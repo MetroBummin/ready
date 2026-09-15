@@ -1081,7 +1081,7 @@ async function activeScopePassages(examId: string) {
   let sourcePassages: any[] = [], factoryCatalogs: any[] = [];
   if (linkedIds.length) {
     const [sourceResult, catalogResult] = await Promise.all([
-      db.from("ready_passages").select("id,title,source_type,source_label,updated_at,canonical_revision,deterministic_catalog_revision").in("id", linkedIds),
+      db.from("ready_passages").select("id,title,source_type,grade,source_year,source_month,source_label,updated_at,canonical_revision,deterministic_catalog_revision").in("id", linkedIds),
       db.from("ready_workbook_catalogs").select("passage_id,catalog").in("passage_id", linkedIds),
     ]);
     sourcePassages = rows<any[]>(sourceResult);
