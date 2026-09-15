@@ -63,6 +63,8 @@ const workbookScopeContext=server.match(/async function adminWorkbookScopeContex
 assert.match(workbookScopeContext,/ready_content_claims[\s\S]*?\.in\("passage_id", passageIds\)/,'Admin progress must bound confirmed Claim lookup by Passage IDs');
 assert.doesNotMatch(workbookScopeContext,/ready_content_claims[\s\S]*?\.in\("fact_id", facts\.map/,'Admin progress must not put every Fact UUID into one PostgREST URL');
 assert.match(workbookScopeContext,/publicContentClaims\(factsByPassage\.get\(passageId\)[\s\S]*?activeSentenceRowsByPassage\.get\(passageId\)/,'Admin Claim denominator must reuse the public student Claim eligibility rules, not count variants');
+assert.doesNotMatch(workbookScopeContext,/workbookForPassage\(/,'Admin progress must not run student catalog repair while loading the login overview');
+assert.match(workbookScopeContext,/catalogByPassage\.get\(passage\.id\) \|\| codeWorkbookForPassage\(passage\)/,'Admin progress must read the published catalog directly.');
 assert.match(server,/ready_workbook_stage_progress[\s\S]*?correct_clears[\s\S]*?\.range\(from, from \+ ADMIN_WORKBOOK_PROGRESS_PAGE_SIZE - 1\)/,'Admin cumulative progress must page the bounded stage summary rather than depend on a single PostgREST page');
 assert.match(server,/workbookProgressPercent\(correctClears, total\)/,'Admin cumulative stage percent must share the unbounded student floor helper');
 assert.doesNotMatch(server,/\.in\("student_id", students\.map/,'Admin summary must not put every selected student UUID into a PostgREST URL');

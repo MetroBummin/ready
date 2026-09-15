@@ -442,7 +442,15 @@ async function adminWorkbookScopeContext(students: any[]) {
     const publicClaims = publicContentClaims(factsByPassage.get(passageId) || [], claimsByPassage.get(passageId) || [], [], activeSentenceRowsByPassage.get(passageId) || []);
     if (publicClaims.length) claimItemsByPassage.set(passageId, publicClaims.map(claim => ({ key: `content-claim:${claim.id}`, stage: 10, semanticType: "content_claim", number: null, kind: "content_claim", prompt: claim.statement || "" })));
   }
-  const workbookByPassage = new Map(await Promise.all(passages.map(async passage => [passage.id, await workbookForPassage(passage, { catalog: catalogByPassage.get(passage.id), activeSentenceRows: activeSentenceRowsByPassage.get(passage.id) || [], catalogSentenceRows: sentenceRowsByPassage.get(passage.id) || [] })])));
+  // Admin progress is a read-only view of the published catalog.  Do not run
+  // the student Workbook's legacy order repair here: that repair needs a
+  // complete canonical sentence set and one older, incomplete Passage must
+  // never prevent an administrator from signing in or seeing every other
+  // student's status.
+  const workbookByPassage = new Map(passages.map(passage => [
+    passage.id,
+    catalogByPassage.get(passage.id) || codeWorkbookForPassage(passage),
+  ]));
   const passageDefinition = (passageId: string) => {
     const passage = passageById.get(passageId), visibleClaimItems = claimItemsByPassage.get(passageId) || [], storedCatalog = workbookByPassage.get(passageId), catalog = storedCatalog || (visibleClaimItems.length ? contentClaimFallbackCatalog(passage) : null);
     if (!passage || !catalog) return null;
