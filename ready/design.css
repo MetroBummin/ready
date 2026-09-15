@@ -380,7 +380,8 @@ body[data-ready-mode="student"] #student-reader .reader-inline-sentence{-webkit-
 .workbook-study-toolbar{position:relative;min-height:42px;align-items:center;margin-top:calc(-1 * var(--ready-space-12));margin-bottom:var(--ready-space-6);padding:0;border:0}
 .workbook-study-toolbar .workbook-state{width:100%;justify-content:flex-end}
 .workbook-study-toolbar .workbook-state>b{position:absolute;left:50%;font-size:14px;transform:translateX(-50%)}
-#student-workbook:not([hidden]){touch-action:pan-y}
+#student-workbook:not([hidden]){touch-action:auto}
+#student-workbook:not([hidden]) .workbook-study-layout,#student-workbook:not([hidden]) .workbook-milestone-shell{touch-action:pan-y}
 .workbook-tabs{display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:0;margin:0 0 var(--ready-space-4);border:1px solid var(--ready-hairline)}
 .workbook-tabs button{display:grid;min-width:0;gap:var(--ready-space-1);padding:10px 8px;border:0;border-right:1px solid var(--ready-hairline);border-radius:0;color:var(--ready-muted);background:transparent;text-align:left;cursor:pointer}
 .workbook-tabs button.active{color:var(--ready-on-action);background:var(--ready-action);box-shadow:none}
@@ -848,28 +849,45 @@ body[data-ready-mode="student"] .reader-prose p,
 body[data-ready-mode="student"] .reading-passage{font-size:18px;line-height:1.72}
 .reader-inline-notice{border-radius:14px}
 
-/* Workbook: one calm, obvious interaction at a time. */
-.workbook-stage-picker{width:min(100%,920px)}
-.workbook-stage-list{display:grid;gap:10px;border:0}
-.workbook-stage-list-head{border:0}
+/* Workbook selection: categories preserve the existing stage contracts while
+   making the learning choices scan as a compact visual map. */
+.workbook-stage-picker{width:min(100%,1120px)}
+.workbook-stage-list{display:grid;gap:16px;border:0}
+.workbook-stage-list-head{min-height:auto;padding:0 2px;border:0}
+.workbook-stage-list-head h2{font-size:17px}
+.workbook-stage-categories{display:grid;gap:18px}
+.workbook-stage-category{min-width:0;padding:22px;border:1px solid var(--ready-hairline);border-radius:24px;background:var(--ready-surface);box-shadow:var(--ready-shadow-soft)}
+.workbook-stage-category-head{display:flex;align-items:center;gap:14px;margin-bottom:18px}
+.workbook-stage-category-icon{display:grid;width:48px;height:48px;flex:none;place-items:center;border-radius:16px;color:var(--ready-ink);background:color-mix(in srgb,var(--ready-action) 15%,var(--ready-surface));font-size:23px;font-weight:760}
+.workbook-stage-category-head h2{margin:0;color:var(--ready-ink);font-size:21px;font-weight:760;line-height:1.15}
+.workbook-stage-rail{display:grid;min-width:0;grid-template-columns:repeat(var(--workbook-stage-columns),minmax(0,1fr));gap:14px}
 .workbook-stage-option{
   --workbook-progress-start:#ffe36a;
   --workbook-progress-end:#f2c72e;
   display:grid;
-  min-height:84px;
-  grid-template-columns:minmax(0,1fr) auto;
-  gap:12px 18px;
-  padding:15px 18px 14px;
+  min-width:0;
+  min-height:118px;
+  grid-template-columns:42px minmax(0,1fr) auto;
+  grid-template-rows:auto 1fr auto;
+  gap:6px 12px;
+  padding:12px 14px;
   border:1px solid var(--ready-hairline);
-  border-radius:18px;
-  background:var(--ready-surface);
+  border-radius:19px;
+  color:var(--ready-ink);
+  background:var(--ready-canvas);
+  text-align:left;
+  cursor:pointer;
   -webkit-tap-highlight-color:transparent;
   transition:border-color 160ms ease,box-shadow 160ms ease;
 }
 @media (hover:hover) and (pointer:fine){.workbook-stage-option:hover{border-color:var(--ready-hairline-strong);color:var(--ready-ink);box-shadow:var(--ready-shadow-soft)}}
-.workbook-stage-option:disabled{border-color:transparent;border-radius:18px;background:var(--ready-surface)}
-.workbook-stage-copy{align-self:end}.workbook-stage-state{align-self:end}.workbook-stage-state small{color:var(--ready-ink);font-size:14px;font-weight:760}
-.workbook-stage-gauge{position:relative;display:block;height:8px;grid-column:1/-1;overflow:visible;border-radius:999px;background:color-mix(in srgb,var(--ready-canvas-quiet) 78%,var(--ready-hairline));box-shadow:inset 0 1px 2px rgba(28,27,24,.05)}
+.workbook-stage-option:disabled{border-color:var(--ready-hairline);border-radius:19px;background:var(--ready-canvas-quiet);cursor:not-allowed;opacity:.7}
+.workbook-stage-icon{display:grid;width:42px;height:42px;grid-column:1;grid-row:1;place-items:center;border-radius:14px;color:var(--ready-ink);background:color-mix(in srgb,var(--workbook-progress-start) 54%,var(--ready-surface));font-size:20px;font-weight:800;line-height:1}
+.workbook-stage-copy{display:grid;min-width:0;grid-column:2;grid-row:1;align-self:center;gap:4px}
+.workbook-stage-copy strong{overflow:hidden;font-size:16px;font-weight:760;line-height:1.25;text-overflow:ellipsis;white-space:nowrap}
+.workbook-stage-state{display:flex;min-width:0;grid-column:3;grid-row:1;align-self:center;align-items:center;gap:8px;color:var(--ready-muted)}
+.workbook-stage-state small{color:var(--ready-ink);font-size:14px;font-weight:760;white-space:nowrap}.workbook-stage-state b{font-size:22px;font-weight:450;line-height:1}
+.workbook-stage-gauge{position:relative;display:block;height:8px;grid-column:1/-1;grid-row:3;align-self:end;overflow:visible;border-radius:999px;background:color-mix(in srgb,var(--ready-canvas-quiet) 78%,var(--ready-hairline));box-shadow:inset 0 1px 2px rgba(28,27,24,.05)}
 .workbook-stage-gauge i{position:relative;display:block;width:var(--workbook-progress);height:100%;border-radius:inherit;background:linear-gradient(90deg,var(--workbook-progress-start),var(--workbook-progress-end));transition:width 260ms ease}
 .workbook-stage-option.has-progress .workbook-stage-gauge i::after{position:absolute;top:50%;right:0;width:10px;height:10px;border:1px solid var(--workbook-progress-end);border-radius:50%;background:var(--ready-surface);box-shadow:0 0 5px color-mix(in srgb,var(--workbook-progress-end) 26%,transparent);content:"";transform:translate(1px,-50%)}
 .workbook-stage-option.progress-cycle-2{--workbook-progress-start:#ffbd84;--workbook-progress-end:#f28a43}.workbook-milestone.progress-cycle-2{--workbook-progress-color:#df9229}
@@ -877,6 +895,25 @@ body[data-ready-mode="student"] .reading-passage{font-size:18px;line-height:1.72
 .workbook-stage-option.progress-cycle-4{--workbook-progress-start:#f272ad;--workbook-progress-end:#d94fca}.workbook-milestone.progress-cycle-4{--workbook-progress-color:#df657f}
 .workbook-stage-option.progress-cycle-5{--workbook-progress-start:#b77bea;--workbook-progress-end:#8760df}.workbook-milestone.progress-cycle-5{--workbook-progress-color:#b94fa7}
 .workbook-stage-option.progress-cycle-6{--workbook-progress-start:#8757df;--workbook-progress-end:#556ee0}.workbook-milestone.progress-cycle-6{--workbook-progress-color:#6947a8}
+@media(max-width:900px) and (min-width:701px){.workbook-stage-rail{grid-template-columns:repeat(var(--workbook-stage-columns-compact),minmax(0,1fr))}}
+@media(max-width:700px){
+  .workbook-stage-list{gap:14px}
+  .workbook-stage-category{padding:18px 16px}
+  .workbook-stage-category-head{gap:12px;margin-bottom:15px}
+  .workbook-stage-category-icon{width:44px;height:44px;border-radius:14px;font-size:21px}
+  .workbook-stage-category-head h2{font-size:19px}
+  .workbook-stage-rail{display:flex;width:calc(100% + 32px);gap:12px;overflow-x:auto;overflow-y:visible;margin-right:-32px;padding:2px 12px 8px 0;scroll-padding-inline-start:0;scroll-snap-type:x proximity;overscroll-behavior-x:contain;touch-action:pan-x pan-y;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+  .workbook-stage-rail::-webkit-scrollbar{display:none}
+  .workbook-stage-rail::after{flex:0 0 4px;content:""}
+  .workbook-stage-option{width:auto;min-height:112px;grid-template-columns:42px minmax(0,1fr);grid-template-rows:auto auto 1fr auto;gap:6px 10px;padding:10px 12px;flex:0 0 71vw;scroll-snap-align:start;scroll-snap-stop:normal}
+  .workbook-stage-icon{grid-column:1;grid-row:1}
+  .workbook-stage-copy{grid-column:1/-1;grid-row:2;align-self:start}
+  .workbook-stage-copy strong{overflow:visible;text-overflow:clip;white-space:normal}
+  .workbook-stage-state{grid-column:2;grid-row:1;justify-self:end}
+  .workbook-stage-gauge{grid-row:4}
+}
+@media(max-width:380px){.workbook-stage-option{flex-basis:73vw}}
+@media(max-width:340px){.workbook-stage-option{flex-basis:80vw}}
 .workbook-study-layout{width:min(100%,920px)}
 .workbook-card.workbook-focus-card{padding:clamp(22px,4vw,34px);border:1px solid var(--ready-hairline);border-radius:24px;background:var(--ready-surface);box-shadow:var(--ready-shadow-soft)}
 .workbook-card blockquote,.workbook-task-passage{padding:18px 20px;border:0;border-radius:18px;background:var(--ready-canvas-quiet);font-size:17px;line-height:1.72}

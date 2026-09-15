@@ -8,7 +8,7 @@
   <link rel="stylesheet" href="../styles/base.css">
   <link rel="stylesheet" href="../design-tokens.css">
   <link rel="stylesheet" href="../ready/ready.css">
-  <link rel="stylesheet" href="../ready/design.css">
+  <link rel="stylesheet" href="../ready/design.css?v=category-carousel-5">
 </head>
 <body data-ready-mode="student">
 <div id="app">
@@ -18,13 +18,19 @@
   </header>
   <main id="harness-main"></main>
 </div>
-<script>
-const stageRows=[
-  ['2단계','우리말 빈칸','18 / 55'],['3단계','영문 빈칸','7 / 55'],['4단계','문장 해석','0 / 55'],
-  ['5단계','동사형','0 / 55'],['6단계','어법 선택','0 / 55'],['7단계','어색한 곳 찾기','1 / 14'],
-  ['8단계','문장 배열','0 / 55'],['9단계','직접 영작','0 / 55']
+<script type="module">
+import { groupWorkbookStages } from '../ready/workbook-stage-picker.js';
+
+const stages=[
+  {semanticType:'content_claim',progress:133},{semanticType:'korean_blank',progress:300},
+  {semanticType:'english_blank',progress:600},{semanticType:'translation',progress:9},
+  {semanticType:'verb_form',progress:200},{semanticType:'grammar_choice',progress:200},
+  {semanticType:'word_order',progress:250},{semanticType:'writing',progress:180},
 ];
-const picker=`<div class="workbook-stage-picker"><header class="filter-head workbook-picker-head"><button class="back-link">← Home</button><p class="eyebrow">READY · WORKBOOK</p><h1>영어Ⅱ YBM(박준언) 2과 워크북</h1><p>학습할 단계를 선택하세요. 이어서 풀 단계에는 현재 진도가 표시됩니다.</p></header><section class="workbook-stage-list"><div class="workbook-stage-list-head"><h2>단계 선택</h2><small>8개 단계</small></div>${stageRows.map(([stage,title,count])=>`<button class="workbook-stage-option"><span class="workbook-stage-copy"><strong>${stage}</strong><small>${title}</small></span><span class="workbook-stage-state"><small>${count}</small><b>→</b></span></button>`).join('')}</section></div>`;
+const visual=progress=>({fill:progress>0&&progress%100===0?100:progress%100,cycle:progress<=100?1:progress<=200?2:progress<=300?3:progress<=400?4:progress<=500?5:6});
+const card=presentation=>{const progress=Number(presentation.stage.progress)||0,state=visual(progress);return `<button class="workbook-stage-option progress-cycle-${state.cycle} has-progress" type="button" data-workbook-stage="${presentation.stageIndex}" style="--workbook-progress:${state.fill}%"><span class="workbook-stage-icon" aria-hidden="true">${presentation.icon}</span><span class="workbook-stage-copy"><strong>${presentation.label}</strong></span><span class="workbook-stage-state"><small>${progress}%</small></span><span class="workbook-stage-gauge" aria-hidden="true"><i></i></span></button>`;};
+const category=group=>`<section class="workbook-stage-category workbook-stage-category--${group.key}" style="--workbook-stage-columns:${Math.min(4,group.stages.length)};--workbook-stage-columns-compact:${Math.min(2,group.stages.length)}"><header class="workbook-stage-category-head"><span class="workbook-stage-category-icon" aria-hidden="true">${group.icon}</span><h2>${group.title}</h2></header><div class="workbook-stage-rail" aria-label="${group.title} Workbook">${group.stages.map(card).join('')}</div></section>`;
+const picker=`<div class="workbook-stage-picker"><header class="filter-head workbook-picker-head"><button class="back-link">← Home</button><p class="eyebrow">READY · WORKBOOK</p><h1>공통영어2 NE(민병천) 1과</h1></header><section class="workbook-stage-list"><div class="workbook-stage-list-head"><h2>학습 선택</h2><small>8개</small></div><div class="workbook-stage-categories">${groupWorkbookStages(stages).map(category).join('')}</div></section></div>`;
 const study=`<button class="study-back"><span>‹</span></button><div class="workbook-study-layout"><header class="workbook-study-head"><div><p class="eyebrow">7단계 · 어색한 곳 찾기</p><p class="workbook-instruction">어색한 표현을 찾아 쓰고 알맞게 고쳐 쓰세요.</p></div><span class="workbook-state"><b>1 / 14</b><button class="question-bookmark"><span class="bookmark-star">☆</span></button></span></header><section class="workbook-card workbook-focus-card"><div class="workbook-task-passage" lang="en">Jiyun, a high school student, starts her day by logging out of a music streaming service on her smartphone. She enjoys listening to her favorite music, discovering new songs, and exploring new artists every day. For a healthy breakfast, Jiyun receives a delivery from a subscription service that provides fresh vegetables and fruits.</div><div class="workbook-correction-list"><div class="workbook-correction-row"><span>1</span><label>어색한 표현<input value="logging out"></label><b>→</b><label>바르게 고치기<input placeholder="직접 입력"></label></div><div class="workbook-correction-row"><span>2</span><label>어색한 표현<input placeholder="직접 입력"></label><b>→</b><label>바르게 고치기<input placeholder="직접 입력"></label></div></div><div class="workbook-actions"><button class="button primary" disabled>채점하기</button></div></section><div class="workbook-nav"><button class="button quiet" disabled>← 이전</button><button class="button quiet">단계 선택</button></div></div>`;
 const orderStudy=`<button class="study-back"><span>‹</span></button><div class="workbook-study-layout"><header class="workbook-study-head workbook-study-toolbar"><span class="workbook-state"><b>1 / 8</b><span class="workbook-order-mode" data-workbook-order-mode="real">실전 모드</span><button class="workbook-bookmark" type="button"><span class="bookmark-star">☆</span></button></span></header><section class="workbook-card workbook-focus-card"><blockquote>수치가 있는 문장도 원문 그대로 칩에 남습니다.</blockquote><div class="workbook-prompt order-task" lang="en"><span class="workbook-order-group"><span class="workbook-order-built" aria-label="배열한 문장"></span><span class="workbook-order-bank" aria-label="선택할 단어">${['1.5','15','10,000','CO₂','15–20%','2014','cost','at','after','a','rise','In'].map(word=>`<span class="workbook-order-bank-slot"><button>${word}</button></span>`).join('')}</span></span></div></section></div>`;
 const params=new URLSearchParams(location.search),view=params.get('view');
