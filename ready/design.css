@@ -902,7 +902,7 @@ body[data-ready-mode="student"] .reading-passage{font-size:18px;line-height:1.72
   .workbook-stage-category-head{gap:12px;margin-bottom:15px}
   .workbook-stage-category-icon{width:44px;height:44px;border-radius:14px;font-size:21px}
   .workbook-stage-category-head h2{font-size:19px}
-  .workbook-stage-rail{display:flex;width:calc(100% + 32px);gap:12px;overflow-x:auto;overflow-y:visible;margin-right:-32px;padding:2px 12px 8px 0;scroll-padding-inline-start:0;scroll-snap-type:x proximity;overscroll-behavior-x:contain;touch-action:pan-x pan-y;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+  .workbook-stage-rail{display:flex;width:100%;gap:12px;overflow-x:auto;overflow-y:visible;padding:2px 12px 8px 0;scroll-padding-inline-start:0;scroll-snap-type:x proximity;overscroll-behavior-x:contain;touch-action:pan-x pan-y;-webkit-overflow-scrolling:touch;scrollbar-width:none}
   .workbook-stage-rail::-webkit-scrollbar{display:none}
   .workbook-stage-rail::after{flex:0 0 4px;content:""}
   .workbook-stage-option{width:auto;min-height:112px;grid-template-columns:42px minmax(0,1fr);grid-template-rows:auto auto 1fr auto;gap:6px 10px;padding:10px 12px;flex:0 0 71vw;scroll-snap-align:start;scroll-snap-stop:normal}

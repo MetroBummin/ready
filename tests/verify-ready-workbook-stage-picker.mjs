@@ -45,7 +45,8 @@ assert.doesNotMatch(stageCardRenderer, /→/, 'Cards remain directly tappable wi
 assert.doesNotMatch(app, /<p>\$\{esc\(group\.description\)\}<\/p>/, 'Category descriptions must not add small explanatory copy beneath the category title.');
 assert.doesNotMatch(app, /학습할 항목을 선택하세요/, 'The picker header must not add a second explanatory sentence.');
 assert.match(css, /#student-workbook:not\(\[hidden\]\)\{touch-action:auto\}/, 'Picker must not inherit a pan-y-only gesture policy.');
-assert.match(css, /\.workbook-stage-rail\{display:flex;width:calc\(100% \+ 32px\);[^}]*overflow-x:auto[^}]*scroll-snap-type:x proximity[^}]*overscroll-behavior-x:contain[^}]*touch-action:pan-x pan-y/, 'Mobile category rail must be its own native horizontal scroller.');
+assert.match(css, /\.workbook-stage-rail\{display:flex;width:100%;[^}]*overflow-x:auto[^}]*scroll-snap-type:x proximity[^}]*overscroll-behavior-x:contain[^}]*touch-action:pan-x pan-y/, 'Mobile category rail must be its own native horizontal scroller within the category card.');
+assert.doesNotMatch(css, /\.workbook-stage-rail\{display:flex;width:calc\(100% \+ 32px\);[^}]*margin-right:-32px/, 'Mobile category rails must not extend beyond their category card.');
 assert.match(css, /\.workbook-stage-option\{[\s\S]*?min-height:118px[\s\S]*?padding:12px 14px/, 'Desktop category cards must stay compact after the supporting copy is removed.');
 assert.match(css, /\.workbook-stage-option\{width:auto;min-height:112px;grid-template-columns:42px minmax\(0,1fr\);grid-template-rows:auto auto 1fr auto;gap:6px 10px;padding:10px 12px;flex:0 0 71vw/, 'Mobile cards must use viewport-aware widths while retaining a compact partial-next-card affordance.');
 assert.match(css, /@media\(max-width:380px\)\{\.workbook-stage-option\{flex-basis:73vw\}\}/, '375px cards must retain the requested 70–76% viewport width.');
