@@ -1,0 +1,35 @@
+name: READY local-first server verification
+
+on:
+  push:
+    branches: [chatgpt/ready-local-first-server-20260920]
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Export exact source snapshot for offline verification
+        run: |
+          mkdir -p /tmp/ready-verification
+          git rev-parse HEAD > /tmp/ready-verification/source-sha.txt
+          git archive --format=tar HEAD | gzip > /tmp/ready-verification/source.tar.gz
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ready-local-first-source
+          path: /tmp/ready-verification
+          retention-days: 3
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run ready:test
+      - run: npm run build
+      - run: npm run native:verify
