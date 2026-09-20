@@ -6,9 +6,33 @@ const READ_ONLY_OPS = new Set([
   'admin_passage_workbook_status', 'admin_workbook_progress', 'admin_workbook_progress_detail', 'admin_workbook_attempt_replay',
 ]);
 
+// Pending requests only, never a cache of completed responses or authorization.
+// Full session token, endpoint and request body stay in memory, never in logs/storage.
+const workbookRequests = new Map();
+
 export async function readyApi(op, data = {}, token = '', { signal, keepalive = false } = {}) {
   const { API_URL } = getConfig();
   if (!API_URL) throw new Error('READY config.js의 API_URL을 확인해 주세요.');
+  const payload = { op, ...data }, requestBody = JSON.stringify(payload);
+  // A caller-owned AbortSignal must not cancel another caller's request.
+  // Never coalesce writes, hints or other operations, including an overridden op.
+  if (op !== 'student_workbook' || payload.op !== 'student_workbook' || signal) {
+    return requestReadyApi(API_URL, op, requestBody, token, { signal, keepalive });
+  }
+  const key = JSON.stringify([API_URL, token, requestBody, keepalive]);
+  let pending = workbookRequests.get(key);
+  if (!pending) {
+    pending = requestReadyApi(API_URL, op, requestBody, token, { keepalive }).finally(() => {
+      if (workbookRequests.get(key) === pending) workbookRequests.delete(key);
+    });
+    workbookRequests.set(key, pending);
+  }
+  // Prefetch progress reconciliation and the active workbook both mutate data.
+  // Each consumer needs its own JSON object even when they share one HTTP read.
+  return JSON.parse(JSON.stringify(await pending));
+}
+
+async function requestReadyApi(API_URL, op, requestBody, token, { signal, keepalive }) {
   let response;
   const attempts = READ_ONLY_OPS.has(op) ? 2 : 1;
   for (let attempt=0; attempt<attempts && !response; attempt+=1) {
@@ -21,7 +45,7 @@ export async function readyApi(op, data = {}, token = '', { signal, keepalive = 
         },
         signal,
         keepalive,
-        body: JSON.stringify({ op, ...data }),
+        body: requestBody,
       });
     } catch {
       if (signal?.aborted) throw new DOMException('Aborted', 'AbortError');
