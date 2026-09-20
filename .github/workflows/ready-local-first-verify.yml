@@ -30,6 +30,13 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
+      - name: Export locked dependencies for isolated local tests
+        run: tar -czf /tmp/ready-verification-dependencies.tar.gz node_modules
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ready-local-first-dependencies
+          path: /tmp/ready-verification-dependencies.tar.gz
+          retention-days: 1
       - run: npm run ready:test
       - run: npm run build
       - run: npm run native:verify
