@@ -7,7 +7,8 @@ import {
 } from '../ready/sentence-practice.js';
 import { pickEnglishVoice, sentenceAudioSupported, speakSentence } from '../ready/sentence-audio.js';
 import { clearWorkbookCycleItem } from '../ready/workbook-progress.js';
-import { matchEditorRows, parseSentenceRows } from '../ready/admin/sentence-rows.js';
+import { editorLine, matchEditorRows, parseSentenceRows } from '../ready/admin/sentence-rows.js';
+import { attemptId } from '../ready/api.js';
 
 const sentence = (words, id = 's1') => practiceItem({ id, text: `${words.join(' ')}.`, translation: '해석' });
 const nWords = count => Array.from({ length: count }, (_, index) => `w${index + 1}`);
@@ -183,4 +184,36 @@ test('admin sentence editor parses TAB rows and keeps sentence ids', () => {
   const previous = [{ id: 'a', text: 'One two.' }, { id: 'b', text: 'Three four.' }];
   assert.deepEqual(matchEditorRows(previous, [{ text: 'New first.', translation: '새' }, { text: 'One two.', translation: '하나' }, { text: 'Three four!', translation: '셋' }]).map(row => row.id), [null, 'a', null], 'a moved line keeps its id by text; a brand-new position gets a new id');
   assert.deepEqual(matchEditorRows(previous, [{ text: 'One two, edited.', translation: '하나' }]).map(row => row.id), ['a'], 'an edited line keeps its position id');
+});
+
+test('admin editor flattens stored line breaks so one row stays one line', () => {
+  assert.equal(editorLine({ text: 'One\ntwo\tthree.', translation: '하나\r\n둘' }), 'One two three.\t하나 둘');
+  const parsed = parseSentenceRows([editorLine({ text: 'One\ntwo.', translation: '하나\n둘' }), editorLine({ text: 'Three four.', translation: '셋 넷' })].join('\n'));
+  assert.deepEqual(parsed.errors, []);
+  assert.deepEqual(matchEditorRows([{ id: 'b', text: 'Three four.' }, { id: 'a', text: 'One\ntwo.' }], parsed.rows).map(row => row.id), ['a', 'b'], 'stored text with a line break still matches by text');
+});
+
+test('attempt ids are RFC 4122 v4 even without crypto.randomUUID', () => {
+  const v4 = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/;
+  assert.match(attemptId(), v4);
+  const legacy = { getRandomValues: bytes => { bytes.fill(0xff); return bytes; } };
+  assert.equal(attemptId(legacy), 'ffffffff-ffff-4fff-bfff-ffffffffffff');
+  assert.equal(new Set(Array.from({ length: 50 }, () => attemptId({ getRandomValues: bytes => crypto.getRandomValues(bytes) }))).size, 50);
+});
+
+test('the English voice skips Apple novelty voices and prefers the default or a natural voice', () => {
+  const voices = [{ name: 'Albert', lang: 'en-US', localService: true }, { name: 'Bad News', lang: 'en-US', localService: true }, { name: 'Zarvox', lang: 'en-US', localService: true }, { name: 'Samantha', lang: 'en-US', localService: true }, { name: 'Yuna', lang: 'ko-KR', localService: true, default: true }];
+  assert.equal(pickEnglishVoice(voices).name, 'Samantha');
+  assert.equal(pickEnglishVoice([...voices, { name: 'Ava (Premium)', lang: 'en-US', default: true }]).name, 'Ava (Premium)', 'an English system default wins');
+  assert.equal(pickEnglishVoice([{ name: 'Albert', lang: 'en-US' }, { name: 'Daniel', lang: 'en-GB' }]).name, 'Daniel', 'novelty voices are never used, even as the only en-US voice');
+  assert.equal(pickEnglishVoice([{ name: 'Yuna', lang: 'ko-KR' }]), null);
+  assert.equal(pickEnglishVoice([]), null, 'Chrome returns no voices before voiceschanged; lang en-US is still set');
+});
+
+test('batches: the last chip of a batch is forced (documented limitation)', () => {
+  // This records the current behaviour REVIEW.md discusses; it is not a goal.
+  const item = sentence(nWords(7)), orders = {};
+  let run = startRun(item, 2);
+  for (let index = 0; index < 6; index += 1) run = placeWord(item, run, index).run;
+  assert.deepEqual(visibleChips(item, run, orders).visible, [6], 'a 7-word sentence ends with a one-chip batch');
 });

@@ -1037,3 +1037,5 @@ body[data-ready-mode="admin"] .scope-form .passage-check{display:flex;align-item
 body[data-ready-mode="admin"] .scope-form>.button{justify-self:start}
 body[data-ready-mode="admin"] #passage-form textarea{font-family:var(--ready-font-mono);font-size:13px;white-space:pre;overflow-x:auto}
 .tabular{font-variant-numeric:tabular-nums}
+/* The step label and the step-2 rule stack on the right so they never run under the centred "n / m" counter at 360px. */
+.practice-step-meta{display:flex;flex-direction:column;align-items:flex-end;gap:2px;text-align:right}

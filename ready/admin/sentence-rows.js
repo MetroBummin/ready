@@ -1,5 +1,11 @@
 // Admin sentence-set editor helpers. Pure functions so they can be unit tested.
 
+// Stored text from older imports can contain line breaks or TABs, which would
+// split one row into broken editor lines. The editor shows such whitespace as
+// single spaces; ordering is unaffected because chips split on whitespace.
+const flat = value => String(value ?? '').replace(/\s+/g, ' ').trim();
+export function editorLine(row = {}) { return `${flat(row.text)}\t${flat(row.translation)}`; }
+
 // One line per sentence: "English<TAB>Korean". Blank lines are ignored.
 export function parseSentenceRows(source = '') {
   const rows = [], errors = [];
@@ -18,8 +24,8 @@ export function parseSentenceRows(source = '') {
 // otherwise the id of the previous row at the same position, otherwise none.
 export function matchEditorRows(previous = [], next = []) {
   const used = new Set(), byText = new Map();
-  previous.forEach((row, index) => { if (row?.id && !byText.has(row.text)) byText.set(row.text, index); });
-  const assigned = next.map(row => { const index = byText.get(row.text); if (index === undefined || used.has(index)) return -1; used.add(index); return index; });
+  previous.forEach((row, index) => { if (row?.id && !byText.has(flat(row.text))) byText.set(flat(row.text), index); });
+  const assigned = next.map(row => { const index = byText.get(flat(row.text)); if (index === undefined || used.has(index)) return -1; used.add(index); return index; });
   return next.map((row, position) => {
     let index = assigned[position];
     if (index < 0 && previous[position]?.id && !used.has(position)) { index = position; used.add(position); }

@@ -38,10 +38,16 @@ class Query {
   else if(this.op==='delete')sql=`delete from ${table}`;
   else sql=`select ${cols} from ${table}`;
   if(this.filters.length)sql+=' where '+this.filters.map(([k,op,v])=>op==='is'?qid(k)+(v===null?' is null':' is '+v):op==='in'?qid(k)+' in ('+v.map(bind).join(',')+')':qid(k)+op+bind(v)).join(' and ');
-  if(this.op==='select'){if(this.sort.length)sql+=' order by '+this.sort.join(',');if(this.max)sql+=' limit '+Number(this.max);if(this.offset)sql+=' offset '+Number(this.offset);}else sql+=' returning '+cols;
+  // Like PostgREST: `head` count queries return only the exact count, and every
+  // other select is silently capped at max-rows (1000 by default; tests may
+  // lower it through globalThis.__readyMaxRows to exercise paging).
+  if(this.op==='select'&&this.options?.head){sql=sql.replace(/^select .*? from /,'select count(*)::integer as count from ');const result=await pg.query(sql,params);return {data:null,error:null,count:result.rows[0].count};}
+  if(this.op==='select'){const cap=Number(globalThis.__readyMaxRows)||1000,max=Math.min(this.max||cap,cap);if(this.sort.length)sql+=' order by '+this.sort.join(',');sql+=' limit '+Number(max);if(this.offset)sql+=' offset '+Number(this.offset);}else sql+=' returning '+cols;
   const result=await pg.query(sql,params),rows=result.rows;
   if(this.required&&rows.length!==1)throw new Error('single row expected');
-  return {data:this.singleRow?rows[0]||null:rows,error:null,count:rows.length};
+  let count=rows.length;
+  if(this.op==='select'&&this.options?.count){const where=sql.match(/ where (.*?)(?: order by | limit |$)/)?.[1];count=(await pg.query(`select count(*)::integer as count from ${table}${where?' where '+where:''}`,params)).rows[0].count;}
+  return {data:this.singleRow?rows[0]||null:rows,error:null,count};
  }catch(error){log('DB',this.table,error.message);return {data:null,error:{message:error.message,code:error.code}};}}
  then(resolve,reject){return this.execute().then(resolve,reject);}
 }
@@ -56,8 +62,9 @@ globalThis.fetch=async url=>{throw new Error('External network is forbidden in R
 let source=readFileSync(repo+'/server/ready/index.ts','utf8').replace(/import \{ createClient \} from "[^"]+";/,'const createClient=()=>globalThis.__readyDb;');
 source=source.replace(/(from\s*|import\()(["'])(\.[^"']+)\2/g,(_,lead,quote,path)=>lead+quote+pathToFileURL(resolve(repo+'/server/ready',path)).href+quote);
 source+='\nexport {dispatch};';writeFileSync(resolve(scratch,'edge.mjs'),stripTypeScriptTypes(source,{mode:'transform'}));
-export const {dispatch,READY_OPS}=await import(pathToFileURL(resolve(scratch,'edge.mjs')).href);
-export async function request(op,data={},token='') {return handler(new Request('http://localhost/api',{method:'POST',headers:{'content-type':'application/json',...(token?{authorization:'Bearer '+token}:{})},body:JSON.stringify({op,...data})}));}
+export const {dispatch,READY_OPS,learningSince,mergePassageStructure}=await import(pathToFileURL(resolve(scratch,'edge.mjs')).href);
+export async function request(op,data={},token='',headers={}) {return handler(new Request('http://localhost/api',{method:'POST',headers:{'content-type':'application/json',...headers,...(token?{authorization:'Bearer '+token}:{})},body:JSON.stringify({op,...data})}));}
+export async function rawRequest(body,token=''){return handler(new Request('http://localhost/api',{method:'POST',headers:{'content-type':'application/json',...(token?{authorization:'Bearer '+token}:{})},body}));}
 export async function call(op,data={},token=''){const res=await request(op,data,token),body=await res.json();if(!res.ok)throw Object.assign(new Error(body.error),{body,status:res.status});return body;}
 export const admin=(await call('admin_login',{password:'ready-local'})).session.token;
 export async function close(){await pg.close();globalThis.fetch=originalFetch;console.error=originalConsoleError;delete globalThis.Deno;delete globalThis.__readyDb;rmSync(scratch,{recursive:true,force:true});}

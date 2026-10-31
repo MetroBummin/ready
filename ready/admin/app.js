@@ -1,7 +1,7 @@
 // READY Admin: students, sentence sets, scope assignment, practice summary.
 import { readyApi } from '../api.js';
 import { practiceItems } from '../sentence-practice.js?v=sentence-practice-1';
-import { matchEditorRows, parseSentenceRows } from './sentence-rows.js?v=sentence-practice-1';
+import { editorLine, matchEditorRows, parseSentenceRows } from './sentence-rows.js?v=sentence-practice-1';
 
 const $ = selector => document.querySelector(selector), $$ = selector => [...document.querySelectorAll(selector)];
 const SESSION_KEY = 'ready-admin-session';
@@ -30,8 +30,10 @@ async function login(form) {
   form.reset(); if (!data) return;
   state.token = data.session.token; localStorage.setItem(SESSION_KEY, JSON.stringify(data.session)); await loadAdmin();
 }
-async function loadAdmin() {
-  const [data, progress] = await Promise.all([safely(() => call('teacher_bootstrap')), safely(() => readyApi('admin_learning_progress', { period: state.period }, state.token))]);
+// After a save only the library changes, so the attempt summary (the largest
+// read) is not fetched again.
+async function loadAdmin({ progress: withProgress = true } = {}) {
+  const [data, progress] = await Promise.all([safely(() => call('teacher_bootstrap')), withProgress ? safely(() => readyApi('admin_learning_progress', { period: state.period }, state.token)) : state.progress]);
   if (!data) return;
   state.data = data; state.progress = progress;
   $('#admin-login').hidden = true; $('#admin-nav').hidden = false; $('#admin-logout').hidden = false;
@@ -75,27 +77,27 @@ function fillPassageForm(passage = {}, rows = []) {
   const form = $('#passage-form');
   form.passageId.value = passage.id || ''; form.title.value = passage.title || ''; form.grade.value = passage.grade || '1학년';
   form.sourceType.value = passage.source_type || 'TEXTBOOK'; form.sourceYear.value = passage.source_year || ''; form.sourceMonth.value = passage.source_month || '';
-  form.rows.value = rows.map(row => `${row.text}\t${row.translation}`).join('\n');
+  form.rows.value = rows.map(editorLine).join('\n');
   $('[data-delete-passage]').hidden = !passage.id;
   $('#passage-page-title').textContent = passage.title || '새 문장 세트';
   route('passage-editor');
 }
-function newPassage() { state.editor = { rows: [] }; fillPassageForm(); }
+function newPassage() { state.editor = { rows: [], revision: null }; fillPassageForm(); }
 async function openPassage(passageId) {
   const data = await safely(() => call('passage_editor', { passageId }, '문장을 불러오는 중…'));
   if (!data) return;
-  state.editor = { rows: data.rows.filter(row => (row.blockType || 'SENTENCE') === 'SENTENCE') };
+  state.editor = { rows: data.rows.filter(row => (row.blockType || 'SENTENCE') === 'SENTENCE'), revision: data.passage?.canonical_revision ?? null };
   fillPassageForm(data.passage, state.editor.rows);
 }
 async function savePassage(form) {
   const values = Object.fromEntries(new FormData(form)), parsed = parseSentenceRows(values.rows);
   if (parsed.errors.length) return toast(parsed.errors[0]);
   const skipped = parsed.rows.length - practiceItems(parsed.rows).length;
-  const rows = matchEditorRows(state.editor?.rows || [], parsed.rows), body = { ...values, rows };
+  const rows = matchEditorRows(state.editor?.rows || [], parsed.rows), body = { ...values, rows, ...(values.passageId && state.editor?.revision != null ? { expectedRevision: state.editor.revision } : {}) };
   const data = await safely(() => call(values.passageId ? 'save_passage' : 'create_passage', body, '저장하는 중…'));
   if (!data) return;
   toast(skipped ? `저장했습니다. 단어가 2개 미만인 ${skipped}문장은 배열 연습에서 제외됩니다.` : '저장했습니다.');
-  await loadAdmin(); await openPassage(data.passageId);
+  await loadAdmin({ progress: false }); await openPassage(data.passageId);
 }
 async function deletePassage() {
   const passageId = $('#passage-form').passageId.value; if (!passageId || !(await confirmDelete('passage', passageId))) return;
@@ -112,7 +114,7 @@ function renderScopes() {
 }
 async function saveScope(form) {
   const passageIds = new FormData(form).getAll('passageIds');
-  if (await safely(() => call('set_scope_passages', { school: form.dataset.scopeSchool, grade: form.dataset.scopeGrade, passageIds }, '시험범위를 저장하는 중…'))) { toast('시험범위를 저장했습니다.'); await loadAdmin(); }
+  if (await safely(() => call('set_scope_passages', { school: form.dataset.scopeSchool, grade: form.dataset.scopeGrade, passageIds }, '시험범위를 저장하는 중…'))) { toast('시험범위를 저장했습니다.'); await loadAdmin({ progress: false }); }
 }
 
 document.addEventListener('click', async event => {

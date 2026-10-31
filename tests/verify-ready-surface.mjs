@@ -64,7 +64,7 @@ const migrations = readdirSync(join(repo, 'supabase/migrations')).sort().map(nam
 const created = new Set([...migrations.matchAll(/create table (?:if not exists )?public\.(ready_[a-z_]+)/g)].map(match => match[1]));
 const dropped = new Set([...migrations.matchAll(/drop table if exists public\.(ready_[a-z_]+)/g)].map(match => match[1]));
 const live = [...created].filter(table => !dropped.has(table));
-const used = new Set([...server.matchAll(/from\("(ready_[a-z_]+)"\)/g)].map(match => match[1]));
+const used = new Set([...server.matchAll(/(?:from|allRows<[^>]*>)\("(ready_[a-z_]+)"/g)].map(match => match[1]));
 const listed = doc => new Set([...read(doc).split('## Dormant database tables')[1].split(/\n## /)[0].matchAll(/^- `(ready_[a-z_]+)`/gm)].map(match => match[1]));
 for (const doc of ['PRACTICE_NOTES.md', 'README.md']) {
   const dormant = listed(doc);

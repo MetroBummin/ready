@@ -7,10 +7,18 @@ export function sentenceAudioSupported(win = globalThis) {
   return Boolean(win?.speechSynthesis && typeof win.SpeechSynthesisUtterance === 'function');
 }
 
+// Apple platforms list novelty voices (Albert, Bad News, Zarvox, ...) as
+// local en-US voices, often first in alphabetical order. They are never picked.
+const NOVELTY_VOICES = /\b(albert|bad news|bahh|bells|boing|bubbles|cellos|deranged|good news|hysterical|jester|junior|kathy|organ|pipe organ|princess|ralph|superstar|trinoids|whisper|wobble|zarvox|fred)\b/i;
+const PREFERRED_VOICES = /\b(samantha|alex|ava|allison|susan|google us english|aria|jenny|guy|zira|david)\b/i;
+
 export function pickEnglishVoice(voices = []) {
-  const list = Array.isArray(voices) ? voices : [];
   const lang = voice => String(voice?.lang || '').replace('_', '-').toLowerCase();
-  return list.find(voice => lang(voice) === 'en-us' && voice.localService) || list.find(voice => lang(voice) === 'en-us') || list.find(voice => lang(voice).startsWith('en')) || null;
+  const list = (Array.isArray(voices) ? voices : []).filter(voice => lang(voice).startsWith('en') && !NOVELTY_VOICES.test(String(voice?.name || '')));
+  const us = list.filter(voice => lang(voice) === 'en-us');
+  return us.find(voice => voice.default) || us.find(voice => PREFERRED_VOICES.test(String(voice.name || '')) && voice.localService)
+    || us.find(voice => PREFERRED_VOICES.test(String(voice.name || ''))) || us.find(voice => voice.localService) || us[0]
+    || list.find(voice => voice.default) || list[0] || null;
 }
 
 export function speakSentence(text, { win = globalThis, rate = 0.9 } = {}) {
