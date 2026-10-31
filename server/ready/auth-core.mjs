@@ -1,9 +1,5 @@
 const encoder = new TextEncoder();
 
-export function validPin(value) {
-  return /^\d{4,6}$/.test(String(value ?? ''));
-}
-
 export function bearerToken(header) {
   const match = String(header || '').match(/^Bearer\s+([A-Za-z0-9_-]{32,})$/i);
   return match ? match[1] : '';

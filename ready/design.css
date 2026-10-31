@@ -1023,3 +1023,107 @@ body[data-ready-mode] .sheet{border-radius:24px 0 0 24px}
   body[data-ready-mode] .word-review-tab{flex:1;justify-content:center;padding-inline:8px}
   .word-review-tab span{font-size:9px}
 }
+
+/* Sentence-ordering practice: home list and admin additions. The practice
+   screen itself has its own section at the end of this file. */
+.practice-home-lead{max-width:62ch;margin:0 0 var(--ready-space-4);color:var(--ready-body);font-size:14px;line-height:1.55}
+body[data-ready-mode="student"] .passage-workbook small{display:block;margin-top:2px;font:600 10px/1.2 var(--ready-font-mono);opacity:.82}
+body[data-ready-mode="admin"] .scope-form{display:grid;gap:var(--ready-space-2);margin-bottom:var(--ready-space-4)}
+body[data-ready-mode="admin"] .scope-form h2 small{color:var(--ready-muted);font-size:13px;font-weight:600}
+body[data-ready-mode="admin"] .scope-form .passage-check{display:flex;align-items:center;gap:var(--ready-space-2)}
+body[data-ready-mode="admin"] .scope-form>.button{justify-self:start}
+body[data-ready-mode="admin"] #passage-form textarea{font-family:var(--ready-font-mono);font-size:13px;white-space:pre;overflow-x:auto}
+.tabular{font-variant-numeric:tabular-nums}
+
+/* Sentence-practice screen (ready/practice-view.js).
+   Flat white page, no card: top bar, then the prompt, then the answer on ruled
+   lines, then every chip. Bar, Korean prompt and answer form one sticky head,
+   so on a long sentence only the chips scroll under it. Sentences with
+   LONG_SENTENCE_WORD_THRESHOLD or more words get `.is-long` (smaller answer
+   and chips). */
+html:has(body.practice-mode){background:var(--ready-surface)}
+/* body otherwise has overflow-x:hidden, which makes it a scroll container that
+   never scrolls, so the sticky head would scroll away with the page. */
+body[data-ready-mode].practice-mode{overflow-x:clip;overflow-y:visible;background:var(--ready-surface)}
+body[data-ready-mode].practice-mode main{width:min(100%,640px);padding:0 var(--ready-space-4)}
+.practice-screen{
+  --practice-rule:48px;
+  --practice-answer-size:22px;
+  --practice-chip-size:20px;
+  --practice-chip-pad:10px 14px;
+  --practice-chip-gap:12px;
+  --practice-wash:color-mix(in srgb,var(--ready-ink) 6%,var(--ready-surface));
+  position:relative;display:flex;min-height:100vh;min-height:100dvh;flex-direction:column;color:var(--ready-ink)
+}
+.practice-screen.is-long{--practice-rule:38px;--practice-answer-size:18px;--practice-chip-size:17px;--practice-chip-pad:10px 11px;--practice-chip-gap:10px 8px}
+.practice-screen.is-preview{touch-action:pan-y;user-select:none;-webkit-user-select:none}
+.practice-icon{display:block;flex:none}
+.practice-head{
+  position:sticky;z-index:30;top:0;max-height:calc(100dvh - 96px);overflow-y:auto;
+  margin-inline:calc(-1 * var(--ready-space-4));padding:env(safe-area-inset-top) var(--ready-space-4) var(--ready-space-2);
+  background:var(--ready-surface);overscroll-behavior:contain
+}
+.practice-bar{display:grid;min-height:60px;grid-template-columns:1fr auto 1fr;align-items:center}
+body[data-ready-mode] .practice-icon-button{display:grid;width:44px;height:44px;place-items:center;padding:0;border:0;border-radius:50%;color:var(--ready-ink);background:transparent;cursor:pointer;transition:background-color var(--ready-duration-fast) var(--ready-ease)}
+body[data-ready-mode] .practice-icon-button:hover{background:var(--practice-wash)}
+body[data-ready-mode] .practice-back{justify-self:start;margin-left:-12px}
+.practice-bar-actions{display:flex;justify-self:end;gap:2px;margin-right:-8px}
+body[data-ready-mode] .practice-star{color:var(--ready-muted)}
+body[data-ready-mode] .practice-star[aria-pressed="true"]{color:var(--ready-ink)}
+.practice-counter{display:inline-flex;align-items:baseline;padding:7px 20px;border-radius:var(--ready-radius-round);background:var(--practice-wash);font:750 17px/1.2 var(--ready-font-sans);font-variant-numeric:tabular-nums;letter-spacing:0}
+.practice-counter-sep{margin:0 .55em;font-weight:650}
+.practice-tools{display:flex;min-height:48px;align-items:center;gap:var(--ready-space-3)}
+body[data-ready-mode] .practice-speaker{margin-left:-8px;color:var(--ready-muted)}
+body[data-ready-mode] .practice-speaker:hover{color:var(--ready-ink)}
+.practice-step{margin-left:auto;color:var(--ready-body);font:600 12px/1.3 var(--ready-font-sans);text-align:right}
+
+/* ref1: step-1 preview card */
+.practice-preview{padding-top:var(--ready-space-3)}
+.practice-preview-en{margin:0 0 var(--ready-space-5);font:750 26px/1.38 var(--ready-font-sans);letter-spacing:-.015em;overflow-wrap:anywhere}
+.is-long .practice-preview-en{font-size:23px}
+body[data-ready-mode] .practice-reveal{display:block;width:45%;min-width:150px;min-height:44px;padding:4px 0;border:0;border-radius:10px;background:transparent;cursor:pointer}
+.practice-reveal::before{display:block;height:36px;border-radius:10px;background:var(--practice-wash);content:"";transition:background-color var(--ready-duration-fast) var(--ready-ease)}
+.practice-reveal:hover::before{background:color-mix(in srgb,var(--ready-ink) 10%,var(--ready-surface))}
+.practice-preview-ko{margin:0;padding:8px 0;color:var(--ready-body);font:550 17px/1.55 var(--ready-font-sans);overflow-wrap:anywhere;outline:0}
+.practice-foot{position:sticky;bottom:0;display:flex;justify-content:center;margin-top:auto;padding:var(--ready-space-4) 0 calc(var(--ready-space-6) + env(safe-area-inset-bottom));background:var(--ready-surface)}
+body[data-ready-mode] .practice-begin{display:inline-flex;min-height:48px;align-items:center;gap:var(--ready-space-2);padding:0 var(--ready-space-4);border:0;border-radius:var(--ready-radius-round);color:var(--ready-action);background:transparent;font:700 17px/1.2 var(--ready-font-sans);cursor:pointer}
+body[data-ready-mode] .practice-begin:hover{background:var(--practice-wash)}
+
+/* ref2: ordering */
+.practice-ko{margin:var(--ready-space-1) 0 0;color:var(--ready-body);font:550 15px/1.55 var(--ready-font-sans);overflow-wrap:anywhere}
+/* Placed words flow as text on ruled lines. The area starts as one empty line
+   and grows only when the words wrap; no empty lines are drawn in advance. */
+.practice-answer{
+  min-height:var(--practice-rule);margin-top:var(--ready-space-3);
+  background-image:linear-gradient(to bottom,transparent calc(var(--practice-rule) - 2px),var(--ready-hairline) calc(var(--practice-rule) - 2px));
+  background-size:100% var(--practice-rule);
+  font:750 var(--practice-answer-size)/var(--practice-rule) var(--ready-font-sans);letter-spacing:-.01em;overflow-wrap:anywhere
+}
+.is-complete .practice-answer{color:var(--ready-success)}
+.practice-feedback{min-height:20px;margin:var(--ready-space-2) 0 0;font:650 13px/1.5 var(--ready-font-sans)}
+.practice-feedback.is-wrong{color:var(--ready-error)}
+.practice-feedback.is-correct{color:var(--ready-success)}
+.practice-bank{display:flex;flex-wrap:wrap;align-content:flex-start;gap:var(--practice-chip-gap);padding:var(--ready-space-5) 0 calc(var(--ready-space-8) + env(safe-area-inset-bottom))}
+body[data-ready-mode] .practice-chip{
+  min-width:44px;max-width:100%;min-height:44px;padding:var(--practice-chip-pad);
+  border:2px solid var(--ready-hairline);border-radius:var(--ready-radius-xs);
+  color:var(--ready-ink);background:var(--ready-surface);
+  font:750 var(--practice-chip-size)/1.2 var(--ready-font-sans);letter-spacing:-.01em;overflow-wrap:anywhere;cursor:pointer;
+  transition:border-color var(--ready-duration-fast) var(--ready-ease),background-color var(--ready-duration-fast) var(--ready-ease)
+}
+body[data-ready-mode] .practice-chip:hover{border-color:var(--ready-hairline-strong)}
+body[data-ready-mode] .practice-chip:active{background:var(--practice-wash)}
+body[data-ready-mode] .practice-chip.wrong{border-color:var(--ready-error);color:var(--ready-error);background:var(--ready-error-soft)}
+body[data-ready-mode] .practice-next{width:100%;max-width:480px}
+
+/* Settings: a small panel under the bar. */
+.practice-settings{position:fixed;z-index:60;top:calc(58px + env(safe-area-inset-top));right:max(var(--ready-space-2),calc((100vw - 640px) / 2 + var(--ready-space-2)));display:grid;width:min(260px,calc(100vw - 16px));gap:2px;padding:6px;border:1px solid var(--ready-hairline);border-radius:var(--ready-radius-sm);background:var(--ready-surface);box-shadow:var(--ready-shadow-float)}
+body[data-ready-mode] .practice-switch{display:flex;width:100%;min-height:48px;align-items:center;justify-content:space-between;gap:var(--ready-space-3);padding:0 var(--ready-space-3);border:0;border-radius:var(--ready-radius-xs);color:var(--ready-ink);background:transparent;font:600 15px/1.3 var(--ready-font-sans);text-align:left;cursor:pointer}
+body[data-ready-mode] .practice-switch:hover{background:var(--practice-wash)}
+.practice-switch-track{position:relative;display:block;width:40px;height:24px;flex:none;border-radius:var(--ready-radius-round);background:var(--ready-hairline-strong);transition:background-color var(--ready-duration-fast) var(--ready-ease)}
+.practice-switch-track span{position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:var(--ready-surface);transition:transform var(--ready-duration-fast) var(--ready-ease)}
+.practice-switch[aria-checked="true"] .practice-switch-track{background:var(--ready-action)}
+.practice-switch[aria-checked="true"] .practice-switch-track span{background:var(--ready-on-action);transform:translateX(16px)}
+
+body[data-ready-mode].dark .practice-answer{background-image:linear-gradient(to bottom,transparent calc(var(--practice-rule) - 2px),var(--ready-hairline-strong) calc(var(--practice-rule) - 2px))}
+body[data-ready-mode].dark .practice-chip:not(.wrong){border-color:var(--ready-hairline-strong)}

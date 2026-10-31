@@ -5,13 +5,12 @@
   "type": "module",
   "scripts": {
     "dev": "python3 -m http.server 4173 --directory .",
-    "workbook:check": "node tests/verify-ready-workbook-check.mjs && node tests/verify-ready-workbook-factory.mjs && node tests/verify-ready-workbook-golden.mjs && node tests/verify-ready-studio.mjs && node tests/verify-ready-publisher-import-regression.mjs && node tests/verify-ready-studio-api.mjs && node tests/verify-ready-content-claim.mjs && node tests/verify-ready-gemini-sentence.mjs",
-    "workbook:import": "node tools/ready-import-workbooks.mjs",
-    "test:active": "npm run workbook:check && node tests/verify-ready-active-surface.mjs && node tests/verify-ready-local-first.mjs && node tests/verify-ready-stability.mjs && node tests/verify-ready-workbook-keyboard.mjs && node tests/verify-ready-workbook-progress.mjs && node tests/verify-ready-reader-gloss.mjs && node tests/verify-ready-pdf-text.mjs && node tests/verify-ready-scope-layout.mjs && node tests/verify-ready-review-export.mjs && node tests/verify-ready-learning-progress.mjs && node tests/verify-ready-passage-presentation.mjs && node tests/verify-ready-workbook-stage-picker.mjs",
-    "test:questions:dormant": "node tests/verify-ready.mjs && node tests/verify-ready-contracts.mjs && node tests/verify-ready-question-authoring.mjs && node tests/verify-ready-question-reference-bank.mjs && node tests/verify-ready-question-representation.mjs && node tests/verify-ready-intelligence.mjs && node tests/verify-ready-written-contract.mjs && node tests/verify-ready-writing-mode.mjs && node tests/verify-ready-shorts.mjs && node tests/verify-ready-question-sheet.mjs && node tests/verify-ready-pdf-underlines.mjs",
-    "test:all": "npm run test:active && npm run test:questions:dormant",
+    "test:unit": "node --test tests/verify-sentence-practice.mjs",
+    "test:api": "node tests/verify-ready-api.mjs",
+    "test:surface": "node tests/verify-ready-surface.mjs",
+    "test": "npm run test:unit && npm run test:surface && npm run test:api",
+    "test:all": "npm test && npm run native:verify",
     "ready:test": "npm run test:all",
-    "test": "npm run test:active",
     "build": "node tools/build-pages.mjs",
     "native:build": "READY_NATIVE_BUILD=1 node tools/build-pages.mjs",
     "native:sync": "npm run native:build && cap sync",
@@ -19,20 +18,12 @@
     "native:android": "npm run native:sync && cap open android",
     "native:doctor": "cap doctor",
     "native:verify": "node tests/verify-ready-native.mjs",
-    "structure:written": "node tools/ready-structure-written-with-codex.mjs",
-    "validate:pipeline": "node tools/ready-validate-pipeline.mjs",
-    "represent:questions": "node tools/ready-build-question-representations.mjs",
-    "audit:questions": "node tools/ready-audit-question-publication.mjs",
-    "audit:workbooks:semantic": "node tools/ready-audit-semantic-workbooks.mjs",
-    "structure:objective-fallback": "node tools/ready-structure-objective-fallback-with-codex.mjs",
-    "import": "node tools/ready-import-questions.mjs",
     "deploy:api": "npx supabase functions deploy ready --no-verify-jwt --project-ref fqvhlyocdkwiyioiokte"
   },
   "dependencies": {
     "@capacitor/android": "^8.5.0",
     "@capacitor/core": "^8.5.0",
-    "@capacitor/ios": "^8.5.0",
-    "pdfjs-dist": "^5.7.284"
+    "@capacitor/ios": "^8.5.0"
   },
   "devDependencies": {
     "@capacitor/cli": "^8.5.0",
