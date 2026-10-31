@@ -6,7 +6,7 @@
 
 ```text
 관리자: 학생 코드 발급 → 문장 세트(English[TAB]Korean) 등록 → 학교/학년 시험범위에 배정
-학생: 6자리 코드 로그인 → 문장 세트 선택 → 1단계(소리, 틀려도 계속) → 2단계(소리 없음, 틀리면 다시)
+학생: 6자리 코드 로그인 → 문장 세트 선택 → 1단계(영어 미리보기 카드 → 배열, 소리, 틀려도 계속) → 2단계(바로 배열, 소리 없음, 틀리면 다시)
 → 문장마다 Attempt를 기기 queue에 넣고 background batch로 저장
 ```
 
@@ -15,6 +15,7 @@
 | 파일 | 역할 |
 | --- | --- |
 | `sentence-practice.js` | 단계 규칙, tokenizer, 서버 재검증 (`LONG_SENTENCE_WORD_THRESHOLD = 12`) |
+| `practice-view.js` | 연습 화면 HTML (미리보기 카드, 배열 화면, 설정). DOM 없이 test 가능 |
 | `sentence-audio.js` | 1단계 소리 (Web Speech API) |
 | `workbook-interaction.js` | 기존 Workbook 어순 배열에서 재사용한 칩 동작 |
 | `deterministic-grading.js` | 칩 비교용 정규화 |

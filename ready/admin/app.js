@@ -1,7 +1,7 @@
 // READY Admin: students, sentence sets, scope assignment, practice summary.
 import { readyApi } from '../api.js';
-import { practiceItems } from '../sentence-practice.js?v=sentence-practice-1';
-import { editorLine, matchEditorRows, parseSentenceRows } from './sentence-rows.js?v=sentence-practice-1';
+import { practiceItems } from '../sentence-practice.js?v=sentence-practice-2';
+import { editorLine, matchEditorRows, parseSentenceRows } from './sentence-rows.js?v=sentence-practice-2';
 
 const $ = selector => document.querySelector(selector), $$ = selector => [...document.querySelectorAll(selector)];
 const SESSION_KEY = 'ready-admin-session';

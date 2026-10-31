@@ -93,12 +93,10 @@ Verification: `npm test`, `npm run ready:test`, `npm run build` and
 - **Problem:** "최근 30일" downloads one row per attempt and aggregates in the function. It is now paged, so the result is correct, but egress and latency grow with use. For example, 200 students × 100 sentences a day × 30 days is 600k rows per click.
 - **Fix:** Add an aggregate RPC (migration) grouped by `student_id, stage` with `count(*)`, `count(*) filter (where correct)` and `max(created_at)`. The existing `ready_admin_learning_progress` RPC mixes all workbook keys and stages, so it does not fit.
 
-### P1-6 The last chip of every batch is forced, and batch boundaries leak word order
+### P1-6 The last chip of every batch is forced, and batch boundaries leak word order — **resolved**
 
-- **Where:** `ready/sentence-practice.js:94-99`, `ready/workbook-interaction.js:55-61`.
-- **Problem:** Chips are shown in fixed slices of six. Inside a batch the choices shrink to one, so every sixth word is a free placement that can never be a mistake. A 7-word sentence ends with a one-chip batch (6+1), and 13 words gives 6+6+1. In step 2 these free taps count toward a clean pass. The visible set also tells the student which six words come next, which is a strong hint for the hardest part: the order across phrases.
-- **Why it matters:** For short and medium sentences, step 2 is noticeably easier than "arrange the whole sentence". Batches end in fixed places, so the same phrase boundaries leak every time.
-- **Fix (needs a product decision, so not changed):** Use a sliding window that always shows the next `min(6, remaining)` unplaced words, shuffled, and adds one new chip each time a chip is placed. Then only the very last word of the sentence is forced, which is unavoidable in any ordering task. A cheaper alternative is balanced batches (7 → 4+3, 13 → 5+4+4) plus one look-ahead chip from the next batch. Either change stays inside `sentence-practice.js`; the server and the stored data are unaffected. The current behaviour is pinned by a test in `tests/verify-sentence-practice.mjs` ("documented limitation").
+- **Was:** chips were shown in fixed slices of six (`ready/sentence-practice.js` `visibleChips`, `ready/workbook-interaction.js` `progressiveOrderState`), so every sixth word was a forced tap that could not be a mistake, and each batch revealed which six words came next.
+- **Resolution (owner decision, ClassCard-style layout):** every chip of the sentence is shown at once, shuffled once per run and reshuffled after a step-2 restart. Only the very last word of a sentence is forced. `VISIBLE_CHIP_LIMIT` is gone. Long sentences stay usable through the compact `.is-long` layout and the sticky Korean/answer head (see `PRACTICE_NOTES.md`, "Practice screen layout"). The server and the stored data are unchanged. The "documented limitation" test was replaced by "only the last word of a sentence is ever forced" and "every chip of a 16+ word sentence is visible at once" in `tests/verify-sentence-practice.mjs`.
 
 ## P2
 
@@ -180,7 +178,7 @@ All of the following are covered by `npm test` unless noted.
   - Focus returns to the same chip after each tap, to the first chip of the next sentence, and to the set after leaving.
   - Feedback and completion are announced through one polite live region (`#practice-live`) instead of re-inserted `role=status` nodes.
   - The built sentence has `role="group"` for its label.
-- **Double-tap guard:** for 280 ms after a batch changes or the sentence restarts, taps are ignored, so a fast second tap on a chip that just appeared is not counted as a mistake.
+- **Double-tap guard:** for 280 ms after a batch changes or the sentence restarts, taps are ignored, so a fast second tap on a chip that just appeared is not counted as a mistake. (Batches are gone since P1-6 was resolved; the guard now covers restarts, the start of ordering, and a same-spot second tap after a placement.)
 - **Legacy caches** of the removed Reader/Workbook client (`ready-workbook-cache-v3:` and others) are deleted at start-up to free storage. The old unsent attempt queue is kept.
 - **Audio stops when the page is hidden.**
 - **At 360px, the step label and the step-2 rule overlapped the "n / m" counter.** They are now stacked (`.practice-step-meta`).

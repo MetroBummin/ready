@@ -49,8 +49,10 @@ export function shuffleWorkbookOrderBatch(batch=[],random=Math.random){
   return shuffled;
 }
 
-// Long sentences are shown in consecutive batches of 4-6 chips. Every word of
-// the sentence is still placed; only the next batch is visible at a time.
+// Expected chip order and the next expected chip. The batch fields come from
+// the former Workbook stage, which showed 4-6 chips at a time; sentence
+// practice shows every chip (see sentence-practice.js `visibleChips`) and only
+// uses `nextExpected` through `workbookOrderClick`.
 export function progressiveOrderState(group=[],answer='',chosen=[],visibleCount=6,batchOrder=[]){
   const expected=workbookOrderAnswerIndexes(group,answer),limit=Math.max(4,Math.min(6,Number(visibleCount)||6));
   if(!expected.length)return {expected,visible:group.map((_,index)=>index),batch:[],batchIndex:0,nextExpected:-1};

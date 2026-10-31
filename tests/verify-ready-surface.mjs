@@ -12,7 +12,7 @@ const walk = dir => readdirSync(join(repo, dir)).flatMap(name => { const path = 
 // 1. Exactly the runtime files the practice app needs.
 assert.deepEqual(walk('ready').map(path => relative('ready', path)).sort(), [
   'README.md', 'admin/app.js', 'admin/index.html', 'admin/sentence-rows.js', 'api.js', 'app.js', 'config.js', 'design.css',
-  'deterministic-grading.js', 'index.html', 'ready.css', 'sentence-audio.js', 'sentence-practice.js', 'workbook-interaction.js', 'workbook-progress.js',
+  'deterministic-grading.js', 'index.html', 'practice-view.js', 'ready.css', 'sentence-audio.js', 'sentence-practice.js', 'workbook-interaction.js', 'workbook-progress.js',
 ]);
 assert.deepEqual(readdirSync(join(repo, 'server/ready')).sort(), ['auth-core.mjs', 'index.ts']);
 assert.deepEqual(readdirSync(join(repo, 'tools')).sort(), ['build-pages.mjs']);
@@ -45,6 +45,14 @@ assert.match(read('ready/sentence-practice.js'), /export const LONG_SENTENCE_WOR
 assert.match(read('ready/sentence-practice.js'), /wordCount\) >= LONG_SENTENCE_WORD_THRESHOLD \? 1 : 0/);
 const app = read('ready/app.js');
 assert.match(app, /stepUsesAudio\(practice\.step\) && sentenceAudioSupported\(\)/, 'the audio button depends on the step');
+assert.match(app, /phase: stepShowsPreview\(practice\.step\) \? 'preview' : 'order'/, 'only step 1 opens on the preview card');
+assert.match(read('ready/sentence-practice.js'), /export function stepShowsPreview\(step\) \{ return Number\(step\) === 1; \}/);
+const view = read('ready/practice-view.js');
+assert.match(view, /isLongSentence\(view\.item\.words\.length\)/, 'the long-sentence layout uses the shared threshold');
+assert.doesNotMatch(view, /\b12\b/, 'no hard-coded 12 in the practice screen');
+assert.doesNotMatch(app + read('ready/design.css'), /(?:[<>]=?|===?)\s*12\b/, 'no word-count comparison with a literal 12');
+assert.doesNotMatch(read('ready/sentence-practice.js') + app, /VISIBLE_CHIP_LIMIT|batchIndex/, 'chips are not shown in batches');
+assert.doesNotMatch(app, /localStorage\.setItem\([^)]*bookmark[^)]*\)[^;]*call\(|call\('[a-z_]*bookmark/i, 'bookmarks stay on the device');
 assert.doesNotMatch(read('ready/sentence-practice.js'), /\b(?:a|an|the)\b['"]\s*[,\]]/i, 'no article stop-word list');
 
 // 5. Student page has only login, home and practice.

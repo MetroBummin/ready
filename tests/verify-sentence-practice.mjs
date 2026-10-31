@@ -2,9 +2,10 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import {
-  LONG_SENTENCE_WORD_THRESHOLD, PRACTICE_STEPS, attemptPayload, builtSentence, gradeSentenceAttempt, mistakeAllowance,
-  placeWord, practiceItem, practiceItems, runIsClean, sentenceWords, startRun, stepUsesAudio, visibleChips, shuffleChangedOrder,
+  LONG_SENTENCE_WORD_THRESHOLD, PRACTICE_STEPS, attemptPayload, builtSentence, gradeSentenceAttempt, isLongSentence, mistakeAllowance,
+  placeWord, practiceItem, practiceItems, runIsClean, sentenceWords, startRun, stepShowsPreview, stepUsesAudio, visibleChips, shuffleChangedOrder,
 } from '../ready/sentence-practice.js';
+import { practiceScreenHtml } from '../ready/practice-view.js';
 import { pickEnglishVoice, sentenceAudioSupported, speakSentence } from '../ready/sentence-audio.js';
 import { clearWorkbookCycleItem } from '../ready/workbook-progress.js';
 import { editorLine, matchEditorRows, parseSentenceRows } from '../ready/admin/sentence-rows.js';
@@ -27,7 +28,7 @@ test('articles a / an / the are kept as chips and must be placed', () => {
   assert.equal(item.answer, 'The boy ate an apple and a pear in the park');
   for (const article of ['The', 'an', 'a', 'the']) assert.ok(item.words.includes(article), `${article} must be a chip`);
   const run = startRun(item, 1), chips = visibleChips(item, run, {}, () => 0.3).visible;
-  assert.ok(chips.some(index => item.words[index] === 'The'), 'the first batch shows the leading article');
+  assert.ok(chips.some(index => item.words[index] === 'The'), 'the leading article is a visible chip');
   const done = placeAll(item, run);
   assert.equal(done.type, 'complete');
   assert.equal(builtSentence(item, done.run), item.answer, 'the finished sentence contains every article');
@@ -124,17 +125,104 @@ test('duplicate words are interchangeable chips', () => {
   assert.equal(builtSentence(item, result.run), 'the cat saw the dog');
 });
 
-test('chips appear in shuffled batches of up to six and a used chip is ignored', () => {
-  const item = sentence(nWords(14)), orders = {}, run = startRun(item, 1);
+test('every chip of a 16+ word sentence is visible at once, shuffled once per run', () => {
+  const item = sentence(nWords(18)), orders = {}, run = startRun(item, 1);
   const first = visibleChips(item, run, orders, Math.random);
-  assert.equal(first.visible.length, 6);
-  assert.deepEqual([...first.visible].sort((a, b) => a - b), [0, 1, 2, 3, 4, 5]);
-  assert.notDeepEqual(first.visible, [0, 1, 2, 3, 4, 5], 'a batch is never shown in answer order');
-  assert.deepEqual(visibleChips(item, run, orders).visible, first.visible, 'the order is stable within a batch');
+  assert.equal(first.visible.length, 18, 'no batches: all 18 chips are shown');
+  assert.deepEqual([...first.visible].sort((a, b) => a - b), item.words.map((_, index) => index));
+  assert.notDeepEqual(first.visible, item.words.map((_, index) => index), 'chips are never shown in answer order');
+  assert.deepEqual(visibleChips(item, run, orders).visible, first.visible, 'the order is stable within a run');
   let next = run; for (let index = 0; index < 6; index += 1) next = placeWord(item, next, index).run;
-  assert.equal(visibleChips(item, next, orders).batchIndex, 1);
-  assert.equal(placeWord(item, next, 0).type, 'ignore');
+  const after = visibleChips(item, next, orders).visible;
+  assert.equal(after.length, 12, 'placed chips leave the bank');
+  assert.deepEqual(after, first.visible.filter(index => index >= 6), 'the remaining chips keep their relative order');
+  assert.equal(placeWord(item, next, 0).type, 'ignore', 'a used chip is ignored');
   assert.deepEqual(shuffleChangedOrder([7, 8], () => 0.99), [8, 7]);
+});
+
+test('a step-2 restart reshuffles all chips when the caller passes a fresh order', () => {
+  const item = sentence(nWords(8));
+  let orders = {}, run = startRun(item, 2);
+  const seeded = seed => () => { seed = (seed * 16807) % 2147483647; return seed / 2147483647; };
+  const before = visibleChips(item, run, orders, seeded(7)).visible;
+  run = placeWord(item, run, 0).run;
+  const restart = placeWord(item, run, 5);
+  assert.equal(restart.type, 'restart');
+  orders = {};
+  const after = visibleChips(item, restart.run, orders, seeded(99)).visible;
+  assert.equal(after.length, 8, 'every chip is back after a restart');
+  assert.notDeepEqual(after, before, 'and in a new order');
+});
+
+test('only the last word of a sentence is ever forced (REVIEW P1-6 resolved)', () => {
+  const item = sentence(nWords(7)), orders = {};
+  let run = startRun(item, 2);
+  for (let index = 0; index < 5; index += 1) {
+    assert.equal(visibleChips(item, run, orders).visible.length, 7 - index, `before word ${index + 1} every unplaced chip is a choice`);
+    run = placeWord(item, run, index).run;
+  }
+  assert.equal(visibleChips(item, run, orders).visible.length, 2, 'the sixth word is a real choice (it was forced with batches of six)');
+  run = placeWord(item, run, 5).run;
+  assert.deepEqual(visibleChips(item, run, orders).visible, [6], 'only the very last word is forced');
+});
+
+const view = (item, step, extra = {}) => {
+  const run = extra.run || startRun(item, step);
+  return practiceScreenHtml({ step, phase: stepShowsPreview(step) ? 'preview' : 'order', item, run, allowance: run.allowance, chips: visibleChips(item, run, {}).visible, wrongChip: null, feedback: null, built: builtSentence(item, run), clean: runIsClean(run), done: 0, total: 10, isLast: false, revealed: false, audio: stepUsesAudio(step), bookmarked: false, settingsOpen: false, autoplay: false, dark: false, ...extra });
+};
+const count = (html, pattern) => (html.match(pattern) || []).length;
+
+test('step 1 starts with a preview card; ordering starts only after the preview', () => {
+  assert.equal(stepShowsPreview(1), true);
+  assert.equal(stepShowsPreview(2), false);
+  const item = practiceItem({ id: 'p', text: 'Resilience: The Power to Overcome', translation: '회복 탄력성: 극복하는 힘' });
+  const preview = view(item, 1);
+  assert.match(preview, /data-practice-phase="preview"/);
+  assert.ok(preview.includes('Resilience: The Power to Overcome'), 'the preview shows the English sentence');
+  assert.ok(!preview.includes('회복 탄력성'), 'the Korean stays hidden behind the reveal bar');
+  assert.match(preview, /data-practice-reveal/);
+  assert.match(preview, /data-practice-begin[^>]*>.*밀어서 영작연습/);
+  assert.match(preview, /data-play-audio/);
+  assert.equal(count(preview, /data-chip=/g), 0, 'no chips before ordering starts');
+  assert.ok(view(item, 1, { revealed: true }).includes('회복 탄력성: 극복하는 힘'), 'tapping the bar reveals the Korean in place');
+  const order = view(item, 1, { phase: 'order' });
+  assert.match(order, /class="practice-ko" lang="ko">회복 탄력성: 극복하는 힘/);
+  assert.match(order, /data-play-audio/, 'step 1 keeps the speaker while ordering');
+  assert.equal(count(order, /data-chip=/g), 5);
+  assert.match(order, /<b>0<\/b><span class="practice-counter-sep">\/<\/span><b>10<\/b>/, 'the counter starts at 0 / total');
+});
+
+test('step 2 goes straight to ordering, with no English sentence and no audio', () => {
+  const item = practiceItem({ id: 'q', text: 'The boy ate an apple and a pear in the park.', translation: '소년은 공원에서 사과 하나와 배 하나를 먹었다.' });
+  const html = view(item, 2);
+  assert.match(html, /data-practice-phase="order"/);
+  assert.doesNotMatch(html, /data-practice-begin|data-practice-reveal|data-play-audio/);
+  assert.ok(!html.includes(item.text) && !html.includes(item.answer), 'the English sentence is not in the page before it is arranged');
+  assert.equal(count(html, /data-chip=/g), 11, 'every word is a chip');
+  assert.doesNotMatch(view(item, 2, { settingsOpen: true }), /data-practice-setting="autoplay"/, 'no auto-play setting without audio');
+  assert.match(view(item, 1, { phase: 'order', settingsOpen: true }), /data-practice-setting="autoplay"/);
+});
+
+test('the long-sentence layout starts at LONG_SENTENCE_WORD_THRESHOLD words', () => {
+  assert.equal(isLongSentence(LONG_SENTENCE_WORD_THRESHOLD - 1), false);
+  assert.equal(isLongSentence(LONG_SENTENCE_WORD_THRESHOLD), true);
+  const screenClass = words => view(sentence(nWords(words)), 2).match(/class="(practice-screen[^"]*)"/)[1].split(' ');
+  assert.ok(!screenClass(11).includes('is-long'));
+  assert.ok(screenClass(12).includes('is-long'));
+  assert.ok(screenClass(20).includes('is-long'));
+  assert.equal(count(view(sentence(nWords(20)), 2), /data-chip=/g), 20, 'a 20-word sentence shows all 20 chips');
+});
+
+test('a finished sentence shows the canonical text, a quiet success line and the next button', () => {
+  const item = practiceItem({ id: 'c', text: 'Resilience: The Power to Overcome', translation: '회복 탄력성: 극복하는 힘' });
+  const done = placeAll(item, startRun(item, 2)).run;
+  const html = view(item, 2, { run: done, done: 1 });
+  assert.match(html, /practice-screen is-order is-complete/);
+  assert.ok(html.includes('<span lang="en">Resilience: The Power to Overcome</span>'));
+  assert.match(html, /practice-feedback is-correct/);
+  assert.match(html, /data-practice-next[^>]*>다음 문장/);
+  assert.equal(count(html, /data-chip=/g), 0);
+  assert.match(view(item, 2, { run: done, isLast: true }), /data-practice-next[^>]*>결과 보기/);
 });
 
 test('server grading re-checks the arrangement and step policy', () => {
@@ -208,12 +296,4 @@ test('the English voice skips Apple novelty voices and prefers the default or a 
   assert.equal(pickEnglishVoice([{ name: 'Albert', lang: 'en-US' }, { name: 'Daniel', lang: 'en-GB' }]).name, 'Daniel', 'novelty voices are never used, even as the only en-US voice');
   assert.equal(pickEnglishVoice([{ name: 'Yuna', lang: 'ko-KR' }]), null);
   assert.equal(pickEnglishVoice([]), null, 'Chrome returns no voices before voiceschanged; lang en-US is still set');
-});
-
-test('batches: the last chip of a batch is forced (documented limitation)', () => {
-  // This records the current behaviour REVIEW.md discusses; it is not a goal.
-  const item = sentence(nWords(7)), orders = {};
-  let run = startRun(item, 2);
-  for (let index = 0; index < 6; index += 1) run = placeWord(item, run, index).run;
-  assert.deepEqual(visibleChips(item, run, orders).visible, [6], 'a 7-word sentence ends with a one-chip batch');
 });

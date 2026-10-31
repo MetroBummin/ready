@@ -9,20 +9,92 @@ reused, and what was rewritten.
 
 | | Step 1 | Step 2 |
 | --- | --- | --- |
-| Prompt | Korean sentence | Korean sentence |
-| Audio | "▶ 문장 듣기" plays the English sentence | none |
-| Wrong chip | flashes red with a quiet note; the student keeps going | the sentence restarts from the first word |
+| Before ordering | preview card: the English sentence, the speaker, and the Korean behind a tap-to-reveal bar | none: ordering starts at once, the English is never shown first |
+| Prompt while ordering | Korean sentence | Korean sentence |
+| Audio | speaker icon plays the English sentence (optional auto-play) | none |
+| Wrong chip | flashes red with a quiet note and is not placed; the student keeps going | the sentence restarts from the first word, chips reshuffled |
 | Long sentences | no limit on mistakes | `LONG_SENTENCE_WORD_THRESHOLD` (12) or more words: one mistake is tolerated, the second restarts |
 | Recorded as clean (`correct`) | no wrong chip at all | finished without a restart |
 
-Every word is a chip, including the articles `a`, `an`, `the`. Long sentences
-show their chips in consecutive shuffled batches of up to six, but every word is
-still placed.
+Every word is a chip, including the articles `a`, `an`, `the`. All chips of
+the sentence are shown at once, shuffled once per run (a step-2 restart
+reshuffles). Placed chips leave the bank and the rest reflow. Duplicate words
+stay interchangeable.
 
 The single policy lives in `ready/sentence-practice.js`
-(`LONG_SENTENCE_WORD_THRESHOLD`, `mistakeAllowance`, `startRun`, `placeWord`,
-`runIsClean`, `gradeSentenceAttempt`). The student app, the Edge Function and
+(`LONG_SENTENCE_WORD_THRESHOLD`, `mistakeAllowance`, `stepShowsPreview`,
+`isLongSentence`, `startRun`, `placeWord`, `visibleChips`, `runIsClean`,
+`gradeSentenceAttempt`). The student app, the Edge Function and
 the tests all import that one file.
+
+## Practice screen layout
+
+The screen follows the two ClassCard-style references (preview card and
+ordering) in READY's own tokens: white `--ready-surface` page with no card
+around the content, `--ready-ink` text, `--ready-hairline` rules and chip
+edges, `--ready-action` for the swipe hint, `--ready-success` / `--ready-error`
+for state. Dark mode uses the same tokens. The HTML is built by
+`ready/practice-view.js` (pure functions, tested in Node); `ready/app.js` owns
+state, events and focus; the CSS is the last section of `ready/design.css`.
+
+- **Top bar:** back chevron, a pill counter `n / total` (n = sentences finished
+  in this run, so a set starts at `0 / 10`), a star and a settings icon. Every
+  control is a 44 px target.
+- **Step-1 preview:** the English sentence (26 px bold), then a gray bar that
+  reveals the Korean in place when tapped, then "« 밀어서 영작연습" at the
+  bottom. A left swipe of 60 px or more anywhere on the screen (pointer
+  events; vertical scrolling still works through `touch-action: pan-y`), a tap
+  on the hint, or Enter / → starts ordering. A swipe that ends on a button
+  does not also press it.
+- **Ordering:** speaker (step 1 only) and the step label, the Korean prompt in
+  small gray text, the answer, a feedback line, then the chips (white, 2 px
+  hairline border, bold 20 px).
+- **Sticky head:** the top bar, the Korean prompt and the answer form one
+  `position: sticky` block, so they stay in view while only the chips scroll
+  under them on a long sentence or a short screen. (`body` gets
+  `overflow-x: clip` on this screen: with the global `overflow-x: hidden`,
+  `body` became a scroll container and the sticky head scrolled away.)
+- **Answer lines:** placed words flow as text on ruled lines drawn by a
+  repeating background. The area starts as one empty line and grows only when
+  the words wrap; no empty lines are drawn ahead.
+- **Long sentences:** at `isLongSentence(words)` (the same 12-word threshold)
+  the screen gets `.is-long`: answer 18 px on 38 px lines, chips 17 px with
+  tighter padding and gaps. Checked in headless Chrome: a 22-word answer takes
+  4 lines at 390 px and 5 at 360 px; 17 words take 2-3 lines. No horizontal
+  overflow at 360 px.
+- **Completion:** the answer shows the canonical sentence, punctuation
+  included, in `--ready-success`, a "✓ 완성했어요." line (plus the mistake or
+  restart count when not clean), and a "다음 문장" / "결과 보기" button at the
+  bottom. Focus moves to it, and Enter goes on.
+- **Star:** a per-sentence mark stored only on this device, in
+  `localStorage['ready-practice-bookmarks-v1:student:<student id>']` as a list
+  of `sentence:<id>` keys. No server call or table. `aria-pressed` follows it.
+- **Settings:** a small panel with a dark-mode switch and, in step 1 when
+  speech is available, "자동 재생" (play the sentence when each preview card
+  opens; `localStorage['ready-practice-autoplay']`). Escape or a tap outside
+  closes it. The home screen keeps its own theme button.
+- **Accessibility kept from `0eb25f3`:** one polite live region announces the
+  prompt, mistakes, restarts and completion; focus returns to the same control
+  after each re-render (for a chip: the chip now at the same position, since
+  placed chips leave the bank); the tap guard ignores taps for 280 ms after a
+  restart reshuffles the chips or after ordering starts, and ignores a second
+  tap on the same spot within 280 ms of a correct placement (the next chip has
+  just slid under the finger).
+
+### Decisions
+
+- **All chips at once (resolves REVIEW P1-6).** With batches of six, every
+  sixth word was a forced, mistake-free tap and the batch told the student
+  which six words came next. Now only the last word of a sentence is forced.
+  All-chips stayed workable for long sentences: 22 chips fit in about six rows
+  at 360 px with the long-sentence sizes, and the sticky head keeps the
+  Korean and the answer in view while the chips scroll.
+- **Placed chips leave the bank** instead of leaving empty placeholders. The
+  answer line shows what was placed, and a shrinking bank is easier to scan
+  than one with holes. The cost, a chip sliding under the finger, is covered
+  by the same-spot double-tap guard.
+- **Step 2 has no preview** and the English text is not in the page until the
+  sentence is finished, so it cannot be read before ordering.
 
 ## Where steps 1 and 2 existed before
 
@@ -33,7 +105,7 @@ The owner was right: both steps existed as the two modes of the Workbook
 | --- | --- | --- |
 | `ready/workbook-order-practice.js` | `workbookOrderModeAtProblemStart`, `captureWorkbookOrderMode`, `workbookSemanticType` | Chose **practice mode** for the first two cycles (under 200 %) and **real mode** afterwards. Practice mode was step 1, real mode was step 2. |
 | `ready/workbook-interaction.js` | `workbookOrderClick(…, {practice})` | Practice: a wrong chip returned `practice-wrong` and was not consumed, so the student continued. Real: a wrong chip was consumed and returned `wrong`. |
-| same file | `progressiveOrderState`, `shuffleWorkbookOrderBatch`, `workbookOrderAnswerIndexes`, `workbookOrderTokenMatches` | Batches of 4–6 visible chips, duplicate words interchangeable. |
+| same file | `progressiveOrderState`, `shuffleWorkbookOrderBatch`, `workbookOrderAnswerIndexes`, `workbookOrderTokenMatches` | Batches of 4–6 visible chips, duplicate words interchangeable. (Sentence practice now shows every chip; only the next-expected logic is still used.) |
 | `ready/deterministic-grading.js` | `normalizeWorkbookOrderAnswer` | Chip comparison that keeps internal punctuation (`1.5` ≠ `15`). |
 | `ready/app.js` | `changeWorkbookOrder`, `flashWorkbookOrderWrongChip`, `workbookOrderGroupHtml`, `workbookOrderMode`, `retryWorkbook`, `workbookMilestoneCopy` ("200% 완료! 이제 실전 모드예요.") | UI: the built sentence, the chip bank, the red flash in practice mode, and in real mode an immediate wrong submission followed by a "지금 재시도" button. |
 | `server/ready/workbook-factory.mjs` | `orderTokenParts` / `orderTokens` (tokenizer `order-tokens-v2`), `factoryOrderBank`, stage 6 in `generatePassageDeterministicCatalog` | Built one `reorder_groups` item per canonical sentence: Korean `source`, one English word per chip, articles included. |
@@ -66,9 +138,10 @@ Reused unchanged (trimmed to these exports):
 - `ready/workbook-progress.js`: `workbookProgressPercent`, `clearWorkbookCycleItem`.
 - The tokenizer regex of `orderTokenParts`, copied into `sentenceWords`
   (the tokenizer version is still `order-tokens-v2`).
-- The Workbook order UI classes in `ready/design.css` (`workbook-order-*`,
-  `workbook-card`, `workbook-feedback`, `workbook-milestone`). Only a few
-  practice rules were appended at the end of the file.
+- The Workbook milestone classes in `ready/design.css` (`workbook-milestone`)
+  for the summary screen. The practice screen has its own `practice-*` rules at
+  the end of the file; the old `workbook-order-*` rules are no longer used by
+  the student app.
 - Auth and data: student 6-digit codes (`ready_verify_student_code`), opaque
   sessions, admin password login, passages and sentences with Korean
   translations, the current school/grade scope, and the append-only

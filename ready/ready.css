@@ -49,6 +49,10 @@ button{touch-action:manipulation}
 .student-grid{display:grid}.passage-list{display:grid}.passage-row{display:flex}.passage-open{display:flex}.passage-actions{display:flex}
 body.study-mode #topbar{display:none}
 .study-back{position:fixed;z-index:80}
+/* Sentence-practice screen: sticky head (bar + prompt + answer), wrapping chip
+   bank, and horizontal swipes on the step-1 preview reach the app. */
+.practice-screen{display:flex;flex-direction:column}.practice-head{position:sticky;top:0}.practice-bank{display:flex;flex-wrap:wrap}
+.practice-screen.is-preview{touch-action:pan-y}
 .reader-shell{margin-inline:auto}.reader-prose{display:grid}.reading-passage{user-select:text}
 
 /* Workbook interaction layout hooks */

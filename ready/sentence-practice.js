@@ -3,17 +3,20 @@
 // This module is imported by the student app (browser), by the READY Edge
 // Function (Deno), and by Node tests, so it must stay dependency-free ESM.
 //
-// Step 1: Korean sentence + optional sentence audio. A wrong chip is shown
-//         quietly and the student keeps going.
-// Step 2: Korean sentence, no audio. A wrong chip restarts the sentence,
-//         except that sentences with LONG_SENTENCE_WORD_THRESHOLD or more
-//         words tolerate exactly one mistake per run.
+// Step 1: preview card (English sentence + audio, Korean hidden until tapped),
+//         then ordering with the Korean prompt and audio. A wrong chip is
+//         shown quietly and the student keeps going.
+// Step 2: no preview, no audio: straight to ordering with the Korean prompt.
+//         A wrong chip restarts the sentence, except that sentences with
+//         LONG_SENTENCE_WORD_THRESHOLD or more words tolerate exactly one
+//         mistake per run.
+//
+// Every chip of the sentence is visible at once, shuffled once per run.
 import { normalizeWorkbookOrderAnswer } from './deterministic-grading.js';
-import { progressiveOrderState, shuffleWorkbookOrderBatch, workbookOrderClick } from './workbook-interaction.js';
+import { shuffleWorkbookOrderBatch, workbookOrderClick } from './workbook-interaction.js';
 
 export const LONG_SENTENCE_WORD_THRESHOLD = 12;
 export const PRACTICE_STEPS = Object.freeze([1, 2]);
-export const VISIBLE_CHIP_LIMIT = 6;
 export const SENTENCE_PRACTICE_CONTRACT = 'sentence-practice-v1';
 export const SENTENCE_PRACTICE_WORKBOOK_KEY = 'sentence-practice';
 export const SENTENCE_TOKENIZER_VERSION = 'order-tokens-v2';
@@ -39,6 +42,11 @@ export function mistakeAllowance(step, wordCount) {
 }
 
 export function stepUsesAudio(step) { return Number(step) === 1; }
+// Only step 1 shows the English sentence before ordering (the preview card).
+export function stepShowsPreview(step) { return Number(step) === 1; }
+// The same threshold that sets the step-2 tolerance also switches the
+// practice screen to its compact long-sentence layout.
+export function isLongSentence(wordCount) { return Number(wordCount) >= LONG_SENTENCE_WORD_THRESHOLD; }
 export function practiceItemKey(sentenceId) { return `sentence:${String(sentenceId ?? '').trim()}`; }
 export function practiceProgressKey(step) { return `sentence_order_step${Number(step)}`; }
 
@@ -89,16 +97,17 @@ export function attemptPayload(item, run) {
   return { sentenceId: item.sentenceId, step: run.step, arranged: builtSentence(item, run), mistakes: run.mistakes, restarts: run.restarts };
 }
 
-// The chips visible for the current batch. `orders` memoizes one shuffle per
-// batch so the chip positions do not jump while the student is working.
+// Every unplaced chip, in one shuffled order per run. `orders` memoizes the
+// shuffle so chip order does not change while the student works; the caller
+// passes a fresh object after a step-2 restart to reshuffle. Placed chips are
+// left out, so the remaining chips reflow without gaps.
 export function visibleChips(item, run, orders = {}, random = Math.random) {
-  let state = progressiveOrderState(item.words, item.answer, run.chosen, VISIBLE_CHIP_LIMIT);
-  if (!orders[state.batchIndex]) orders[state.batchIndex] = shuffleChangedOrder(state.batch, random);
-  state = progressiveOrderState(item.words, item.answer, run.chosen, VISIBLE_CHIP_LIMIT, orders[state.batchIndex]);
-  return { visible: state.visible, batchIndex: state.batchIndex, nextExpected: state.nextExpected };
+  if (!Array.isArray(orders.all) || orders.all.length !== item.words.length) orders.all = shuffleChangedOrder(item.words.map((_, index) => index), random);
+  const used = new Set(run.consumed);
+  return { visible: orders.all.filter(index => !used.has(index)) };
 }
 
-// Avoid presenting a batch of two or more chips already in sentence order.
+// Avoid presenting two or more chips already in sentence order.
 export function shuffleChangedOrder(batch, random = Math.random) {
   let shuffled = shuffleWorkbookOrderBatch(batch, random);
   for (let tries = 0; batch.length > 1 && tries < 8 && shuffled.every((value, index) => value === batch[index]); tries += 1) shuffled = shuffleWorkbookOrderBatch(batch, random);

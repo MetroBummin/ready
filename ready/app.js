@@ -1,21 +1,22 @@
 // READY Student: sentence-ordering practice (step 1 and step 2) only.
 import { attemptId, readyApi } from './api.js';
-import { attemptPayload, builtSentence, LONG_SENTENCE_WORD_THRESHOLD, placeWord, practiceItems, runIsClean, startRun, stepUsesAudio, visibleChips } from './sentence-practice.js?v=sentence-practice-1';
-import { sentenceAudioSupported, speakSentence, stopSentenceAudio } from './sentence-audio.js?v=sentence-practice-1';
-import { clearWorkbookCycleItem } from './workbook-progress.js?v=sentence-practice-1';
+import { attemptPayload, builtSentence, LONG_SENTENCE_WORD_THRESHOLD, placeWord, practiceItems, runIsClean, startRun, stepShowsPreview, stepUsesAudio, visibleChips } from './sentence-practice.js?v=sentence-practice-2';
+import { sentenceAudioSupported, speakSentence, stopSentenceAudio } from './sentence-audio.js?v=sentence-practice-2';
+import { clearWorkbookCycleItem } from './workbook-progress.js?v=sentence-practice-2';
+import { esc, feedbackSpeech, practiceScreenHtml, STEP_LABEL } from './practice-view.js?v=sentence-practice-2';
 
 const $ = selector => document.querySelector(selector);
-const esc = value => String(value ?? '').replace(/[&<>'"]/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[char]));
 const SESSION_KEY = 'ready-student-session';
 const ATTEMPT_QUEUE = 'ready-sentence-attempt-queue-v1:';
 // Disposable caches of the removed Reader/Workbook/Review client. Some held
 // whole Workbook catalogs and could fill the storage quota the attempt queue
 // needs. The old unsent Workbook attempt queue is left untouched.
 const LEGACY_CACHE_PREFIXES = ['ready-dashboard-cache-v1:', 'ready-passage-cache-v2:', 'ready-review-cache-v3:', 'ready-workbook-cache-v3:', 'ready-workbook-progress-floor-v2:', 'ready-last-passage:'];
-const MAX_FLUSH_DELAY = 60_000, TAP_SETTLE_MS = 280;
-const STEP_LABEL = { 1: '1단계 · 듣고 배열', 2: '2단계 · 혼자 배열' };
+const BOOKMARK_PREFIX = 'ready-practice-bookmarks-v1:student:', AUTOPLAY_KEY = 'ready-practice-autoplay';
+const MAX_FLUSH_DELAY = 60_000, TAP_SETTLE_MS = 280, DOUBLE_TAP_PX = 24, SWIPE_MIN_PX = 60;
 const state = { token: '', student: null, scope: null, passages: [], practice: null };
 let busyCount = 0, toastTimer, flushTimer = null, attemptQueue = [], flushing = null, wrongTimer = null, flushDelay = 1500;
+let settingsOpen = false, swipe = null, suppressClickUntil = 0;
 const passageCache = new Map();
 
 function busy(on, label = '잠시만요…') { busyCount = Math.max(0, busyCount + (on ? 1 : -1)); $('#busy').hidden = !busyCount; $('#busy span:last-child').textContent = label; }
@@ -36,6 +37,7 @@ async function safely(job, { auth = true } = {}) {
 function show(id) {
   ['student-home', 'student-sets', 'student-workbook'].forEach(section => { $('#' + section).hidden = section !== id; });
   document.body.classList.toggle('study-mode', id === 'student-workbook');
+  document.body.classList.remove('practice-mode');
   $('#logout').hidden = !state.token;
 }
 // The queue stays in localStorage under the student id, so attempts survive
@@ -93,6 +95,8 @@ async function loadHome() {
 }
 
 // ---------- Practice ----------
+// Step 1: preview card (English + audio, Korean behind a tap-to-reveal bar),
+// then ordering. Step 2: straight to ordering, no English and no audio.
 function current() { const practice = state.practice; return { practice, item: practice?.items[practice.index] }; }
 async function loadPassage(passageId) {
   try {
@@ -113,64 +117,74 @@ async function openPractice(passageId, step) {
   const passage = state.passages.find(candidate => candidate.id === passageId);
   if (passage && data.progress) passage.progress = data.progress;
   const cleared = new Set(stepProgress(passage || data, step).currentCycleClears || []), firstOpen = items.findIndex(item => !cleared.has(item.key));
-  state.practice = { passageId, title: data.passage?.title || passage?.title || '', step: Number(step), items, index: Math.max(0, firstOpen), run: null, orders: {}, feedback: null, cleanCount: 0, finishedCount: 0, done: false, settleUntil: 0 };
+  state.practice = { passageId, title: data.passage?.title || passage?.title || '', step: Number(step), items, index: Math.max(0, firstOpen), run: null, orders: {}, feedback: null, cleanCount: 0, finishedCount: 0, done: false, settleUntil: 0, lastPlace: null, phase: 'order', revealed: false };
   startItem({ focus: true });
 }
 function startItem({ focus = false } = {}) {
   const { practice, item } = current();
   if (!practice || !item) return;
-  practice.run = startRun(item, practice.step); practice.orders = {}; practice.feedback = null; practice.settleUntil = 0;
+  Object.assign(practice, { run: startRun(item, practice.step), orders: {}, feedback: null, settleUntil: 0, lastPlace: null, phase: stepShowsPreview(practice.step) ? 'preview' : 'order', revealed: false });
+  settingsOpen = false; clearTimeout(wrongTimer);
   stopSentenceAudio();
-  renderPractice({ focusChip: focus });
+  renderPractice({ focusId: focus ? (practice.phase === 'preview' ? 'begin' : 'chip') : null });
+  announce(practice.phase === 'preview' ? item.text : item.translation);
+  if (practice.phase === 'preview' && audioAvailable(practice) && autoplayOn()) speakSentence(item.text);
 }
-function feedbackHtml(practice, item) {
-  const feedback = practice.feedback, run = practice.run;
-  if (run.completed) {
-    const clean = runIsClean(run);
-    return `<div class="workbook-feedback ${clean ? 'correct' : 'wrong'}"><strong>${clean ? '완성했어요.' : '끝까지 완성했어요.'}</strong><span class="workbook-feedback-copy"><span lang="en">${esc(item.text)}</span>${clean ? '' : `<span>${practice.step === 1 ? `틀린 선택 ${run.mistakes}번` : `다시 시작 ${run.restarts}번`} · 다음에는 한 번에 해 보세요.</span>`}</span></div><div class="workbook-actions"><button class="button primary" type="button" data-practice-next>${practice.index === practice.items.length - 1 ? '결과 보기' : '다음 문장'}</button></div>`;
-  }
-  if (feedback?.type === 'mistake' && practice.step === 1) return `<small class="practice-note">그 단어는 아직 아니에요. 계속 골라 보세요.</small>`;
-  if (feedback?.type === 'mistake') return `<small class="workbook-order-feedback">한 번 틀렸어요. 한 번 더 틀리면 처음부터 다시 시작해요.</small>`;
-  if (feedback?.type === 'restart') return `<small class="workbook-order-feedback">틀렸어요. 처음부터 다시 배열하세요.</small>`;
-  return '';
+function beginOrdering() {
+  const { practice, item } = current();
+  if (!practice || practice.phase !== 'preview') return;
+  practice.phase = 'order'; settingsOpen = false;
+  // Chips appear where the card was; a tap that lands right away is ignored.
+  practice.settleUntil = performance.now() + TAP_SETTLE_MS;
+  renderPractice({ focusId: 'chip' });
+  announce(`배열하세요. ${item.translation}`);
 }
-function orderGroupHtml(practice, item) {
-  const run = practice.run, built = builtSentence(item, run), { visible } = visibleChips(item, run, practice.orders), used = new Set(run.consumed), wrong = practice.feedback?.wrongChip;
-  const bank = run.completed ? '' : visible.map(chip => `<span class="workbook-order-bank-slot${used.has(chip) ? ' used' : ''}${wrong === chip ? ' wrong' : ''}"><button type="button" data-chip="${chip}" aria-invalid="${wrong === chip}" ${used.has(chip) ? 'disabled' : ''}>${esc(item.words[chip])}</button></span>`).join('');
-  return `<span class="workbook-order-group${run.completed ? ' correct' : ''}" data-practice-group><span class="workbook-order-built" role="group" aria-label="배열한 문장"><span class="workbook-order-built-sizer" aria-hidden="true">${esc(item.answer)}</span><span class="workbook-order-built-text">${built ? esc(built) : '<em>단어를 순서대로 누르세요</em>'}</span></span><span class="workbook-order-bank" aria-label="선택할 단어">${bank}</span></span>`;
-}
-// Every tap re-renders the card, which would drop keyboard and screen-reader
-// focus on <body>. Focus moves to the same chip (or the first open one).
-function renderPractice({ focusChip = false } = {}) {
+function audioAvailable(practice) { return stepUsesAudio(practice.step) && sentenceAudioSupported(); }
+// Every tap re-renders the screen, which would drop keyboard and screen-reader
+// focus on <body>. Focus returns to the same control, or for a chip to the chip
+// now at the same position in the bank (placed chips leave the bank).
+function renderPractice({ focusId = null } = {}) {
   const { practice, item } = current();
   if (!practice) return renderHome();
   if (practice.done) return renderSummary();
-  const active = document.activeElement, chipFocused = Boolean(active?.closest?.('#student-workbook') && active.dataset?.chip !== undefined);
-  const previousChip = chipFocused ? active.dataset.chip : null;
-  show('student-workbook');
-  const run = practice.run, audio = stepUsesAudio(practice.step) && sentenceAudioSupported() ? '<button class="button quiet practice-audio" type="button" data-play-audio aria-label="영어 문장 듣기">▶ 문장 듣기</button>' : '';
-  const tolerance = practice.step === 2 ? `<span class="practice-rule">${run.allowance ? '한 번 틀려도 됨' : '틀리면 다시 시작'}</span>` : '';
-  $('#student-workbook').innerHTML = `<button class="study-back" type="button" data-exit-practice aria-label="목록으로"><span aria-hidden="true">‹</span></button><div class="workbook-study-layout"><header class="workbook-study-head workbook-study-toolbar"><span class="workbook-state"><b>${practice.index + 1} / ${practice.items.length}</b><span class="practice-step-meta"><span class="workbook-order-mode" data-practice-step="${practice.step}">${STEP_LABEL[practice.step]}</span>${tolerance}</span></span></header><section class="workbook-card workbook-focus-card" data-practice-item="${esc(item.key)}"><blockquote lang="ko">${esc(item.translation)}</blockquote>${audio}<div class="workbook-prompt order-task" lang="en">${orderGroupHtml(practice, item)}</div><div data-practice-outcome>${feedbackHtml(practice, item)}</div></section></div>`;
-  if (run.completed) $('[data-practice-next]')?.focus({ preventScroll: true });
-  else if (chipFocused || focusChip) ($(`[data-chip="${previousChip}"]:not([disabled])`) || $('[data-chip]:not([disabled])'))?.focus({ preventScroll: true });
+  const active = document.activeElement, inScreen = Boolean(active?.closest?.('#student-workbook'));
+  const chipsBefore = [...document.querySelectorAll('#student-workbook [data-chip]')], chipPosition = Math.max(0, chipsBefore.indexOf(active));
+  const keep = focusId || (inScreen ? (active.dataset?.chip !== undefined ? 'chip' : active.dataset?.focusId) : null);
+  show('student-workbook'); document.body.classList.add('practice-mode');
+  const run = practice.run;
+  $('#student-workbook').innerHTML = practiceScreenHtml({
+    step: practice.step, phase: practice.phase, item, run, allowance: run.allowance,
+    chips: visibleChips(item, run, practice.orders).visible, wrongChip: practice.feedback?.wrongChip ?? null, feedback: practice.feedback,
+    built: builtSentence(item, run), clean: runIsClean(run), done: practice.index + (run.completed ? 1 : 0), total: practice.items.length,
+    isLast: practice.index === practice.items.length - 1, revealed: practice.revealed,
+    audio: stepUsesAudio(practice.step) && sentenceAudioSupported(), bookmarked: bookmarks().has(item.key),
+    settingsOpen, autoplay: autoplayOn(), dark: document.body.classList.contains('dark'),
+  });
+  const screen = $('#student-workbook');
+  if (run.completed && keep !== 'bookmark' && keep !== 'settings' && !String(keep).startsWith('setting-')) return $('[data-practice-next]')?.focus({ preventScroll: true });
+  if (keep === 'chip') { const chips = [...screen.querySelectorAll('[data-chip]')]; return chips[Math.min(chipPosition, chips.length - 1)]?.focus({ preventScroll: true }); }
+  if (keep) screen.querySelector(`[data-focus-id="${CSS.escape(keep)}"]`)?.focus({ preventScroll: true });
 }
-const FEEDBACK_SPEECH = { 1: { mistake: '그 단어는 아직 아니에요.' }, 2: { mistake: '한 번 틀렸어요. 한 번 더 틀리면 처음부터 다시 시작해요.', restart: '틀렸어요. 처음부터 다시 배열하세요.' } };
-function tapChip(chipIndex) {
+function tapChip(chipIndex, point = null) {
   const { practice, item } = current();
-  if (!practice || !item || practice.run.completed) return;
-  // When a batch is replaced (or the sentence restarts) new chips appear under
-  // the finger; ignore a fast second tap so it is not counted as a mistake.
-  if (performance.now() < practice.settleUntil) return;
-  const before = visibleChips(item, practice.run, practice.orders).batchIndex;
+  if (!practice || !item || practice.phase !== 'order' || practice.run.completed) return;
+  const now = performance.now();
+  // After a restart every chip is reshuffled under the finger; ignore a fast
+  // second tap so it is not counted as a mistake.
+  if (now < practice.settleUntil) return;
+  // A placed chip leaves the bank and the next chip slides into its place. A
+  // second tap on the same spot right after a placement is a double tap.
+  const last = practice.lastPlace;
+  if (point && last && now - last.at < TAP_SETTLE_MS && Math.hypot(point.x - last.x, point.y - last.y) < DOUBLE_TAP_PX) return;
   const result = placeWord(item, practice.run, chipIndex);
   if (result.type === 'ignore') return;
   practice.run = result.run;
-  if (result.type === 'restart') practice.orders = {};
+  practice.lastPlace = result.type === 'correct' && point ? { ...point, at: now } : null;
+  if (result.type === 'restart') { practice.orders = {}; practice.settleUntil = now + TAP_SETTLE_MS; }
   practice.feedback = result.type === 'mistake' || result.type === 'restart' ? { type: result.type, wrongChip: result.type === 'mistake' ? chipIndex : null } : null;
   if (result.type === 'complete') finishItem(practice, item);
-  else if (result.type === 'restart' || visibleChips(item, practice.run, practice.orders).batchIndex !== before) practice.settleUntil = performance.now() + TAP_SETTLE_MS;
   renderPractice();
-  announce(result.type === 'complete' ? `완성했어요. ${item.text}` : FEEDBACK_SPEECH[practice.step]?.[result.type] || '');
+  announce(result.type === 'complete' ? `완성했어요. ${item.text}` : feedbackSpeech(practice.step, result.type));
   clearTimeout(wrongTimer);
   if (result.type === 'mistake') wrongTimer = setTimeout(() => { if (state.practice === practice && practice.feedback?.wrongChip === chipIndex) { practice.feedback = { ...practice.feedback, wrongChip: null }; renderPractice(); } }, 650);
 }
@@ -184,18 +198,43 @@ function finishItem(practice, item) {
 function nextItem() {
   const { practice } = current();
   if (!practice?.run?.completed) return;
-  if (practice.index >= practice.items.length - 1) { practice.done = true; stopSentenceAudio(); return renderSummary(); }
+  if (practice.index >= practice.items.length - 1) { practice.done = true; settingsOpen = false; stopSentenceAudio(); return renderSummary(); }
   practice.index += 1; startItem({ focus: true });
 }
 function renderSummary() {
   const practice = state.practice; show('student-workbook');
   const nextStep = practice.step === 1 ? '<button class="button quiet" type="button" data-practice-step2>2단계 시작</button>' : '';
   $('#student-workbook').innerHTML = `<button class="study-back" type="button" data-exit-practice aria-label="목록으로"><span aria-hidden="true">‹</span></button><div class="workbook-milestone-shell"><section class="workbook-milestone" aria-live="polite"><div class="workbook-milestone-mark"><span>${practice.cleanCount}/${practice.finishedCount}</span></div><p class="eyebrow">${esc(STEP_LABEL[practice.step])}</p><h1>${esc(practice.title)}</h1><p>${practice.finishedCount}문장을 완성했고, 그중 ${practice.cleanCount}문장은 한 번에 맞혔어요.</p><div class="workbook-milestone-actions"><button class="button primary" type="button" data-practice-repeat>다시 하기</button>${nextStep}<button class="button quiet" type="button" data-exit-practice>목록으로</button></div></section></div>`;
+  $('[data-practice-repeat]')?.focus({ preventScroll: true });
 }
 function restartSet(step) {
   const practice = state.practice; if (!practice) return;
   Object.assign(practice, { step, index: 0, done: false, cleanCount: 0, finishedCount: 0 });
   startItem({ focus: true });
+}
+
+// ---------- Practice settings and bookmarks (this device only) ----------
+// Bookmarks are a local list of sentence keys per student; nothing is sent to
+// the server. Auto-play is a device preference for step 1.
+function bookmarkKey() { return state.student?.id ? `${BOOKMARK_PREFIX}${state.student.id}` : ''; }
+function bookmarks() {
+  try { const saved = JSON.parse(localStorage.getItem(bookmarkKey()) || '[]'); return new Set(Array.isArray(saved) ? saved.filter(value => typeof value === 'string') : []); } catch { return new Set(); }
+}
+function toggleBookmark(itemKey) {
+  const key = bookmarkKey(), marks = bookmarks(); if (!key) return false;
+  if (marks.has(itemKey)) marks.delete(itemKey); else marks.add(itemKey);
+  try { if (marks.size) localStorage.setItem(key, JSON.stringify([...marks])); else localStorage.removeItem(key); } catch { /* storage full or disabled */ }
+  return marks.has(itemKey);
+}
+function autoplayOn() { try { return localStorage.getItem(AUTOPLAY_KEY) === '1'; } catch { return false; } }
+function setSettingsOpen(open, { focus = true } = {}) {
+  settingsOpen = open;
+  renderPractice({ focusId: focus ? (open ? 'setting-theme' : 'settings') : null });
+}
+function changeSetting(name) {
+  if (name === 'theme') theme(document.body.classList.contains('dark') ? 'light' : 'dark');
+  if (name === 'autoplay') { try { localStorage.setItem(AUTOPLAY_KEY, autoplayOn() ? '0' : '1'); } catch { /* storage disabled */ } }
+  renderPractice({ focusId: `setting-${name}` });
 }
 
 // ---------- Attempt queue (local-first, flushed in batches) ----------
@@ -248,25 +287,51 @@ async function flushAttempts({ keepalive = false } = {}) {
 
 // ---------- Events ----------
 document.addEventListener('click', event => {
+  // A swipe that ends on a button must not also press it.
+  if (performance.now() < suppressClickUntil) { event.preventDefault(); return; }
   const button = event.target.closest?.('button');
+  // An open settings panel closes on any tap outside it; that tap does nothing else.
+  if (settingsOpen && !event.target.closest?.('.practice-settings, [data-practice-settings]')) { event.preventDefault(); return setSettingsOpen(false, { focus: false }); }
   if (!button) return;
   if (button.id === 'theme-toggle') return theme(document.body.classList.contains('dark') ? 'light' : 'dark');
   if (button.id === 'logout') return logout();
   if (button.hasAttribute('data-home') && state.token) return state.scope || state.passages.length ? renderHome() : loadHome();
   if (button.hasAttribute('data-retry-home')) return loadHome();
   if (button.dataset.startStep) return openPractice(button.dataset.passage, Number(button.dataset.startStep));
-  if (button.dataset.chip !== undefined) return tapChip(Number(button.dataset.chip));
+  if (button.dataset.chip !== undefined) return tapChip(Number(button.dataset.chip), event.detail ? { x: event.clientX, y: event.clientY } : null);
   if (button.hasAttribute('data-play-audio')) { const { item } = current(); if (item) speakSentence(item.text); return; }
+  if (button.hasAttribute('data-practice-reveal')) { const { practice, item } = current(); if (!practice) return; practice.revealed = true; renderPractice({ focusId: 'reveal' }); return announce(item.translation); }
+  if (button.hasAttribute('data-practice-begin')) return beginOrdering();
+  if (button.hasAttribute('data-practice-bookmark')) { const { item } = current(); if (!item) return; const on = toggleBookmark(item.key); renderPractice({ focusId: 'bookmark' }); return announce(on ? '이 문장을 표시했어요.' : '표시를 지웠어요.'); }
+  if (button.hasAttribute('data-practice-settings')) return setSettingsOpen(!settingsOpen);
+  if (button.dataset.practiceSetting) return changeSetting(button.dataset.practiceSetting);
   if (button.hasAttribute('data-practice-next')) return nextItem();
   if (button.hasAttribute('data-practice-repeat')) return restartSet(state.practice.step);
   if (button.hasAttribute('data-practice-step2')) return restartSet(2);
-  if (button.hasAttribute('data-exit-practice')) { const passageId = state.practice?.passageId || ''; flushAttempts(); renderHome(); return $(`.passage-open[data-passage="${CSS.escape(passageId)}"]`)?.focus({ preventScroll: true }); }
+  if (button.hasAttribute('data-exit-practice')) { const passageId = state.practice?.passageId || ''; settingsOpen = false; flushAttempts(); renderHome(); return $(`.passage-open[data-passage="${CSS.escape(passageId)}"]`)?.focus({ preventScroll: true }); }
 });
 document.addEventListener('keydown', event => {
-  if (event.key !== 'Enter' || $('#student-workbook').hidden || event.isComposing) return;
+  if ($('#student-workbook').hidden || event.isComposing) return;
   const { practice } = current();
-  if (practice?.run?.completed && !practice.done) { event.preventDefault(); nextItem(); }
+  if (!practice || practice.done) return;
+  if (settingsOpen) { if (event.key === 'Escape') { event.preventDefault(); setSettingsOpen(false); } return; }
+  // Enter on another control (audio, star, settings, reveal) keeps its own meaning.
+  const otherControl = event.target.closest?.('button, [role="switch"]') && !event.target.closest('[data-practice-begin], [data-practice-next]');
+  if (practice.phase === 'preview' && (event.key === 'ArrowRight' || (event.key === 'Enter' && !otherControl))) { event.preventDefault(); return beginOrdering(); }
+  if (event.key === 'Enter' && practice.run?.completed && !otherControl) { event.preventDefault(); nextItem(); }
 });
+// Step-1 preview: swiping left anywhere on the card starts ordering.
+document.addEventListener('pointerdown', event => {
+  const { practice } = current();
+  swipe = practice && !practice.done && practice.phase === 'preview' && !settingsOpen && event.isPrimary && event.button === 0 && event.target.closest?.('#student-workbook .practice-screen')
+    ? { id: event.pointerId, x: event.clientX, y: event.clientY } : null;
+});
+document.addEventListener('pointerup', event => {
+  if (!swipe || event.pointerId !== swipe.id) return;
+  const dx = event.clientX - swipe.x, dy = event.clientY - swipe.y; swipe = null;
+  if (dx <= -SWIPE_MIN_PX && Math.abs(dy) < Math.abs(dx)) { suppressClickUntil = performance.now() + TAP_SETTLE_MS; beginOrdering(); }
+});
+document.addEventListener('pointercancel', () => { swipe = null; });
 document.addEventListener('submit', event => { event.preventDefault(); if (event.target.id === 'student-code-form') login(event.target); });
 window.addEventListener('pagehide', () => { stopSentenceAudio(); flushAttempts({ keepalive: true }); });
 document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden') { stopSentenceAudio(); flushAttempts({ keepalive: true }); } });
