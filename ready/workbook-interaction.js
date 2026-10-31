@@ -1,24 +1,10 @@
-import { normalizeWorkbookOrderAnswer } from './deterministic-grading.js?v=word-order-numeric-1';
+import { normalizeWorkbookOrderAnswer } from './deterministic-grading.js';
 
+// Word-order chip mechanics reused from the former Workbook `word_order`
+// stage. A "group" is the list of chips; `answer` is the expected sentence.
+// Chips are matched by normalized text, so duplicate words (for example two
+// "the" chips) are interchangeable.
 const clean=value=>normalizeWorkbookOrderAnswer(value);
-
-// Legacy generated catalogs used a standalone marker followed by a forced
-// period. Remove only that presentation artifact, never source punctuation
-// adjacent to a marker or punctuation inside a numeric chip.
-export function workbookOrderDisplayPrompt(prompt=''){
-  return String(prompt??'').replace(/^(\s*⟦ORDER:\d+⟧)\.(\s*)$/u,'$1$2');
-}
-
-export function workbookEnterAction(values=[],currentIndex=0,result=null){
-  if(result)return result.correct?{type:'next'}:{type:'retry'};
-  const normalized=values.map(value=>String(value??'').trim());
-  if(normalized.every(Boolean))return {type:'submit'};
-  for(let offset=1;offset<=normalized.length;offset+=1){
-    const index=(currentIndex+offset)%normalized.length;
-    if(!normalized[index])return {type:'focus',index};
-  }
-  return {type:'submit'};
-}
 
 export function workbookOrderAnswerIndexes(group=[],answer=''){
   const unused=new Set(group.map((_,index)=>index));
@@ -37,6 +23,9 @@ export function workbookOrderTokenMatches(group=[],expectedIndex=-1,clickedIndex
   return Boolean(expected)&&expected===clicked;
 }
 
+// `practice: true` keeps a wrong chip out of the built sentence and reports
+// `practice-wrong`, so the caller decides whether the student continues
+// (step 1, tolerated step-2 mistake) or restarts (step 2).
 export function workbookOrderClick(group=[],answer='',chosen=[],consumed=[],chipIndex=-1,{practice=false}={}){
   const progressive=progressiveOrderState(group,answer,chosen),nextChosen=[...chosen],nextConsumed=[...consumed];
   if(!Number.isInteger(chipIndex)||chipIndex<0||chipIndex>=group.length||nextConsumed.includes(chipIndex)||progressive.nextExpected<0)return {type:'ignore',chosen:nextChosen,consumed:nextConsumed};
@@ -60,6 +49,8 @@ export function shuffleWorkbookOrderBatch(batch=[],random=Math.random){
   return shuffled;
 }
 
+// Long sentences are shown in consecutive batches of 4-6 chips. Every word of
+// the sentence is still placed; only the next batch is visible at a time.
 export function progressiveOrderState(group=[],answer='',chosen=[],visibleCount=6,batchOrder=[]){
   const expected=workbookOrderAnswerIndexes(group,answer),limit=Math.max(4,Math.min(6,Number(visibleCount)||6));
   if(!expected.length)return {expected,visible:group.map((_,index)=>index),batch:[],batchIndex:0,nextExpected:-1};

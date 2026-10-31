@@ -1,34 +1,68 @@
 # READY
 
-고려에듀의 지문 중심 영어 문제 풀이와 인터랙티브 워크북입니다.
+고려에듀의 영어 문장 배열 연습 앱입니다. 학생은 한국어 문장을 보고 영어 문장 전체를 단어 단위로 배열합니다. 관사(a, an, the)를 포함한 모든 단어가 칩으로 나옵니다.
 
-## UI 개발 원칙
+- **1단계 · 듣고 배열:** 영어 문장 소리를 들을 수 있습니다. 틀린 칩은 조용히 표시되고 그대로 계속 진행합니다.
+- **2단계 · 혼자 배열:** 소리가 없습니다. 틀리면 그 문장을 처음부터 다시 배열합니다. 12단어 이상 문장은 한 번까지 틀려도 되고, 두 번째에 다시 시작합니다. 기준값은 `ready/sentence-practice.js`의 `LONG_SENTENCE_WORD_THRESHOLD` 하나입니다.
 
-Student 또는 Admin UI를 변경하기 전에 반드시 [`DESIGN.md`](./DESIGN.md)를 먼저 읽습니다. 현재 시각 구조와 기능 보존 경계는 [`UI_AUDIT.md`](./UI_AUDIT.md), 정적 컴포넌트 기준은 [`design-preview.html`](./design-preview.html), 의미 토큰의 기준값은 [`design-tokens.css`](./design-tokens.css)에 있습니다. 실제 READY 표현 계층은 [`ready/design.css`](./ready/design.css)에, 런타임이 요구하는 구조·동작 호환 규칙만 [`ready/ready.css`](./ready/ready.css)에 둡니다.
+단계가 원래 어디에 있었는지, 무엇을 재사용했고 무엇을 지웠는지는 [`PRACTICE_NOTES.md`](./PRACTICE_NOTES.md)에 있습니다.
 
-시각 개편은 기존 Question Contract와 Interaction Contract의 표현 계층만 다룹니다. importer, validator, renderer 데이터 계약, grader, Attempt, READY/DROP, source filter, Shorts navigation, Workbook, authentication, API, DB를 디자인 때문에 다시 작성하거나 확장하지 않습니다.
+## 구성
 
-이 저장소가 READY의 단일 배포 기준입니다.
-
-- `ready/`: 학생 화면과 관리자 화면
-- `server/ready/`: READY API의 실제 로직
+- `ready/`: 학생 화면(`index.html`, `app.js`)과 최소 관리자 화면(`admin/`: 학생, 문장 세트, 시험범위, 연습 현황)
+- `ready/sentence-practice.js`: 1·2단계 규칙. 학생 화면, 서버, 테스트가 같은 파일을 씁니다.
+- `ready/sentence-audio.js`: 1단계 소리. 기기의 Web Speech API를 쓰며 서버나 API key가 필요 없습니다.
+- `server/ready/`: READY API (`index.ts`, `auth-core.mjs`)
 - `supabase/functions/ready/`: Supabase 배포 진입점
-- `tools/`: PDF 추출, 검증, 정적 사이트 빌드
-- `tests/`: 문제 명세·워크북·API 계약 검증
+- `tools/build-pages.mjs`: 정적 사이트 빌드
+- `tests/`: 단계 규칙 unit test, PGlite API 통합 test, 정적 surface test, native shell test
+
+## UI 원칙
+
+Student 또는 Admin UI를 바꾸기 전에 [`DESIGN.md`](./DESIGN.md)를 읽습니다. 의미 토큰은 [`design-tokens.css`](./design-tokens.css), 표현 계층은 [`ready/design.css`](./ready/design.css), 런타임 구조 규칙은 [`ready/ready.css`](./ready/ready.css)에 있습니다.
 
 ## 로컬 확인
 
 ```sh
-npm test
+npm test            # unit + surface + API 통합 (PGlite, 네트워크 없음)
+npm run ready:test  # npm test + native shell 검사 (CI와 동일)
 npm run build
+npm run native:verify
 npm run dev
 ```
 
-로컬 주소는 `http://localhost:4173/ready/`입니다.
+로컬 주소는 `http://localhost:4173/ready/`입니다. 로컬 화면도 `ready/config.js`의 운영 API를 사용합니다.
 
 ## 배포 원칙
 
-`main`에 푸시하면 먼저 전체 READY 검증을 수행한 뒤 GitHub Pages를 배포합니다.
-API는 같은 커밋의 `server/ready/`를 Supabase Edge Function으로 배포합니다. API 자동 배포에는 저장소의 `SUPABASE_ACCESS_TOKEN` secret이 필요합니다.
+`main`에 푸시하면 `npm run ready:test`와 `npm run build`를 통과한 뒤 GitHub Pages를 배포합니다. API는 같은 커밋의 `server/ready/`를 Supabase Edge Function으로 배포하며 저장소의 `SUPABASE_ACCESS_TOKEN` secret이 필요합니다. 학생 화면은 배포 주소의 루트에, 관리자 화면은 `/admin/`에 놓입니다.
 
-GitHub Pages용 결과물은 `dist/`에 생성되며, 학생 화면은 배포 주소의 루트에, 관리자 화면은 `/admin/`에 놓입니다.
+## 데이터베이스
+
+테이블은 삭제하지 않았고 새 migration도 없습니다. 연습 기록은 기존 `ready_workbook_attempts`에 `workbook_key = 'sentence-practice'`로 append-only 저장되고, 기존 trigger가 단계별 진도(`ready_workbook_stage_progress`, `ready_workbook_cycle_item_clears`)를 갱신합니다.
+
+사용 중인 테이블: `ready_students`, `ready_sessions`, `ready_login_attempts`, `ready_exams`, `ready_exam_passages`, `ready_passages`, `ready_passage_sentences`, `ready_workbook_attempts`, `ready_workbook_stage_progress`, `ready_workbook_cycle_item_clears`.
+
+## Dormant database tables
+
+아래 테이블은 앱이 더 이상 읽거나 쓰지 않지만 데이터와 함께 그대로 남아 있습니다.
+
+- `ready_questions`
+- `ready_attempts`
+- `ready_question_bookmarks`
+- `ready_ai_grading_requests`
+- `ready_word_lookup_events`
+- `ready_saved_words`
+- `ready_saved_word_senses`
+- `ready_word_states`
+- `ready_word_cache`
+- `ready_saved_sentences`
+- `ready_sentence_translation_view_events`
+- `ready_sentence_learning_cache`
+- `ready_workbook_bookmarks`
+- `ready_workbook_ai_grading_requests`
+- `ready_workbook_catalogs`
+- `ready_workbook_factory_jobs`
+- `ready_content_facts`
+- `ready_content_claims`
+- `ready_content_claim_variants`

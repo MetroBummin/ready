@@ -1,438 +1,213 @@
+// READY Student: sentence-ordering practice (step 1 and step 2) only.
 import { readyApi } from './api.js';
-import { koreanRecallCompositionState, livePrefixState, verifierMatches, workbookRecallCue, workbookRecallIsPendingJamo, workbookSlotCh } from './workbook-assistance.js?v=workbook-composition-1';
-import { createReaderInlineGloss, readerGestureDecision, readerSentenceMarkup } from './reader-inline-gloss.js?v=reader-word-panel-followup-2';
-import { gradeLocalWorkbook, gradeWorkbookCorrectionPairs, revealLocalWorkbook } from './deterministic-grading.js?v=word-order-numeric-1';
-import { reviewExportDocumentHtml } from './review-export.js?v=review-pdf-1';
-import { workbookWritingHtml, renderWritingPrefixState } from './workbook-writing-ui.js?v=workbook-keyboard-1';
-import { clearWorkbookCycleItem, reconcileWorkbookProgress, workbookCycleMilestone, workbookProgressPercent, workbookProgressVisual } from './workbook-progress.js?v=unique-cycle-1';
-import { progressiveOrderState, shuffleWorkbookOrderBatch, workbookEnterAction, workbookOrderClick, workbookOrderDisplayPrompt } from './workbook-interaction.js?v=word-order-numeric-1';
-import { captureWorkbookOrderMode, workbookSemanticType } from './workbook-order-practice.js?v=word-order-practice-mode-1';
-import { contentClaimEvidence, gradeContentClaim } from './content-claim.js?v=content-claim-variant-1';
-import { presentPassageTitle } from './passage-presentation.js?v=mock-exam-number-1';
-import { groupWorkbookStages } from './workbook-stage-picker.js?v=category-carousel-1';
+import { attemptPayload, builtSentence, LONG_SENTENCE_WORD_THRESHOLD, placeWord, practiceItems, runIsClean, startRun, stepUsesAudio, visibleChips } from './sentence-practice.js?v=sentence-practice-1';
+import { sentenceAudioSupported, speakSentence, stopSentenceAudio } from './sentence-audio.js?v=sentence-practice-1';
+import { clearWorkbookCycleItem } from './workbook-progress.js?v=sentence-practice-1';
 
-const $=selector=>document.querySelector(selector);
-const esc=value=>String(value??'').replace(/[&<>'"]/g,char=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[char]));
-const SESSION_KEY='ready-student-session';
-const CACHE_INDEX='ready-passage-cache-v2:';
-const DASHBOARD_CACHE='ready-dashboard-cache-v1:';
-const WORKBOOK_CACHE='ready-workbook-cache-v3:';
-const WORKBOOK_PROGRESS_FLOOR='ready-workbook-progress-floor-v2:';
-const WORKBOOK_ATTEMPTS='ready-workbook-attempt-queue-v1:';
-const REVIEW_CACHE='ready-review-cache-v3:';
-const state={token:'',student:null,scope:null,passages:[],resume:null,passage:null,sentences:[],savedWords:[],workbookSession:null,reviewData:null,reviewLoading:{},reviewValidated:{},reviewErrors:{},reviewExportData:null,reviewKind:'word',reviewCount:0};
-let busyCount=0,toastTimer,readerGlossController=null,workbookFlushTimer=null,workbookAttemptQueue=[],workbookAttemptFlight=null,navigationEpoch=0;
-const navPointers=new Map();
-let lastNavGesture=null;
+const $ = selector => document.querySelector(selector);
+const esc = value => String(value ?? '').replace(/[&<>'"]/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[char]));
+const SESSION_KEY = 'ready-student-session';
+const ATTEMPT_QUEUE = 'ready-sentence-attempt-queue-v1:';
+const STEP_LABEL = { 1: '1단계 · 듣고 배열', 2: '2단계 · 혼자 배열' };
+const state = { token: '', student: null, scope: null, passages: [], practice: null };
+let busyCount = 0, toastTimer, flushTimer = null, attemptQueue = [], flushing = null, wrongTimer = null;
 
-function beginNavigation(){navigationEpoch+=1;return navigationEpoch;}
-function navigationIsCurrent(epoch){return epoch===navigationEpoch;}
-// Breeze-style ownership: movement beyond 10px or any native scroll owns the gesture.
-function beginNavPointer(event){
-  if(event.pointerType==='mouse'&&event.button!==0)return;
-  lastNavGesture=null;
-  navPointers.set(event.pointerId,{startX:event.clientX,startY:event.clientY,startScrollX:window.scrollX,startScrollY:window.scrollY,maxDistance:0,scrollChanged:false});
-}
-function moveNavPointer(event){
-  const pointer=navPointers.get(event.pointerId);
-  if(!pointer)return;
-  const distance=Math.hypot(event.clientX-pointer.startX,event.clientY-pointer.startY);
-  pointer.maxDistance=Math.max(pointer.maxDistance,distance);
-  pointer.scrollChanged=pointer.scrollChanged||pointer.startScrollX!==window.scrollX||pointer.startScrollY!==window.scrollY;
-}
-function markNavScroll(){for(const pointer of navPointers.values())pointer.scrollChanged=true;}
-function finishNavPointer(event,cancelled=false){
-  const pointer=navPointers.get(event.pointerId);if(!pointer)return;
-  pointer.maxDistance=Math.max(pointer.maxDistance,Math.hypot(event.clientX-pointer.startX,event.clientY-pointer.startY));
-  const decision=readerGestureDecision({maxDistance:pointer.maxDistance,scrollChanged:pointer.scrollChanged,cancelled,released:true,sentenceEnabled:false});
-  lastNavGesture={decision,tailClickUsed:false};
-  navPointers.delete(event.pointerId);
-}
-function guardNavTailClick(event){
-  if(event.detail===0||!lastNavGesture||lastNavGesture.tailClickUsed)return;
-  // Consume by pointer sequence identity, not a timer that can swallow the next real tap.
-  lastNavGesture.tailClickUsed=true;
-  if(lastNavGesture.decision!=='SCROLL')return;
-  event.preventDefault();event.stopImmediatePropagation();
-}
-
-function busy(on,label='잠시만요…'){busyCount=Math.max(0,busyCount+(on?1:-1));$('#busy').hidden=!busyCount;$('#busy span:last-child').textContent=label;}
-function toast(message,ms=1900){const node=$('#toast');node.textContent=message;node.classList.add('on');clearTimeout(toastTimer);toastTimer=setTimeout(()=>node.classList.remove('on'),ms);}
-function theme(next){const dark=next==='dark';document.documentElement.classList.toggle('dark',dark);document.body.classList.toggle('dark',dark);localStorage.setItem('ready-theme',next);}
-async function call(op,data={},token=state.token,label='잠시만요…'){busy(true,label);try{return await readyApi(op,data,token);}finally{busy(false);}}
-function record(op,data={}){readyApi(op,data,state.token).catch(()=>{});}
-function dashboardCacheKey(){return `${DASHBOARD_CACHE}${state.token.slice(-12)}`;}
-function clearSession(){beginNavigation();clearTimeout(workbookFlushTimer);workbookFlushTimer=null;workbookAttemptQueue=[];workbookAttemptFlight=null;if(state.token)localStorage.removeItem(dashboardCacheKey());localStorage.removeItem(SESSION_KEY);Object.assign(state,{token:'',student:null,scope:null,passages:[],resume:null,passage:null,sentences:[],savedWords:[],workbookSession:null,reviewData:null,reviewLoading:{},reviewValidated:{},reviewErrors:{},reviewExportData:null,reviewKind:'word',reviewCount:0});}
-async function safely(job,{auth=true}={}){try{return await job();}catch(error){if(auth&&error.status===401){clearSession();showStudentLogin();}toast(error.message||'요청을 처리하지 못했습니다.',3600);return null;}}
-function show(...ids){if(!ids.some(id=>['student-reader','student-workbook'].includes(id))&&readerGlossController){readerGlossController.destroy();readerGlossController=null;}['student-home','student-sets','student-review','student-reader','student-workbook','student-library'].forEach(id=>$('#'+id).hidden=!ids.includes(id));document.body.classList.toggle('study-mode',ids.includes('student-reader')||ids.includes('student-workbook'));}
-function updateStudentNav(){const nav=$('#student-nav');nav.hidden=!state.token;$('#logout').hidden=!state.token;const review=nav.querySelector('[data-student-route="review"]');if(review)review.innerHTML=`Review${state.reviewCount?` <span>${state.reviewCount}</span>`:''}`;}
-
-function showStudentLogin(){show('student-home');updateStudentNav();requestAnimationFrame(()=>$('#student-code')?.focus());}
-async function login(form){const values=Object.fromEntries(new FormData(form)),data=await safely(()=>call('student_login',{code:values.code,remember:true},'','학생 코드를 확인하는 중…'),{auth:false});form.reset();$('#student-code').blur();if(!data)return;state.token=data.session.token;state.student=data.student;localStorage.setItem(SESSION_KEY,JSON.stringify(data.session));await loadDashboard();}
-function applyDashboard(data){const previousIdentity=`${state.student?.id||''}:${state.scope?.id||''}`,nextIdentity=`${data.student?.id||''}:${data.scope?.id||''}`;if(previousIdentity!==nextIdentity)Object.assign(state,{reviewData:null,reviewLoading:{},reviewValidated:{},reviewErrors:{},reviewKind:'word'});state.student=data.student;state.scope=data.scope;state.passages=data.passages||[];state.resume=data.resume||null;state.savedWords=data.savedWords||[];state.reviewCount=Number(data.reviewCount)||0;updateStudentNav();renderScope();}
-async function loadDashboard(){restoreWorkbookAttempts();const navigation=beginNavigation();let cached=null;try{cached=JSON.parse(localStorage.getItem(dashboardCacheKey())||'null');}catch{}if(cached?.student&&state.token)applyDashboard(cached);const data=await safely(()=>(cached?readyApi('student_bootstrap_active',{},state.token):call('student_bootstrap_active',{},state.token,'학습 범위를 준비하는 중…')));if(!data||!navigationIsCurrent(navigation))return;applyDashboard(data);try{localStorage.setItem(dashboardCacheKey(),JSON.stringify(data));}catch{}prefetchWorkbooks();prefetchReview();restoreWorkbookAttempts();flushWorkbookAttempts();}
-
-function hasWorkbook(passage){return passage?.has_workbook===true;}
-function passageChoice(passage,index){const workbook=hasWorkbook(passage),kind=passage.source_type==='TEXTBOOK'?'교과서 본문':'모의고사',availability=workbook?'Workbook 학습 가능':'지문 읽기',presentation=presentPassageTitle(passage),copy=presentation?`<span class="passage-copy passage-exam-copy"><strong class="passage-exam-number">${esc(presentation.questionLabel)}</strong><small class="passage-exam-meta">${esc(presentation.metaLabel||kind)}</small><span class="sr-only">${esc(`${kind} · ${availability}`)}</span></span>`:`<span class="passage-copy"><strong class="${passage.source_type==='MOCK_EXAM'?'passage-title-wrap':''}">${esc(passage.title)}</strong><small>${kind} · ${availability}</small></span>`;return `<article class="passage-row${presentation?' passage-row-mock':''}"><button class="passage-open" type="button" data-start-passage="${passage.id}">${presentation?'':`<span class="passage-index">${String(index+1).padStart(2,'0')}</span>`}${copy}<b aria-hidden="true">›</b></button>${workbook?`<div class="passage-actions"><button class="passage-workbook" type="button" data-start-workbook="${passage.id}">시작하기</button></div>`:''}</article>`;}
-function scopePassagesHtml(){const blocks=[];for(let index=0;index<state.passages.length;){const passage=state.passages[index];if(!passage.groupKey){blocks.push(`<div class="passage-list">${passageChoice(passage,index)}</div>`);index+=1;continue;}const start=index,group=[];while(index<state.passages.length&&state.passages[index].groupKey===passage.groupKey){group.push(state.passages[index]);index+=1;}blocks.push(`<details class="student-scope-group" open><summary><strong>${esc(passage.groupLabel)}</strong><span><small>${group.length}지문</small><b aria-hidden="true">⌄</b></span></summary><div class="passage-list">${group.map((item,offset)=>passageChoice(item,start+offset)).join('')}</div></details>`);}return `<div class="scope-passage-layout">${blocks.join('')}</div>`;}
-function renderScope(){state.workbookSession=null;show('student-sets');const content=!state.scope?'<div class="empty scope-empty"><strong>아직 배정된 시험범위가 없습니다.</strong></div>':state.passages.length?scopePassagesHtml():'<div class="empty scope-empty"><strong>아직 배정된 지문이 없습니다.</strong></div>',resume=state.resume?`<section class="student-resume"><div><p class="eyebrow">RESUME</p><strong>${esc(state.resume.passageTitle)}</strong><span>${state.resume.stage?'Workbook 이어서 학습':'이어서 학습하기'}</span></div><button class="button primary" type="button" data-start-workbook="${esc(state.resume.passageId)}">이어서 하기</button></section>`:'';$('#student-sets').innerHTML=`${resume}<div class="home-head"><span>학습할 지문</span><small>${state.scope?`${esc(state.student.school)} · ${esc(state.student.grade)} · ${state.passages.length}개`:''}</small></div><div class="home-content">${content}</div>`;}
-
-function workbookCurrent(){const session=state.workbookSession,stage=session?.data.stages[session.stageIndex];return {session,stage,item:stage?.items[session.itemIndex]};}
-function workbookStageLabel(stage){return String(stage?.title||stage?.instruction||'Workbook').replace(/^\s*\d+\s*단계\s*[·:—-]?\s*/,'')||'Workbook';}
-function workbookProgressStyle(stage){const progress=workbookProgressVisual(stage?.progressPercent);return {progress,className:`progress-cycle-${progress.cycle}`,style:`--workbook-progress:${progress.fill}%`};}
-function workbookValues(session,item){return session.responses[item.key]||Array(item.slotCount).fill('');}
-function workbookSlotState(result,index){return result?(result.slotResults?.[index]?'correct':'wrong'):'';}
-function workbookAssistanceState(session,item){session.assistance??={};return session.assistance[item.key]??={hintCount:0,usedFullAnswerHint:false,hintReceipt:'',hints:{},live:{},requestSequence:{}};}
-function ensureWorkbookAssistance(session,item){return !item?.assistance?.mode||Array.isArray(item.assistance.slots);}
-function workbookBlankHtml(item,values,result,session,lookupText=null){const assistance=workbookAssistanceState(session,item),recall=item.assistance?.mode==='recall_unlock',live=item.assistance?.mode==='prefix_typing',verbForm=item.semanticType==='verb_form';let slot=0;return String(item.prompt||'').split(/_{5,}/).map((part,index,all)=>{const copy=lookupText&&/[A-Za-z]/.test(part)?lookupText(part,`prompt:${index}`):esc(part);if(index===all.length-1)return copy;const value=values[slot]||'',expected=result?.answers?.[slot]||'',reserved=item.grading?.answers?.[slot]||expected,hint=item.hints?.[slot],status=workbookSlotState(result,slot),measure=[hint,reserved,'답'].reduce((longest,candidate)=>workbookSlotCh(candidate)>workbookSlotCh(longest)?candidate:longest,''),slotCh=workbookSlotCh(measure),liveState=assistance.live?.[slot],input=`<span class="workbook-blank ${status}${verbForm?' verb-form-slot':''}${verbForm&&slot===0?' verb-form-leading-slot':''}${recall?' recall-slot':''}${live&&liveState?.valid===false?' live-mismatch':''}${slotCh>24?' long-slot':''}" data-workbook-fixed-width="true" style="--workbook-slot-ch:${slotCh}"><input type="text" data-workbook-slot="${slot}" ${recall?`data-workbook-recall="${esc(item.assistance.recallMode)}"`:''} ${live?'data-workbook-live-prefix="true"':''} value="${esc(value)}" placeholder="${esc(hint||'')}" aria-label="빈칸 ${slot+1}${hint?` (${esc(hint)})`:''}" ${result?'data-workbook-graded="true" aria-readonly="true"':''} autocomplete="off" autocapitalize="off" enterkeyhint="${slot<item.slotCount-1?'next':'done'}" spellcheck="false">${live&&liveState?.valid===false?`<small class="workbook-live-copy"><span>${esc(value.slice(0,liveState.mismatchIndex))}</span><b>${esc(value.slice(liveState.mismatchIndex))}</b></small>`:''}${assistance.hints?.[slot]?`<small class="workbook-slot-hint">힌트: ${esc(assistance.hints[slot])}</small>`:''}${result&&status==='wrong'?`<small class="workbook-answer">정답: ${esc(expected)}</small>`:''}</span>`;slot+=1;return copy+input;}).join('');}
-function workbookChoiceHtml(item,values,result,lookupText=null){let partIndex=0;return String(item.prompt||'').split(/(⟦CHOICE:\d+⟧)/).map(part=>{const marker=part.match(/^⟦CHOICE:(\d+)⟧$/);if(!marker){const index=partIndex++;return lookupText&&/[A-Za-z]/.test(part)?lookupText(part,`prompt:${index}`):esc(part);}const index=Number(marker[1]),status=workbookSlotState(result,index),options=item.groups?.[index]||[];return `<span class="workbook-choice-group ${status}" role="group" aria-label="둘 중 하나 선택 ${index+1}">${options.map((option,optionIndex)=>`<button type="button" data-workbook-choice-group="${index}" data-workbook-choice-value="${esc(option)}" class="workbook-choice${values[index]===option?' selected':''}" aria-pressed="${values[index]===option}" ${result?'disabled':''}><span>${esc(option)}</span>${values[index]===option?'<b aria-hidden="true">✓</b>':''}</button>${optionIndex===0?'<i class="workbook-choice-or" aria-hidden="true">또는</i>':''}`).join('')}${result&&status==='wrong'?`<small>정답: ${esc(result.answers[index])}</small>`:''}</span>`;}).join('');}
-function workbookCorrectionHtml(item,values,result,lookupText=null){const prompt=lookupText&&/[A-Za-z]/.test(item.prompt)?lookupText(item.prompt,'prompt:0'):esc(item.prompt),type=item.subtype==='grammar'?'어법':item.subtype==='context'?'문맥':'표현',instruction=item.subtype==='grammar'?'어법상 어색한 표현을 찾아 바르게 고치세요.':item.subtype==='context'?'문맥상 어색한 표현을 찾아 바르게 고치세요.':'어색한 표현을 찾아 바르게 고치세요.';return `<p class="workbook-correction-instruction"><strong>${type}</strong><span>${instruction}</span></p><div class="workbook-task-passage" lang="en">${prompt}</div><div class="workbook-correction-list">${Array.from({length:item.pairCount},(_,pair)=>{const wrongIndex=pair*2,correctIndex=wrongIndex+1,status=result?(result.slotResults?.[wrongIndex]&&result.slotResults?.[correctIndex]?'correct':'wrong'):'';return `<div class="workbook-correction-row ${status}"><span>${pair+1}</span><label>어색한 표현<input type="text" data-workbook-slot="${wrongIndex}" value="${esc(values[wrongIndex]||'')}" ${result?'data-workbook-graded="true" aria-readonly="true"':''} enterkeyhint="next" autocomplete="off" autocapitalize="off" spellcheck="false"></label><b aria-hidden="true">→</b><label>바르게 고치기<input type="text" data-workbook-slot="${correctIndex}" value="${esc(values[correctIndex]||'')}" ${result?'data-workbook-graded="true" aria-readonly="true"':''} enterkeyhint="${correctIndex<item.slotCount-1?'next':'done'}" autocomplete="off" autocapitalize="off" spellcheck="false"></label>${result&&status==='wrong'&&result.answers?.length?`<small>${esc(result.answers[wrongIndex])} → ${esc(result.answers[correctIndex])}</small>`:''}</div>`;}).join('')}</div>`;}
-function workbookOrderSelections(session,item){session.orderSelections??={};return session.orderSelections[item.key]??=Array.from({length:item.groups?.length||0},()=>[]);}
-function workbookOrderConsumedChips(session,item){session.orderConsumedChips??={};return session.orderConsumedChips[item.key]??=Array.from({length:item.groups?.length||0},()=>[]);}
-function workbookOrderBatchOrders(session,item){session.orderBatchOrders??={};return session.orderBatchOrders[item.key]??=Array.from({length:item.groups?.length||0},()=>[]);}
-function workbookOrderWrongChips(session,item){session.orderWrongChips??={};return session.orderWrongChips[item.key]??=Array.from({length:item.groups?.length||0},()=>null);}
-function clearWorkbookOrderWrongChip(session,item,group){const chips=workbookOrderWrongChips(session,item);if(chips[group])chips[group]=null;}
-function flashWorkbookOrderWrongChip(session,item,group,chipIndex){
-  const chips=workbookOrderWrongChips(session,item),sequence=(Number(session.orderWrongSequence)||0)+1;
-  session.orderWrongSequence=sequence;
-  chips[group]={chipIndex,sequence};
-  refreshWorkbookOrderGroup(group);
-  setTimeout(()=>{
-    const current=workbookCurrent();
-    if(current.session!==session||current.item!==item)return;
-    const active=workbookOrderWrongChips(session,item)[group];
-    if(active?.sequence!==sequence)return;
-    workbookOrderWrongChips(session,item)[group]=null;
-    refreshWorkbookOrderGroup(group);
-  },520);
-}
-function workbookOrderMode(session,stage,item){
-  session.orderModeSnapshot=captureWorkbookOrderMode(session.orderModeSnapshot,stage,item);
-  return session.orderModeSnapshot.mode;
-}
-function workbookOrderInteractionStarted(session,item){
-  if(!session||!item||item.kind!=='reorder_groups')return false;
-  const hasEntries=groups=>Array.isArray(groups)&&groups.some(group=>Array.isArray(group)&&group.length);
-  return Boolean(session.results?.[item.key])||hasEntries(session.orderSelections?.[item.key])||hasEntries(session.orderConsumedChips?.[item.key])||Boolean((session.orderWrongChips?.[item.key]||[]).some(Boolean))||Boolean((session.responses?.[item.key]||[]).some(value=>String(value).trim()));
-}
-function workbookOrderProgress(session,item,index){const group=item.groups?.[index]||[],answer=item.grading?.answers?.[index]||item.answers?.[index]||'',chosen=workbookOrderSelections(session,item)[index]||[],orders=workbookOrderBatchOrders(session,item)[index];let progressive=progressiveOrderState(group,answer,chosen);if(!orders[progressive.batchIndex])orders[progressive.batchIndex]=shuffleWorkbookOrderBatch(progressive.batch);return progressiveOrderState(group,answer,chosen,6,orders[progressive.batchIndex]);}
-function workbookOrderGroupHtml(item,index,result,session){
-  const selections=workbookOrderSelections(session,item),group=item.groups?.[index]||[],chosen=selections[index]||[],consumedSet=new Set(workbookOrderConsumedChips(session,item)[index]||[]),wrongChip=workbookOrderWrongChips(session,item)[index]?.chipIndex,status=workbookSlotState(result,index),progressive=workbookOrderProgress(session,item,index),answer=item.grading?.answers?.[index]||item.answers?.[index]||group.join(' '),built=chosen.map(chipIndex=>group[chipIndex]).join(' ');
-  return `<span class="workbook-order-group ${status}" data-workbook-order-group="${index}" data-workbook-order-batch="${progressive.batchIndex}"><span class="workbook-order-built" aria-label="배열한 문장"><span class="workbook-order-built-sizer" aria-hidden="true">${esc(answer)}</span><span class="workbook-order-built-text">${built?esc(built):'<em>단어를 순서대로 누르세요</em>'}</span></span><span class="workbook-order-bank" aria-label="선택할 단어">${progressive.visible.map(chipIndex=>{const used=consumedSet.has(chipIndex),wrong=wrongChip===chipIndex;return `<span class="workbook-order-bank-slot${used?' used':''}${wrong?' wrong':''}"><button type="button" data-workbook-order-add="${index}:${chipIndex}" aria-pressed="${used}" aria-invalid="${wrong?'true':'false'}" ${used||result?'disabled':''}>${esc(group[chipIndex])}</button></span>`;}).join('')}</span>${Number.isInteger(wrongChip)&&!result?'<small class="workbook-order-feedback" role="status">다시 골라보세요</small>':''}${result&&status==='wrong'?`<small>정답: ${esc(result.answers[index])}</small>`:''}</span>`;
-}
-function workbookOrderHtml(item,values,result,session,lookupText=null){let partIndex=0;return workbookOrderDisplayPrompt(item.prompt).split(/(⟦ORDER:\d+⟧)/).map(part=>{const marker=part.match(/^⟦ORDER:(\d+)⟧$/);if(marker)return workbookOrderGroupHtml(item,Number(marker[1]),result,session);const index=partIndex++;return lookupText&&/[A-Za-z]/.test(part)?lookupText(part,`prompt:${index}`):esc(part);}).join('');}
-function stabilizeWorkbookOrderGeometry(root=document){const groups=root.matches?.('.workbook-order-group')?[root]:[...(root.querySelectorAll?.('.workbook-order-group')||[])];groups.forEach(group=>{const bank=group.querySelector('.workbook-order-bank');if(!bank)return;const previous=Number.parseFloat(group.style.getPropertyValue('--workbook-order-bank-height'))||0,height=Math.max(previous,Math.ceil(bank.getBoundingClientRect().height));group.style.setProperty('--workbook-order-bank-height',`${height}px`);});}
-function refreshWorkbookOrderGroup(index){const {session,item}=workbookCurrent(),current=document.querySelector(`[data-workbook-order-group="${index}"]`);if(!session||!item||!current)return renderWorkbook();const template=document.createElement('template');template.innerHTML=workbookOrderGroupHtml(item,index,session.results[item.key],session).trim();const next=template.content.firstElementChild,bankHeight=current.style.getPropertyValue('--workbook-order-bank-height');if(bankHeight)next.style.setProperty('--workbook-order-bank-height',bankHeight);current.replaceWith(next);stabilizeWorkbookOrderGeometry(next);}
-function workbookTaskHtml(item,values,result,session,lookupText=null){if(item.kind==='content_claim'){const choice=values[0]||'';return `<div class="content-claim-task" lang="${item.language==='ko'?'ko':'en'}"><p>${esc(item.statement)}</p><div class="content-claim-choices" role="group" aria-label="내용 일치 선택"><button type="button" data-content-claim-choice="O" class="${choice==='O'?'selected':''}" ${result?'disabled':''}>O</button><button type="button" data-content-claim-choice="X" class="${choice==='X'?'selected':''}" ${result?'disabled':''}>X</button></div></div>`;}if(item.kind==='translation_ai'||item.kind==='translation_input')return `<label class="workbook-translation ${result?(result.correct?'correct':'wrong'):''}"><span>나의 해석</span><textarea rows="3" data-workbook-slot="0" enterkeyhint="done" ${result?'data-workbook-graded="true" aria-readonly="true"':''} placeholder="우리말 해석을 입력하세요">${esc(values[0]||'')}</textarea></label>`;if(item.kind==='full_sentence_input'){const assistance=workbookAssistanceState(session,item);return workbookWritingHtml({value:values[0]||'',disabled:!!result,visibleAnswer:assistance.visibleAnswer||'',liveState:assistance.live?.[0]});}if(item.kind==='choice_groups')return `<div class="workbook-prompt choice-task" lang="en">${workbookChoiceHtml(item,values,result,lookupText)}</div>`;if(item.kind==='correction_pairs')return workbookCorrectionHtml(item,values,result,lookupText);if(item.kind==='reorder_groups')return `<div class="workbook-prompt order-task" lang="en">${workbookOrderHtml(item,values,result,session,lookupText)}</div>`;return `<div class="workbook-prompt inline-blank-task" lang="${item.semanticType==='korean_blank'?'ko':'en'}">${workbookBlankHtml(item,values,result,session,lookupText)}</div>`;}
-function workbookTabsHtml(session){return session.data.stages.map((stage,index)=>{const progress=workbookProgressVisual(stage.progressPercent);return `<button type="button" data-workbook-stage="${index}" class="${index===session.stageIndex?'active':''}" ${stage.locked?'disabled aria-disabled="true"':''}><span>${esc(workbookStageLabel(stage))}${stage.locked?' · 준비 중':''}</span><b>${stage.locked?'잠김':`${progress.percent}%`}</b></button>`;}).join('');}
-function workbookStageChoiceHtml(presentation){const {stage,stageIndex,label,icon}=presentation,available=!stage.locked&&stage.items.length,visual=workbookProgressStyle(stage);return `<button class="workbook-stage-option ${visual.className}${visual.progress.percent>0?' has-progress':''}" type="button" data-workbook-stage="${stageIndex}" ${available?'':`disabled aria-disabled="true"`} style="${visual.style}"><span class="workbook-stage-icon" aria-hidden="true">${esc(icon)}</span><span class="workbook-stage-copy"><strong>${esc(label)}</strong></span><span class="workbook-stage-state"><small>${available?`${visual.progress.percent}%`:'준비 중'}</small></span><span class="workbook-stage-gauge" aria-hidden="true"><i></i></span></button>`;}
-function workbookStageChoicesHtml(session){return groupWorkbookStages(session.data.stages).map(group=>`<section class="workbook-stage-category workbook-stage-category--${esc(group.key)}" style="--workbook-stage-columns:${Math.min(4,group.stages.length)};--workbook-stage-columns-compact:${Math.min(2,group.stages.length)}"><header class="workbook-stage-category-head"><span class="workbook-stage-category-icon" aria-hidden="true">${esc(group.icon)}</span><h2>${esc(group.title)}</h2></header><div class="workbook-stage-rail" aria-label="${esc(group.title)} Workbook">${group.stages.map(workbookStageChoiceHtml).join('')}</div></section>`).join('');}
-function renderWorkbookStages(){const session=state.workbookSession;if(!session)return renderScope();show('student-workbook');document.body.classList.remove('study-mode');const available=session.data.stages.filter(stage=>!stage.locked&&stage.items.length).length;$('#student-workbook').innerHTML=`<div class="workbook-stage-picker"><header class="filter-head workbook-picker-head"><button class="back-link" type="button" data-exit-workbook>← Home</button><p class="eyebrow">READY · WORKBOOK</p><h1>${esc(session.data.title)}</h1></header><section class="workbook-stage-list" aria-labelledby="workbook-stage-title"><div class="workbook-stage-list-head"><h2 id="workbook-stage-title">학습 선택</h2><small>${available}개</small></div><div class="workbook-stage-categories">${workbookStageChoicesHtml(session)}</div></section></div>`;}
-function workbookFeedbackHtml(item,result){if(!result)return'';if(item.kind==='content_claim'){const evidence=contentClaimEvidence(item);return `<div class="workbook-feedback ${result.correct?'correct':'wrong'}"><strong>${result.correct?'정답입니다!':'정답을 다시 확인해 보세요.'}</strong><div class="content-claim-evidence"><small>근거</small>${evidence.map(row=>`<p><b>${row.sentenceNumber}.</b> ${esc(row.text)}</p>`).join('')}</div></div>`;}const translation=item.kind==='translation_ai'||item.semanticType==='translation';if(result.revealedAnswer){const answer=translation&&result.answers?.[0]?`<span class="workbook-revealed-answer">${esc(result.answers[0])}</span>`:'';return `<div class="workbook-feedback wrong"><strong>정답을 확인했습니다.</strong><span class="workbook-feedback-copy">${answer}<span>이번 문제는 Review에 자동 저장했습니다.</span></span></div>`;}if(translation&&(Number.isFinite(result.aiScore)||result.aiFeedback)){const lines=(result.aiFeedbackLines?.length?result.aiFeedbackLines:[result.aiFeedback]).filter(Boolean).slice(0,3);return `<div class="workbook-feedback ${result.correct?'correct':'wrong'}"><strong>${Number.isFinite(result.aiScore)?`${result.aiScore}점 · `:''}${result.correct?'통과':'다시 해보기'}</strong><span class="workbook-feedback-copy">${lines.map(line=>`<span>${esc(line)}</span>`).join('')}</span></div>`;}if(result.completedAfterHint)return `<div class="workbook-feedback wrong"><strong>끝까지 완성했습니다.</strong><span>전체 답 힌트를 사용해 이번 기록은 복습에 추가됐어요. 다음에는 힌트 없이 다시 풀어 보세요.</span></div>`;return `<div class="workbook-feedback ${result.correct?'correct':'wrong'}"><strong>${result.correct?'정답입니다.':'표시된 부분만 고쳐 보세요.'}</strong><span>${esc(result.aiFeedback||(result.correct?'Enter를 누르거나 다음 문장으로 넘어가세요.':'Review에 자동 저장했습니다. 맞은 부분은 유지됩니다.'))}</span></div>`;}
-function workbookResponseReady(session,item){if(item.kind==='reorder_groups'){const selections=workbookOrderSelections(session,item);return (item.groups||[]).length===item.slotCount&&(item.groups||[]).every((group,index)=>(selections[index]||[]).length===group.length);}const values=workbookValues(session,item);return values.length===item.slotCount&&values.every(value=>String(value).trim());}
-function workbookResultActionHtml(result,nextLabel){if(!result)return'';return `<div class="workbook-actions">${!result.correct?'<button class="button primary" type="button" data-workbook-retry>지금 재시도</button><button class="button quiet" type="button" data-workbook-later>나중에 다시하기</button>':`<button class="button primary" type="button" data-workbook-next>${nextLabel}</button>`}</div>`;}
-function workbookToolbarActionHtml(session,stage,item){const mode=workbookOrderMode(session,stage,item);return mode?`<span class="workbook-order-mode" data-workbook-order-mode="${mode}">${mode==='practice'?'연습 모드':'실전 모드'}</span>`:'';}
-function workbookSubmitHtml(session,item,result){if(result||item.kind==='content_claim')return'<div class="workbook-submit-actions" data-workbook-submit></div>';const assistance=workbookAssistanceState(session,item),writing=item.semanticType==='writing',hintLabel=assistance.hintPending?'힌트 준비 중':assistance.hintUsed?'힌트 사용함':'힌트 보기';return `<div class="workbook-submit-actions" data-workbook-submit>${writing?`<button class="button quiet workbook-submit-hint" type="button" data-workbook-hint ${assistance.hintUsed||assistance.hintPending?'disabled':''}>${hintLabel}</button>`:''}<button class="button primary" type="button" data-submit-workbook>제출</button></div>`;}
-function workbookAiStatusHtml(session,item){if(session.aiPending?.[item.key])return '<div class="local-ai-status" role="status"><strong>AI가 해석을 확인하고 있어요…</strong><span>작성한 답안은 그대로 유지됩니다.</span></div>';const error=session.aiErrors?.[item.key];return error?`<div class="local-ai-status error" role="status"><strong>${esc(error)}</strong><span>연결을 확인한 뒤 다시 채점해 주세요.</span></div>`:'';}
-function refreshWorkbookAiStatus(session,item){const card=$('#student-workbook').querySelector(`[data-workbook-item="${CSS.escape(item.key)}"]`),host=card?.querySelector('[data-workbook-ai-status]');if(host)host.innerHTML=workbookAiStatusHtml(session,item);}
-function workbookNextLabel(session,stage){const lastItem=session.itemIndex===stage.items.length-1,lastStage=session.stageIndex===session.data.stages.length-1;return lastItem?(lastStage?'학습 목록':'다음 단계'):'다음 문제';}
-function refreshWorkbookSubmit(session,item){const card=$('#student-workbook').querySelector(`[data-workbook-item="${CSS.escape(item.key)}"]`),host=card?.querySelector('[data-workbook-submit]');if(host)host.outerHTML=workbookSubmitHtml(session,item,session.results[item.key]);}
-function refreshWorkbookOutcome(session,item){
-  const {stage}=workbookCurrent(),result=session.results[item.key],card=$('#student-workbook').querySelector(`[data-workbook-item="${CSS.escape(item.key)}"]`);
-  if(!card||!stage||!result)return renderWorkbook();
-  card.querySelectorAll('[data-workbook-slot]').forEach(input=>{const index=Number(input.dataset.workbookSlot);input.dataset.workbookGraded='true';input.setAttribute('aria-readonly','true');input.setAttribute('aria-invalid',String(!result.slotResults?.[index]));const blank=input.closest('.workbook-blank');if(blank){blank.classList.remove('correct','wrong');blank.classList.add(result.slotResults?.[index]?'correct':'wrong');if(!result.slotResults?.[index]&&result.answers?.[index]&&!blank.querySelector('.workbook-answer'))blank.insertAdjacentHTML('beforeend',`<small class="workbook-answer">정답: ${esc(result.answers[index])}</small>`);}});
-  card.querySelectorAll('.workbook-correction-row').forEach((row,pair)=>{const correct=result.slotResults?.[pair*2]&&result.slotResults?.[pair*2+1];row.classList.remove('correct','wrong');row.classList.add(correct?'correct':'wrong');if(!correct&&result.answers?.length&&!row.querySelector('small'))row.insertAdjacentHTML('beforeend',`<small>${esc(result.answers[pair*2])} → ${esc(result.answers[pair*2+1])}</small>`);});
-  card.querySelectorAll('.workbook-choice-group').forEach((group,index)=>{group.classList.remove('correct','wrong');group.classList.add(result.slotResults?.[index]?'correct':'wrong');group.querySelectorAll('button').forEach(button=>button.disabled=true);if(!result.slotResults?.[index]&&result.answers?.[index]&&!group.querySelector('small'))group.insertAdjacentHTML('beforeend',`<small>정답: ${esc(result.answers[index])}</small>`);});
-  const translation=card.querySelector('.workbook-translation');if(translation){translation.classList.remove('correct','wrong');translation.classList.add(result.correct?'correct':'wrong');}
-  if(item.kind==='reorder_groups')(item.groups||[]).forEach((_,index)=>refreshWorkbookOrderGroup(index));
-  const outcome=card.querySelector('[data-workbook-outcome]');if(outcome)outcome.innerHTML=workbookFeedbackHtml(item,result)+workbookResultActionHtml(result,workbookNextLabel(session,stage));
-  refreshWorkbookSubmit(session,item);
-}
-function bookmarkIcon(active=false){return `<span class="bookmark-star" aria-hidden="true">${active?'★':'☆'}</span>`;}
-function workbookMilestoneCopy(stage,milestone){
-  const wordOrderTransition=workbookSemanticType(stage,stage.items?.[0])==='word_order'&&Number(milestone?.percent)===200;
-  if(wordOrderTransition)return {heading:'200% 완료! 이제 실전 모드예요.',copy:'다음 문제부터는 칩을 한 번 잘못 선택하면 오답 처리돼요. 배운 어순을 떠올리며 풀어보세요.',repeatLabel:'실전 모드로 계속하기'};
-  return {heading:`${workbookStageLabel(stage)} ${milestone.percent}% 달성!`,copy:'한 바퀴를 끝냈어요. 같은 학습을 바로 한 번 더 이어갈 수 있어요.',repeatLabel:stage.semanticType==='content_claim'?'다음 난이도 계속하기':`한 번 더 ${workbookStageLabel(stage)} 하기`};
-}
-function renderWorkbookMilestone(){
-  const session=state.workbookSession,milestone=session?.milestone,stage=session?.data.stages[milestone?.stageIndex];
-  if(!session||!milestone||!stage)return renderWorkbook();
-  const visual=workbookProgressVisual(milestone.percent),copy=workbookMilestoneCopy(stage,milestone),root=$('#student-workbook');
-  readerGlossController?.destroy();readerGlossController=null;show('student-workbook');document.body.classList.add('study-mode');
-  root.innerHTML=`<button class="study-back" type="button" data-workbook-stages aria-label="워크북 단계 선택으로"><span aria-hidden="true">‹</span></button><div class="workbook-milestone-shell"><section class="workbook-milestone progress-cycle-${visual.cycle}" style="--workbook-progress:${visual.fill}%" aria-live="polite"><div class="workbook-milestone-mark"><span>${milestone.percent}%</span></div><p class="eyebrow">CYCLE COMPLETE</p><h1>${esc(copy.heading)}</h1><p>${esc(copy.copy)}</p><div class="workbook-milestone-actions"><button class="button primary" type="button" data-workbook-repeat>${esc(copy.repeatLabel)}</button><button class="button quiet" type="button" data-workbook-other>다른 학습 선택</button></div></section></div>`;
-}
-const WORKBOOK_AUTOFOCUS_TYPES=new Set(['korean_blank','english_blank','verb_form','translation','writing']);
-function workbookShouldAutofocus(item){return WORKBOOK_AUTOFOCUS_TYPES.has(String(item?.semanticType||''))||(Number(item?.stage)===2||Number(item?.stage)===3||Number(item?.stage)===4||Number(item?.stage)===5||Number(item?.stage)===9)&&!['choice_groups','reorder_groups','correction_pairs'].includes(item?.kind);}
-function workbookFocusFirstSlot(root,item,{preferEmpty=false}={}){if(!workbookShouldAutofocus(item))return false;const slots=[...root.querySelectorAll('[data-workbook-slot]:not([disabled]):not([readonly])')];if(!slots.length)return false;const target=preferEmpty?slots.find(slot=>!String(slot.value||'').trim())||slots[0]:slots[0];target.setAttribute('autofocus','');try{target.focus({preventScroll:true});}catch{target.focus();}return document.activeElement===target;}
-function workbookStudyHeaderHtml(session,stage,item,result){return `<header class="workbook-study-head workbook-study-toolbar"><span class="workbook-state"><b>${session.itemIndex+1} / ${stage.total}</b>${workbookToolbarActionHtml(session,stage,item)}${item.kind==='content_claim'?'':`<button class="workbook-bookmark ${item.bookmarked?'active':''}" type="button" data-toggle-workbook-bookmark aria-pressed="${!!item.bookmarked}" aria-label="${item.bookmarked?'Review에서 제거':'Review에 저장'}">${bookmarkIcon(item.bookmarked)}</button>`}</span></header>`;}
-function renderWorkbook({focus=false,preserveKeyboard=false,preferEmpty=false}={}){const {session,stage,item}=workbookCurrent();if(session?.milestone)return renderWorkbookMilestone();if(!session||!stage||!item)return renderWorkbookStages();readerGlossController?.destroy();readerGlossController=null;const values=workbookValues(session,item),result=session.results[item.key],lastItem=session.itemIndex===stage.items.length-1,lastStage=session.stageIndex===session.data.stages.length-1,nextLabel=lastItem?(lastStage?'학습 목록':'다음 단계'):'다음 문제',lookupSentences=[],lookupEnabled=false,root=$('#student-workbook'),showFactoryStageNineBank=Number(item.stage)!==9||!String(session.data.workbookKey||'').startsWith('factory-');let lookupIndex=0;const lookupText=lookupEnabled?(text,surfaceKey)=>{const id=`workbook:${item.key}:${surfaceKey}:${lookupIndex++}`,sentence={id,text:String(text||''),lookupContext:{surfaceKind:'workbook',surfaceKey,workbookItemKey:item.key,surfaceTextContext:String(text||'')}};lookupSentences.push(sentence);return readerGlossSentenceHtml(sentence);}:null,cardHtml=`<section class="workbook-card workbook-focus-card" data-workbook-item="${esc(item.key)}">${item.source?`<blockquote lang="${item.kind==='translation_ai'?'en':item.kind==='blank_input'?'en':'ko'}">${lookupText&&/[A-Za-z]/.test(item.source)?lookupText(item.source,'source'):esc(item.source)}</blockquote>`:''}${showFactoryStageNineBank&&item.wordBank?.length?`<div class="workbook-word-bank"><small>사용할 말</small>${item.wordBank.map(word=>`<span>${esc(word)}</span>`).join('')}</div>`:''}${workbookTaskHtml(item,values,result,session,lookupText)}<div data-workbook-ai-status>${workbookAiStatusHtml(session,item)}</div><div data-workbook-outcome>${workbookFeedbackHtml(item,result)}${workbookResultActionHtml(result,nextLabel)}</div>${workbookSubmitHtml(session,item,result)}<p class="reader-inline-notice" data-reader-gloss-notice hidden></p><span class="sr-only" data-reader-gloss-live aria-live="polite"></span></section>`,template=document.createElement('template');template.innerHTML=cardHtml;const nextCard=template.content.firstElementChild;show('student-workbook');document.body.classList.add('study-mode');const layout=root.querySelector('.workbook-study-layout'),currentCard=layout?.querySelector('.workbook-card'),currentHeader=layout?.querySelector('.workbook-study-head');if(layout&&currentCard&&currentHeader){currentHeader.outerHTML=workbookStudyHeaderHtml(session,stage,item,result);currentCard.after(nextCard);if(focus&&preserveKeyboard)workbookFocusFirstSlot(nextCard,item,{preferEmpty});currentCard.remove();if(focus&&!preserveKeyboard)workbookFocusFirstSlot(nextCard,item,{preferEmpty});}else{root.innerHTML=`<button class="study-back" type="button" data-workbook-stages aria-label="워크북 단계 선택으로"><span aria-hidden="true">‹</span></button><div class="workbook-study-layout">${workbookStudyHeaderHtml(session,stage,item,result)}${cardHtml}</div>`;if(focus)workbookFocusFirstSlot(root,item,{preferEmpty});}if(lookupEnabled)attachWordLookup(root,{id:session.passageId,updated_at:session.data.passage?.updated_at||`workbook:${session.data.workbookKey}`},lookupSentences);requestAnimationFrame(()=>stabilizeWorkbookOrderGeometry(root));}
-function workbookCacheKey(passageId){const passage=state.passages.find(item=>item.id===passageId),revision=[passage?.canonical_revision||0,passage?.workbookRevision||passage?.deterministic_catalog_revision||0,passage?.updated_at||''].join('-');return `${WORKBOOK_CACHE}${state.student?.id||'student'}:${state.scope?.id||'scope'}:${passageId}:${revision}`;}
-function workbookProgressFloorKey(passageId){return `${WORKBOOK_PROGRESS_FLOOR}${state.student?.id||'student'}:${state.scope?.id||'scope'}:${passageId}`;}
-function workbookProgressFloors(passageId){try{return JSON.parse(localStorage.getItem(workbookProgressFloorKey(passageId))||'{}')||{};}catch{return {};}}
-function workbookProgressKey(stage){return String(stage?.semanticType||`stage:${stage?.stage}`);}
-function workbookProgressSnapshot(stage){return {correctClears:Number(stage?.correctClears)||0,completedCycles:Number(stage?.completedCycles)||0,currentCycle:Number(stage?.currentCycle)||1,currentCycleClears:[...(stage?.currentCycleClears||[])]};}
-function applyWorkbookProgressSnapshot(stage,snapshot){Object.assign(stage,snapshot);stage.progressPercent=workbookProgressPercent(stage.correctClears,stage.total);stage.completed=stage.currentCycleClears.length;const cleared=new Set(stage.currentCycleClears);stage.items?.forEach(item=>item.completed=cleared.has(item.key));}
-function mergeWorkbookProgress(data,passageId){if(!data?.stages)return data;const floors=workbookProgressFloors(passageId);for(const stage of data.stages){const key=workbookProgressKey(stage),saved=floors[key],incoming=workbookProgressSnapshot(stage),progress=reconcileWorkbookProgress(saved?.correctClears,incoming.correctClears,stage.total),useSaved=saved&&progress.correctClears===Number(saved.correctClears)&&Number(saved.correctClears)>=incoming.correctClears,snapshot=useSaved?{...saved,currentCycleClears:[...(saved.currentCycleClears||[])]}:incoming;applyWorkbookProgressSnapshot(stage,snapshot);floors[key]=workbookProgressSnapshot(stage);}try{localStorage.setItem(workbookProgressFloorKey(passageId),JSON.stringify(floors));}catch{}return data;}
-function rememberWorkbookProgress(passageId,stage){if(!passageId||!stage)return;const floors=workbookProgressFloors(passageId),key=workbookProgressKey(stage),saved=floors[key];if(saved&&Number(saved.correctClears)>Number(stage.correctClears))applyWorkbookProgressSnapshot(stage,saved);floors[key]=workbookProgressSnapshot(stage);try{localStorage.setItem(workbookProgressFloorKey(passageId),JSON.stringify(floors));}catch{}}
-function cachedWorkbook(passageId){try{const data=JSON.parse(localStorage.getItem(workbookCacheKey(passageId))||'null');if(data?.stages?.some(stage=>stage.semanticType==='content_claim')){localStorage.removeItem(workbookCacheKey(passageId));return null;}return data;}catch{return null;}}
-function cacheWorkbook(passageId,data){mergeWorkbookProgress(data,passageId);try{if(data?.stages?.some(stage=>stage.semanticType==='content_claim'))localStorage.removeItem(workbookCacheKey(passageId));else localStorage.setItem(workbookCacheKey(passageId),JSON.stringify(data));}catch{}}
-function startWorkbookSession(data,passageId,targetItemKey='',targetStageKey=''){
-  mergeWorkbookProgress(data,passageId);
-  const available=data.stages.map((stage,index)=>({...stage,index})).filter(stage=>!stage.locked&&stage.items.length);let next=targetItemKey?available.find(stage=>stage.items.some(item=>item.key===targetItemKey)):null;next=next||(targetStageKey?available.find(stage=>String(stage.semanticType||stage.stage)===String(targetStageKey)):null);next=next||available.find(stage=>stage.completed<stage.total)||available[0];
-  if(!next)return false;
-  const stageIndex=next.index,stage=data.stages[stageIndex],targetIndex=targetItemKey?stage.items.findIndex(item=>item.key===targetItemKey):-1,itemIndex=targetIndex>=0?targetIndex:Math.max(0,stage.items.findIndex(item=>!item.completed));
-  state.savedWords=data.savedWords||state.savedWords||[];state.workbookSession={data,passageId,stageIndex,itemIndex,responses:{},results:{},orderSelections:{},orderConsumedChips:{},orderBatchOrders:{},orderWrongChips:{},orderWrongSequence:0,orderModeSnapshot:null,assistance:{},aiPending:{},aiErrors:{},persistenceSequence:{},milestone:null,acknowledgedMilestones:{},focusedSlot:0};
-  if(!targetItemKey&&!targetStageKey)renderWorkbookStages();else renderWorkbook({focus:true});return true;
-}
-async function openWorkbook(passageId,targetItemKey='',targetStageKey=''){
-  if(!state.scope)return;const navigation=beginNavigation();
-  const cached=cachedWorkbook(passageId);if(cached)startWorkbookSession(cached,passageId,targetItemKey,targetStageKey);
-  const data=await safely(()=>(cached?readyApi('student_workbook',{examId:state.scope.id,passageId},state.token):call('student_workbook',{examId:state.scope.id,passageId},state.token,'워크북을 준비하는 중…')));if(!data)return;
-  if(!navigationIsCurrent(navigation))return;
-  cacheWorkbook(passageId,data);
-  if(!cached||!state.workbookSession||state.workbookSession.passageId!==passageId){if(!startWorkbookSession(data,passageId,targetItemKey,targetStageKey))toast('현재 풀 수 있는 워크북 단계가 없습니다.');}
-  else {
-    const session=state.workbookSession;
-    session.data.savedWords=data.savedWords||session.data.savedWords;
-    let refreshCurrentOrderMode=false;
-    for(const incoming of data.stages||[]){
-      const stage=session.data.stages.find(candidate=>(incoming.semanticType&&candidate.semanticType===incoming.semanticType)||Number(candidate.stage)===Number(incoming.stage));
-      if(!stage||Number(incoming.correctClears)<Number(stage.correctClears||0))continue;
-      Object.assign(stage,{correctClears:Number(incoming.correctClears)||0,completedCycles:Number(incoming.completedCycles)||0,currentCycle:Number(incoming.currentCycle)||1,currentCycleClears:[...(incoming.currentCycleClears||[])],progressPercent:Number(incoming.progressPercent)||0});
-      stage.completed=stage.currentCycleClears.length;
-      const cleared=new Set(stage.currentCycleClears);stage.items.forEach(item=>item.completed=cleared.has(item.key));
-      rememberWorkbookProgress(passageId,stage);
-      const current=workbookCurrent();
-      if(session.orderModeSnapshot?.stage===stage&&current.stage===stage&&current.item===session.orderModeSnapshot.item&&!workbookOrderInteractionStarted(session,current.item)){
-        session.orderModeSnapshot=null;
-        refreshCurrentOrderMode=true;
-      }
-    }
-    if($('#student-workbook')&&!$('#student-workbook').hidden){
-      if(refreshCurrentOrderMode)renderWorkbook();
-      else if(document.querySelector('.workbook-stage-picker'))renderWorkbookStages();
-    }
+function busy(on, label = '잠시만요…') { busyCount = Math.max(0, busyCount + (on ? 1 : -1)); $('#busy').hidden = !busyCount; $('#busy span:last-child').textContent = label; }
+function toast(message, ms = 2400) { const node = $('#toast'); node.textContent = message; node.classList.add('on'); clearTimeout(toastTimer); toastTimer = setTimeout(() => node.classList.remove('on'), ms); }
+function theme(next) { const dark = next === 'dark'; document.documentElement.classList.toggle('dark', dark); document.body.classList.toggle('dark', dark); localStorage.setItem('ready-theme', next); }
+async function call(op, data = {}, label = '잠시만요…') { busy(true, label); try { return await readyApi(op, data, state.token); } finally { busy(false); } }
+async function safely(job, { auth = true } = {}) {
+  try { return await job(); } catch (error) {
+    if (auth && error.status === 401) { clearSession(); showLogin(); }
+    toast(error.message || '요청을 처리하지 못했습니다.', 3600);
+    return null;
   }
 }
-function updateWorkbookSlot(index,value){const {session,item}=workbookCurrent();if(!session||!item||session.results[item.key])return;const values=[...(session.responses[item.key]||Array(item.slotCount).fill(''))];values[index]=value;session.responses[item.key]=values;}
-function syncWorkbookSlotWidth(input){const wrapper=input.closest('.workbook-blank');if(!wrapper||wrapper.dataset.workbookFixedWidth==='true')return;const slotCh=workbookSlotCh(input.value||input.placeholder||'답');wrapper.style.setProperty('--workbook-slot-ch',slotCh);wrapper.classList.toggle('long-slot',slotCh>24);}
-const workbookRecallWrongTimers=new WeakMap();
-function clearWorkbookRecallTimers(input){const wrong=workbookRecallWrongTimers.get(input);if(wrong)clearTimeout(wrong);workbookRecallWrongTimers.delete(input);input.classList.remove('recall-wrong');}
-function workbookRecallIsCurrent(input,session,item,index,sequence,snapshot){const current=workbookCurrent(),assistance=workbookAssistanceState(session,item);return input.isConnected&&current.session===session&&current.item?.key===item.key&&!session.results[item.key]&&assistance.recallSequence?.[index]===sequence&&input.value===snapshot&&input.dataset.recallComplete!=='true';}
-function flashRecallWrong(input,session,item,index,sequence,snapshot,{rejectComposition=false}={}){if(!workbookRecallIsCurrent(input,session,item,index,sequence,snapshot))return;input.classList.add('recall-wrong');if(rejectComposition){input.dataset.recallRejecting='true';input.dataset.recallRejected='true';input.dataset.recallRejectedValue=snapshot;}const timer=setTimeout(()=>{workbookRecallWrongTimers.delete(input);const current=workbookCurrent();if(!input.isConnected||current.session!==session||current.item?.key!==item.key||session.results[item.key]||!workbookRecallIsCurrent(input,session,item,index,sequence,snapshot))return;input.value='';updateWorkbookSlot(index,'');input.classList.remove('recall-wrong');delete input.dataset.recallRejecting;delete input.dataset.recallRejectedValue;},220);workbookRecallWrongTimers.set(input,timer);}
-async function verifyWorkbookRecallInput(input,session,item,index,mode,sequence,snapshot,{allowComposing=false}={}){
-  if(!workbookRecallIsCurrent(input,session,item,index,sequence,snapshot)||(!allowComposing&&input.dataset.composing==='true')||workbookRecallIsPendingJamo(snapshot,mode))return;
-  const cue=workbookRecallCue(snapshot,mode);if(!cue)return flashRecallWrong(input,session,item,index,sequence,snapshot);
-  input.dataset.verifying='true';const matches=await verifierMatches(cue,item.assistance?.slots?.[index]);if(workbookRecallIsCurrent(input,session,item,index,sequence,snapshot))delete input.dataset.verifying;else return;
-  if(!matches)return flashRecallWrong(input,session,item,index,sequence,snapshot);
-  const answer=item.grading?.answers?.[index];if(!answer)return;const ownsFocus=document.activeElement===input&&session.focusedSlot===index;clearWorkbookRecallTimers(input);input.dataset.unlocking='true';updateWorkbookSlot(index,answer);input.value=answer;syncWorkbookSlotWidth(input);input.classList.add('recall-complete');input.dataset.recallComplete='true';input.readOnly=true;input.setAttribute('aria-readonly','true');
-  const next=document.querySelector(`[data-workbook-slot="${index+1}"]`);if(ownsFocus&&next)try{next.focus({preventScroll:true});}catch{next.focus();}
+function show(id) {
+  ['student-home', 'student-sets', 'student-workbook'].forEach(section => { $('#' + section).hidden = section !== id; });
+  document.body.classList.toggle('study-mode', id === 'student-workbook');
+  $('#logout').hidden = !state.token;
 }
-function handleWorkbookRecallInput(input,event=null){
-  const {session,item}=workbookCurrent();
-  if(!session||!item||session.results[item.key]||input.dataset.unlocking==='true'||input.dataset.recallComplete==='true')return;
-  if(event?.type==='compositionend'&&input.dataset.recallRejected==='true'){input.value='';updateWorkbookSlot(Number(input.dataset.workbookSlot),'');return;}
-  if(input.dataset.recallRejecting==='true'){if(event?.type!=='input'||!event.data)return;clearWorkbookRecallTimers(input);input.value=String(event.data);delete input.dataset.recallRejecting;delete input.dataset.recallRejected;delete input.dataset.recallRejectedValue;}
-  else if(event?.type==='input'&&input.dataset.recallRejected==='true')delete input.dataset.recallRejected;
-  const index=Number(input.dataset.workbookSlot),mode=input.dataset.workbookRecall,raw=String(input.value||'').trim(),assistance=workbookAssistanceState(session,item);assistance.recallSequence??={};const sequence=(assistance.recallSequence[index]||0)+1;assistance.recallSequence[index]=sequence;clearWorkbookRecallTimers(input);updateWorkbookSlot(index,input.value);
-  if(!raw)return;
-  if(mode==='korean_syllable'){
-    const composition=koreanRecallCompositionState(raw,item.grading?.answers?.[index]);
-    if(composition.state==='partial'||composition.state==='empty')return;
-    if(composition.state==='mismatch')return flashRecallWrong(input,session,item,index,sequence,input.value,{rejectComposition:true});
-    return verifyWorkbookRecallInput(input,session,item,index,mode,sequence,input.value,{allowComposing:true});
-  }
-  if(workbookRecallIsPendingJamo(raw,mode))return;
-  verifyWorkbookRecallInput(input,session,item,index,mode,sequence,input.value,{allowComposing:true});
+function clearSession() {
+  clearTimeout(flushTimer); flushTimer = null; attemptQueue = []; flushing = null; stopSentenceAudio();
+  localStorage.removeItem(SESSION_KEY);
+  Object.assign(state, { token: '', student: null, scope: null, passages: [], practice: null });
 }
-async function handleWorkbookLiveInput(input){const {session,item}=workbookCurrent();if(!session||!item||session.results[item.key])return;const index=Number(input.dataset.workbookSlot),value=input.value,assistance=workbookAssistanceState(session,item),sequence=(assistance.requestSequence[index]||0)+1;assistance.requestSequence[index]=sequence;syncWorkbookSlotWidth(input);updateWorkbookSlot(index,value);const live=await livePrefixState(value,item.assistance?.slots?.[index]);if(state.workbookSession!==session||session.assistance?.[item.key]!==assistance||assistance.requestSequence[index]!==sequence)return;assistance.live[index]=live;if(item.kind==='full_sentence_input')return renderWritingPrefixState(input,value,live);const wrapper=input.closest('.workbook-blank');if(!wrapper)return;wrapper.classList.toggle('live-mismatch',live.valid===false);let copy=wrapper.querySelector('.workbook-live-copy');if(live.valid===false){if(!copy){copy=document.createElement('small');copy.className='workbook-live-copy';wrapper.append(copy);}copy.innerHTML=`<span>${esc(value.slice(0,live.mismatchIndex))}</span><b>${esc(value.slice(live.mismatchIndex))}</b>`;}else copy?.remove();}
-async function requestWorkbookHint(){const {session,item}=workbookCurrent();if(!session||!item||item.semanticType!=='writing'||session.results[item.key])return;const assistance=workbookAssistanceState(session,item);if(assistance.hintUsed||assistance.hintPending)return;const requestSequence=(Number(assistance.hintRequestSequence)||0)+1;assistance.hintRequestSequence=requestSequence;assistance.hintPending=true;refreshWorkbookSubmit(session,item);const data=await safely(()=>readyApi('workbook_hint',{examId:state.scope.id,passageId:session.passageId,itemKey:item.key},state.token));if(state.workbookSession!==session||session.assistance?.[item.key]!==assistance||assistance.hintRequestSequence!==requestSequence)return;assistance.hintPending=false;const current=workbookCurrent();if(!data?.answer){if(current.session===session&&current.item===item)refreshWorkbookSubmit(session,item);return;}if(current.session!==session||current.item!==item||session.results[item.key])return;assistance.hintUsed=true;assistance.usedFullAnswerHint=true;assistance.visibleAnswer=data.answer;assistance.hintCount=Number(data.hintCount)||1;assistance.hintReceipt=data.hintReceipt||'';const itemKey=item.key,sequence=(assistance.hintSequence||0)+1,card=$('#student-workbook').querySelector(`[data-workbook-item="${CSS.escape(item.key)}"]`),writing=card?.querySelector('.workbook-writing');assistance.hintSequence=sequence;if(writing&&!card.querySelector('.workbook-writing-hint'))writing.insertAdjacentHTML('beforebegin',`<p class="workbook-writing-hint" role="status"><strong>5초 힌트</strong><span>${esc(data.answer)}</span></p>`);refreshWorkbookSubmit(session,item);setTimeout(()=>{const active=workbookCurrent();if(active.session!==session||active.item!==item||session.assistance?.[itemKey]!==assistance||assistance.hintSequence!==sequence)return;delete assistance.visibleAnswer;$('#student-workbook').querySelector(`[data-workbook-item="${CSS.escape(itemKey)}"] .workbook-writing-hint`)?.remove();},Math.max(1000,Number(data.visibleForMs)||5000));}
-function chooseWorkbookOption(group,value){updateWorkbookSlot(group,value);renderWorkbook();}
-function chooseContentClaim(choice){const {session,item}=workbookCurrent();if(!session||item?.kind!=='content_claim'||session.results[item.key])return;const grade=gradeContentClaim(item.truth,choice);if(!grade.valid)return;const sequence=(session.persistenceSequence[item.key]||0)+1,body={examId:state.scope.id,passageId:session.passageId,itemKey:item.key,responses:[choice],clientAttemptId:crypto.randomUUID()};session.persistenceSequence[item.key]=sequence;session.responses[item.key]=[choice];applyWorkbookOutcome(session,item,{...grade,slotResults:[grade.correct],answers:[],persisted:false,persistenceSequence:sequence});persistWorkbookAttempt(session,item,body,sequence);renderWorkbook();}
-function changeWorkbookOrder(group,chipIndex,remove=false){
-  const {session,stage,item}=workbookCurrent();
-  if(!session||!stage||!item||session.results[item.key])return;
-  const selections=workbookOrderSelections(session,item),consumed=workbookOrderConsumedChips(session,item),current=[...(selections[group]||[])],position=current.indexOf(chipIndex),words=(item.groups?.[group]||[]),answer=item.grading?.answers?.[group]||item.answers?.[group]||'';
-  if(remove&&position>=0){
-    clearWorkbookOrderWrongChip(session,item,group);
-    current.splice(position);consumed[group].splice(position);selections[group]=current;updateWorkbookSlot(group,current.map(index=>words[index]).join(' '));
-    return refreshWorkbookOrderGroup(group);
-  }
-  const practice=workbookOrderMode(session,stage,item)==='practice',click=workbookOrderClick(words,answer,current,consumed[group],chipIndex,{practice});
-  if(click.type==='ignore')return;
-  if(click.type==='practice-wrong')return flashWorkbookOrderWrongChip(session,item,group,click.chipIndex);
-  clearWorkbookOrderWrongChip(session,item,group);
-  selections[group]=click.chosen;consumed[group]=click.consumed;updateWorkbookSlot(group,click.chosen.map(index=>words[index]).join(' '));
-  if(click.type==='wrong')return submitWorkbook();
-  refreshWorkbookOrderGroup(group);
-  if(workbookResponseReady(session,item))submitWorkbook();
-}
-function applyWorkbookOutcome(session,item,result){const stageIndex=session.data.stages.findIndex(candidate=>Number(candidate.stage)===Number(item.stage)),stage=session.data.stages[stageIndex];session.results[item.key]=result;item.lastResult=result.correct;if(!stage){item.completed=result.correct;return;}const before=Number(stage.correctClears)||0;if(result.correct){if(Number.isFinite(result.correctClears)&&Number(result.correctClears)>=before){stage.correctClears=Number(result.correctClears);stage.completedCycles=Number(result.completedCycles)||0;stage.currentCycle=Number(result.currentCycle)||1;stage.currentCycleClears=[...(result.currentCycleClears||[])];}else if(!Number.isFinite(result.correctClears)){const progress=clearWorkbookCycleItem(stage,item.key,stage.total);Object.assign(stage,progress);}stage.completed=stage.currentCycleClears?.length||0;item.completed=stage.currentCycleClears?.includes(item.key)||stage.correctClears>before;}else item.completed=stage.currentCycleClears?.includes(item.key)||false;stage.progressPercent=workbookProgressPercent(stage.correctClears,stage.total);rememberWorkbookProgress(session.passageId,stage);const milestone=workbookCycleMilestone(before,stage.correctClears,stage.total),key=workbookSemanticType(stage,item)||String(stage.stage);if(milestone>Number(session.acknowledgedMilestones?.[key]||0)){session.acknowledgedMilestones[key]=milestone;session.milestone={stageIndex,percent:milestone};}}
-function workbookServerResult(data){return {correct:data.correct,revealedAnswer:data.revealedAnswer===true,answers:data.answers,slotResults:data.slotResults,aiFeedback:data.aiFeedback||'',aiFeedbackLines:data.aiFeedbackLines||[],aiScore:typeof data.aiScore==='number'?data.aiScore:null,gradingPolicy:data.gradingPolicy||null,hintCount:Number(data.hintCount)||0,usedFullAnswerHint:data.usedFullAnswerHint===true,completedAfterHint:data.completedAfterHint===true,correctClears:Number.isFinite(Number(data.correctClears))?Number(data.correctClears):null,completedCycles:Number.isFinite(Number(data.completedCycles))?Number(data.completedCycles):null,currentCycle:Number.isFinite(Number(data.currentCycle))?Number(data.currentCycle):null,currentCycleClears:Array.isArray(data.currentCycleClears)?data.currentCycleClears:[],progressPercent:Number.isFinite(Number(data.progressPercent))?Number(data.progressPercent):null,persisted:true};}
-function workbookAttemptStorageKey(){return `${WORKBOOK_ATTEMPTS}${state.token.slice(-12)}`;}
-function saveWorkbookAttemptQueue(queue=workbookAttemptQueue,key=workbookAttemptStorageKey()){try{localStorage.setItem(key,JSON.stringify(queue.map(entry=>entry.body)));}catch{}}
-function restoreWorkbookAttempts(){if(workbookAttemptQueue.length||!state.token)return;try{const pending=JSON.parse(localStorage.getItem(workbookAttemptStorageKey())||'[]');if(Array.isArray(pending))workbookAttemptQueue=pending.map(body=>({body,session:null,item:null,sequence:0}));}catch{}}
-function queueWorkbookAttempt(session,item,body,sequence){restoreWorkbookAttempts();workbookAttemptQueue.push({session,item,body,sequence});saveWorkbookAttemptQueue();clearTimeout(workbookFlushTimer);workbookFlushTimer=setTimeout(()=>flushWorkbookAttempts(),180);}
-async function flushWorkbookAttempts({keepalive=false}={}){
-  clearTimeout(workbookFlushTimer);workbookFlushTimer=null;
-  if(workbookAttemptFlight?.queue===workbookAttemptQueue)return workbookAttemptFlight.promise;
-  if(!workbookAttemptQueue.length||!state.token)return;
-  const queue=workbookAttemptQueue,token=state.token,key=workbookAttemptStorageKey(),batch=queue.slice(0,20);
-  const ownsQueue=()=>state.token===token&&workbookAttemptQueue===queue;
-  // In-flight attempts stay durable until their individual acknowledgements arrive.
-  const flight={queue,promise:null};workbookAttemptFlight=flight;
-  flight.promise=(async()=>{
-    try{
-      const data=await readyApi('submit_workbook_attempts',{attempts:batch.map(entry=>entry.body)},token,{keepalive});
-      let changedReview=false;
-      batch.forEach((entry,index)=>{
-        const result=data.results?.[index];
-        if(!result?.attempt?.id||result.error)return;
-        const position=queue.indexOf(entry);if(position>=0)queue.splice(position,1);
-        if(!ownsQueue())return;
-        changedReview=true;
-        if(entry.item&&entry.session){
-          const current=entry.session.results[entry.item.key];
-          if(current?.persistenceSequence===entry.sequence){entry.item.bookmarked=result.bookmarked;state.reviewCount=Number(result.reviewCount)||0;applyWorkbookOutcome(entry.session,entry.item,{...workbookServerResult(result),persistenceSequence:entry.sequence});}
-        }
-      });
-      if(ownsQueue()){if(changedReview)invalidateReviewKind('workbook');updateStudentNav();}
-    }catch{/* Keep the original order and durable IDs for the next retry. */}
-    finally{
-      saveWorkbookAttemptQueue(queue,key);
-      if(workbookAttemptFlight===flight)workbookAttemptFlight=null;
-      if(ownsQueue()&&queue.length&&!keepalive)workbookFlushTimer=setTimeout(()=>flushWorkbookAttempts(),900);
-    }
-  })();
-  return flight.promise;
-}
-function persistWorkbookAttempt(session,item,body,sequence){queueWorkbookAttempt(session,item,body,sequence);}
-async function submitWorkbook(){const {session,item}=workbookCurrent();if(!session||!item||session.results[item.key]||session.submitting)return;const source=session.responses[item.key]||[],responses=Array.from({length:item.slotCount},(_,index)=>String(source[index]||''));const assistance=workbookAssistanceState(session,item),body={examId:state.scope.id,passageId:session.passageId,itemKey:item.key,responses,hintReceipt:assistance.hintReceipt||'',clientAttemptId:crypto.randomUUID()};
-  if(item.grading?.mode==='deterministic'){
-    const pairGrade=item.grading.kind==='correction_pairs'?gradeWorkbookCorrectionPairs(item.grading.answers,responses,{allowIncomplete:true}):null,grade=pairGrade?{valid:pairGrade.valid,correct:pairGrade.correct,completedAfterHint:false,answers:pairGrade.correct?[]:pairGrade.alignedAnswers,slotResults:pairGrade.slotResults,needsServer:false}:gradeLocalWorkbook(item.grading,responses,{usedFullAnswerHint:assistance.usedFullAnswerHint});if(!grade.valid)return;
-    const sequence=(session.persistenceSequence[item.key]||0)+1;session.persistenceSequence[item.key]=sequence;
-    applyWorkbookOutcome(session,item,{...grade,hintCount:assistance.hintCount,usedFullAnswerHint:assistance.usedFullAnswerHint,persisted:false,persistenceSequence:sequence});persistWorkbookAttempt(session,item,body,sequence);
-    refreshWorkbookOutcome(session,item);return;
-  }
-  if(navigator.onLine===false){session.aiErrors[item.key]='채점하려면 인터넷 연결이 필요해요.';refreshWorkbookAiStatus(session,item);return;}
-  session.submitting=true;session.aiPending[item.key]=true;delete session.aiErrors[item.key];refreshWorkbookAiStatus(session,item);
-  const data=await safely(()=>readyApi('submit_workbook_attempt',body,state.token));session.submitting=false;delete session.aiPending[item.key];
-  if(!data){session.aiErrors[item.key]=navigator.onLine===false?'AI 채점은 인터넷 연결이 필요해요.':'AI 채점을 완료하지 못했습니다.';refreshWorkbookAiStatus(session,item);return;}
-  const result=workbookServerResult(data);applyWorkbookOutcome(session,item,result);item.bookmarked=data.bookmarked;state.reviewCount=Number(data.reviewCount)||0;invalidateReviewKind('workbook');updateStudentNav();refreshWorkbookOutcome(session,item);
-}
-async function revealWorkbookAnswer(){const {session,item}=workbookCurrent();if(!session||!item||session.results[item.key]||session.submitting)return;const responses=Array.from({length:item.slotCount},(_,index)=>String(workbookValues(session,item)[index]||'')),assistance=workbookAssistanceState(session,item),body={examId:state.scope.id,passageId:session.passageId,itemKey:item.key,responses,hintReceipt:assistance.hintReceipt||'',revealAnswer:true,clientAttemptId:crypto.randomUUID()};
-  if(item.grading?.mode==='deterministic'){
-    const reveal=revealLocalWorkbook(item.grading,responses);if(!reveal.valid)return;
-    const sequence=(session.persistenceSequence[item.key]||0)+1;session.persistenceSequence[item.key]=sequence;
-    applyWorkbookOutcome(session,item,{...reveal,hintCount:assistance.hintCount,usedFullAnswerHint:item.semanticType==='writing',persisted:false,persistenceSequence:sequence});renderWorkbook();
-    persistWorkbookAttempt(session,item,body,sequence);return;
-  }
-  session.submitting=true;const data=await safely(()=>call('submit_workbook_attempt',body,state.token,'정답을 불러오는 중…'));session.submitting=false;if(!data)return;
-  applyWorkbookOutcome(session,item,workbookServerResult(data));item.bookmarked=data.bookmarked;state.reviewCount=Number(data.reviewCount)||0;invalidateReviewKind('workbook');updateStudentNav();renderWorkbook();
-}
-async function toggleWorkbookBookmark(){const {session,item}=workbookCurrent();if(!session||!item)return;const next=!item.bookmarked,data=await safely(()=>call('set_workbook_bookmark',{examId:state.scope.id,passageId:session.passageId,itemKey:item.key,bookmarked:next},state.token,next?'Review에 저장하는 중…':'Review에서 제거하는 중…'));if(!data)return;item.bookmarked=data.bookmarked;state.reviewCount=Number(data.reviewCount)||0;invalidateReviewKind('workbook');updateStudentNav();renderWorkbook();}
-function retryWorkbook(){const {session,item}=workbookCurrent();if(!session||!item)return;const result=session.results[item.key],previous=session.responses[item.key]||Array(item.slotCount).fill(''),priorAssistance=workbookAssistanceState(session,item);let next=result?.completedAfterHint?Array(item.slotCount).fill(''):previous.map((value,index)=>result?.slotResults?.[index]?value:'');if(item.kind==='correction_pairs')for(let pair=0;pair<item.pairCount;pair+=1){const left=pair*2,right=left+1;if(!result?.slotResults?.[left]||!result?.slotResults?.[right])next[left]=next[right]='';}if(item.kind==='reorder_groups'){session.orderSelections[item.key]=Array.from({length:item.groups?.length||0},()=>[]);delete session.orderConsumedChips?.[item.key];delete session.orderWrongChips?.[item.key];next=Array(item.slotCount).fill('');delete session.orderBatchOrders?.[item.key];}session.responses[item.key]=next;session.assistance[item.key]={hintCount:0,usedFullAnswerHint:false,hintReceipt:'',hintUsed:priorAssistance.hintUsed===true,hints:{},live:{},requestSequence:{}};delete session.results[item.key];renderWorkbook({focus:true,preferEmpty:true});}
-function deferWorkbook(){const {session,stage,item}=workbookCurrent();if(!session||!stage||!item)return;const at=session.itemIndex,only=stage.items.length===1;stage.items.splice(at,1);stage.items.push(item);delete session.results[item.key];session.responses[item.key]=Array(item.slotCount).fill('');session.orderSelections[item.key]=Array.from({length:item.groups?.length||0},()=>[]);delete session.orderConsumedChips?.[item.key];delete session.orderWrongChips?.[item.key];delete session.orderBatchOrders?.[item.key];session.orderModeSnapshot=null;session.assistance[item.key]={hintCount:0,usedFullAnswerHint:false,hintReceipt:'',hints:{},live:{},requestSequence:{}};session.itemIndex=only?0:Math.min(at,stage.items.length-1);renderWorkbook({focus:true});}
-function moveWorkbook(delta,{focus=true,preserveKeyboard=false}={}){const {session,stage}=workbookCurrent();if(!session||!stage)return;const next=session.itemIndex+delta;if(next>=0&&next<stage.items.length){session.itemIndex=next;if(ensureWorkbookAssistance(session,stage.items[next]))renderWorkbook({focus,preserveKeyboard});return;}if(next>=stage.items.length){const nextStage=session.data.stages.findIndex((candidate,index)=>index>session.stageIndex&&!candidate.locked&&candidate.items.length);if(nextStage>=0){session.stageIndex=nextStage;session.itemIndex=0;if(ensureWorkbookAssistance(session,session.data.stages[nextStage].items[0]))renderWorkbook({focus,preserveKeyboard});return;}if(session.milestone)return renderWorkbook();return renderScope();}}
-function resetWorkbookCycleState(session,stage){if(!session||!stage)return false;session.orderModeSnapshot=null;session.focusedSlot=0;for(const item of stage.items||[]){item.completed=false;delete item.lastResult;delete session.responses?.[item.key];delete session.results?.[item.key];delete session.orderSelections?.[item.key];delete session.orderConsumedChips?.[item.key];delete session.orderWrongChips?.[item.key];delete session.orderBatchOrders?.[item.key];delete session.assistance?.[item.key];delete session.aiPending?.[item.key];delete session.aiErrors?.[item.key];/* Keep persistenceSequence: it makes queued prior-cycle acknowledgements stale. */}return true;}
-function startWorkbookCycle(session,stageIndex){const stage=session?.data.stages[stageIndex];if(!stage)return null;session.stageIndex=stageIndex;session.itemIndex=0;session.milestone=null;resetWorkbookCycleState(session,stage);return stage;}
-function setWorkbookStage(index){const session=state.workbookSession,stage=session?.data.stages[index];if(!session||!stage||stage.locked)return;if(session.milestone)startWorkbookCycle(session,session.milestone.stageIndex);session.stageIndex=index;session.itemIndex=Math.max(0,stage.items.findIndex(item=>!item.completed));if(ensureWorkbookAssistance(session,stage.items[session.itemIndex]))renderWorkbook({focus:true});}
-async function repeatWorkbookCycle(){const session=state.workbookSession,milestone=session?.milestone,stage=session?.data.stages[milestone?.stageIndex];if(!session||!milestone||!stage)return;if(stage.semanticType==='content_claim'){await flushWorkbookAttempts();if(workbookAttemptQueue.length)return toast('학습 기록을 저장한 뒤 다시 눌러 주세요.');const data=await safely(()=>call('student_workbook',{examId:state.scope.id,passageId:session.passageId},state.token,'다음 난이도를 준비하는 중…'));if(!data)return;cacheWorkbook(session.passageId,data);return startWorkbookSession(data,session.passageId,'','content_claim');}if(!startWorkbookCycle(session,milestone.stageIndex))return;renderWorkbook({focus:true});}
-function chooseOtherWorkbook(){const session=state.workbookSession;if(!session)return;if(session.milestone)startWorkbookCycle(session,session.milestone.stageIndex);else session.orderModeSnapshot=null;renderWorkbookStages();}
+function showLogin() { show('student-home'); requestAnimationFrame(() => $('#student-code')?.focus()); }
 
-function cleanDisplayText(value){return String(value||'').replace(/^\s*(?:[※]\s*)?다음\s*(?:글|대화)(?:을|를)\s*읽고\s*(?:다음\s*)?물음에\s*답하시오\s*[.!?]?\s*/u,'').replace(/\s+/g,' ').trim();}
-function plainPassage(){return state.sentences.map(sentence=>esc(cleanDisplayText(sentence.text))).filter(Boolean).join(' ');}
-function readerUnits(){const text=state.sentences.map(sentence=>cleanDisplayText(sentence.text)).filter(Boolean).join(' ');if(!text)return [];try{return [...new Intl.Segmenter('en',{granularity:'sentence'}).segment(text)].map(item=>item.segment.trim()).filter(Boolean);}catch{return text.split(/(?<=[.!?])\s+(?=[A-Z“"'])/).filter(Boolean);}}
-function readerParagraphs(units){const paragraphs=[];let current=[];for(const unit of units){const length=current.join(' ').length;if(current.length&&length+unit.length>430){paragraphs.push(current.join(' '));current=[];}current.push(unit);}if(current.length)paragraphs.push(current.join(' '));return paragraphs;}
-function readerGlossEnabled(){return window.READY_CONFIG?.READER_INLINE_GLOSS_ENABLED===true;}
-function readerGlossParagraphs(sentences){const paragraphs=[];let current=[];for(const sentence of sentences){const length=current.reduce((sum,item)=>sum+item.text.length+1,0);if(current.length&&length+sentence.text.length>430){paragraphs.push(current);current=[];}current.push(sentence);}if(current.length)paragraphs.push(current);return paragraphs;}
-function readerSavedWordMap(){return new Map((state.savedWords||[]).map(item=>[item.lemma,item]));}
-function readerGlossSentenceHtml(sentence){return `<span class="reader-inline-sentence" data-reader-sentence-id="${esc(sentence.id)}">${readerSentenceMarkup(sentence,[],[],readerSavedWordMap())}</span>`;}
-function structuredReaderBody(gloss=false){const rows=state.sentences||[];if(!rows.some(row=>row.block_type&&row.block_type!=='SENTENCE'||Number(row.paragraph_index)>0))return '';let paragraph=-1,open=false,html='';for(const row of rows){const type=row.block_type||'SENTENCE';if(type==='TITLE'){if(open){html+='</p>';open=false;}html+=`<h2 class="reader-block-title">${esc(row.text)}</h2>`;continue;}if(type==='SUBTITLE'){if(open){html+='</p>';open=false;}html+=`<h3 class="reader-block-subtitle">${esc(row.text)}</h3>`;continue;}const next=Number(row.paragraph_index)||0;if(!open||next!==paragraph){if(open)html+='</p>';html+='<p>';open=true;paragraph=next;}else html+=' ';html+=gloss?readerGlossSentenceHtml({id:row.id,text:String(row.text||'').trim(),translation:String(row.translation||'')}):esc(cleanDisplayText(row.text));}if(open)html+='</p>';return html;}
-function attachWordLookup(root,passage,sentences){readerGlossController?.destroy();readerGlossController=null;if(!readerGlossEnabled()||root?.id!=='student-reader'||!passage||!sentences.length)return;root.dataset.readerPassageId=passage.id;readerGlossController=createReaderInlineGloss({root,passage,sentences,savedWords:state.savedWords,sentenceEnabled:true,onSavedWordsChange:words=>{const delta=words.length-state.savedWords.length;state.savedWords=words;state.reviewCount=Math.max(0,state.reviewCount+delta);invalidateReviewKind('word');updateStudentNav();},request:data=>readyApi('word_lookup_meaning',{examId:state.scope.id,...data},state.token),requestDictionary:data=>readyApi('word_dictionary_candidates',{examId:state.scope.id,...data},state.token),saveWord:data=>readyApi('save_reader_word',{examId:state.scope.id,...data},state.token),removeWord:data=>readyApi('remove_reader_word',{examId:state.scope.id,...data},state.token),requestSentence:data=>readyApi('sentence_easy_translation',{examId:state.scope.id,...data},state.token)});}
-function renderReader(){
-  readerGlossController?.destroy();readerGlossController=null;
-  if(!readerGlossEnabled()){const structured=structuredReaderBody(false),units=readerUnits(),lead=structured?'':units.shift()||'',paragraphs=structured?[]:readerParagraphs(units);show('student-reader');$('#student-reader').innerHTML=`<button class="study-back" type="button" data-exit-study aria-label="학습 목록으로"><span aria-hidden="true">‹</span></button><div class="reader-shell reader-document"><p class="eyebrow">PASSAGE</p><h1>${esc(state.passage.title)}</h1>${lead?`<p class="reader-lede">${esc(lead)}</p>`:''}<article class="reader-prose">${structured|| (paragraphs.length?paragraphs.map(paragraph=>`<p>${esc(paragraph)}</p>`).join(''):`<p>${plainPassage()}</p>`)}</article></div>`;return;}
-  const lookupSentences=state.sentences.filter(sentence=>(sentence.block_type||'SENTENCE')==='SENTENCE').map(sentence=>({id:sentence.id,text:String(sentence.text||'').trim(),translation:String(sentence.translation||'')})).filter(sentence=>sentence.text),structured=structuredReaderBody(true),sentences=[...lookupSentences],lead=structured?'':sentences.shift(),paragraphs=structured?[]:readerGlossParagraphs(sentences),root=$('#student-reader');show('student-reader');root.dataset.readerPassageId=state.passage.id;root.innerHTML=`<button class="study-back" type="button" data-exit-study aria-label="학습 목록으로"><span aria-hidden="true">‹</span></button><div class="reader-shell reader-document"><p class="eyebrow">PASSAGE</p><h1>${esc(state.passage.title)}</h1>${lead?`<p class="reader-lede">${readerGlossSentenceHtml(lead)}</p>`:''}<article class="reader-prose">${structured||(paragraphs.length?paragraphs.map(paragraph=>`<p>${paragraph.map(readerGlossSentenceHtml).join(' ')}</p>`).join(''):'<p></p>')}</article><p class="reader-inline-notice" data-reader-gloss-notice hidden></p><span class="sr-only" data-reader-gloss-live aria-live="polite"></span></div>`;
-  attachWordLookup(root,state.passage,lookupSentences);
+async function login(form) {
+  const code = new FormData(form).get('code');
+  const data = await safely(() => call('student_login', { code, remember: true }, '학생 코드를 확인하는 중…'), { auth: false });
+  form.reset(); $('#student-code').blur();
+  if (!data) return;
+  state.token = data.session.token; state.student = data.student;
+  localStorage.setItem(SESSION_KEY, JSON.stringify(data.session));
+  await loadHome();
 }
-function cacheIndexKey(passageId){return `${CACHE_INDEX}${state.student?.id}:${passageId}`;}
-function cachedPassage(passageId){try{const pointer=JSON.parse(localStorage.getItem(cacheIndexKey(passageId))||'null');return pointer?.key?JSON.parse(localStorage.getItem(pointer.key)||'null'):null;}catch{return null;}}
-function cachePassage(data){try{const revision=[data.passage.id,data.passage.updated_at||'current'].join(':'),key=`ready-passage-cache-v2:${state.student.id}:${revision}`;localStorage.setItem(key,JSON.stringify(data));localStorage.setItem(cacheIndexKey(data.passage.id),JSON.stringify({key,revision}));}catch{/* disposable acceleration only */}}
-function applyPassage(data){Object.assign(state,{passage:data.passage,sentences:data.sentences||[],savedWords:data.savedWords||state.savedWords||[]});}
-async function openPassageStudy(passageId){if(!state.scope)return;const navigation=beginNavigation(),cached=cachedPassage(passageId);if(cached){applyPassage(cached);renderReader();}const data=await safely(()=>cached?readyApi('student_passage',{examId:state.scope.id,passageId},state.token):call('student_passage',{examId:state.scope.id,passageId},state.token,'지문을 준비하는 중…'));if(!data||!navigationIsCurrent(navigation))return;applyPassage(data);renderReader();cachePassage(data);localStorage.setItem(`ready-last-passage:${state.student.id}:${state.scope.id}`,passageId);}
-function prefetchWorkbooks(){if(!state.scope||!state.student)return;const token=state.token,scopeId=state.scope.id,studentId=state.student.id,passages=state.passages.filter(hasWorkbook).filter(item=>!cachedWorkbook(item.id)),owns=()=>state.token===token&&state.scope?.id===scopeId&&state.student?.id===studentId;const run=()=>{if(!owns())return;passages.slice(0,4).forEach(passage=>{const key=workbookCacheKey(passage.id);readyApi('student_workbook',{examId:scopeId,passageId:passage.id},token).then(data=>{if(owns()&&workbookCacheKey(passage.id)===key)cacheWorkbook(passage.id,data);}).catch(()=>{});});};if('requestIdleCallback'in window)requestIdleCallback(run,{timeout:1800});else setTimeout(run,500);}
+async function logout() { if (state.token) { await flushAttempts(); readyApi('logout', {}, state.token).catch(() => {}); } clearSession(); showLogin(); }
 
-function reviewMemoryHtml(levelValue){const level=Math.max(1,Math.min(3,Number(levelValue)||1));return `<span class="word-review-memory" data-memory-level="${level}"><b>LEVEL ${level}</b><span class="word-review-level-bars" aria-hidden="true"><i></i><i></i><i></i></span></span>`;}
-function reviewWordHtml(item){const examples=item.examples||[],senses=item.senses?.length?item.senses:[{id:item.id,meaning:item.meaning}];return `<details class="word-review-item review-word" data-review-word-id="${esc(item.id)}"><summary class="word-review-summary"><span class="word-review-term"><strong class="word-review-lemma">${esc(item.lemma)}</strong><span class="word-review-meaning">${senses.map(sense=>esc(sense.meaning)).join('<br>')}</span><small>예문 ${item.exampleCount??examples.length}개</small></span>${reviewMemoryHtml(item.memoryLevel)}<span class="word-review-chevron" aria-hidden="true">⌄</span></summary><div class="word-review-detail review-word-detail"><section class="review-word-contexts"><div class="review-detail-heading"><p class="eyebrow">EXAMPLES <b>${String(examples.length).padStart(2,'0')}</b></p></div>${examples.length?`<div class="word-context-history">${examples.map(example=>`<article class="word-context-row"><div><strong>${esc(example.sourceSpan)}</strong><span class="word-context-gloss">당시 뜻 · ${esc(example.meaning)}</span></div><div><p class="word-context-en" lang="en">${esc(example.englishSentence)}</p>${example.publisherTranslation?`<p class="word-context-ko">${esc(example.publisherTranslation)}</p>`:''}<small>${esc(example.passageTitle||example.sourceLabel||'READY')} · ${esc(example.sourceKind||'reader')}</small></div></article>`).join('')}</div>`:'<p class="review-empty-copy">저장 후 다른 문맥에서 찾아본 예문이 아직 없습니다.</p>'}</section><section class="review-word-controls"><button class="word-review-remove" type="button" data-review-word-remove="${esc(item.lemma)}">단어 제거</button></section></div></details>`;}
-function reviewNavHtml(counts,active){return `<nav class="word-review-nav" aria-label="Review 유형">${[['workbook','오답'],['word','WORD'],['sentence','SENTENCE']].map(([kind,label])=>`<button class="word-review-tab${active===kind?' is-active':''}" type="button" data-review-kind="${kind}" aria-current="${active===kind?'page':'false'}"><span>${label}</span><b>${Number.isFinite(Number(counts[kind]))?Number(counts[kind]):'—'}</b></button>`).join('')}</nav>`;}
-function reviewAnswerRows(item){const responses=item.studentResponses||[],answers=item.answers||[],length=Math.max(responses.length,answers.length);return `<div class="review-wrong-answers">${Array.from({length},(_,index)=>`<div><span>내 답 ${length>1?index+1:''}<b>${esc(responses[index]||'응답 없음')}</b></span><span>정답 ${length>1?index+1:''}<b>${esc(answers[index]||'—')}</b></span></div>`).join('')}</div>`;}
-function reviewWorkbookWrongHtml(item,index){return `<details class="review-workbook-wrong" ${index===0?'open':''}><summary><span><strong>${esc(item.title)}${item.number?` · ${esc(item.number)}번`:''}</strong><small>${esc(item.passageTitle)}</small></span><b>오답</b></summary><div>${item.sourceText?`<blockquote>${esc(item.sourceText)}</blockquote>`:''}${item.prompt?`<p class="review-wrong-prompt" lang="en">${esc(item.prompt)}</p>`:''}${reviewAnswerRows(item)}${(item.gradingFeedback||[]).length?`<p class="review-wrong-feedback">${item.gradingFeedback.map(esc).join('<br>')}</p>`:''}<button type="button" class="button primary" data-review-workbook-passage="${item.passageId}" data-review-workbook-item="${item.itemKey}">다시 풀기</button></div></details>`;}
-function reviewPanelHtml(kind,{workbooks,words,sentences,counts}){
-  if(kind==='word')return `<section class="review-panel word-review-panel"><header class="review-panel-head"><div><p class="eyebrow">WORD</p><h2>단어장</h2></div><small>${Number(counts.word)||0}개 저장됨</small></header>${words.length?`<div class="word-review-list">${words.map(reviewWordHtml).join('')}</div>`:'<div class="review-panel-empty">저장한 단어가 없습니다.</div>'}</section>`;
-  if(kind==='sentence')return `<section class="review-panel sentence-review-panel"><header class="review-panel-head"><div><p class="eyebrow">SENTENCE</p><h2>저장한 문장</h2></div><small>${Number(counts.sentence)||0}개 저장됨</small></header>${sentences.length?`<div class="review-sentence-list">${sentences.map(item=>`<article><p lang="en">${esc(item.source_text_snapshot)}</p><p>${esc(item.translation_snapshot)}</p><small>${esc(item.passage?.title||'READY Reader')}</small></article>`).join('')}</div>`:'<div class="review-panel-empty">저장한 문장이 없습니다.</div>'}</section>`;
-  if(kind==='workbook'){const wrong=workbooks.filter(item=>item.lastResult===false),saved=workbooks.filter(item=>item.lastResult!==false);return `<section class="review-panel workbook-review-panel"><header class="review-panel-head"><div><p class="eyebrow">WRONG ANSWERS</p><h2>오답 다시 보기</h2></div><small>${wrong.length}문제</small></header>${wrong.length?`<div class="review-workbook-wrongs">${wrong.map(reviewWorkbookWrongHtml).join('')}</div>`:'<div class="review-panel-empty">현재 다시 볼 오답이 없습니다.</div>'}${saved.length?`<details class="review-saved-workbooks"><summary>따로 저장한 문제 ${saved.length}개</summary><div class="review-workbook-list">${saved.map(item=>`<button type="button" data-review-workbook-passage="${item.passageId}" data-review-workbook-item="${item.itemKey}"><span><strong>${esc(item.title)}${item.number?` · ${esc(item.number)}번`:''}</strong><small>${esc(item.passageTitle)}</small></span><b>›</b></button>`).join('')}</div></details>`:''}</section>`;}
+// ---------- Home: assigned sentence sets ----------
+function stepProgress(passage, step) { return passage?.progress?.[step] || { total: passage?.sentenceCount || 0, completedCycles: 0, currentCycle: 1, currentCycleClears: [] }; }
+function progressLabel(progress) {
+  const cleared = progress.currentCycleClears?.length || 0, total = Number(progress.total) || 0, cycles = Number(progress.completedCycles) || 0;
+  return `${cleared}/${total}${cycles ? ` · ${cycles}회 완료` : ''}`;
+}
+function passageRow(passage, index) {
+  const steps = [1, 2].map(step => `<button class="passage-workbook" type="button" data-start-step="${step}" data-passage="${esc(passage.id)}" aria-label="${esc(passage.title)} ${step}단계 시작">${step}단계 <small>${esc(progressLabel(stepProgress(passage, step)))}</small></button>`).join('');
+  return `<article class="passage-row"><button class="passage-open" type="button" data-start-step="1" data-passage="${esc(passage.id)}"><span class="passage-index">${String(index + 1).padStart(2, '0')}</span><span class="passage-copy"><strong>${esc(passage.title)}</strong><small>문장 ${Number(passage.sentenceCount) || 0}개</small></span></button><div class="passage-actions">${steps}</div></article>`;
+}
+function renderHome() {
+  state.practice = null; stopSentenceAudio(); show('student-sets');
+  const content = !state.scope ? '<div class="empty scope-empty"><strong>아직 배정된 시험범위가 없습니다.</strong></div>'
+    : state.passages.length ? `<div class="passage-list">${state.passages.map(passageRow).join('')}</div>`
+      : '<div class="empty scope-empty"><strong>아직 배정된 문장 세트가 없습니다.</strong></div>';
+  $('#student-sets').innerHTML = `<div class="home-head"><span>문장 배열 연습</span><small>${state.scope ? `${esc(state.student?.school)} · ${esc(state.student?.grade)} · ${state.passages.length}개` : ''}</small></div><p class="practice-home-lead">1단계는 소리를 들으며 배열하고, 틀려도 계속 진행합니다. 2단계는 소리 없이 배열하며 틀리면 처음부터 다시 시작합니다. ${LONG_SENTENCE_WORD_THRESHOLD}단어 이상 문장은 한 번까지 틀려도 됩니다.</p><div class="home-content">${content}</div>`;
+}
+async function loadHome() {
+  restoreAttempts();
+  const data = await safely(() => call('student_bootstrap_active', {}, '학습 범위를 준비하는 중…'));
+  if (!data) return;
+  Object.assign(state, { student: data.student, scope: data.scope, passages: data.passages || [] });
+  renderHome();
+  flushAttempts();
+}
+
+// ---------- Practice ----------
+function current() { const practice = state.practice; return { practice, item: practice?.items[practice.index] }; }
+async function openPractice(passageId, step) {
+  const data = await safely(() => call('student_passage', { examId: state.scope.id, passageId }, '문장을 불러오는 중…'));
+  if (!data) return;
+  const items = practiceItems(data.sentences);
+  if (!items.length) return toast('배열할 문장이 없습니다.');
+  const passage = state.passages.find(candidate => candidate.id === passageId);
+  if (passage && data.progress) passage.progress = data.progress;
+  const cleared = new Set(stepProgress(passage || data, step).currentCycleClears || []), firstOpen = items.findIndex(item => !cleared.has(item.key));
+  state.practice = { passageId, title: data.passage?.title || passage?.title || '', step: Number(step), items, index: Math.max(0, firstOpen), run: null, orders: {}, feedback: null, cleanCount: 0, finishedCount: 0, done: false };
+  startItem();
+}
+function startItem() {
+  const { practice, item } = current();
+  if (!practice || !item) return;
+  practice.run = startRun(item, practice.step); practice.orders = {}; practice.feedback = null;
+  stopSentenceAudio();
+  renderPractice();
+}
+function feedbackHtml(practice, item) {
+  const feedback = practice.feedback, run = practice.run;
+  if (run.completed) {
+    const clean = runIsClean(run);
+    return `<div class="workbook-feedback ${clean ? 'correct' : 'wrong'}"><strong>${clean ? '완성했어요.' : '끝까지 완성했어요.'}</strong><span class="workbook-feedback-copy"><span lang="en">${esc(item.text)}</span>${clean ? '' : `<span>${practice.step === 1 ? `틀린 선택 ${run.mistakes}번` : `다시 시작 ${run.restarts}번`} · 다음에는 한 번에 해 보세요.</span>`}</span></div><div class="workbook-actions"><button class="button primary" type="button" data-practice-next>${practice.index === practice.items.length - 1 ? '결과 보기' : '다음 문장'}</button></div>`;
+  }
+  if (feedback?.type === 'mistake' && practice.step === 1) return `<small class="practice-note" role="status">그 단어는 아직 아니에요. 계속 골라 보세요.</small>`;
+  if (feedback?.type === 'mistake') return `<small class="workbook-order-feedback" role="status">한 번 틀렸어요. 한 번 더 틀리면 처음부터 다시 시작해요.</small>`;
+  if (feedback?.type === 'restart') return `<small class="workbook-order-feedback" role="status">틀렸어요. 처음부터 다시 배열하세요.</small>`;
   return '';
 }
-function reviewCacheKey(){return `${REVIEW_CACHE}${state.student?.id||'student'}:${state.scope?.id||'scope'}`;}
-function ensureReviewData(){if(state.reviewData)return state.reviewData;let cached=null;try{cached=JSON.parse(localStorage.getItem(reviewCacheKey())||'null');}catch{}state.reviewData=cached&&cached.loaded?cached:{wordItems:[],sentenceItems:[],workbookItems:[],counts:{word:(state.savedWords||[]).length,sentence:null,workbook:null},loaded:{word:false,sentence:false,workbook:false}};return state.reviewData;}
-function saveReviewData(){try{localStorage.setItem(reviewCacheKey(),JSON.stringify(state.reviewData));}catch{}}
-function invalidateReviewKind(kind){const data=ensureReviewData();if(state.reviewLoading[kind])state.reviewLoading[kind].invalidated=true;data.loaded[kind]=false;state.reviewValidated[kind]=false;delete state.reviewErrors[kind];saveReviewData();}
-function applyReviewKind(kind,data){const target=ensureReviewData(),field={word:'wordItems',sentence:'sentenceItems',workbook:'workbookItems'}[kind],items=data?.[field]||[];target[field]=items;target.counts[kind]=Number.isFinite(Number(data?.count))?Number(data.count):items.length;target.loaded[kind]=true;delete state.reviewErrors[kind];saveReviewData();}
-function renderReview(){const data=ensureReviewData(),workbooks=data.workbookItems||[],words=data.wordItems||[],sentences=data.sentenceItems||[],counts=data.counts||{},kind=['word','sentence','workbook'].includes(state.reviewKind)?state.reviewKind:'workbook',titles={word:['Word Review','저장한 단어를 다시 확인하세요.'],sentence:['Sentence Review','저장한 문장을 다시 확인하세요.'],workbook:['오답 다시 보기','틀린 문제와 내 답, 정답을 바로 확인하세요.']},[title,description]=titles[kind],statusCopy=state.reviewErrors[kind]?'불러오지 못했습니다. 탭을 다시 누르면 재시도합니다.':state.reviewLoading[kind]?'불러오는 중…':'Review를 준비하고 있어요.',panel=data.loaded?.[kind]?reviewPanelHtml(kind,{workbooks,words,sentences,counts}):`<section class="review-panel review-panel-loading" aria-live="polite"><span>${statusCopy}</span></section>`;show('student-review');$('#student-review').innerHTML=`<div class="review-head"><div><p class="eyebrow">READY · REVIEW</p><h1>${title}</h1><small>${description}</small></div><button class="review-export-open" type="button" data-open-review-export>PDF 만들기</button></div><div class="word-review-dashboard">${reviewNavHtml(counts,kind)}${panel}</div>`;}
-async function loadReviewKind(kind,{force=false}={}){
-  if(!state.scope||!state.token)return;
-  const data=ensureReviewData();if(state.reviewLoading[kind]||(data.loaded?.[kind]&&(!force||state.reviewValidated[kind])))return;
-  const token=state.token,scopeId=state.scope.id,request={invalidated:false};state.reviewLoading[kind]=request;delete state.reviewErrors[kind];
-  const owns=()=>state.token===token&&state.scope?.id===scopeId&&state.reviewData===data&&state.reviewLoading[kind]===request;
-  if(!$('#student-review').hidden&&state.reviewKind===kind)renderReview();
-  let result;
-  try{result=await readyApi('student_review',{examId:scopeId,kind},token);}
-  catch(error){if(!owns())return;if(error.status===401){clearSession();showStudentLogin();return;}state.reviewErrors[kind]=true;}
-  if(!owns())return;
-  state.reviewLoading[kind]=false;
-  if(request.invalidated){if(!$('#student-review').hidden&&state.reviewKind===kind)return loadReviewKind(kind,{force:true});return;}
-  if(result){state.reviewValidated[kind]=true;applyReviewKind(kind,result);}
-  if(!$('#student-review').hidden&&state.reviewKind===kind)renderReview();
+function orderGroupHtml(practice, item) {
+  const run = practice.run, built = builtSentence(item, run), { visible } = visibleChips(item, run, practice.orders), used = new Set(run.consumed), wrong = practice.feedback?.wrongChip;
+  const bank = run.completed ? '' : visible.map(chip => `<span class="workbook-order-bank-slot${used.has(chip) ? ' used' : ''}${wrong === chip ? ' wrong' : ''}"><button type="button" data-chip="${chip}" aria-invalid="${wrong === chip}" ${used.has(chip) ? 'disabled' : ''}>${esc(item.words[chip])}</button></span>`).join('');
+  return `<span class="workbook-order-group${run.completed ? ' correct' : ''}" data-practice-group><span class="workbook-order-built" aria-label="배열한 문장"><span class="workbook-order-built-sizer" aria-hidden="true">${esc(item.answer)}</span><span class="workbook-order-built-text">${built ? esc(built) : '<em>단어를 순서대로 누르세요</em>'}</span></span><span class="workbook-order-bank" aria-label="선택할 단어">${bank}</span></span>`;
 }
-function prefetchReview(){if(!state.scope||!state.student)return;ensureReviewData();const token=state.token,scopeId=state.scope.id,data=state.reviewData;const run=()=>{if(state.token===token&&state.scope?.id===scopeId&&state.reviewData===data)loadReviewKind('workbook',{force:true});};if('requestIdleCallback'in window)requestIdleCallback(run,{timeout:1400});else setTimeout(run,400);}
-function openReview(){if(!state.scope)return;beginNavigation();state.reviewKind='workbook';ensureReviewData();renderReview();loadReviewKind('workbook',{force:true});}
-function reviewExportKindOption(kind,label,count){return `<label class="review-export-option"><input type="checkbox" name="kind" value="${kind}" ${count?'checked':'disabled'}><span><strong>${label}</strong><small>${Number(count)||0}개</small></span></label>`;}
-function renderReviewExportComposer(){const data=state.reviewExportData;if(!data)return renderReview();const counts=data.counts||{};show('student-review');$('#student-review').innerHTML=`<div class="review-export-toolbar"><button class="back-link" type="button" data-close-review-export>← Review</button><p class="eyebrow">READY · REVIEW PRINT</p><h1>PDF 만들기</h1><p>출력할 복습 항목과 정답 위치를 선택하세요.</p></div><form id="review-export-form" class="review-export-form"><fieldset><legend>복습 항목</legend><div class="review-export-options">${reviewExportKindOption('word','저장 단어',counts.word)}${reviewExportKindOption('workbook','틀린 Workbook',counts.workbook)}</div></fieldset><fieldset><legend>정답</legend><div class="review-export-answer-options"><label><input type="radio" name="answerMode" value="included"><span>문제와 함께</span></label><label><input type="radio" name="answerMode" value="appendix" checked><span>맨 뒤에만</span></label><label><input type="radio" name="answerMode" value="excluded"><span>제외</span></label></div></fieldset><button class="button primary review-export-preview-button" type="submit">PDF 미리보기</button></form>`;}
-async function openReviewExport(){if(!state.scope)return;const data=await safely(()=>call('student_review_export_active',{examId:state.scope.id},state.token,'PDF 항목을 준비하는 중…'));if(!data)return;state.reviewExportData=data;renderReviewExportComposer();}
-function previewReviewExport(form){const values=new FormData(form),kinds=values.getAll('kind'),answerMode=values.get('answerMode')||'appendix';if(!kinds.length){toast('출력할 항목을 하나 이상 선택해 주세요.');return;}show('student-review');$('#student-review').innerHTML=`<div class="review-export-preview-bar"><button class="back-link" type="button" data-edit-review-export>← 항목 다시 선택</button><div><button class="button quiet" type="button" data-close-review-export>Review로</button><button class="button primary" type="button" data-print-review-export>저장 / 인쇄</button></div></div><div class="review-export-preview">${reviewExportDocumentHtml(state.reviewExportData,{kinds,answerMode})}</div>`;window.scrollTo({top:0,behavior:'smooth'});}
-async function removeReviewWord(lemmaValue){const data=await safely(()=>call('remove_reader_word',{examId:state.scope.id,lemma:lemmaValue},state.token,'단어를 제거하는 중…'));if(!data)return;state.savedWords=(state.savedWords||[]).filter(item=>item.lemma!==data.lemma);invalidateReviewKind('word');state.reviewData.counts.word=state.savedWords.length;renderReview();loadReviewKind('word',{force:true});}
-async function updateReviewWordMeaning(savedWordId,meaning){if(!meaning)return;const data=await safely(()=>call('update_reader_word_meaning',{examId:state.scope.id,savedWordId,meaning},state.token,'저장 뜻을 바꾸는 중…'));if(!data)return;const saved=(state.savedWords||[]).find(item=>item.id===savedWordId);if(saved)saved.meaning=data.meaning;invalidateReviewKind('word');renderReview();loadReviewKind('word',{force:true});}
-async function logout(){if(state.token){await flushWorkbookAttempts();record('logout');}clearSession();showStudentLogin();}
+function renderPractice() {
+  const { practice, item } = current();
+  if (!practice) return renderHome();
+  if (practice.done) return renderSummary();
+  show('student-workbook');
+  const run = practice.run, audio = stepUsesAudio(practice.step) && sentenceAudioSupported() ? '<button class="button quiet practice-audio" type="button" data-play-audio aria-label="영어 문장 듣기">▶ 문장 듣기</button>' : '';
+  const tolerance = practice.step === 2 ? `<span class="practice-rule">${run.allowance ? '한 번 틀려도 됨' : '틀리면 다시 시작'}</span>` : '';
+  $('#student-workbook').innerHTML = `<button class="study-back" type="button" data-exit-practice aria-label="목록으로"><span aria-hidden="true">‹</span></button><div class="workbook-study-layout"><header class="workbook-study-head workbook-study-toolbar"><span class="workbook-state"><b>${practice.index + 1} / ${practice.items.length}</b><span class="workbook-order-mode" data-practice-step="${practice.step}">${STEP_LABEL[practice.step]}</span>${tolerance}</span></header><section class="workbook-card workbook-focus-card" data-practice-item="${esc(item.key)}"><blockquote lang="ko">${esc(item.translation)}</blockquote>${audio}<div class="workbook-prompt order-task" lang="en">${orderGroupHtml(practice, item)}</div><div data-practice-outcome>${feedbackHtml(practice, item)}</div></section></div>`;
+  if (run.completed) $('[data-practice-next]')?.focus({ preventScroll: true });
+}
+function tapChip(chipIndex) {
+  const { practice, item } = current();
+  if (!practice || !item || practice.run.completed) return;
+  const result = placeWord(item, practice.run, chipIndex);
+  if (result.type === 'ignore') return;
+  practice.run = result.run;
+  if (result.type === 'restart') practice.orders = {};
+  practice.feedback = result.type === 'mistake' || result.type === 'restart' ? { type: result.type, wrongChip: result.type === 'mistake' ? chipIndex : null } : null;
+  if (result.type === 'complete') finishItem(practice, item);
+  renderPractice();
+  clearTimeout(wrongTimer);
+  if (result.type === 'mistake') wrongTimer = setTimeout(() => { if (state.practice === practice && practice.feedback?.wrongChip === chipIndex) { practice.feedback = { ...practice.feedback, wrongChip: null }; renderPractice(); } }, 650);
+}
+function finishItem(practice, item) {
+  const clean = runIsClean(practice.run);
+  practice.finishedCount += 1; if (clean) practice.cleanCount += 1;
+  const passage = state.passages.find(candidate => candidate.id === practice.passageId);
+  if (clean && passage) { const progress = stepProgress(passage, practice.step); passage.progress = { ...(passage.progress || {}), [practice.step]: { ...progress, ...clearWorkbookCycleItem(progress, item.key, progress.total) } }; }
+  queueAttempt({ examId: state.scope.id, passageId: practice.passageId, ...attemptPayload(item, practice.run), clientAttemptId: crypto.randomUUID() });
+}
+function nextItem() {
+  const { practice } = current();
+  if (!practice?.run?.completed) return;
+  if (practice.index >= practice.items.length - 1) { practice.done = true; stopSentenceAudio(); return renderSummary(); }
+  practice.index += 1; startItem();
+}
+function renderSummary() {
+  const practice = state.practice; show('student-workbook');
+  const nextStep = practice.step === 1 ? '<button class="button quiet" type="button" data-practice-step2>2단계 시작</button>' : '';
+  $('#student-workbook').innerHTML = `<button class="study-back" type="button" data-exit-practice aria-label="목록으로"><span aria-hidden="true">‹</span></button><div class="workbook-milestone-shell"><section class="workbook-milestone" aria-live="polite"><div class="workbook-milestone-mark"><span>${practice.cleanCount}/${practice.finishedCount}</span></div><p class="eyebrow">${esc(STEP_LABEL[practice.step])}</p><h1>${esc(practice.title)}</h1><p>${practice.finishedCount}문장을 완성했고, 그중 ${practice.cleanCount}문장은 한 번에 맞혔어요.</p><div class="workbook-milestone-actions"><button class="button primary" type="button" data-practice-repeat>다시 하기</button>${nextStep}<button class="button quiet" type="button" data-exit-practice>목록으로</button></div></section></div>`;
+}
+function restartSet(step) {
+  const practice = state.practice; if (!practice) return;
+  Object.assign(practice, { step, index: 0, done: false, cleanCount: 0, finishedCount: 0 });
+  startItem();
+}
 
-let workbookBackSwipe=null;
-document.addEventListener('pointerdown',beginNavPointer);
-document.addEventListener('pointermove',moveNavPointer,{passive:true});
-document.addEventListener('pointerup',finishNavPointer);
-document.addEventListener('pointercancel',event=>finishNavPointer(event,true));
-window.addEventListener('scroll',markNavScroll,{passive:true});
-document.addEventListener('scroll',markNavScroll,{passive:true,capture:true});
-document.addEventListener('click',guardNavTailClick,true);
-function finishWorkbookBackSwipe(event,cancelled=false){if(!workbookBackSwipe||event.pointerId!==workbookBackSwipe.pointerId)return;const swipe=workbookBackSwipe;workbookBackSwipe=null;const dx=event.clientX-swipe.startX,dy=event.clientY-swipe.startY,backGesture=dx<=-64||(swipe.fromLeftEdge&&dx>=64);if(!cancelled&&backGesture&&Math.abs(dx)>Math.abs(dy)*1.2)moveWorkbook(-1);}
-document.addEventListener('pointerdown',event=>{if(event.pointerType==='mouse'||!state.workbookSession||$('#student-workbook').hidden||event.target.closest?.('input,textarea,select,button,[contenteditable="true"]'))return;const root=$('#student-workbook');workbookBackSwipe={pointerId:event.pointerId,startX:event.clientX,startY:event.clientY,fromLeftEdge:event.clientX<=36};root.setPointerCapture?.(event.pointerId);});
-document.addEventListener('pointerup',event=>finishWorkbookBackSwipe(event));
-document.addEventListener('pointercancel',event=>finishWorkbookBackSwipe(event,true));
-document.addEventListener('click',event=>{const button=event.target.closest?.('[data-workbook-hint],[data-workbook-reveal]');if(!button)return;event.stopImmediatePropagation();if(button.hasAttribute('data-workbook-hint'))requestWorkbookHint();else revealWorkbookAnswer();},true);
-document.addEventListener('click',event=>{const button=event.target.closest?.('[data-workbook-stages]');if(!button)return;event.stopImmediatePropagation();beginNavigation();renderWorkbookStages();},true);
-document.addEventListener('focusin',event=>{if(event.target.matches?.('[data-workbook-slot]')&&state.workbookSession)state.workbookSession.focusedSlot=Number(event.target.dataset.workbookSlot)||0;});
-document.addEventListener('compositionstart',event=>{if(event.target.matches?.('[data-workbook-recall]'))event.target.dataset.composing='true';});
-document.addEventListener('compositionend',event=>{if(!event.target.matches?.('[data-workbook-recall]'))return;event.target.dataset.composing='false';handleWorkbookRecallInput(event.target,event);});
-document.addEventListener('beforeinput',event=>{if(event.target.matches?.('[data-workbook-graded="true"],[data-recall-complete="true"]'))event.preventDefault();},true);
-document.addEventListener('click',event=>{const button=event.target.closest?.('[data-review-kind]');if(!button)return;event.stopImmediatePropagation();state.reviewKind=button.dataset.reviewKind;renderReview();loadReviewKind(state.reviewKind);},true);
-document.addEventListener('click',event=>{const button=event.target.closest?.('[data-open-review-export],[data-close-review-export],[data-edit-review-export],[data-print-review-export]');if(!button)return;event.stopImmediatePropagation();if(button.hasAttribute('data-open-review-export'))return openReviewExport();if(button.hasAttribute('data-edit-review-export'))return renderReviewExportComposer();if(button.hasAttribute('data-print-review-export'))return window.print();state.reviewExportData=null;renderReview();},true);
-document.addEventListener('input',event=>{const input=event.target;if(input.matches?.('[data-workbook-recall]')){event.stopImmediatePropagation();handleWorkbookRecallInput(input,event);return;}if(input.matches?.('[data-workbook-live-prefix]')){event.stopImmediatePropagation();handleWorkbookLiveInput(input);}},true);
-document.addEventListener('click',event=>{const button=event.target.closest?.('[data-review-word-remove],[data-review-word-meaning-save]');if(!button)return;event.stopImmediatePropagation();if(button.dataset.reviewWordRemove)return removeReviewWord(button.dataset.reviewWordRemove);if(button.dataset.reviewWordMeaningSave){const input=document.querySelector(`[data-review-word-meaning-input="${CSS.escape(button.dataset.reviewWordMeaningSave)}"]`);return updateReviewWordMeaning(button.dataset.reviewWordMeaningSave,input?.value.trim()||'');}},true);
-document.addEventListener('click',event=>{const button=event.target.closest('button');if(button?.dataset.contentClaimChoice)return chooseContentClaim(button.dataset.contentClaimChoice);if(button?.hasAttribute('data-toggle-workbook-bookmark'))return toggleWorkbookBookmark();if(button?.dataset.workbookChoiceGroup!==undefined)return chooseWorkbookOption(Number(button.dataset.workbookChoiceGroup),button.dataset.workbookChoiceValue||'');if(button?.dataset.workbookOrderAdd){const [group,chip]=button.dataset.workbookOrderAdd.split(':').map(Number);return changeWorkbookOrder(group,chip);}if(button?.dataset.workbookOrderRemove){const [group,chip]=button.dataset.workbookOrderRemove.split(':').map(Number);return changeWorkbookOrder(group,chip,true);}if(button?.id==='theme-toggle')return theme(document.body.classList.contains('dark')?'light':'dark');if(button?.id==='logout')return logout();if(button?.dataset.reviewWorkbookPassage)return openWorkbook(button.dataset.reviewWorkbookPassage,button.dataset.reviewWorkbookItem||'');if(button?.dataset.startWorkbook)return openWorkbook(button.dataset.startWorkbook);if(button?.dataset.startPassage)return openPassageStudy(button.dataset.startPassage);if(button?.hasAttribute('data-open-review')||button?.dataset.studentRoute==='review')return openReview();if(button?.hasAttribute('data-exit-workbook')){beginNavigation();return renderScope();}if(button?.hasAttribute('data-workbook-repeat'))return repeatWorkbookCycle();if(button?.hasAttribute('data-workbook-other')){beginNavigation();return chooseOtherWorkbook();}if(button?.hasAttribute('data-submit-workbook'))return submitWorkbook();if(button?.hasAttribute('data-workbook-retry'))return retryWorkbook();if(button?.hasAttribute('data-workbook-later'))return deferWorkbook();if(button?.hasAttribute('data-workbook-next'))return moveWorkbook(1);if(button?.hasAttribute('data-workbook-prev'))return moveWorkbook(-1);if(button?.dataset.workbookStage!==undefined)return setWorkbookStage(Number(button.dataset.workbookStage));if(button?.hasAttribute('data-exit-study')||button?.dataset.studentRoute==='passages'){beginNavigation();return renderScope();}});
-document.addEventListener('input',event=>{if(event.target.matches('[data-workbook-slot]')){syncWorkbookSlotWidth(event.target);updateWorkbookSlot(Number(event.target.dataset.workbookSlot),event.target.value);}});
-document.addEventListener('keydown',event=>{if(event.key!=='Enter'||!state.workbookSession||$('#student-workbook').hidden)return;const {session,item}=workbookCurrent(),result=session?.results?.[item?.key],slot=event.target.closest?.('[data-workbook-slot]');if(!result&&!slot)return;if(slot?.matches('textarea')&&event.shiftKey)return;if(!result&&slot?.dataset.workbookRecall==='korean_syllable'&&slot.dataset.recallComplete!=='true'){if(event.isComposing||event.keyCode===229||slot.dataset.composing==='true')return;event.preventDefault();handleWorkbookRecallInput(slot,event);return;}if(event.isComposing||event.keyCode===229)return;event.preventDefault();const action=workbookEnterAction(workbookValues(session,item),Number(slot?.dataset.workbookSlot)||0,result);if(action.type==='focus'){const next=document.querySelector(`[data-workbook-slot="${action.index}"]`);if(next)try{next.focus({preventScroll:true});}catch{next.focus();}return;}if(action.type==='submit')return submitWorkbook();if(action.type==='next')return moveWorkbook(1,{focus:true,preserveKeyboard:true});return retryWorkbook();});
-document.addEventListener('submit',event=>{event.preventDefault();if(event.target.id==='student-code-form')return login(event.target);if(event.target.id==='review-export-form')return previewReviewExport(event.target);});
+// ---------- Attempt queue (local-first, flushed in batches) ----------
+function queueKey() { return `${ATTEMPT_QUEUE}${state.token.slice(-12)}`; }
+function saveQueue() { try { localStorage.setItem(queueKey(), JSON.stringify(attemptQueue)); } catch { /* storage full or disabled */ } }
+function restoreAttempts() { if (attemptQueue.length || !state.token) return; try { const saved = JSON.parse(localStorage.getItem(queueKey()) || '[]'); if (Array.isArray(saved)) attemptQueue = saved; } catch { attemptQueue = []; } }
+function queueAttempt(body) { attemptQueue.push(body); saveQueue(); clearTimeout(flushTimer); flushTimer = setTimeout(() => flushAttempts(), 300); }
+async function flushAttempts({ keepalive = false } = {}) {
+  clearTimeout(flushTimer); flushTimer = null;
+  if (flushing) return flushing;
+  if (!attemptQueue.length || !state.token) return;
+  const token = state.token, batch = attemptQueue.slice(0, 20);
+  flushing = (async () => {
+    try {
+      const data = await readyApi('submit_sentence_attempts', { attempts: batch }, token, { keepalive });
+      batch.forEach((entry, index) => {
+        const result = data.results?.[index];
+        // Invalid attempts are dropped too: they would be rejected again on retry.
+        if (result?.attempt?.id || result?.rejected) attemptQueue = attemptQueue.filter(candidate => candidate !== entry);
+        const passage = state.passages.find(candidate => candidate.id === entry.passageId);
+        if (result?.progress && passage) passage.progress = { ...(passage.progress || {}), [entry.step]: result.progress };
+      });
+    } catch { /* keep the queue for the next retry */ }
+    finally {
+      if (state.token === token) saveQueue();
+      flushing = null;
+      if (state.token === token && attemptQueue.length && !keepalive) flushTimer = setTimeout(() => flushAttempts(), 1500);
+    }
+  })();
+  return flushing;
+}
 
-theme(localStorage.getItem('ready-theme')||(matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light'));
-window.addEventListener('pagehide',()=>flushWorkbookAttempts({keepalive:true}));
-document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden')flushWorkbookAttempts({keepalive:true});});
-try{const previous=JSON.parse(localStorage.getItem(SESSION_KEY)||'null');if(previous?.token){state.token=previous.token;loadDashboard();}else showStudentLogin();}catch{showStudentLogin();}
+// ---------- Events ----------
+document.addEventListener('click', event => {
+  const button = event.target.closest?.('button');
+  if (!button) return;
+  if (button.id === 'theme-toggle') return theme(document.body.classList.contains('dark') ? 'light' : 'dark');
+  if (button.id === 'logout') return logout();
+  if (button.hasAttribute('data-home') && state.token) return renderHome();
+  if (button.dataset.startStep) return openPractice(button.dataset.passage, Number(button.dataset.startStep));
+  if (button.dataset.chip !== undefined) return tapChip(Number(button.dataset.chip));
+  if (button.hasAttribute('data-play-audio')) { const { item } = current(); if (item) speakSentence(item.text); return; }
+  if (button.hasAttribute('data-practice-next')) return nextItem();
+  if (button.hasAttribute('data-practice-repeat')) return restartSet(state.practice.step);
+  if (button.hasAttribute('data-practice-step2')) return restartSet(2);
+  if (button.hasAttribute('data-exit-practice')) { flushAttempts(); return renderHome(); }
+});
+document.addEventListener('keydown', event => {
+  if (event.key !== 'Enter' || $('#student-workbook').hidden || event.isComposing) return;
+  const { practice } = current();
+  if (practice?.run?.completed && !practice.done) { event.preventDefault(); nextItem(); }
+});
+document.addEventListener('submit', event => { event.preventDefault(); if (event.target.id === 'student-code-form') login(event.target); });
+window.addEventListener('pagehide', () => flushAttempts({ keepalive: true }));
+document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden') flushAttempts({ keepalive: true }); });
+
+theme(localStorage.getItem('ready-theme') || (matchMedia('(prefers-color-scheme:dark)').matches ? 'dark' : 'light'));
+try { const previous = JSON.parse(localStorage.getItem(SESSION_KEY) || 'null'); if (previous?.token) { state.token = previous.token; loadHome(); } else showLogin(); } catch { showLogin(); }

@@ -2,180 +2,54 @@
 <html lang="ko">
   <head>
     <meta charset="utf-8" />
-    <meta
-      name="viewport"
-      content="width=device-width,initial-scale=1,viewport-fit=cover"
-    />
+    <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
     <title>READY Admin · 고려에듀</title>
-    <meta
-      name="theme-color"
-      content="#F6F6F3"
-      media="(prefers-color-scheme:light)"
-    />
-    <meta
-      name="theme-color"
-      content="#171713"
-      media="(prefers-color-scheme:dark)"
-    />
+    <meta name="theme-color" content="#F6F6F3" media="(prefers-color-scheme:light)" />
+    <meta name="theme-color" content="#171713" media="(prefers-color-scheme:dark)" />
     <link rel="icon" href="../../assets/favicon/icon-192.png?v=monofy-bear-1" type="image/png" sizes="192x192" />
     <link rel="apple-touch-icon" href="../../assets/favicon/apple-touch-icon.png?v=monofy-bear-1" />
     <link rel="stylesheet" href="../../styles/fonts.css" />
     <link rel="stylesheet" href="../../styles/tokens.css" />
     <link rel="stylesheet" href="../../styles/base.css" />
     <link rel="stylesheet" href="../../design-tokens.css?v=passage-mastery-1" />
-    <link rel="stylesheet" href="../ready.css?v=passage-mastery-1" />
-    <link rel="stylesheet" href="../design.css?v=studio-workbook-dashboard-3" />
-    <link rel="stylesheet" href="studio.css?v=studio-workbook-dashboard-3" />
+    <link rel="stylesheet" href="../ready.css?v=sentence-practice-1" />
+    <link rel="stylesheet" href="../design.css?v=sentence-practice-1" />
     <script defer src="../config.js"></script>
-    <script type="module" src="app.js?v=word-order-numeric-1"></script>
+    <script type="module" src="app.js?v=sentence-practice-1"></script>
   </head>
   <body data-ready-mode="admin">
     <div id="app">
       <header id="topbar">
-        <button
-          id="logo"
-          class="brand-button"
-          type="button"
-          data-route="students"
-        >
-          <img src="../../assets/favicon/icon-192.png" alt=""><span class="mark">READY</span><span class="family">Admin</span>
-        </button>
+        <button id="logo" class="brand-button" type="button" data-route="students"><img src="../../assets/favicon/icon-192.png" alt=""><span class="mark">READY</span><span class="family">Admin</span></button>
         <nav id="admin-nav" hidden>
-          <button class="navbtn on" type="button" data-route="students">학생 현황</button>
-          <button class="navbtn" type="button" data-route="passages">Studio</button>
+          <button class="navbtn on" type="button" data-route="students">학생</button>
+          <button class="navbtn" type="button" data-route="passages">문장 세트</button>
           <button class="navbtn" type="button" data-route="scopes">시험범위</button>
         </nav>
-        <button
-          id="theme-toggle"
-          class="icon-button"
-          type="button"
-          aria-label="색상 모드 바꾸기"
-        >
-          ◐</button
-        ><button
-          id="admin-logout"
-          class="button quiet small"
-          type="button"
-          hidden
-        >
-          로그아웃
-        </button>
+        <button id="theme-toggle" class="icon-button" type="button" aria-label="색상 모드 바꾸기">◐</button><button id="admin-logout" class="button quiet small" type="button" hidden>로그아웃</button>
       </header>
       <main>
-        <section
-          id="admin-login"
-          class="auth-wrap"
-          aria-labelledby="admin-login-title"
-        >
+        <section id="admin-login" class="auth-wrap" aria-labelledby="admin-login-title">
           <form id="admin-login-form" class="card auth-card">
             <img class="auth-bear" src="../../assets/favicon/icon-192.png" width="54" height="54" alt="" aria-hidden="true" />
             <p class="eyebrow">READY ADMIN</p>
             <h1 id="admin-login-title">관리자 로그인</h1>
-            <p class="lead">
-              관리자 비밀번호는 로그인할 때 한 번만 서버에서 확인합니다.
-            </p>
-            <label
-              ><span>관리자 비밀번호</span
-              ><input
-                name="password"
-                type="password"
-                autocomplete="current-password"
-                maxlength="200"
-                required /></label
-            ><button class="button primary" type="submit">
-              관리자 화면 열기
-            </button>
+            <p class="lead">관리자 비밀번호는 로그인할 때 한 번만 서버에서 확인합니다.</p>
+            <label><span>관리자 비밀번호</span><input name="password" type="password" autocomplete="current-password" maxlength="200" required /></label>
+            <button class="button primary" type="submit">관리자 화면 열기</button>
           </form>
         </section>
-        <section class="view" id="v-passages">
-          <div class="page-head">
-            <div>
-              <p class="eyebrow">STUDIO</p>
-              <h1>Passage Studio</h1>
-            </div>
-            <div class="page-actions"><button class="button primary" type="button" data-route="factory">+ 새 Passage</button><button id="refresh-passages" class="button quiet" type="button">새로고침</button></div>
-          </div>
-          <div class="filter-toolbar">
-            <label
-              >학년<select id="passage-grade-filter">
-                <option value="">전체</option>
-                <option>1학년</option>
-                <option>2학년</option>
-                <option>3학년</option>
-              </select></label
-            ><label
-              >종류<select id="passage-type-filter">
-                <option value="">전체</option>
-                <option value="TEXTBOOK">교과서</option>
-                <option value="MOCK_EXAM">모의고사</option>
-              </select></label
-            ><label
-              >연도<input
-                id="passage-year-filter"
-                inputmode="numeric"
-                placeholder="전체" /></label
-            ><label
-              >월<select id="passage-month-filter">
-                <option value="">전체</option>
-                <option>3</option>
-                <option>6</option>
-                <option>9</option>
-                <option>11</option>
-              </select></label
-            >
-          </div>
-          <div id="passage-selection"></div>
-          <div id="passage-library"></div>
-        </section>
+
         <section class="view" id="v-students">
-          <div class="page-head">
-            <div>
-              <p class="eyebrow">STUDENTS</p>
-              <h1>학생 학습 현황</h1>
-            </div>
-            <button id="refresh-admin" class="button quiet" type="button">
-              새로고침
-            </button>
-          </div>
+          <div class="page-head"><div><p class="eyebrow">STUDENTS</p><h1>학생과 연습 현황</h1></div><button id="refresh-admin" class="button quiet" type="button">새로고침</button></div>
           <details class="student-create-panel">
             <summary>+ 학생 추가</summary>
-            <form
-              id="create-student-form"
-              class="form-grid student-create-school"
-            >
-              <label
-                ><span>학생 이름</span
-                ><input name="name" maxlength="40" required /></label
-              ><label
-                ><span>학교</span
-                ><select name="school" required>
-                  <option value="신흥고">신흥고</option>
-                  <option value="동고">동고</option>
-                  <option value="중앙고">중앙고</option>
-                  <option value="한빛고">한빛고</option>
-                  <option value="test">test (QA)</option>
-                  <option value="test2">test2 (QA)</option>
-                </select></label
-              ><label
-                ><span>학년</span
-                ><select name="grade" required>
-                  <option value="1학년">1학년</option>
-                  <option value="2학년">2학년</option>
-                  <option value="3학년">3학년</option>
-                </select></label
-              ><label
-                ><span>학생 코드</span
-                ><input
-                  name="code"
-                  type="password"
-                  inputmode="numeric"
-                  pattern="[0-9]{6}"
-                  minlength="6"
-                  maxlength="6"
-                  autocomplete="new-password"
-                  placeholder="직접 정한 6자리"
-                  required /></label
-              ><button class="button primary" type="submit">학생 추가</button>
+            <form id="create-student-form" class="form-grid student-create-school">
+              <label><span>학생 이름</span><input name="name" maxlength="40" required /></label>
+              <label><span>학교</span><select name="school" required><option value="신흥고">신흥고</option><option value="동고">동고</option><option value="중앙고">중앙고</option><option value="한빛고">한빛고</option><option value="test">test (QA)</option><option value="test2">test2 (QA)</option></select></label>
+              <label><span>학년</span><select name="grade" required><option value="1학년">1학년</option><option value="2학년">2학년</option><option value="3학년">3학년</option></select></label>
+              <label><span>학생 코드</span><input name="code" type="password" inputmode="numeric" pattern="[0-9]{6}" minlength="6" maxlength="6" autocomplete="new-password" placeholder="직접 정한 6자리" required /></label>
+              <button class="button primary" type="submit">학생 추가</button>
             </form>
           </details>
           <div class="learning-toolbar">
@@ -184,87 +58,39 @@
               <button class="active" type="button" data-learning-period="7d">최근 7일</button>
               <button type="button" data-learning-period="30d">최근 30일</button>
             </div>
-            <label>학교<select id="learning-school-filter"><option value="">전체 학교</option></select></label>
-            <label>학년<select id="learning-grade-filter"><option value="">전체 학년</option></select></label>
-            <label>정렬<select id="learning-sort"><option value="oldest">오래된 순</option><option value="recent">최근 학습순</option></select></label>
           </div>
-          <div id="learning-progress-summary"><div class="empty">학생 현황을 불러오는 중입니다.</div></div>
-          <div id="learning-progress-detail" hidden></div>
+          <div id="student-table"><div class="empty">학생 현황을 불러오는 중입니다.</div></div>
         </section>
-        <section class="view" id="v-factory">
-          <div class="page-head"><div><button type="button" class="back-link" data-route="passages"><span aria-hidden="true">‹</span> Studio</button><p class="eyebrow">NEW PASSAGE</p><h1>새 Passage</h1><p class="lead">종류와 범위를 고르면 제목은 자동으로 만들어집니다.</p></div></div>
-          <form id="factory-start-form" class="card form-card">
-            <label><span>등록 대상</span><select name="factoryMode" id="factory-mode"><option value="new_passage">새 Passage</option><option value="existing_passage">기존 Passage 1개 복구</option><option value="batch_existing">파일명으로 기존 Passage 일괄 복구</option></select></label>
-            <label><span>자료 종류</span><select name="importKind" id="factory-import-kind"><option value="publisher_workbook">전체 Workbook · 출판사 원본 검증</option><option value="passage_only">본문·해석만</option></select><small>전체 Workbook은 원본 문제를 검증해 등록하며 AI 문제를 만들지 않습니다.</small></label>
-            <label id="factory-existing-field" hidden><span>기존 READY Passage</span><select name="existingPassageId" id="factory-existing-passage"><option value="">Passage를 선택하세요</option></select><small>기존 문장·문제·시험범위·풀이 기록은 변경하지 않습니다.</small></label>
-            <div id="factory-new-fields">
-              <div id="factory-source-builder" class="source-builder"></div>
-              <input name="title" type="hidden" required>
-              <input name="sourceType" type="hidden">
-              <input name="grade" type="hidden" required>
-              <input name="sourceLabel" type="hidden" value="">
-              <input name="sourceYear" type="hidden">
-              <input name="sourceMonth" type="hidden">
-            </div>
-            <label><span>PDF 업로드 <small id="factory-pdf-note">또는 아래에 본문을 붙여 넣으세요.</small></span><input name="pdf" type="file" multiple accept="application/pdf,.pdf"></label>
-            <label><span>또는 2열 붙여넣기</span><textarea name="sourceText" rows="10" placeholder="English 문장[TAB]Korean 해석&#10;한 행에 한 문장쌍"></textarea><small>붙여넣기는 TAB으로 구분된 두 열만 지원합니다.</small></label>
-            <button class="button primary" type="submit">Passage 불러오기</button>
-          </form>
-          <section id="factory-review" hidden></section>
+
+        <section class="view" id="v-passages">
+          <div class="page-head"><div><p class="eyebrow">SENTENCE SETS</p><h1>문장 세트</h1></div><div class="page-actions"><button class="button primary" type="button" data-new-passage>+ 새 문장 세트</button></div></div>
+          <div id="passage-library"></div>
         </section>
-        <section class="view" id="v-scopes">
-          <div class="page-head">
-            <div>
-              <p class="eyebrow">CURRENT SCOPE</p>
-              <h1>시험범위</h1>
-            </div>
-            <button id="refresh-exams" class="button quiet" type="button">
-              새로고침
-            </button>
-          </div>
-          <div id="teacher-exams"></div>
-        </section>
-        <section class="view" id="v-scope-detail">
-          <div id="scope-detail-content"></div>
-        </section>
+
         <section class="view" id="v-passage-editor">
-          <div class="passage-editor-page-head">
-            <button type="button" class="back-link" data-close-passage><span aria-hidden="true">‹</span> Studio</button>
-            <div><p class="eyebrow">PASSAGE</p><h1 id="passage-page-title">Passage 편집</h1></div>
-          </div>
-          <div class="studio-flow-host"></div>
-          <div id="passage-editor"></div>
+          <div class="page-head"><div><button type="button" class="back-link" data-route="passages"><span aria-hidden="true">‹</span> 문장 세트</button><p class="eyebrow">SENTENCE SET</p><h1 id="passage-page-title">문장 세트</h1></div></div>
+          <form id="passage-form" class="card form-card">
+            <input type="hidden" name="passageId" />
+            <div class="form-grid">
+              <label><span>제목</span><input name="title" maxlength="120" required /></label>
+              <label><span>학년</span><select name="grade" required><option>1학년</option><option>2학년</option><option>3학년</option></select></label>
+              <label><span>종류</span><select name="sourceType"><option value="TEXTBOOK">교과서</option><option value="MOCK_EXAM">모의고사</option></select></label>
+              <label><span>연도 (모의고사)</span><input name="sourceYear" inputmode="numeric" maxlength="4" /></label>
+              <label><span>월 (모의고사)</span><input name="sourceMonth" inputmode="numeric" maxlength="2" /></label>
+            </div>
+            <label><span>문장 (한 줄에 한 문장: English[TAB]Korean)</span><textarea name="rows" rows="16" required placeholder="The cat sat on the mat.&#9;고양이가 매트 위에 앉았다."></textarea><small>기존 문장을 고치면 같은 문장 ID와 연습 기록이 유지됩니다. 줄을 지우면 그 문장은 비활성화됩니다.</small></label>
+            <div class="page-actions"><button class="button primary" type="submit">저장</button><button class="button quiet" type="button" data-delete-passage hidden>삭제</button></div>
+          </form>
+        </section>
+
+        <section class="view" id="v-scopes">
+          <div class="page-head"><div><p class="eyebrow">CURRENT SCOPE</p><h1>시험범위</h1></div></div>
+          <p class="lead">학교·학년마다 학생이 연습할 문장 세트를 고릅니다. 같은 학년의 문장 세트만 배정할 수 있습니다.</p>
+          <div id="scope-list"></div>
         </section>
       </main>
     </div>
-    <div id="delete-modal" class="modal" aria-hidden="true">
-      <div class="modal-scrim" data-close-delete></div>
-      <section
-        class="sheet small-sheet"
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="delete-title"
-      >
-        <div class="sheet-head">
-          <div>
-            <p class="eyebrow">DELETE</p>
-            <h2 id="delete-title">삭제 확인</h2>
-          </div>
-          <button
-            class="icon-button"
-            type="button"
-            data-close-delete
-            aria-label="닫기"
-          >
-            ×
-          </button>
-        </div>
-        <div id="delete-content"></div>
-      </section>
-    </div>
-    <div id="busy" class="busy" hidden>
-      <span class="spinner"></span><span>잠시만요…</span>
-    </div>
+    <div id="busy" class="busy" hidden><span class="spinner"></span><span>잠시만요…</span></div>
     <div id="toast" role="status"></div>
   </body>
 </html>

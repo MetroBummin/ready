@@ -6,6 +6,8 @@
 
 **Status:** canonical direction for future READY design work. Read this document before changing Student or Admin UI.
 
+> **Current scope (sentence-practice reduction):** READY now ships only sentence-ordering practice, steps 1 and 2 (see `PRACTICE_NOTES.md`). The tokens, typography, color and component rules below still apply. Sections that describe Today, Review, mastery axes other than Sentence, Question surfaces, or `design-preview.html` describe removed or future surfaces; the preview file was deleted with the reduction.
+
 ## 1. Product character
 
 READY is a **Passage Mastery Workbook**, not a digital exam paper. Its interface should make a large amount of practice feel small, clear, and finishable.

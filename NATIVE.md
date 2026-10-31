@@ -1,7 +1,7 @@
 # READY native shell
 
-READY의 기존 웹 번들을 그대로 담는 Capacitor 셸입니다. Question Contract,
-Renderer, Grader, Importer, API, DB는 네이티브 프로젝트와 분리되어 있으며
+READY의 기존 웹 번들(학생 문장 배열 연습 화면)을 그대로 담는 Capacitor 셸입니다.
+연습 규칙, API, DB는 네이티브 프로젝트와 분리되어 있으며
 `npm run native:sync`가 웹 `dist/`를 iOS와 Android에 복사합니다.
 
 ## 식별자
